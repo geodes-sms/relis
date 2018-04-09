@@ -1,0 +1,54 @@
+ 5W+1H pattern: A perspective of systematic mapping studies and a case study on cloud software testing  $ Jia C., Cai Y., Yu Y.T., Tse T.H.  $ baila $ ()	zz_added
+ A Mapping Study of Software Causal Factors for Improving Maintenance  $ Carroll C., Falessi D., Forney V., Frances A., Izurieta C., Seaman C.  $ brice $ () zz_added
+ A first systematic mapping study on combinatorial interaction testing for software product lines  $ Lopez-Herrejon R.E., Fischer S., Ramler R., Egyed A.  $ baila $ () zz_added
+ A systematic literature review of literature reviews in software testing  $ Garousi V., Mäntylä M.V.  $ baila $ () zz_added
+ A systematic mapping of data generation for integration software testing  $ Brito M.A.S., Santos M.P., Souza S.R.S., Souza P.S.L.  $ brice $ () zz_added
+ A systematic mapping study of software product lines testing  $ Da Mota Silveira Neto P.A., Carmo MacHado I.D., McGregor J.D., De Almeida E.S., De Lemos Meira S.R.  $ baila $ () zz_added
+ A systematic mapping study on non-functional search-based software testing  $ Afzal W., Torkar R., Feldt R.  $ brice $ () zz_added
+ A systematic mapping study on software engineering testbeds  $ Barreiros E., Almeida A., Saraiva J., Soares S.  $ baila $ () zz_added
+ Alignment of requirements specification and testing: A systematic mapping study  $ Barmi Z.A., Ebrahimi A.H., Feldt R.  $ baila $ () zz_added
+ Analyzing an automotive testing process with evidence-based software engineering  $ Kasoju A., Petersen K., Mäntylä M.V.  $ baila $ () zz_added
+ Challenges and opportunities for software change request repositories: A systematic mapping study  $ Cavalcanti Y.C., Da Mota Silveira Neto P.A., Machado I.D.C., Vale T.F., De Almeida E.S., Meira S.R.D.L.  $ baila $ () zz_added
+ Change impact in product lines: A systematic mapping study  $ Brink C., Heisig P., Wackermann F.  $ brice $ () zz_added
+ Characteristics, attributes, metrics and usability recommendations: A systematic mapping  $ Nissola F., Benitti F.B.V.  $ baila $ () zz_added
+ Concurrent software testing in practice: A catalog of tools  $ Melo S.M., Souza S.R.S., Silva R.A., Souza P.S.L.  $ brice $ () zz_added
+ Cost, benefits and quality of software development documentation: A systematic mapping  $ Zhi J., Garousi-Yusifo?lu V., Sun B., Garousi G., Shahnewaz S., Ruhe G.  $ baila $ () zz_added
+ Empirical studies concerning the maintenance of UML diagrams and their use in the maintenance of code: A systematic mapping study  $ Fernández-Sáez A.M., Genero M., Chaudron M.R.V.  $ baila $ () zz_added
+ Evaluating software product quality: A systematic mapping study  $ Ouhbi S., Idri A., Aleman J.L.F., Toval A.  $ brice $ () zz_added
+ Feature location for software product line migration: A mapping study  $ Assunção W.K.G., Vergilio S.R.  $ baila $ () zz_added
+ Graphical user interface (GUI) testing: Systematic mapping and repository  $ Banerjee I., Nguyen B., Garousi V., Memon A.  $ baila $ () zz_added
+ ISBSG variables most frequently used for software effort estimation: A mapping review  $ Gonzalez-Ladron-De-Guevara F., Fernández-Diego M.  $ brice $ () zz_added
+ Knowledge management applied to software testing: A systematic mapping  $ Souza E.F., Falbo R.A., Vijaykumar N.L.  $ baila $ () zz_added
+ Predicting software product quality: A systematic mapping study  $ Ouhbi S., Idri A., Fer?andez-Alemán J.L., Toval A.  $ baila $ () zz_added
+ Reducing test effort: A systematic mapping study on existing approaches  $ Elberzhager F., Rosbach A., Münch J., Eschbach R.  $ baila $ () zz_added
+ Risk management in software product line engineering: A mapping study  $ Lobato L.L., Bittar T.J., Neto P.A.D.M.S., MacHado I.D.C., De Almeida E.S., Meira S.R.D.L.  $ baila $ () zz_added
+ Software fault prediction: A systematic mapping study  $ Murillo-Morera J., Quesada-López C., Jenkins M.  $ baila $ () zz_added
+ Software product line testing - A systematic mapping study  $ Engström E., Runeson P.  $ brice $ () zz_added
+ Software quality requirements: A systematic mapping study  $ Ouhbi S., Idri A., Fernández-Alemán J.L., Toval A.  $ brice $ () zz_added
+ Software test-code engineering: A systematic mapping  $ Garousi Yusifo?lu V., Amannejad Y., Betin Can A.  $ baila $ ()zz_added
+ Strategies for consistency checking on software product lines: A mapping study  $ Santos A.R., De Oliveira R.P., De Almeida E.S.  $ baila $ () zz_added
+ Systematic mapping study of quality attributes measurement in service oriented architecture  $ Nik Daud N.M., Kadir W.M.N.W.  $ brice $ () zz_added
+ Ten years of research on fault management in grid computing: A systematic mapping study  $ Filho P.C., Brasilino C., Duarte A.  $ brice $ () zz_added
+ Testability and software performance: A systematic mapping study  $ Hassan M.M., Shah S.M.A., Afzal W., Andler S.F., Lindström B., Blom M.  $ brice $ () zz_added
+ The role of process in early software defect prediction: Methods, attributes and metrics  $ Ozakinci R., Tarhan A.  $ baila $ () zz_added
+ Usable results from the field of API usability: A systematic mapping and further analysis  $ Burns C., Ferreira J., Hellmann T.D., Maurer F.  $ baila $ () zz_added
+ Validation of software visualization tools: A systematic mapping study  $ Seriai A., Benomar O., Cerat B., Sahraoui H.  $ baila $ () zz_added
+ Vertical Test Reuse for Embedded Systems: A Systematic Mapping Study  $ Flemstrom D., Sundmark D., Afzal W.  $ baila $ () zz_added
+ What do we know about the defect types detected in conceptual models?  $ Granda M.F., Condori-Fernandez N., Vos T.E.J., Pastor O.  $ baila $ () zz_added
+ When and what to automate in software testing? A multi-vocal literature review  $ Garousi V., Mäntylä M.V.  $ baila $ () zz_added
+A Systematic Mapping Study on Test Generation from Input/Output Transition Systems  $ Paiva S.L.D.C., Simao A.D.S.  $ younous $ (0,)  zz_added
+A mapping study to investigate component-based software system metrics  $ Abdellatief M., Sultan A.B.M., Ghani A.A.A., Jabar M.A.  $ brice $ ()   zz_added
+A review of research on risk analysis methods for IT systems  $ Sulaman S.M., Weyns K., Höst M.  $ brice $ ()   zz_added
+A systematic mapping study of mobile application testing techniques  $ Zein S., Salleh N., Grundy J.  $ younous $ ()  zz_added
+A systematic mapping study of web application testing  $ Garousi V., Mesbah A., Betin-Can A., Mirshokraie S.  $ brice $ ()  zz_added
+A systematic mapping study on fault management in cloud computing  $ Neto C.B.L., Filho P.B.D.C., Duarte A.N.  $ brice $ ()   zz_added
+A systematic mapping study on legacy system modernization  $ De Vargas Agilar E., De Almeida R.B., Canedo E.D.  $ brice $ ()  zz_added
+A systematic mapping study on testing technique experiments: Has the situation changed since 2000?  $ González J.E., Juristo N., Vegas S.  $ younous $ (0,)   zz_added
+A systematic mapping study on the combination of static and dynamic quality assurance techniques  $ Elberzhager F., Münch J., Nha V.T.N.  $ younous $ (0,)  zz_added
+Agile testing: Past, present, and future - Charting a systematic map of testing in agile software development  $ Hellmann T.D., Sharma A., Ferreira J., Maurer F.  $ brice $ ()   zz_added
+RiPLE-TE: A process for testing Software Product Lines  $ Do Carmo Machado I., Da Mota Silveira Neto P.A., De Almeida E.S., De Lemos Meira S.R.  $ younous $ ()  zz_added
+Systematic mapping study in automatic test case generation  $ Mohi-Aldeen S.M., Deris S., Mohamad R.  $ younous $ ()  zz_added
+Systematic mapping study of model transformations for concrete problems  $ Batot E., Sahraoui H., Syriani E., Molins P., Sboui W.  $ younous $ (0,)  zz_added
+Test case prioritization: A systematic mapping study  $ Catal C., Mishra D.  $ younous $ ()  zz_added
+Web application testing: A systematic literature review  $ Do?an S., Betin-Can A., Garousi V.  $ brice $ ()   zz_added
+What a long, strange trip it's been: Past, present, and future perspectives on software testing research  $ Durelli V.H.S., Araujo R.F., Silva M.A.G., Oliveira R.A.P., Maldonado J.C., Delamaro M.E.  $ brice $ ()  zz_added

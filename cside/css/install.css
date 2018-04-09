@@ -1,0 +1,25 @@
+#wrapper {
+    margin: 1% auto 0;
+    max-width: 80%;
+    position: relative;
+    right: 0;
+}
+.login_content  {
+    text-align: left;
+    text-shadow: 0 1px 0 #fff;
+}
+.login_content h1 ,.form-group label{
+    text-align: center;
+    text-shadow: 0 1px 0 #fff;
+}
+
+.login_content .form-group label{
+    text-align: right;
+    
+}
+
+.login_content .form-group input{
+margin-bottom: 0px;
+    
+}
+

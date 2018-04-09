@@ -1,0 +1,109 @@
+
+.centre{
+	text-align:center;
+}
+.droite{
+	text-align:right;
+}
+
+.gauche{
+	text-align:left;
+}
+
+.pagination_mine {
+    margin: 0px 0;
+	display: inline-block;
+	text-align: right;
+
+}
+.dropdown-menu{
+	
+	min-width: 100px;
+}
+
+.tile_count  a:hover div{
+	
+	  text-decoration: underline;
+}
+.drilldown_link a{
+	color:green;
+
+	
+}.drilldown_link a:hover{
+	
+	text-decoration: underline;
+}
+table.sql_result{table-layout:auto;}
+
+ span.change_lang {
+    cursor: pointer;
+    font-weight: 400;
+    margin-bottom: 0;
+    min-height: 20px;
+    padding-left: 5px;
+    margin-top: 20px;
+}
+.table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
+  background-color: #eee;
+}
+
+.action_butt{
+	
+	margin:auto;
+	font-size:15px;
+	min-height: 36px;
+}
+div.login_description{
+	
+	padding:30px 0 0 5% 	;
+	font-size:1.3em;
+	text-align: justify;
+}
+#wrapper{
+	margin-top:0px;
+	padding:0 0 0 5%;
+	
+	
+}
+
+.login_content {
+    margin: 0 auto;
+    padding: 0px 0 0;
+    }
+    
+ #loginz{
+ position: relative;
+ padding:0 0 0 10px;
+ border-left:1px solid #D8D8D8;
+ }
+ 
+ .login_content h1{
+ font-size:35px;
+ }
+ 
+ .publishedProject{
+  border:3px solid #74ec76;
+  }
+  
+ .objectif .tile-stats h3{
+ text-align:center;
+ }
+ .objectif .tile-stats{
+  min-height:100px; padding:5px;
+  
+  border:0px solid #E4E4E4;
+  border-left:1px solid green;
+  border-radius:5px;
+  }
+  
+ .home_page p,.home_page li .title a{
+ font-size:1.2em;
+  }
+  
+ .what_relis .title a{
+  color:green
+  }
+  
+  .udm_logo img{
+  	height:30px;
+  }
