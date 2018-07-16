@@ -10,30 +10,21 @@ You can use a publically available instance of ReLiS at [http://relis.iro.umontr
 
 ## Features
 High-level features supported:
-- Protocol development
-- Decision tracking
-- Data maintenance
-- Traceability
-- Data sharing
 - Collaboration support
-- Search execution (archive search queries only)
-- Search results (mass export of results only)
-- Storage of studies (all but PDF)
+- Protocol development and modification iteratively
+- Traceability
+- Decision tracking
 - Support inclusion and exculsion
-- QA process
-- Process standardization
 - Support quality assessment
 - Data extraction form
 - Data management
-- Process efficacy assurance
-- Tool support
-- Coding methods and data
-- Synthesizing primary studies
-- Handling data
-- Statistical analysis
+- Data maintenance
+- Basic statistical analysis
 - Report preparation
+- Data sharing
 - Visualization
-
+- Export studies and data
+- Storage of studies (all but PDF)
 
 # Installation
 
