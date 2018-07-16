@@ -9,7 +9,31 @@ Unlike other systematic review tools, ReLiS is an online tool that automatically
 You can use a publically available instance of ReLiS at [http://relis.iro.umontreal.ca/](http://relis.iro.umontreal.ca/). This GitHub repository allows you to install ReLiS on your servers.
 
 ## Features
-- TBD
+High-level features supported:
+- Protocol development
+- Decision tracking
+- Data maintenance
+- Traceability
+- Data sharing
+- Collaboration support
+- Search execution (archive search queries only)
+- Search results (mass export of results only)
+- Storage of studies (all but PDF)
+- Support inclusion and exculsion
+- QA process
+- Process standardization
+- Support quality assessment
+- Data extraction form
+- Data management
+- Process efficacy assurance
+- Tool support
+- Coding methods and data
+- Synthesizing primary studies
+- Handling data
+- Statistical analysis
+- Report preparation
+- Visualization
+
 
 # Installation
 
