@@ -33,11 +33,19 @@
                   
                   <div class="x_content" style="min-height:1000px ">
                   <p class="lead"><?php echo $number_of_papers.lng(' Papers found');
-                  if(!empty($uploaded_papers_error)){
-                  	echo "<span class='red'> with ".count($uploaded_papers_error) . " <u><a class='red' href='#error'>errors</a><span></u>";
+                  if(!empty($uploaded_papers_exist)){
+                  	echo "<span class='red'> with ".count($uploaded_papers_exist) . " <u><a class='red' href='#exist'>already added</a><span></u>";
                   	
                   }
-                  
+                  if(!empty($uploaded_papers_error)){
+                  	if(empty($uploaded_papers_exist)){
+                  		$with= "with";
+                  	}else{
+                  		$with= "and";
+                  	}
+                  	echo "<span class='red'> $with ".count($uploaded_papers_error) . " <u><a class='red' href='#error'>errors</a><span></u>";
+                  	
+                  }
                   ?> </p>
                            <form class="form-horizontal" method="post" action="../../relis/manager/import_papers_save_bibtext" enctype="multipart/form-data">
                         <?php 
@@ -84,6 +92,22 @@
                           // print_test($csv_papers)?>
                  
                    <?php 
+                   if(!empty($uploaded_papers_exist)){
+                   	?>
+                   	<p class="lead red" id="exist">Papers already added: </p>
+                     <?php 
+
+                     $tmpl = array (
+                     		'table_open'  => '<table class="table table-striped table-hover red">',
+                     		'table_close'  => '</table>'
+                     );
+                     $this->table->set_template($tmpl);
+		                  echo $this->table->generate($uploaded_papers_exist); 
+                          
+                   	
+                   }
+                   ?>
+                   <?php 
                    if(!empty($uploaded_papers_error)){
                    	?>
                    	<p class="lead red" id="error">Error found - please check the uploaded file: </p>
@@ -99,7 +123,6 @@
                    	
                    }
                    ?>
-                   
                   </div>
                   
                   

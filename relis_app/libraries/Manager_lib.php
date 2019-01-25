@@ -147,6 +147,122 @@ class Manager_lib
 	
 	}
 	
+	function get_reference_select_values_old($config,$start_with_empty=True,$get_leaf=False,$multiselect=False){
+	
+		$conf=explode(";", $config);
+		//print_test($conf);
+		$ref_table=$conf[0];
+		$fields=$conf[1];
+		$ref_table_config=get_table_config($ref_table);
+		//for_array
+	
+		if($get_leaf){
+	
+			while(!empty($ref_table_config['fields'][$fields]['input_type']) AND $ref_table_config['fields'][$fields]['input_type']=='select' AND $ref_table_config['fields'][$fields]['input_select_source']=='table' ){
+	
+				$config=$ref_table_config['fields'][$fields]['input_select_values'];
+	
+				$conf=explode(";", $config);
+				//print_test($conf);
+				$ref_table=$conf[0];
+				$fields=$conf[1];
+				$ref_table_config=get_table_config($ref_table);
+	
+	
+				//echo "<h1>$fields</h1>";
+			}
+		}
+	
+		if($multiselect AND isset($ref_table_config['fields'][$fields]['input_select_source']) AND $ref_table_config['fields'][$fields]['input_select_source']=='array'){
+	
+			$result=array();
+	
+	
+	
+			$result=$ref_table_config['fields'][$fields]['input_select_values'];
+	
+	
+			//print_test($result);
+			//exit;
+		}
+	
+		else{
+	
+			if($multiselect AND isset($ref_table_config['fields'][$fields]['input_select_source']) AND $ref_table_config['fields'][$fields]['input_select_source']=='table'){
+					
+				$config=$ref_table_config['fields'][$fields]['input_select_values'];
+					
+				$conf=explode(";", $config);
+				//print_test($conf);
+				$ref_table=$conf[0];
+				$fields=$conf[1];
+				$ref_table_config=get_table_config($ref_table);
+					
+					
+					
+			}
+	
+			//	$extra_condition="";
+	
+	
+	
+			$res=$this->CI->DBConnection_mdl->get_reference_select_values($ref_table_config,$fields);
+	
+			$result=array();
+			if($res AND $start_with_empty)
+				$result['']="Select...";
+					
+				$_stable_config=$ref_table_config;
+				$_fields=$fields;
+				foreach ($res as $key => $value) {
+	
+					$ref_table_config = $_stable_config;
+					$fields = $_fields;
+					//print_test($ref_table_config);
+					$result[$value['refId']]=$value['refDesc'];
+	
+	
+	
+					while(!empty($ref_table_config['fields'][$fields]['input_type']) AND $ref_table_config['fields'][$fields]['input_type']=='select' AND $ref_table_config['fields'][$fields]['input_select_source']=='table' ){
+						//	echo "<h1>bbbb</h1>";
+						//print_test($result);
+	
+						$config=$ref_table_config['fields'][$fields]['input_select_values'];
+	
+						$conf=explode(";", $config);
+	
+						$ref_table=$conf[0];
+						$fields=$conf[1];
+						$ref_table_config=get_table_config($ref_table);
+	
+	
+						$res2=$this->CI->manage_mdl->get_reference_value($ref_table_config['table_name'],$value['refDesc'],$fields,$ref_table_config['table_id']);
+	
+						$result[$value['refId']]= $res2;
+	
+	
+					}
+	
+	
+					if(isset($ref_table_config['fields'][$fields]['input_select_source']) AND $ref_table_config['fields'][$fields]['input_select_source']=='array'){
+	
+						$select_values=$ref_table_config['fields'][$fields]['input_select_values'];
+	
+						$result[$value['refId']]= $select_values[$result[$value['refId']]];
+	
+					}
+	
+	
+	
+				}
+	
+		}
+		//print_test($result);
+		return $result;
+	
+	
+	}
+	
 	
 	
 	 function get_element_multi_values($config,$key_field,$element_id,$display_field=False){
@@ -1429,9 +1545,18 @@ class Manager_lib
 				->get_where('view_class_validation_done', array('assigned_active'=>1,'assigned_user_id'=>$user))
 				->num_rows();
 			}else{
-				$papers_all = $this->CI->db_current->order_by('assigned_id', 'ASC')
-				->get_where('assigned', array('assigned_active'=>1,'assignment_type'=>'Classification','assigned_user_id'=>$user))
-				->num_rows();
+				
+			
+				$sql= "select assigned_id 
+						from assigned,paper 
+						where
+							paper.id= assigned.assigned_paper_id
+							AND paper.paper_excluded=0
+							AND assigned_active=1 
+							AND assignment_type='Classification'
+							AND assigned_user_id = '$user'
+						";
+				$papers_all=$this->CI->db_current->query ( $sql )->num_rows();
 					
 				$papers_done = $this->CI->db_current->order_by('assigned_id', 'ASC')
 				->get_where('view_class_assignment_done', array('assigned_active'=>1,'assignment_type'=>'Classification','assigned_user_id'=>$user))

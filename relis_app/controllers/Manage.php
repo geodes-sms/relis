@@ -61,7 +61,7 @@ class Manage extends CI_Controller {
 		}elseif($ref_table=='config'){
 			redirect('manage/view_ref/config/1');
 		}elseif($ref_table=='project'){
-			redirect('manager/projects_list');
+			redirect('admin/projects_list');
 		}
 	
 	

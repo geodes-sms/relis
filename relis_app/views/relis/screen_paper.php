@@ -34,7 +34,13 @@
                   
                   
                   <div class="x_content" style="min-height:400px ">
+         <?php 
+        if(!empty($screening_phase_info['description'] )){
+        ?>  
+        <p ><b><i><?php echo $screening_phase_info['description'] ?> </i></b></p> <hr/>      
+       
         <?php 
+        }
         if(isset($screen_completion)){
         ?>         
        <div>   

@@ -230,14 +230,14 @@ function get_str_mng() {
 										'label'=>'Close edition mode',
 										'title'=>'Close edition mode',
 										'icon'=>'fa-ban',
-										'url'=>'home/update_edition_mode/no',
+										'url'=>'config/update_edition_mode/no',
 									);
 		}else{
 			$edit_mode=array(
 										'label'=>'Open edition mode',
 										'title'=>'Open edition mode',
 										'icon'=>'fa-check',
-										'url'=>'home/update_edition_mode/yes',
+										'url'=>'config/update_edition_mode/yes',
 									);
 		}
 		

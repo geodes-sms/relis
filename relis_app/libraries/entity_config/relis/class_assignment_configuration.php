@@ -174,6 +174,22 @@ function get_class_assignment() {
 		
 		
 		$table_views=array();
+		//this view is used in classification
+		$table_views['view_classification_paper']=array(
+				'name'=>'view_classification_paper',
+				'desc'=>'',
+					
+				'script'=>'SELECT DISTINCT(A.class_id) as A_id , A.* FROM classification A INNER JOIN  paper P ON (A.class_paper_id = P.id AND  P.paper_excluded=0 AND P.paper_active=1) WHERE A.class_active=1 ',
+					
+		);
+		
+		$table_views['view_class_assignment_all']=array(
+				'name'=>'view_class_assignment_all',
+				'desc'=>'',
+					
+				'script'=>'SELECT DISTINCT(A.assigned_id) as A_id , A.* FROM assigned A INNER JOIN  paper P ON (A.assigned_paper_id = P.id AND  P.paper_excluded=0 AND P.paper_active=1) WHERE A.assigned_active=1 ',
+					
+		);
 	
 		$table_views['view_class_assignment_done']=array(
 					'name'=>'view_class_assignment_done',
@@ -363,7 +379,7 @@ function get_class_assignment() {
 				'operation_description'=>'Assignments for classification',
 				'page_title'=>'Assignments for classification',
 				'table_display_style'=>'dynamic_table',
-				
+				'table_name'=>'view_class_assignment_all',
 				'data_source'=>'get_list_class_assignment',
 				'generate_stored_procedure'=>True,
 					
@@ -440,6 +456,7 @@ function get_class_assignment() {
 				'page_title'=>'My assignments for classification',
 				'table_display_style'=>'dynamic_table',
 				
+				'table_name'=>'view_class_assignment_all',
 				'data_source'=>'get_list_class_assignment_user',
 				'generate_stored_procedure'=>True,
 					

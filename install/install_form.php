@@ -49,24 +49,26 @@ function install_form($values=array(),$error=array()){?>
           <section class="login_content">
             <form action="index.php" method="POST">
               <h1>ReLiS installer</h1><br/>
-			 <?php
-			 
-			 //Display error message if available
-             if(isset($err_msg)){
-				echo '<div class="alert alert-danger" style="text-align:center">';
-				if (isset($err_msg))echo $err_msg;							
-				echo "</div>";
-			}
-			foreach ($error as $key => $err_value) {
-				echo '<div class="alert alert-danger" style="text-align:center">';
-				echo $err_value;	
-				echo "</div>";
-			}
-			
-			
+			  <?php
+                    	if(isset($err_msg))
+						{
+							echo '<div class="alert alert-danger" style="text-align:center">';
+							//echo validation_errors();
+							
+							 if (isset($err_msg))echo $err_msg;
+							
+							echo "</div>";
+						}
+						
+						foreach ($error as $key => $err_value) {
+							echo '<div class="alert alert-danger" style="text-align:center">';
+								echo $err_value;	
+							echo "</div>";
+							
+						}
 			$db_host=(!empty($values['db_host']))?$values['db_host']:'localhost' ;
 			$db_user=(!empty($values['db_user']))?$values['db_user']:'root' ;
-			//	$db_pass=(!empty($values['db_pass']))?$values['db_pass']:'' ;
+		//	$db_pass=(!empty($values['db_pass']))?$values['db_pass']:'' ;
 			$db_name=(!empty($values['db_name']))?$values['db_name']:'' ;
 			
 			$full_name=(!empty($values['full_name']))?$values['full_name']:'Admin' ;
@@ -76,8 +78,6 @@ function install_form($values=array(),$error=array()){?>
 			$dsl_url=(!empty($values['dsl_url']))?$values['dsl_url']:'' ;
 			$dsl_workspace=(!empty($values['dsl_workspace']))?$values['dsl_workspace']:'' ;
 			
-			
-			//Create an array of fields in the form
 			$array_fields_db=array();
 			$array_fields_admin=array();
 			$array_fields_dsl=array();
@@ -100,7 +100,6 @@ function install_form($values=array(),$error=array()){?>
 					'is_required'=>True
 			);
 			array_push($array_fields_db,$field);
-			
 			$field=array(
 					'type'=>'password',
 					'id'=>'db_pass',
@@ -110,7 +109,6 @@ function install_form($values=array(),$error=array()){?>
 					'is_required'=>False
 			);
 			array_push($array_fields_db,$field);
-			
 			$field=array(
 					'type'=>'text',
 					'id'=>'db_name',
@@ -118,8 +116,10 @@ function install_form($values=array(),$error=array()){?>
 					'label'=>'Database Name ',
 					'extra_note'=>'The name of your database: the database will be created',
 					'is_required'=>True
-			);			
+			);
+			
 			array_push($array_fields_db,$field);
+			
 			
 			$field=array(
 					'type'=>'text',
@@ -128,9 +128,11 @@ function install_form($values=array(),$error=array()){?>
 					'label'=>'Editor location',
 					'extra_note'=>'The url of the Editor',
 					'is_required'=>False
-			);			
+			);
+			
 			array_push($array_fields_dsl,$field);
-						
+			
+			
 			$field=array(
 					'type'=>'text',
 					'id'=>'dsl_workspace',
@@ -138,8 +140,12 @@ function install_form($values=array(),$error=array()){?>
 					'label'=>'Editor work space',
 					'extra_note'=>'The path to the Editor workspace',
 					'is_required'=>False
-			);			
+			);
+			
 			array_push($array_fields_dsl,$field);
+			
+			
+			
 			
 			$field=array(
 					'type'=>'text',
@@ -150,7 +156,6 @@ function install_form($values=array(),$error=array()){?>
 					'is_required'=>True
 			);
 			array_push($array_fields_admin,$field);
-			
 			$field=array(
 					'type'=>'text',
 					'id'=>'user_mail',
@@ -160,7 +165,6 @@ function install_form($values=array(),$error=array()){?>
 					'is_required'=>False
 			);
 			array_push($array_fields_admin,$field);
-			
 			$field=array(
 					'type'=>'text',
 					'id'=>'user_name',
@@ -190,16 +194,16 @@ function install_form($values=array(),$error=array()){?>
 					'is_required'=>True
 			);
 			array_push($array_fields_admin,$field);
-			?>
 			
 			
-            <div class="col-md-6 col-sm-6 col-xs-12 ">				
-				<div>	
-				 	<h2 class="col-md-9 col-sm-9 col-xs-12 col-md-offset-3">User information</h2>
-				</div> <br/>
-	                    	
+                    	?>
+            <div class="col-md-6 col-sm-6 col-xs-12 ">
+				
+			<div>	
+			 <h2 class="col-md-9 col-sm-9 col-xs-12 col-md-offset-3">User information</h2>
+			 </div> 
+                    	<br/>
 				<?php
-				//Displayoing the filds from the array on the form
 				foreach ($array_fields_admin as $key => $value) {
 					if($value['is_required']){
 						$required_p='<span class="required">*</span>';
@@ -208,115 +212,116 @@ function install_form($values=array(),$error=array()){?>
 						$required_p="";
 						$required_s="";
 					}
-						
+					
 					if(!empty($value['extra_note'])){
 						$extra_note='<p>'.$value['extra_note'].'</p>';
 					}else{
 						$extra_note="<p> . </p>";
 					}
 					?>
-						
+					
 					<div class="form-group">
 						<label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
-							<?php echo $value['label'].' '. $required_p ?>
+						 <?php echo $value['label'].' '. $required_p ?>
 						</label>
 						<div class="col-md-9 col-sm-9 col-xs-12">
-							<?php 
-							echo '<input 
-										type="'.$value['type'].'"
-										name="'.$value['id'].'" 
-										value="'. $value['value'].'" 
-										id="'.$value['id'].'" 
-	 									class="form-control col-md-7 col-xs-12"  '.$required_s .
-										'style="margin-bottom:1px">'.$extra_note ?>
-												
+						<?php echo '<input type="'.$value['type'].'" name="'.$value['id'].'" value="'. $value['value'].'" id="'.$value['id'].'" class="form-control col-md-7 col-xs-12"  '.$required_s .'style="margin-bottom:1px">'.$extra_note ?>
+											
 						</div>		
 					</div>
-						
-				<?php } ?>
+					
+					<?php
+				}
+				
+				?>
             </div>  
             
             <div class="col-md-6 col-sm-6 col-xs-12 ">
-				<div > <h2 class="col-md-9 col-sm-9 col-xs-12 col-md-offset-3">Database configuration</h2> </div> <br/>
-                    	
-			<?php
-			foreach ($array_fields_db as $key => $value) {
-				if($value['is_required']){
-					$required_p='<span class="required">*</span>';
-					$required_s='required="" ';
-				}else{
-					$required_p="";
-					$required_s="";
-				}
+			<div class>
+			 <h2 class="col-md-9 col-sm-9 col-xs-12 col-md-offset-3">Database configuration</h2>
+			 </div> 
+                    	<br/>
+				<?php
+				foreach ($array_fields_db as $key => $value) {
+					if($value['is_required']){
+						$required_p='<span class="required">*</span>';
+						$required_s='required="" ';
+					}else{
+						$required_p="";
+						$required_s="";
+					}
 					
-				if(!empty($value['extra_note'])){
-					$extra_note='<p>'.$value['extra_note'].'</p>';
-				}else{
-					$extra_note="<p> . </p>";
-				}
-			?>
-			<div class="form-group">
-			<label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
-				<?php echo $value['label'].' '. $required_p ?>
-			</label>
-				<div class="col-md-9 col-sm-9 col-xs-12">
-							
-					<?php echo '<input  type="'.$value['type'].'" 
-										name="'.$value['id'].'" 
-										value="'. $value['value'].'" 
-								 		id="'.$value['id'].'" 
-								 		class="form-control col-md-7 col-xs-12"  '.$required_s .'
-								 		style="margin-bottom:1px">'.$extra_note ?>												
-				</div>		
-			</div>	
-							
-			<?php } ?>
-				
-			<div>  <h2 class="col-md-9 col-sm-9 col-xs-12 col-md-offset-3">RelisEditor configuration</h2> </div> <br/>
-			
-			<?php
-			foreach ($array_fields_dsl as $key => $value) {
-				if($value['is_required']){
-					$required_p='<span class="required">*</span>';
-					$required_s='required="" ';
-				}else{
-					$required_p="";
-					$required_s="";
-				}
+					if(!empty($value['extra_note'])){
+						$extra_note='<p>'.$value['extra_note'].'</p>';
+					}else{
+						$extra_note="<p> . </p>";
+					}
+					?>
 					
-				if(!empty($value['extra_note'])){
-					$extra_note='<p>'.$value['extra_note'].'</p>';
-				}else{
-					$extra_note="<p> . </p>";
-				}
-				?>
-					
-				<div class="form-group">
-					<label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
-						<?php echo $value['label'].' '. $required_p ?>
-					</label>
-					<div class="col-md-9 col-sm-9 col-xs-12">
-						<?php echo '<input type="'.$value['type'].'"
-											name="'.$value['id'].'" 
-											value="'. $value['value'].'" 
-									 		id="'.$value['id'].'" 
-									 		class="form-control col-md-7 col-xs-12"  '.$required_s .'style="margin-bottom:1px">'.$extra_note ?>
+					<div class="form-group">
+						<label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+						 <?php echo $value['label'].' '. $required_p ?>
+						</label>
+						<div class="col-md-9 col-sm-9 col-xs-12">
+						<?php echo '<input type="'.$value['type'].'" name="'.$value['id'].'" value="'. $value['value'].'" id="'.$value['id'].'" class="form-control col-md-7 col-xs-12"  '.$required_s .'style="margin-bottom:1px">'.$extra_note ?>
 											
-					</div>		
-				</div>
+						</div>		
+					</div>
 					
-					<?php } ?>
-			</div>
+					<?php
+				}
+				
+				?>
+				
+				<div class>
+			 <h2 class="col-md-9 col-sm-9 col-xs-12 col-md-offset-3">RelisEditor configuration</h2>
+			 </div> 
+                    	<br/>
+				<?php
+				foreach ($array_fields_dsl as $key => $value) {
+					if($value['is_required']){
+						$required_p='<span class="required">*</span>';
+						$required_s='required="" ';
+					}else{
+						$required_p="";
+						$required_s="";
+					}
+					
+					if(!empty($value['extra_note'])){
+						$extra_note='<p>'.$value['extra_note'].'</p>';
+					}else{
+						$extra_note="<p> . </p>";
+					}
+					?>
+					
+					<div class="form-group">
+						<label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+						 <?php echo $value['label'].' '. $required_p ?>
+						</label>
+						<div class="col-md-9 col-sm-9 col-xs-12">
+						<?php echo '<input type="'.$value['type'].'" name="'.$value['id'].'" value="'. $value['value'].'" id="'.$value['id'].'" class="form-control col-md-7 col-xs-12"  '.$required_s .'style="margin-bottom:1px">'.$extra_note ?>
+											
+						</div>		
+					</div>
+					
+					<?php
+				}
+				
+				?>
+				</div>
+				
 			  
 			<div class="form-group">
-				<div class="col-md-12 col-sm-12 col-xs-12 " style="text-align: center">
-					<button class="btn btn-info" type="submit" name='submit_form' style="padding-left: 20px; padding-right: 20px"> Install </button>
-				</div>
+			<div class="col-md-12 col-sm-12 col-xs-12 " style="text-align: center">
+			<button class="btn btn-info" type="submit" name='submit_form' style="padding-left: 20px; padding-right: 20px"> Install </button>
+			</div>
 			</div>
 		
-            <div class="clearfix"></div>
-            <div class="separator">
-			<div class="clearfix"></div>
+              <div class="clearfix"></div>
+              <div class="separator">
+
+                
+                <div class="clearfix"></div>
                 
               </div>
             </form>
@@ -326,5 +331,4 @@ function install_form($values=array(),$error=array()){?>
     </div>
   </body>
 </html>
-<?php
-}
+<?php }?>

@@ -153,7 +153,7 @@ function form_bm_just_test($label,$text="") {
 	
 		return $bm;				
 }
-
+//Forms
 
 function input_form_bm($label, $name, $id, $value = "", $max = 100, $classe = " ", $readonly = 'bm',$place_holder="",$pattern="",$pattern_info="") {
 
@@ -847,9 +847,9 @@ function user_project($project_id , $user=0,$user_role=""){
 			//if an super admin does not have a projected assigned to him he can access
 			// all projects
 			//
-			if(has_usergroup(1,$user))
-				return TRUE;
-			else 
+			//if(has_usergroup(1,$user))
+			//	return TRUE;
+			//else 
 				return False;
 		}
 		
@@ -903,6 +903,7 @@ function user_project($project_id , $user=0,$user_role=""){
 			WHERE  project_id='$project_id' ";
 		//echo $sql;
 		$res = $ci->db->query($sql)->row_array();
+		//print_test($res);
 		if($res['project_public']){
 			return TRUE;
 		}else{
@@ -1036,6 +1037,7 @@ function user_project($project_id , $user=0,$user_role=""){
 	function get_table_config($_table,$target_db='current')
 	{
 		$ci = get_instance ();
+		//return $ci->entity_config_lib->get_table_config($_table,$target_db);
 		return $ci->entity_configuration_lib->get_table_configuration($_table,$target_db);
 		
 		
@@ -1865,20 +1867,3 @@ function user_project($project_id , $user=0,$user_role=""){
 		}
 	}
 	
-	
-	/*
-	 * Création des stored procedures pour la partie admin
-	 */
-	
-	function admin_initial_db_setup($verbose=FALSE){
-		$ci = get_instance ();
-		$target_db='default';
-		$configs=array('users','project','user_project','logs','str_mng','debug','user_creation','info');
-		foreach ($configs as $k => $config) {
-			create_stored_procedures($config,$target_db ,False);
-		}
-	
-		//change config value
-		$sql="UPDATE config_admin SET first_connect = 0  ";
-		$res=$ci->db->simple_query($sql);
-	}

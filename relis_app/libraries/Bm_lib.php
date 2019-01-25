@@ -132,23 +132,24 @@ class Bm_lib
 			
 			
 	public function send_mail($subject,$message,$destination) {
+		//configure according to your web server
+		//TODO put this part in configuration file
 		$ci = get_instance();
 		$ci->load->library('email');
 		$config['protocol'] = "smtp";
 		$config['smtp_host'] = "ssl://smtp.gmail.com";
 		$config['smtp_port'] = "465";
-		$config['smtp_user'] = "relisgeodes@gmail.com";
-		$config['smtp_pass'] = "R3l1sApp";
+		$config['smtp_user'] = "MAIL-HERE";
+		$config['smtp_pass'] = "PASSWORD-HERE";
 		$config['charset'] = "utf-8";
 		$config['mailtype'] = "html";
 		$config['newline'] = "\r\n";
 			
 		$ci->email->initialize($config);
 			
-		$ci->email->from('relisgeodes@gmail.com', 'ReLiS');
-		//$list = array('bbigendako@gmail.com');
+		$ci->email->from('FROM-MAIL-HERE', 'ReLiS');
 		$ci->email->to($destination);
-		$ci->email->reply_to('relisgeodes@gmail.com', 'ReLiS');
+		$ci->email->reply_to('REPLY-TO-HERE', 'ReLiS');
 		$ci->email->subject($subject);
 		$ci->email->message($message);
 			

@@ -287,7 +287,8 @@ function create_stored_procedures($entity_config,$target_db='current' ,$verbose=
 
 						'table_name'=>!empty($operation_value['table_name'])?$operation_value['table_name']:$table_configuration['table_name'],
 						'table_active_field'=>$table_configuration['table_active_field'],
-						'table_id'=>$table_configuration['table_id']							
+						'table_id'=>$table_configuration['table_id']
+							
 				);
 
 				if ($verbose)
@@ -296,8 +297,34 @@ function create_stored_procedures($entity_config,$target_db='current' ,$verbose=
 
 			}
 		}
-	}	
+	}
+
+
+	
 }
 
 
+/*
+ * Création des stored procedures pour la partie admin
+ */
 
+function admin_initial_db_setup($verbose=FALSE){
+	$ci = get_instance ();
+	$target_db='default';
+
+	$configs=array('users','project','user_project','logs','str_mng'
+				,'debug');
+			
+	
+
+	foreach ($configs as $k => $config) {
+			
+		create_stored_procedures($config,$target_db ,False);
+
+
+	}
+	
+	//change config value
+	$sql="UPDATE config_admin SET first_connect = 0  ";
+	$res=$ci->db->simple_query($sql);
+}

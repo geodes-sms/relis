@@ -306,6 +306,17 @@ LEFT JOIN  screen_decison D ON (S.paper_id=D.paper_id AND S.screening_phase=D.sc
 WHERE screening_active=1  GROUP BY P.id,S.screening_phase',
 			
 	);
+	
+	$table_views['paper_decision_det']=array(
+			'name'=>'view_paper_decision_det',
+			'desc'=>'',
+				
+			'script'=>'SELECT S.screening_id,S.screening_phase,S.user_id,P.id, P.bibtexKey,P.title,P.paper_active,IFNULL(D.screening_decision,"Pending") as screening_status ,IFNULL(D.decision_source,"Pending") as decision_source from screening_paper S
+LEFT JOIN  paper P ON(S.paper_id=P.id AND P.paper_active=1 )
+LEFT JOIN  screen_decison D ON (S.paper_id=D.paper_id AND S.screening_phase=D.screening_phase AND D.decision_active=1 )
+WHERE screening_active=1',
+				
+	);
 
 	$config['table_views']=$table_views;
 	
@@ -487,13 +498,13 @@ WHERE screening_active=1  GROUP BY P.id,S.screening_phase',
 			),
 	);
 	
-	if(has_usergroup(1)){
+	if(has_user_role('Project admin') OR has_usergroup(1)){
 			$clear_papers=array(
-										'label'=>'Delete all',
-										'title'=>'Delete all papers',
-										'icon'=>'Delete all',
-										'url'=>'manager/clear_papers_validation',
-									);
+				'label'=>'Delete all',
+				'title'=>'Delete all papers',
+				'icon'=>'Delete all',
+				'url'=>'manager/clear_papers_validation',
+			);
 		}else{
 			$clear_papers=array();
 		}
@@ -518,7 +529,8 @@ WHERE screening_active=1  GROUP BY P.id,S.screening_phase',
 								'trim'=>trim_nbr_car()
 							)
 					),
-					'authors'=>array(),
+					//'authors'=>array(),
+					'doi'=>array(),
 					'screening_status'=>array('field_title'=>'Decision'),
 					 
 			),
@@ -623,6 +635,7 @@ WHERE screening_active=1  GROUP BY P.id,S.screening_phase',
 								'id_field'=>'id',
 								'trim'=>trim_nbr_car()
 							)),
+					'doi'=>array(),
 					'screening_status'=>array('field_title'=>'Decision'),
 					 
 			),
@@ -696,6 +709,19 @@ WHERE screening_active=1  GROUP BY P.id,S.screening_phase',
 	$operations['list_papers_screen_conflict']=$operations['list_papers_screen_excluded'];
 	$operations['list_papers_screen_conflict']['page_title']='In conflict papers for this phase';
 	$operations['list_papers_screen_conflict']['conditions']['screening_status']['value']='In conflict';
+	
+	$operations['list_papers_screen_my_conflict']=$operations['list_papers_screen_conflict'];
+	$operations['list_papers_screen_my_conflict']['page_title']='My conflict papers in this phase';
+	$operations['list_papers_screen_my_conflict']['table_name']='view_paper_decision_det';
+	$operations['list_papers_screen_my_conflict']['data_source']='get_list_papers_my_screen_per_status';
+	$operations['list_papers_screen_my_conflict']['generate_stored_procedure']=TRUE;
+	$operations['list_papers_screen_my_conflict']['conditions']['user']=array(
+																				'field'=>'user_id',
+																				'value'=>active_user_id(),
+																				'evaluation'=>'equal',
+																				'add_on_generation'=>FALSE,
+																				'parameter_type'=>'VARCHAR(20)'
+																		);
 	
 	
 	

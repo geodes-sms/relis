@@ -47,17 +47,38 @@ function install_result($success=array(),$error=array()){
      
       <div id="wrapper">
         <div id="login" class=" form">
-          <section class="login_content">            
-          		<h1>ReLiS installer</h1><br/>                    
-            	<div class="row" >				
-					<div class=" col-md-8 col-sm-8 col-xs-8 col-md-offset-2 alert alert-success alert-dismissible fade in" role="alert">			
-						<h3 style="text-align:center">Installation success</h3>			
-					</div>		
-				</div><br/><br/>
+          <section class="login_content">
+            
+              <h1>ReLiS installer</h1><br/>
+			  
 			
-				<h1><a href='../index.php'><button class="btn btn-info btn-lg" type="button">Start ReLiS</button></a></h1>					
-              	<div class="clearfix"></div>
-              	<div class="separator"><div class="clearfix"></div></div>            
+                    
+            <div class="row" >
+				
+			<div class=" col-md-8 col-sm-8 col-xs-8 col-md-offset-2 alert alert-success alert-dismissible fade in" role="alert">
+			
+			<h3 style="text-align:center">Installation success</h3>
+			
+			</div>
+			
+		
+			
+			</div>
+			<br/>
+		<br/>
+			<h1><a href='../index.php'><button class="btn btn-info btn-lg" type="button">Start ReLiS</button></a></h1>
+				
+			  
+			
+		
+              <div class="clearfix"></div>
+              <div class="separator">
+
+                
+                <div class="clearfix"></div>
+                
+              </div>
+            
           </section>
         </div>
       </div>

@@ -1739,7 +1739,7 @@ class Manager extends CI_Controller {
 			else
 			{$data['projects']['list'][$key]['icon']= base_url().$this->config->item('image_upload_path')."init/model_project1.png";}
 				
-			if(! (user_project($value['project_id']))){
+			if(! (user_project($value['project_id'])) AND !has_usergroup(1)){
 				unset($data['projects']['list'][$key]);
 			}
 		}
@@ -2403,6 +2403,9 @@ class Manager extends CI_Controller {
 		$sql="UPDATE paperauthor SET 	paperauthor_active=3 where paperauthor_active=1 ";
 		$res=$this->db_current->query($sql);
 		
+		$sql="UPDATE ref_affiliation SET 	ref_active=3 where ref_active=1 ";
+		$res=$this->db_current->query($sql);
+		
 		$sql="UPDATE assigned SET assigned_active=3 where assigned_active=1 ";
 		$res=$this->db_current->query($sql);
 		
@@ -2427,6 +2430,11 @@ class Manager extends CI_Controller {
 		
 		$sql="UPDATE screen_decison SET 	decision_active = 3  where 	decision_active=1 ";
 		$res=$this->db_current->query($sql);
+		
+		$sql="UPDATE  venue SET 	 venue_active = 3  where 	 venue_active=1 ";
+		$res=$this->db_current->query($sql);
+		
+		
 		set_top_msg('All papers deleted');
 		redirect ('op/entity_list/list_all_papers');
 	
@@ -2468,28 +2476,6 @@ class Manager extends CI_Controller {
 		set_top_msg('Clear papers cancelled');
 		redirect ('op/entity_list/list_all_papers');
 	
-	}
-	
-	public function publish_project($project_id = 0, $operation = 1)
-	{
-		if (empty($project_id)) {
-			$project_id = active_project_id();
-		}
-		if (!empty($project_id)) {
-			$projet_label = project_db();
-			$op           = ($operation == 1) ? 1 : 0;
-			$sql          = "UPDATE  projects SET project_public =  $op WHERE  project_id = $project_id ";
-			$res_sql      = $this->manage_mdl->run_query($sql, false, 'default');
-			if ($operation == 1) {
-				set_top_msg("Project $projet_label published");
-				set_log('publish', "Project $projet_label published");
-			} else {
-				set_top_msg("Project $projet_label reopened");
-				set_log('publish', "Project $projet_label reopened");
-			}
-		} else {
-		}
-		redirect('manager/projects_list');
 	}
 	
 	

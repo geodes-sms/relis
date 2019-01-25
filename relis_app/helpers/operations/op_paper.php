@@ -66,7 +66,11 @@ function get_operations_paper() {
 			'tab_ref'=>'papers',
 			'operation_id'=>'list_papers_screen_conflict'
 	);
-	
+	$operations['list_papers_screen_my_conflict']=array(
+			'type'=>'List',
+			'tab_ref'=>'papers',
+			'operation_id'=>'list_papers_screen_my_conflict'
+	);
 	
 	$operations['list_papers_screen_included_after_conflict']=array(
 			'type'=>'List',

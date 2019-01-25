@@ -19,6 +19,7 @@
  * 
  *  :Author: Brice Michel Bigendako
  */
+
 /*
  *---------------------------------------------------------------
  * APPLICATION ENVIRONMENT

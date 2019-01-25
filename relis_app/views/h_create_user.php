@@ -35,17 +35,17 @@
                     	<br/>
               <div>
               <?php echo lng_min('Name')?>
-                <input type="text" class="form-control" placeholder="" name="user_name" 
+                <input type="text" class="form-control" placeholder="" name="user_name" maxlength="49" 
                 	value="<?php echo  !empty($content_item['user_name'])?$content_item['user_name']:""?>" required="" />
               </div>
               <div>
               <?php echo lng_min('Email')?>
-                <input type="text" class="form-control" placeholder="" name="user_mail" 
+                <input type="text" class="form-control" placeholder="" name="user_mail" maxlength="99"
                 value="<?php echo  !empty($content_item['user_mail'])?$content_item['user_mail']:""?>" required="" />
               </div>
               <div>
               <?php echo lng_min('Username')?>
-                <input type="text" class="form-control" placeholder="" name="user_username"
+                <input type="text" class="form-control" placeholder="" name="user_username" maxlength="19"
                  value="<?php echo  !empty($content_item['user_username'])?$content_item['user_username']:""?>" required="" />
               </div>
               

@@ -260,6 +260,7 @@ class Op extends CI_Controller {
 		foreach ($data['list'] as $key => $value) {
 			//print_test($value);
 			$element_array=array();
+			$element_array['links']='';
 			foreach ($field_list as $key_field=> $v_field) {
 				//print_test($v_field);
 				if(isset($value[$v_field])){
@@ -352,8 +353,11 @@ class Op extends CI_Controller {
 			$action_button=create_button_link_dropdown($arr_buttons,lng_min('Action'));
 			//print_test($action_button);
 		
-			if(!empty($action_button))
-			$element_array['links']=$action_button;
+			if(!empty($action_button)){
+				$element_array['links']=$action_button;
+			}else{
+				unset($element_array['links']);
+			}
 			
 			if(isset($element_array[$table_id])){
 				$element_array[$table_id]=$i + $page;
@@ -377,7 +381,7 @@ class Op extends CI_Controller {
 			//$array_header=$ref_table_config['header_list_fields'];
 			$array_header=$field_list_header;
 			if(!empty($data['list'][$key]['links'])) {
-				array_push($array_header,'');
+				array_unshift($array_header,'');
 			}
 			
 			
@@ -615,7 +619,574 @@ class Op extends CI_Controller {
 		
 	}
 	
+	public function entity_list_graph_saved($operation_name,$val = "_",$page = 0,$graph='all'){
+		
+		//$graph='all';
+		$dynamic_table=1;
+		$op=check_operation($operation_name,'List');
+	
+		$ref_table=$op['tab_ref'];
+		$ref_table_operation=$op['operation_id'];
+	
+		
+	
+			/*
+			 * Vérification si il y a une condition de recherche
+			 */
+			$val = urldecode ( urldecode ( $val ) );
+			$filter = array ();
+			if (isset ( $_POST ['search_all'] )) {
+				$filter = $this->input->post ();
+	
+				unset ( $filter ['search_all'] );
+	
+				$val = "_";
+				if (isset ( $filter ['valeur'] ) and ! empty ( $filter ['valeur'] )) {
+					$val = $filter ['valeur'];
+					$val = urlencode ( urlencode ( $val ) );
+				}
+	
+				/*
+				 * mis à jours de l'url en ajoutant la valeur recherché dans le lien puis rechargement de l'url
+				 */
+				$url = "op/entity_list/" . $operation_name ."/". $val ."/0/".$graph;
+	
+				redirect ( $url );
+			}
+	
+			/*
+			 * Récupération de la configuration(structure) de la table à afficher
+			 */
+			$ref_table_config=get_table_configuration($ref_table);
+	
+			//print_test($ref_table_config['report']);
+			$table_id=$ref_table_config['table_id'];
+	
+	//	exit;
+			/*
+			 * Appel du model pour récupérer la liste à aficher dans la Base de donnés
+			 */
+			$rec_per_page=($dynamic_table)?-1:0;
+	
+	
+			$ref_table_config['current_operation']=$ref_table_operation;
+	
+			$data=$this->DBConnection_mdl->get_list_mdl($ref_table_config,$val,$page,$rec_per_page);
+	
+	
+			//print_test($data);
+	
+			/*
+			 * récupération des correspondances des clés externes pour l'affichage  suivant la structure de la table
+			 */
+			$graph_config=array(
+					'9'=>array(
+							'type'=>'compare',
+							'title'=>'Domain per year',
+							'values'=>array(
+									'field'=>'domain',
+									'style'=>'select',
+									'input_select_values'=>'ref_domain;ref_value',
+									'operation'=>'count'
+							),
+							'reference'=>array(
+									'field'=>'year',
+									'style'=>'free',
+									
+									'operation'=>'count'
+							),
+					),
+					'0'=>array(
+							'type'=>'simple',
+							'title'=>'Source language',
+							'values'=>array(
+									'field'=>'source_language',
+									'style'=>'select',
+									
+							),
+					),
+					'7'=>array(
+							'type'=>'simple',
+							'title'=>'Year',
+							'values'=>array(
+									'field'=>'year',
+									'style'=>'free',
+									
+									'operation'=>'count'
+							),
+					),
+					'8'=>array(
+							'type'=>'simple',
+							'title'=>'Domain',
+							'values'=>array(
+									'field'=>'domain',
+									'style'=>'select',
+									'input_select_values'=>'ref_domain;ref_value',
+									'operation'=>'count'
+							),
+					),
+					
+					'2'=>array(
+							'type'=>'simple',
+							'title'=>'Transformation language',
+							'values'=>array(
+									'field'=>'trans_language',
+									'style'=>'select',
+									'input_select_values'=>'ref_transformation_language;ref_value',
+									'input_select_values_multi'=>'trans_language;trans_language',
+									'operation'=>'count'
+							),
+					),
+					'19'=>array(
+							'type'=>'compare',
+							'title'=>'Transformation language',
+							'values'=>array(
+									'field'=>'trans_language',
+									'style'=>'select',
+									'input_select_values'=>'ref_transformation_language;ref_value',
+									'input_select_values_multi'=>'trans_language;trans_language',
+									'operation'=>'count'
+							),
+							'reference'=>array(
+									'field'=>'year',
+									'style'=>'free',
+										
+									'operation'=>'count'
+							),
+					),
+				
+			);
+			
+			$graph_config=array(
+					'9'=>array(
+							'type'=>'compare',
+							'title'=>'Domain per year',
+							'id'=>'domain_year',
+							'values'=>array(
+									'field'=>'domain',
+									'style'=>'select',
+									'input_select_values'=>'ref_domain;ref_value',
+									'title'=>'Domain',
+									'operation'=>'count'
+							),
+							'reference'=>array(
+									'field'=>'year',
+									'style'=>'free',
+									'title'=>'Year',
+										
+									'operation'=>'count'
+							),
+							'referencea'=>array(
+									'field'=>'source_language',
+									'style'=>'free',
+									'title'=>'Source lang',
+									'style'=>'select',
+							
+							),
+					),
+					'2'=>array(
+							'type'=>'simple',
+							'id'=>'graph_trans',
+							'title'=>'Transformation language',
+							'link'=>False,
+							'values'=>array(
+									'field'=>'trans_language',
+									'style'=>'select',
+									'input_select_values'=>'ref_transformation_language;ref_value',
+									'input_select_values_multi'=>'trans_language;trans_language',
+									'operation'=>'count'
+							),
+							),
+					'7'=>array(
+							'type'=>'simple',
+							'id'=>'graph_year',
+							'title'=>'Year',
+							'link'=>True,
+							'values'=>array(
+									'field'=>'year',
+									'style'=>'free',
+										
+									'operation'=>'count'
+							),
+					),
+					'8'=>array(
+							'type'=>'simple',
+							'id'=>'graph_domain',
+							'title'=>'Domain',
+							'link'=>True,
+							'values'=>array(
+									'field'=>'domain',
+									'style'=>'select',
+									'input_select_values'=>'ref_domain;ref_value',
+									'operation'=>'count'
+							),
+					),
+					'12'=>array(
+							'type'=>'simple',
+							'id'=>'graph_source_lang',
+							'link'=>True,
+							'title'=>'Source language',
+							'values'=>array(
+									'field'=>'source_language',
+									'style'=>'select',
+										
+							),
+					),
+			
+			);
+			
+			if(!empty($ref_table_config['report'])){
+				
+				$graph_config=$ref_table_config['report'];
+			//	$graph_config['trans_lang']['values']['input_select_values_multi']='intent;intent';
+		
+			//print_test($graph_config);
+			
+			$fields_list_graph=array(); 
+			$fields_list_graph_all=array(); 
+			foreach ($graph_config as $key => $value) {
+				
+				if(!empty($value['values']['field']) AND $value['values']['style']=='select'){
+					$fields_list_graph[$value['values']['field']]=$value['values'];
+				}
+				$fields_list_graph_all[$value['values']['field']]=$value['values'];
+				
+				if(!empty($value['reference']['field']) AND $value['reference']['style']=='select'){
+					$fields_list_graph[$value['reference']['field']]=$value['reference'];
+				}
+				
+				if(!empty($value['reference']['field'])){
+					$fields_list_graph_all[$value['reference']['field']]=$value['reference'];
+				}
+			}
+			//$fields_list=array('domain'=>'domain','source_language'=>'source_language');
+			
+			//print_test($fields_list_graph);
+			
+			
+			$dropoboxes=array();
+			foreach ($fields_list_graph as $k_field => $v) {
+			//foreach ($ref_table_config['operations'][$ref_table_operation]['fields'] as $k_field => $v) {
+				if(!empty($ref_table_config['fields'][$k_field])){
+					$field_det=$ref_table_config['fields'][$k_field];
+					if(!empty($field_det['input_type']) AND $field_det['input_type']=='select' ){
+	
+	
+						if($field_det['input_select_source']=='array'){
+							//print_test($v);
+							$dropoboxes[$k_field]=$field_det['input_select_values'];
+						}elseif($field_det['input_select_source']=='table'){
+							$input_select_values=!empty($v['input_select_values'])?$v['input_select_values']:$field_det['input_select_values'];
+							$dropoboxes[$k_field]= $this->manager_lib->get_reference_select_values($input_select_values,False);
+							//	print_test($v);
+						}elseif($field_det['input_select_source']=='yes_no'){
+							$dropoboxes[$k_field]=array('0'=>"No",
+									'1'=>"Yes"
+							);
+						}
+					}
+				}
+			}
+	
+	
+	//	print_test($dropoboxes);
+		
+			/*
+			 * Préparation de la liste à afficher sur base du contenu et  stucture de la table
+			 */
+	
+			/**
+			 * @var array $field_list va contenir les champs à afficher
+			 */
+		
+			$field_list=array();
+			$field_list_header=array();
+			foreach ($ref_table_config['operations'][$ref_table_operation]['fields'] as $k => $v) {
 
+				if(!empty($ref_table_config['fields'][$k])){
+							
+					array_push($field_list, $k);
+	
+					$field_header=!empty($v['field_title'])?$v['field_title']:$ref_table_config['fields'][$k]['field_title'];
+	
+					array_push($field_list_header, $field_header);
+						
+						
+				}
+			}
+			//print_test($link_field_list);
+			$i=1;
+			$list_to_display=array();
+			
+			$T_result=array();
+	
+			foreach ($data['list'] as $key => $value) {
+				
+				
+				//Current_problem
+				foreach ($graph_config as $key_graph => $value_graph) {
+					
+					$title_graph=$value_graph['id'];
+					if($value_graph['type']=='simple'){
+						$v_field=$value_graph['values']['field'];
+						
+						if(isset($value[$v_field])){
+							
+							
+							$T_result[$title_graph][$value[$v_field]]=!empty($T_result[$title_graph][$value[$v_field]])?$T_result[$title_graph][$value[$v_field]]+1:1;
+						}else{
+							$element_array[$v_field]="";
+								
+							if((isset($ref_table_config['fields'][$v_field]['number_of_values']) AND $ref_table_config['fields'][$v_field]['number_of_values']!=1) OR
+							(isset($ref_table_config['fields'][$v_field]['category_type']) AND $ref_table_config['fields'][$v_field]['category_type'] =='WithSubCategories')  ){//recuperation pour les multivalues et les champs avec subcategory
+								//print_test($key_graph);
+								$graph_config[$key_graph]['multi_value']=True;
+								if(isset($ref_table_config['fields'][$v_field]['input_select_values']) AND isset($ref_table_config['fields'][$v_field]['input_select_key_field']))
+								{
+									if(!empty($value_graph['values']['input_select_values_multi'])){
+											
+										$input_select_values_multi=$value_graph['values']['input_select_values_multi'];
+									}else{
+											
+										$input_select_values_multi=$ref_table_config['fields'][$v_field]['input_select_values'];
+									}
+									$M_values=$this->manager_lib->get_element_multi_values($input_select_values_multi,$ref_table_config['fields'][$v_field]['input_select_key_field'],$data ['list'] [$key] [$table_id],1);
+										
+							
+									foreach ($M_values as $key_M => $value_M) {
+										
+										$T_result[$title_graph][$value_M]=!empty($T_result[$title_graph][$value_M])?$T_result[$title_graph][$value_M]+1:1;
+											
+									}
+								}
+							
+							}
+							
+						}
+						
+					}elseif($value_graph['type']=='compare'){// for compare the referemce must be single value
+					
+						$v_field=$value_graph['values']['field'];
+						$ref_field=$value_graph['reference']['field'];
+						
+						if(isset($value[$ref_field])){
+							
+							$reference_value=$value[$ref_field];
+							
+							if(isset($value[$v_field])){
+							
+								
+								$T_result[$title_graph][$reference_value][$value[$v_field]]=!empty($T_result[$title_graph][$reference_value][$value[$v_field]])?$T_result[$title_graph][$reference_value][$value[$v_field]]+1:1;
+							}else{
+								
+							
+								if((isset($ref_table_config['fields'][$v_field]['number_of_values']) AND $ref_table_config['fields'][$v_field]['number_of_values']!=1) OR
+										(isset($ref_table_config['fields'][$v_field]['category_type']) AND $ref_table_config['fields'][$v_field]['category_type'] =='WithSubCategories')  ){//recuperation pour les multivalues et les champs avec subcategory
+											$graph_config[$key_graph]['multi_value']=True;
+											if(isset($ref_table_config['fields'][$v_field]['input_select_values']) AND isset($ref_table_config['fields'][$v_field]['input_select_key_field']))
+											{
+												if(!empty($value_graph['values']['input_select_values_multi'])){
+														
+													$input_select_values_multi=$value_graph['values']['input_select_values_multi'];
+												}else{
+														
+													$input_select_values_multi=$ref_table_config['fields'][$v_field]['input_select_values'];
+												}
+												$M_values=$this->manager_lib->get_element_multi_values($input_select_values_multi,$ref_table_config['fields'][$v_field]['input_select_key_field'],$data ['list'] [$key] [$table_id],1);
+							
+												//	$element_array[$v_field]=$M_values;
+												foreach ($M_values as $key_M => $value_M) {
+							
+													$T_result[$reference_value][$value_M]=!empty($T_result[$reference_value][$value_M])?$T_result[$reference_value][$value_M]+1:1;
+														
+												}
+											}
+												
+								}
+									
+							}
+							
+						}
+					}
+					
+				}
+				
+				
+				
+				
+				//test display all elements
+				$element_array=array();
+				
+				foreach ($fields_list_graph_all as $key_field=> $zv_field) {
+					$v_field=$zv_field['field'];
+					//print_test($v_field);
+					if(isset($value[$v_field])){
+						
+						$element_array[$v_field]=$value[$v_field];
+						
+					}else{
+							
+							
+							
+						$element_array[$v_field]="";
+							
+						if((isset($ref_table_config['fields'][$v_field]['number_of_values']) AND $ref_table_config['fields'][$v_field]['number_of_values']!=1) OR
+								(isset($ref_table_config['fields'][$v_field]['category_type']) AND $ref_table_config['fields'][$v_field]['category_type'] =='WithSubCategories')  ){//recuperation pour les multivalues et les champs avec subcategory
+										
+									if(isset($ref_table_config['fields'][$v_field]['input_select_values']) AND isset($ref_table_config['fields'][$v_field]['input_select_key_field']))
+									{
+										if(!empty($zv_field['input_select_values_multi'])){
+											
+											$input_select_values_multi=$zv_field['input_select_values_multi'];
+										}else{
+											
+											$input_select_values_multi=$ref_table_config['fields'][$v_field]['input_select_values'];
+										}
+										$M_values=$this->manager_lib->get_element_multi_values($input_select_values_multi,$ref_table_config['fields'][$v_field]['input_select_key_field'],$data ['list'] [$key] [$table_id],1);
+									
+										$element_array[$v_field]=$M_values;
+									}
+	
+						}
+	
+							
+					}
+	
+					
+	
+				}
+						
+					array_push($list_to_display,$element_array);						
+					$i++;
+			}
+		//print_test($T_result);	
+			
+			//Clean graph
+	//exit;
+	$result=array();
+	$Tzresult=array();
+	//print_test($graph_config);
+			foreach ($graph_config as $key => $value) {
+				
+				$value['link']=!empty($value['multi_value'])?False:True;
+				
+			//	print_test($value);
+				if(!empty($T_result[$value['id']])){
+					if($value['type']=='simple'){
+					
+						$data=array();
+						//ksort($T_result[$value['id']]);
+						ksort($T_result[$value['id']]);
+						foreach ($T_result[$value['id']] as $k => $v_data) {
+							$data[$k]['field']=$k;
+							$data[$k]['nombre']=$v_data;
+							$data[$k]['title']=!empty($dropoboxes[$value['values']['field']][$k])?$dropoboxes[$value['values']['field']][$k]:$k;
+						}
+						$result[$value['id']]=array(
+							'id'=>$value['id'],	
+							'title'=>$value['title'],	
+							'link'=>!empty($value['link'])?True:False,	
+							'type'=>$value['type'],	
+							//'type'=>'zzzz',	
+							'field'=>$value['values']['field'],	
+							'data'=>$data,	
+							'chart'=>$value['chart'],	
+						);
+					
+				}else{
+					ksort($T_result[$value['id']]);
+					//print_test($T_result[$value['id']]);
+					$p_data=array();
+					foreach ($T_result[$value['id']] as $k => $v_data) {
+						
+						ksort($v_data);
+						
+						$data_n=array();
+							foreach ($v_data as $kn => $vn_data) {
+								$data_n[$kn]['field']=$kn;
+								$data_n[$kn]['nombre']=$vn_data;
+								$data_n[$kn]['title']=!empty($dropoboxes[$value['values']['field']][$kn])?$dropoboxes[$value['values']['field']][$kn]:$k;
+							}
+						
+						
+						$p_data[$k]['field']=$k;
+						$p_data[$k]['title']=!empty($dropoboxes[$value['reference']['field']][$k])?$dropoboxes[$value['reference']['field']][$k]:$k;
+						
+						$p_data[$k]['data']=$data_n;
+					}
+					$result[$value['id']]=array(
+							'id'=>$value['id'],
+							'title'=>$value['title'],
+							'link'=>!empty($value['link'])?True:False,
+							'reference_title'=>$value['reference']['title'],
+							'values_title'=>$value['values']['title'],
+							'type'=>$value['type'],
+							//'type'=>'zzzz',
+							'field'=>$value['values']['field'],
+							'p_data'=>$p_data,
+							'chart'=>$value['chart'],
+							
+					);
+					
+					//print_test($result[$value['id']]);
+				}
+				
+				}
+			}
+		//	print_test($result);
+
+	
+	//exit;
+	}else{
+		$result=array();
+	}
+		 $data ['graph_result']=$result;
+		
+		// print_test($result);
+	
+			/*
+			 * Ajout de l'entête de la liste
+			 */
+		
+	
+	
+	
+			/*
+			 * Création des boutons qui vont s'afficher en haut de la page (top_buttons)
+			 */
+	
+			$data ['top_buttons']="";
+
+			if(!empty($ref_table_config['operations'][$ref_table_operation]['top_links']))
+				$data ['top_buttons']=$this->create_top_buttons($ref_table_config['operations'][$ref_table_operation]['top_links']);
+				/*
+				 * Titre de la page
+				 */
+				
+				$data['page_title']=lng('Result');
+				
+				/*
+				 * Configuration pour l'affichage des lien de navigation
+				 */
+	
+				$data ['valeur']=($val=="_")?"":$val;
+	
+	
+				/*
+				 * La vue qui va s'afficher
+				 */
+	
+				$data['has_graph']='yes';
+					
+					
+				if(!empty($val) AND $val=='line'){
+				$data['page']='relis/result_list_graph_line';
+				}else{
+					$data['page']='relis/result_list_graph';
+				}
+				$this->load->view('body',$data);
+	}
+	
 	
 //fonction pour afficher un graphique à partir de la liste- specialisé pour la classifcation
 public function entity_list_graph($operation_name,$val = "_",$page = 0,$graph='all'){
@@ -2701,7 +3272,403 @@ public function entity_list_graph($operation_name,$val = "_",$page = 0,$graph='a
 	}
 	
 	
+	///----------------------------- to be updated
 	
+	private function zz(){
+		
+	}
+	
+	private function zget_reference_select_values($config,$start_with_empty=True,$get_leaf=False,$multiselect=False){
+	
+		$conf=explode(";", $config);
+		//print_test($conf);
+		$ref_table=$conf[0];
+		$fields=$conf[1];
+		$ref_table_config=get_table_config($ref_table);
+		//for_array
+	
+		if($get_leaf){
+	
+			while(!empty($ref_table_config['fields'][$fields]['input_type']) AND $ref_table_config['fields'][$fields]['input_type']=='select' AND $ref_table_config['fields'][$fields]['input_select_source']=='table' ){
+	
+				$config=$ref_table_config['fields'][$fields]['input_select_values'];
+	
+				$conf=explode(";", $config);
+				//print_test($conf);
+				$ref_table=$conf[0];
+				$fields=$conf[1];
+				$ref_table_config=get_table_config($ref_table);
+	
+	
+				//echo "<h1>$fields</h1>";
+			}
+		}
+	
+		if($multiselect AND isset($ref_table_config['fields'][$fields]['input_select_source']) AND $ref_table_config['fields'][$fields]['input_select_source']=='array'){
+				
+			$result=array();
+				
+				
+				
+			$result=$ref_table_config['fields'][$fields]['input_select_values'];
+				
+	
+			//print_test($result);
+			//exit;
+		}
+	
+		else{
+				
+			if($multiselect AND isset($ref_table_config['fields'][$fields]['input_select_source']) AND $ref_table_config['fields'][$fields]['input_select_source']=='table'){
+					
+				$config=$ref_table_config['fields'][$fields]['input_select_values'];
+					
+				$conf=explode(";", $config);
+				//print_test($conf);
+				$ref_table=$conf[0];
+				$fields=$conf[1];
+				$ref_table_config=get_table_config($ref_table);
+					
+					
+					
+			}
+				
+		//	$extra_condition="";
+	
+			
+	
+			$res=$this->DBConnection_mdl->get_reference_select_values($ref_table_config,$fields);
+			
+			$result=array();
+			if($res AND $start_with_empty)
+				$result['']="Select...";
+			
+				$_stable_config=$ref_table_config;
+				$_fields=$fields;
+				foreach ($res as $key => $value) {
+						
+					$ref_table_config = $_stable_config;
+					$fields = $_fields;
+					//print_test($ref_table_config);
+					$result[$value['refId']]=$value['refDesc'];
+						
+					
+	
+						while(!empty($ref_table_config['fields'][$fields]['input_type']) AND $ref_table_config['fields'][$fields]['input_type']=='select' AND $ref_table_config['fields'][$fields]['input_select_source']=='table' ){
+							//	echo "<h1>bbbb</h1>";
+							//print_test($result);
+	
+							$config=$ref_table_config['fields'][$fields]['input_select_values'];
+								
+							$conf=explode(";", $config);
+								
+							$ref_table=$conf[0];
+							$fields=$conf[1];
+							$ref_table_config=get_table_config($ref_table);
+								
+								
+							$res2=$this->manage_mdl->get_reference_value($ref_table_config['table_name'],$value['refDesc'],$fields,$ref_table_config['table_id']);
+								
+							$result[$value['refId']]= $res2;
+	
+								
+						}
+	
+	
+					 if(isset($ref_table_config['fields'][$fields]['input_select_source']) AND $ref_table_config['fields'][$fields]['input_select_source']=='array'){
+	
+					 	$select_values=$ref_table_config['fields'][$fields]['input_select_values'];
+	
+					 	$result[$value['refId']]= $select_values[$result[$value['refId']]];
+	
+					 }
+	
+	
+						
+				}
+	
+		}
+		//print_test($result);
+		return $result;
+	
+	
+	}
+	
+	
+	
+	
+	 private function zget_element_multi_values($config,$key_field,$element_id){
+	 	
+	 	
+	 	$Tvalues_source=explode(';', $config);
+	 	
+	 	$source_table_config=get_table_config($Tvalues_source[0]);
+	 	
+	 	
+	 	
+	 	$extra_condition=" AND $key_field ='".$element_id."'";
+	 	
+	 	$res_values=$this->DBConnection_mdl->get_reference_select_values($source_table_config,$source_table_config['table_id'],$extra_condition);
+	 	
+	 	
+	 	$results=array();
+	 	
+	 	foreach ($res_values as $value) {
+	 		array_push($results, $value['refDesc']);
+	 	}
+	 	//print_test($results);
+	 	return $results;
+	 }
+	/*
+	 * Fonction pour afficher une ligne d'une table avec remplacement des clès externes par leurs correspondances
+	 */
+	private function zget_element_detail($ref_table,$ref_id,$editable=True,$modal_link=False) {
+	
+		
+		//récuperation de la configuration de l'entité
+		$table_config=get_table_config($ref_table);
+	
+		//	print_test($table_config);
+	
+	
+		$dropoboxes=array();
+
+		// récupération des valeurs pour les champs avec la clé enregistre dans la table (pour pouvoir afficher le label)
+		foreach ($table_config['fields'] as $k => $v) {
+	
+			if(!empty($v['input_type']) AND $v['input_type']=='select' AND ! (isset($v['on_view']) AND $v['on_view']=='hidden')){
+				if($v['input_select_source']=='array'){
+					$dropoboxes[$k]=$v['input_select_values'];
+				}elseif($v['input_select_source']=='yes_no' ){
+					$dropoboxes[$k]= array(
+							0=>'No',
+							1=>'Yes'
+					);
+				}elseif($v['input_select_source']=='table'){
+						
+					
+					// recherches des auteurs par papier
+					if( $ref_table=='papers' AND $k=='authors'){
+						$this->db3 = $this->load->database(project_db(), TRUE);
+						
+						//todo generaliser pour tout les multivalues (car les autres prennemt beaucoups de temps)
+						$sql="select P.paperauthor_id ,A.author_name from paperauthor P,author A where P.paperId=$ref_id AND P.authorId=A.author_id AND A.author_active=1 AND P.paperauthor_active=1 ";
+						$res_author=$this->db3->query($sql)->result_array();
+						$t_array=array(''=>'Select ...');
+						//print_test($res_author);
+						foreach ($res_author as $key_a => $value_a) {
+							$t_array[$value_a['paperauthor_id']]=$value_a['author_name'];
+						}
+						//print_test($t_array);
+						$dropoboxes[$k]=$t_array;
+							
+					}else{
+						$dropoboxes[$k]= $this->manager_lib->get_reference_select_values($v['input_select_values']);
+					}
+				}
+			}
+				
+		}
+	
+		
+		//$detail_result = $this->manage_mdl->get_reference_details ( $table_config['table_name'],$table_config['table_id'],$ref_id );
+		
+		$detail_result = $this->DBConnection_mdl->get_row_details ( $ref_table,$ref_id );
+	
+		$content_item=$detail_result;
+	
+	
+		$item_data=array();
+	
+	
+		
+		foreach ($dropoboxes as $k => $v) {
+			$content_item[$k.'_idd']=0;
+			if(isset($content_item[$k])){
+	
+				if(isset($v[$content_item[$k]])){
+	
+					$content_item[$k.'_idd']=$content_item[$k];
+	
+					$content_item[$k]=$v[$content_item[$k]];
+	
+	
+	
+	
+				}
+			}
+			else{
+	
+				$content_item[$k]="";
+			}
+		}
+	
+		
+	
+		//print_test($content_item);
+	
+		foreach ($table_config['fields'] as $key => $value) {
+			$array=array();
+			//print_test($value);
+	
+			if(!(isset($value['on_view']) AND $value['on_view']=='hidden' )){
+					
+	
+				$array['title']=$value['field_title'];
+				$array['edit']=0;
+	
+				
+				//for multi values
+				if(isset($value['number_of_values']) AND ($value['number_of_values']=='*' OR $value['number_of_values']!='1') AND !empty($value['input_select_key_field'])){
+						
+					$Tvalues_source=explode(';', $value['input_select_values']);
+					//echo "<h1>".$Tvalues_source[0]."<h1>";
+					$source_table_config=get_table_config($Tvalues_source[0]);
+					$input_select_key_field=$value['input_select_key_field'];
+	
+					$extra_condition=" AND $input_select_key_field ='".$ref_id."'";
+	
+					$res_values=$this->DBConnection_mdl->get_reference_select_values($source_table_config,$input_select_key_field,$extra_condition);
+						
+					
+					// set add button
+					$add_button = create_button_link('manage/add_element_child/'.$Tvalues_source[0].'/'.$value['input_select_key_field'].'/'.$ref_table.'/'.$ref_id,'<i class="fa fa-plus"></i> Add',"btn-success",'Add ');
+						
+					if($ref_table=='classification'){//use modal for classification
+						$modal_title="Add : ".$value['field_title'];
+						$add_button='<a  class="btn btn-xs btn-info" data-toggle="modal" data-target="#relisformModal" data-operation_type="2"  data-modal_link="manage/add_element_child_modal/'.$Tvalues_source[0].'/'.$value['input_select_key_field'].'/'.$ref_table.'/'.$ref_id.'"  data-modal_title="'.$modal_title.'" ><i class="fa fa-plus"></i>Add</a>';
+					}
+					$k_row=0;
+					if(!(isset($value['multi-select']) AND $value['multi-select']=="Yes") AND $editable)	{
+						$array['val2'][0]="<span> ".$add_button."</span>";
+	
+						$k_row=1;
+						$array['edit']=1;
+					}
+					
+					
+					
+					
+					// Get values if label  are from other tables 
+					foreach ($res_values as $key_v => $value_v) {
+	
+	
+						if(isset($dropoboxes[$key][$value_v['refId']]))
+							$array['val2'][$k_row]=$dropoboxes[$key][$value_v['refId']];
+	
+	
+							if(isset($value_v['refId'])  AND $value['input_select_source']=='table' AND isset($value['input_select_source_type']) ){
+								//print_test($value);
+								$Tconfig=explode(';', $value['input_select_values'])   ;
+								//echo $content_item[$key.'_idd'];
+								if($value_v['refId']!=0)
+								{
+									$edit_button = create_button_link('manage/edit_drilldown/'.$Tconfig[0].'/'.$ref_table.'/'.$key.'/'.$ref_id.'/'.$value_v['refId'],'<i class="fa fa-pencil"></i> Edit',"btn-info",'Edit ');
+	
+									$delete_button = create_button_link('manage/remove_drilldown/'.$value_v['refId'].'/'.$Tconfig[0].'/'.$ref_table.'/'.$ref_id.'/'.$key.'/no','<i class="fa fa-times"></i> Remove',"btn-danger",'Remove ','onlist','alert_ok');
+	
+									if($ref_table=='classification'){//use modal for classification
+										$modal_title="Edit : ".$value['field_title'];
+										$edit_button='<a  class="btn btn-xs btn-info" data-toggle="modal" data-target="#relisformModal" data-operation_type="2"  data-modal_link="manage/edit_drilldown/'.$Tconfig[0].'/'.$ref_table.'/'.$key.'/'.$ref_id.'/'.$value_v['refId'].'/modal"  data-modal_title="'.$modal_title.'" ><i class="fa fa-pencil"></i>Edit</a>';
+											
+										$delete_button = create_button_link('manage/remove_drilldown/'.$value_v['refId'].'/'.$Tconfig[0].'/'.$ref_table.'/'.$ref_id.'/'.$key.'/no/yes','<i class="fa fa-times"></i> Remove',"btn-danger",'Remove ','onlist','alert_ok');
+											
+									}
+	
+	
+	
+									if((isset($value['multi-select']) AND $value['multi-select']=="Yes") OR !$editable)	{
+										$edit_button="";
+										$delete_button="";
+									}
+	
+									if(isset($value['input_select_source_type']) AND  $value['input_select_source_type']=='drill_down')
+										$array['val2'][$k_row]="<span class='drilldown_link'>".anchor('manage/view_ref/'.$Tconfig[0].'/'.$value_v['refId'],$array['val2'][$k_row])."</span> <div class='navbar-right'>$edit_button $delete_button</div>";
+										else
+											$array['val2'][$k_row].=" <div class='navbar-right'>$edit_button $delete_button</div>";
+												
+												
+								}
+							}
+	
+	
+							$k_row++;
+	
+					}
+				}else{
+	
+	
+	
+					$array['val']=isset($content_item[$key])?" ".$content_item[$key]:' ';
+					$array['val2'][0]=isset($content_item[$key])?" ".$content_item[$key]:' ';
+						
+					// for images
+					if(isset($value['input_type']) AND $value['input_type']=='image'){
+						if(!empty($content_item[$key])){
+							//$img=$this->config->item('image_upload_path').$content_item[$key]."_thumb.jpg";
+							//$array['val2'][0]= img($img);
+							
+							
+							$delete_picture_button=get_top_button('all','Remove picture','manager/remove_picture/'.$ref_table.'/'.$table_config['table_name'].'/'.$table_config['table_id'].'/'.$key.'/'.$ref_id,'','fa-close','','btn-danger',FALSE);
+							
+							//$array['val2'][0]= '<img src="data:image/png;base64,'.base64_encode( $content_item[$key]).'"/> '.$delete_picture_button;
+							$array['val2'][0]= '<img src="'.display_picture_from_db($content_item[$key]).'"/> '.$delete_picture_button;
+						}
+	
+					}
+						
+	
+					///echo $content_item[$key.'_idd'];
+					if(isset($content_item[$key.'_idd'])  AND $value['input_select_source']=='table' AND isset($value['input_select_source_type']) AND  $value['input_select_source_type']=='drill_down' ){
+						//print_test($value);
+						$Tconfig=explode(';', $value['input_select_values'])   ;
+						//echo $content_item[$key.'_idd'];
+						if($content_item[$key.'_idd']!=0)
+						{
+							if((isset($value['drill_down_type']) AND $value['drill_down_type'] == 'not_linked') OR !$editable)
+							{
+								$edit_button="";
+								$delete_button="";
+							}else{
+								$edit_button = create_button_link('manage/edit_drilldown/'.$Tconfig[0].'/'.$ref_table.'/'.$key.'/'.$ref_id.'/'.$content_item[$key.'_idd'],'<i class="fa fa-pencil"></i> Edit',"btn-info",'Edit ');
+	
+								$delete_button = create_button_link('manage/remove_drilldown/'.$content_item[$key.'_idd'].'/'.$Tconfig[0].'/'.$ref_table.'/'.$ref_id.'/'.$key,'<i class="fa fa-times"></i> Remove',"btn-danger",'Remove ','onlist','alert_ok');
+							}
+							$array['val']="<span class='drilldown_link'>".anchor('manage/view_ref/'.$Tconfig[0].'/'.$content_item[$key.'_idd'],$array['val'])."</span> <div class='navbar-right'>$edit_button.$delete_button</div>";
+							$array['val2'][0]="<span class='drilldown_link'>".anchor('manage/view_ref/'.$Tconfig[0].'/'.$content_item[$key.'_idd'],$array['val2'][0])."</span> <div class='navbar-right'>$edit_button.$delete_button</div>";
+	
+	
+	
+						}else{
+							if((isset($value['drill_down_type']) AND $value['drill_down_type'] == 'not_linked') OR !$editable)
+							{
+								$add_button = "";
+							}else{
+								$array['edit']=1;
+								$add_button = create_button_link('manage/add_ref_drilldown/'.$Tconfig[0].'/'.$ref_table.'/'.$key.'/'.$ref_id,'<i class="fa fa-plus"></i> Add',"btn-success",'Add ');
+									
+								if($ref_table=='classification'){//use modal for classification
+									$modal_title="Add : ".$value['field_title'];
+									$add_button='<a  class="btn btn-xs btn-success" data-toggle="modal" data-target="#relisformModal" data-operation_type="2"  data-modal_link="manage/add_ref_drilldown_modal/'.$Tconfig[0].'/'.$ref_table.'/'.$key.'/'.$ref_id.'"  data-modal_title="'.$modal_title.'" ><i class="fa fa-plus"></i>Add</a>';
+								}
+									
+									
+							}
+							$array['val']="<span>: ".$add_button."</span>";
+							$array['val2'][0]="<span>: ".$add_button."</span>";
+						}
+					}
+				}
+	
+				array_push($item_data, $array);
+				//array_push($item_data2, $array);
+	
+			}
+		}
+		//print_test($item_data);
+		return $item_data;
+	
+	}
 	
 	public function remove_drilldown ($child_id,$table_config_child,$table_config_parent,$parent_id,$parent_field,$update_parrent='yes',$modal='no'){
 	
