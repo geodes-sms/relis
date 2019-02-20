@@ -23,6 +23,8 @@ relis_app/config/database.php
 /nbproject/
 .idea/*
 
+ci_dev.php
+
 ## Sublime Text cache files
 *.tmlanguage.cache
 *.tmPreferences.cache

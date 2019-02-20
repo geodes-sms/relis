@@ -2,6 +2,15 @@
 include ('install_form.php');
 include ('install_result.php');
 
+/**
+ * A generic used to redirect to installation form displaying the error occured.
+ * @param  string $text The error message to be displayed.
+ * @return [type]       [description]
+ */
+function mysql_error($text) {
+	install_form($_POST,array('Database connection error : '. $text));
+}
+
 if(isset($_POST['submit_form'])){
 	$error=array();
 	//echo "<pre>";
@@ -51,30 +60,34 @@ if(isset($_POST['submit_form'])){
 		
 		$result_array=array();
 		
-		$link = mysql_connect($db_host, $db_user, $db_pass);
+		/** Changed to use mysqli connect (procedural way) */
+		$link = mysqli_connect($db_host, $db_user, $db_pass, $db_name);
+		
 		if (!$link) {
-			//die('Database hosts connection error : ' . mysql_error());
-			install_form($_POST,array('Database hosts connection error : '. mysql_error()));
+			/** Changed to use mysqli error as text */
+			mysql_error(mysqli_connect_error());
 		}else{
 			//echo "<h2>Relis installation</h2>";
 			$sql = 'CREATE DATABASE IF NOT EXISTS '.$db_name;
-			if (mysql_query($sql, $link)) {
+			if (mysqli_query($link, $sql)) {
 		
 				
 				//echo "<h2>database created</h2>";
 				array_push($result_array, 'Database created');
 				//select_database
 		
-				$db_selected = mysql_select_db($db_name, $link);
+				$db_selected = mysqli_select_db($link, $db_name);
 				if (!$db_selected) {
-					//die ('Database connection error  : ' . mysql_error());
-					install_form($_POST,array('Database connection error : '. mysql_error()));
+					/** 
+					 * DB Select failed, we return to installation form using error message,
+					 * depending on the connection used.
+					 */
+					mysql_error(mysqli_error($link));
 				}else{
 		
 					//initialisation des données
 					//echo "<h2>database initialisation</h2>";
 					$db_sql=file_get_contents("sql_init/initial_values.sql");
-		
 		
 					$T_db_sql=explode ( '$$' , $db_sql);
 		
@@ -83,9 +96,9 @@ if(isset($_POST['submit_form'])){
 						$sql=trim($v_sql);
 						//echo $sql."<br/><br/><br/>";
 						if( !empty($sql ) ){
-							$result = mysql_query($sql);
+							$result = mysqli_query($link, $sql);
 							if (!$result) {
-								die('Invalid query : ' . mysql_error());
+								mysql_error(mysqli_error($link));
 							}
 		
 						}
@@ -98,9 +111,9 @@ if(isset($_POST['submit_form'])){
 					
 					// Add admin user
 					$sql="INSERT INTO users (user_name,user_username,user_password,user_mail,user_usergroup) VALUES('".$full_name."','".$user_name."','".$user_password."','".$user_mail."',1)";
-					$result = mysql_query($sql);
+					$result = mysqli_query($link, $sql);
 					if (!$result) {
-						die('Invalid query : ' . mysql_error());
+						mysql_error(mysqli_error($link));
 					}
 					
 					// Add to CodeIgniter the database configuration
@@ -117,10 +130,8 @@ if(isset($_POST['submit_form'])){
 				}
 		
 			} else {
-				
-				install_form($_POST,array('Database not created : '. mysql_error()));
+				mysql_error(mysqli_error($link));
 			}
-		
 		}
 		
 		
@@ -131,7 +142,14 @@ if(isset($_POST['submit_form'])){
 
 }
 
-
+/**
+ * Creating the database configuration file used by CodeIgniter
+ *  
+ * @param string $host          [description]
+ * @param string $database_name [description]
+ * @param string $username      [description]
+ * @param string $pass_word     [description]
+ */
 function add_database_config($host,$database_name,$username,$pass_word){
 		
 	$database_config = '$db'."['default'] = array(
@@ -154,7 +172,7 @@ function add_database_config($host,$database_name,$username,$pass_word){
 		'stricton' => FALSE,
 		'failover' => array(),
 		'save_queries' => TRUE
-);";
+	);";
 	// adding value in the CodeIgniter database configuration file
 	$f_config = fopen("../relis_app/config/database.php", 'a+');
 
@@ -163,7 +181,7 @@ function add_database_config($host,$database_name,$username,$pass_word){
 
 	fclose($f_config);
 	
-	
+	/** TODO: Not sure about the reason for that. */
 	// adding value in the CodeIgniter configuration file
 	$f_config1 = fopen("../relis_app/config/config.php", 'a+');
 	
@@ -198,7 +216,3 @@ function update_ci_configuration(){
 	fclose($f_config);
 
 }
-
-
-
-
