@@ -3711,10 +3711,10 @@ class Op extends CI_Controller {
 	 */
 	public function remove_picture($ref_table,$table_name,$table_id,$field,$element_id)
 	{
-		$table_name = $this->manage_mdl->escape_str($table_name, 'default');
-		$table_id = $this->manage_mdl->escape_str($table_id, 'default');
-		$field = $this->manage_mdl->escape_str($field, 'default');
-		$element_id = $this->manage_mdl->escape($element_id, 'default');
+		$table_name = $this->manage_mdl->query_escape_str($table_name, 'default');
+		$table_id = $this->manage_mdl->query_escape_str($table_id, 'default');
+		$field = $this->manage_mdl->query_escape_str($field, 'default');
+		$element_id = $this->manage_mdl->query_escape($element_id, 'default');
 		
 		$sql = "UPDATE $table_name SET $field = NULL WHERE $table_id = ".$element_id;
 		
