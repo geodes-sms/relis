@@ -2227,16 +2227,35 @@ class Manager extends CI_Controller {
 	
 	}
 	
+	/**
+	 * Endpoint, to remove the picture associated with a project.
+	 *
+	 * Revision: Due to deprecation of mysql engine within in php. The engine
+	 *           to be used is mysqli, so the calls are changed in a way to use
+	 *           mysqli backend.
+	 * 
+	 * @param  [type] $ref_table  [description]
+	 * @param  [type] $table_name [description]
+	 * @param  [type] $table_id   [description]
+	 * @param  [type] $field      [description]
+	 * @param  [type] $element_id [description]
+	 * @return [type]             [description]
+	 */
 	public function remove_picture($ref_table,$table_name,$table_id,$field,$element_id){
-		$table_name=mysql_real_escape_string($table_name);
-		$table_id=mysql_real_escape_string($table_id);
-		$field=mysql_real_escape_string($field);
-		$element_id=mysql_real_escape_string($element_id);
+		$table_name = $this->manage_mdl->query_escape_str($table_name);
+		$table_id = $this->manage_mdl->query_escape_str($this->db, $table_id);
+		$field = $this->manage_mdl->query_escape_str($this->db, $field);
+		$element_id = $this->manage_mdl->query_escape($this->db, $element_id);
 		
-		$sql = "UPDATE $table_name SET $field = NULL WHERE $table_id ='".$element_id."'";
+		/**
+		 *  made usage of hints regarding coding convetions from codeigniter
+		 *  @see https://www.codeigniter.com/userguide3/general/styleguide.html coding conventions
+		 *  @var string
+		 */
+		$sql = "UPDATE ${table_name} SET ${field}=NULL WHERE ${table_id}=${element_id}";
 		
 	
-		$res=$this->db->query($sql);
+		$res = $this->db->query($sql);
 		
 		if($res){
 			set_top_msg(lng_min("Success - picture removed"));
@@ -2246,7 +2265,7 @@ class Manager extends CI_Controller {
 		}
 		
 	
-			redirect ( 'manager/display_element/' .$ref_table.'/'.$element_id  );
+		redirect ( 'manager/display_element/' .$ref_table.'/'.$element_id  );
 		
 	}
 	
