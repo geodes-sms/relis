@@ -316,15 +316,75 @@ class Manage_mdl extends CI_Model
 			return $result;
 		}
 		
+		/**
+		 * A wrapper that simply executes the 
+		 * 			db->escape("...")
+		 * function for multi database environments (Loading is performed
+		 * the same way as done within `run_query` function below).
+		 *
+		 * HINT: Probably obtaining the "normal" database, $this->db
+		 * would be enough anyway, as all databases are using the same
+		 * driver (so escaping would be done anyway in the expected way).
+		 * 
+		 * @author Daniel Hofstetter daniel.hofstetter@sbg.ac.at
+		 * 
+		 * @param  string $value     the value to be escaped as string.
+		 * @param  string $target_db the target database named by a string, 
+		 * 													 or 'current' default. 
+		 * @return string            the escaped value as string.
+		 */
+		function query_escape($value, $target_db = 'current')
+		{
+				return $this->load_database($target_db)->escape($value);
+		}
+		/**
+		 * A wrapper that simply executes the 
+		 * 			db->escape_str("...")
+		 * function for multi database environments (Loading is performed
+		 * the same way as done within `run_query` function below).
+		 *
+		 * HINT: Probably obtaining the "normal" database, $this->db
+		 * would be enough anyway, as all databases are using the same
+		 * driver (so escaping would be done anyway in the expected way).
+		 * 
+		 * @author Daniel Hofstetter daniel.hofstetter@sbg.ac.at
+		 * 
+		 * @param  string $value     the value to be escaped as string.
+		 * @param  string $target_db the target database named by a string, 
+		 * 													 or 'current' default. 
+		 * @return string            the escaped value as string.
+		 */
+		function query_escape_str($value, $target_db = 'current')
+		{
+				return $this->load_database($target_db)->escape_str($value);
+		}
 		
+		/**
+		 * Load the database specified by the identifier ('current' by default, to
+		 * use the currents project db).
+		 * The target_db parameter is translated automatically by using the
+		 * `get_targetdb` helper function.
+		 * 
+		 * @author Daniel Hofstetter daniel.hofstetter@sbg.ac.at
+		 * 
+		 * @param  string $target_db An identifier to specify which db to load.
+		 * @return object|CI_DB_mysql_driver the Database object, FALSE on failure. 
+		 */
+		private function load_database($target_db = 'current')
+		{
+				return $this->load->database(get_targetdb($target_db), TRUE);
+		}
 		
+		/**
+		 * [run_query description]
+		 * @param  [type]  $sql          [description]
+		 * @param  boolean $result_table [description]
+		 * @param  string  $target_db    [description]
+		 * @return [type]                [description]
+		 */
 		function run_query($sql,$result_table=False,$target_db='current'){
-	
-			$target_db=($target_db=='current')?project_db():$target_db;
 			
-			$this->db2 = $this->load->database($target_db, TRUE);
-			
-			
+			$this->db2 = $this->load_database($target_db);
 			
 			if ( !($resu = $this->db2->simple_query($sql)))
 			{

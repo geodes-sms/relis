@@ -543,6 +543,37 @@ function set_log($log_type,$log_event,$log_publish=1,$log_user_id=0,$log_poste_i
 	//print_test($log);
 	$ci->DBConnection_mdl->save_reference_mdl($log);
 }
+
+/**
+ * Returns the database name to be used specified by using an identifier.
+ * In case of 'current' provided (the default), the database associated with
+ * the user's current project is returned.
+ *
+ * The value returned can be used to load a database using the Codeigniter
+ * framework function (e.g. $this->load->database(get_targetdb(), TRUE)).
+ *  
+ * @param  string $target_db The identifier to specify which db name to be 
+ *                           returned, or 'current' by default.
+ * @return string            The db name as string.
+ *
+ * @author Daniel Hofstetter daniel.hofstetter@sbg.ac.at
+ */
+function get_targetdb($target_db = 'current')
+{
+		return ($target_db === 'current') ? project_db() : $target_db;
+}
+
+/**
+ * Helper to return/determine the db associated with the project.
+ * The "active" project is determined by inspection of the user's
+ * session.
+ *
+ * If no db is found (e.g. currently not beeing in any project)
+ * then 'default' gets returned (the value can later be used to 
+ * load a specific database for further operations).
+ * 
+ * @return string the db associated with the project.
+ */
 function project_db() {
 	
 	$ci = get_instance ();
@@ -552,17 +583,26 @@ function project_db() {
 	return 'default';
 }
 
-function active_user_name() {
-
-	$ci = get_instance ();
+/**
+ * Helper to retrieve the username for the currently logged in user.
+ * @return string the user's username, or 'user_unknown'
+ */
+function active_user_name() 
+{
+	$ci = get_instance();
 	if($ci->session->userdata ( 'user_username' ))
 		return $ci->session->userdata ( 'user_username' );
 		else
 			return 'user_unknown';
 }
+/**
+ * Retrieve the project id 
+ * @return [type] [description]
+ */
 function active_project_id() {
 
 	$ci = get_instance ();
+	//TODO: Probably an error to be fixed
 	if($ci->session->userdata ( 'user_id' ))
 		return $ci->session->userdata ( 'project_id' );
 		else
