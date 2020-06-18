@@ -962,7 +962,8 @@ class DBConnection_mdl extends CI_Model
 			}else{
 				$search="";
 			}
-				
+			
+			
 			if(admin_config($config)){
 				$data=$this->db->query ( "CALL ".$stored_procedure."(0,0,'".$search."' ".$extra_parameters.") " );
 				mysqli_next_result( $this->db->conn_id );

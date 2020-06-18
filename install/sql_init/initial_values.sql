@@ -138,9 +138,28 @@ CREATE TABLE IF NOT EXISTS `users` (
   UNIQUE KEY `user_username` (`user_username`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 $$
 
--- INSERT INTO `users` (`user_id`, `user_name`, `user_username`, `user_password`, `user_mail`, `user_usergroup`, `user_picture`, `user_status`, `user_active`) VALUES
--- (1, 'Brice', 'admin', '0192023a7bbd73250516f069df18b500', 'bbigendako@gmail.com', 1, '', 1, 1),
--- (2, 'Eugene', 'uj', '6026e5d1d4ee04c873dd28f245312908', 'bbigendako@gmail.com', 1, '', 1, 1)$$
+DROP TABLE IF EXISTS `info`$$
+CREATE TABLE IF NOT EXISTS `info` (
+  `info_id` int(11) NOT NULL AUTO_INCREMENT,
+  `info_title` varchar(500) NOT NULL,
+  `info_desc` varchar(1000) DEFAULT NULL,
+  `info_link` varchar(500) DEFAULT NULL,
+  `info_type` enum('Home','Features','Help','Reference') NOT NULL DEFAULT 'Help',
+  `info_order` int(2) NOT NULL DEFAULT '1',
+  `info_active` int(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`info_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=15 $$
+
+DROP TABLE IF EXISTS `user_creation`$$
+CREATE TABLE IF NOT EXISTS `user_creation` (
+  `user_creation_id` int(11) NOT NULL AUTO_INCREMENT,
+  `creation_user_id` int(11) NOT NULL,
+  `confirmation_code` varchar(50) NOT NULL,
+  `confirmation_expiration` int(10) NOT NULL,
+  `confirmation_try` int(10) NOT NULL,
+  `user_creation_active` int(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`user_creation_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 $$
 
 -- stored procedures
 
@@ -585,3 +604,101 @@ UPDATE  config_admin SET config_id = _config_id , editor_url = _editor_url , edi
 WHERE (config_id = _element_id);
 COMMIT;
 END$$
+
+DROP PROCEDURE IF EXISTS `add_info`$$
+CREATE PROCEDURE `add_info`(_info_id INT , _info_title  VARCHAR(505) , _info_desc  VARCHAR(1005) , _info_link  VARCHAR(505) , _info_type  VARCHAR(25) , _info_order INT)
+BEGIN
+START TRANSACTION;
+INSERT INTO info (info_title , info_desc , info_link , info_type , info_order) VALUES (_info_title , _info_desc , _info_link , _info_type , _info_order);
+SELECT info_id AS id_value FROM info WHERE info_id = LAST_INSERT_ID();
+COMMIT;
+END$$
+
+DROP PROCEDURE IF EXISTS `get_detail_info`$$
+CREATE PROCEDURE `get_detail_info`(IN _row_id INT)
+BEGIN
+					START TRANSACTION;
+					SELECT * FROM info
+WHERE info_id= _row_id;
+COMMIT;
+END$$
+
+DROP PROCEDURE IF EXISTS `get_list_info`$$
+CREATE  PROCEDURE `get_list_info`(IN _start_by INT,IN _range INT, IN _search VARCHAR(500))
+BEGIN
+					START TRANSACTION;
+					 SET @search_info_title := CONCAT('%',TRIM(_search),'%') ;
+					IF _range < 1 THEN
+					SELECT * FROM info
+WHERE info_active=1   AND (  (info_title LIKE  @search_info_title)  )    ORDER BY info_title ASC ;
+ELSE
+SELECT * FROM info
+WHERE info_active=1   AND (  (info_title LIKE  @search_info_title)  )    ORDER BY info_title ASC  LIMIT _start_by , _range;
+END IF;
+COMMIT;
+END$$
+
+DROP PROCEDURE IF EXISTS `remove_info`$$
+CREATE PROCEDURE `remove_info`(IN _element_id INT)
+BEGIN
+START TRANSACTION;
+UPDATE info SET info_active=0
+WHERE info_id= _element_id;
+COMMIT;
+END$$
+
+DROP PROCEDURE IF EXISTS `update_info`$$
+CREATE PROCEDURE `update_info`(_element_id INT , _info_id INT , _info_title  VARCHAR(505) , _info_desc  VARCHAR(1005) , _info_link  VARCHAR(505) , _info_type  VARCHAR(25) , _info_order INT)
+BEGIN
+START TRANSACTION;
+UPDATE  info SET info_id = _info_id , info_title = _info_title , info_desc = _info_desc , info_link = _info_link , info_type = _info_type , info_order = _info_order
+WHERE (info_id = _element_id);
+COMMIT;
+END$$
+
+DROP TABLE IF EXISTS `info`$$
+CREATE TABLE IF NOT EXISTS `info` (
+  `info_id` int(11) NOT NULL AUTO_INCREMENT,
+  `info_title` varchar(500) NOT NULL,
+  `info_desc` varchar(1000) DEFAULT NULL,
+  `info_link` varchar(500) DEFAULT NULL,
+  `info_type` enum('Home','Features','Help','Reference') NOT NULL DEFAULT 'Help',
+  `info_order` int(2) NOT NULL DEFAULT '1',
+  `info_active` int(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`info_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=15 $$
+
+DROP PROCEDURE IF EXISTS `add_user_creation`$$
+CREATE PROCEDURE `add_user_creation`(_user_creation_id INT , _creation_user_id INT , _confirmation_code  VARCHAR(55) , _confirmation_try INT , _confirmation_expiration INT)
+BEGIN
+START TRANSACTION;
+INSERT INTO user_creation (creation_user_id , confirmation_code , confirmation_try , confirmation_expiration) VALUES (_creation_user_id , _confirmation_code , _confirmation_try , _confirmation_expiration);
+SELECT user_creation_id AS id_value FROM user_creation WHERE user_creation_id = LAST_INSERT_ID();
+COMMIT;
+END$$
+
+DROP PROCEDURE IF EXISTS `get_detail_user_creation`$$
+CREATE PROCEDURE `get_detail_user_creation`(IN _row_id INT)
+BEGIN
+					START TRANSACTION;
+					SELECT * FROM user_creation
+WHERE user_creation_id= _row_id;
+COMMIT;
+END$$
+
+
+INSERT INTO `info` (`info_id`, `info_title`, `info_desc`, `info_link`, `info_type`, `info_order`, `info_active`) VALUES
+(1, 'ReLiS : a tool for conducting Systematic Review', 'Systematic Review (SR) is a technique used to search for evidence in scientific literature that is conducted in a formal manner, applying well-defined steps, according to a previously elaborated protocol. As the SR has many steps and activities, its execution is laborious and repetitive. Therefore, the support of a computational tool is essential to improve the quality of its application. ReLiS is a tool to help in  planning, conducting and reporting the review.<br/>\r\n<i>ReLiS stands for <b>Revue Litteraire Systématique</b> which is French for <b> Systematic Literature Reviews</b>  Relis literally translates to “reread”.</i>\r\n', '', 'Home', 1, 1),
+(2, 'Plan the review', 'ReLiS features a domain specific language to define a protocol that will guide the process of conducting the review. That protocol will help to generate a project tailored to the needs of the review.', '', 'Features', 1, 1),
+(3, 'Import papers', 'ReLiS allow to add papers manually or import a list of them from CSV, BibTeX or EndNote files', '', 'Features', 2, 1),
+(4, 'Screen papers', 'Each paper can be assigned automatically or manually to a number of reviewers and a reviewer  can start screening the corpus and decide which paper to include and which one to exclude.', '', 'Features', 3, 1),
+(5, 'Create user account', '', 'create_account.mp4', 'Help', 1, 1),
+(6, 'Add reviewers to project', '', 'add_user_to_project.mp4', 'Help', 2, 1),
+(7, 'Import papers', 'ReLiS allow to add papers manually or import a list of them from CSV, BibTeX or EndNote files', 'add_papers.mp4', 'Help', 4, 1),
+(8, 'Learn more about the tool in:', '<p>B. Bigendako. and E. Syriani. Modeling a Tool for Conducting Systematic Reviews Iteratively. <i>Proceedings of the 6th International Conference on Model-Driven Engineering and Software Development</i>. pp. 552–559. (2018).</p>\r\n<p><center></center></p>', '', 'Reference', 1, 1),
+(9, 'Assess quality', 'Researchers can assess the quality of selected studies by using forms customised to the review.', '', 'Features', 4, 1),
+(10, 'Do data extraction', 'Researchers extracts the relevant data from each included paper according to the categories of a classification scheme he predefined for the study.', '', 'Features', 6, 1),
+(11, 'Export results', 'Extracted data are automatically synthesized in tables and charts and can be exported for further analysis.', '', 'Features', 7, 1),
+(12, 'Add a project', '', 'new_project.mp4', 'Help', 2, 1),
+(13, 'Data extraction  (or classification)', '', 'data_extraction.mp4', 'Help', 10, 1),
+(14, 'Screening', '', 'screening.mp4', 'Help', 6, 1)$$

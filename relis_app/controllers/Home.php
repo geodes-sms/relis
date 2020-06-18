@@ -169,7 +169,7 @@ if (!defined('BASEPATH')) exit('No direct script access allowed');
 					}
 					$data['page'] = 'general/home';
 					$this->load->view('body', $data);
-		}
+		
 	} 
 	
 	
@@ -901,7 +901,7 @@ month={Aug},}
 			
 			foreach ($data['users'] as $key => $value) {
 				
-				if(! (user_project($this->session->userdata('project_id'),$value['user_id'])) OR $value['user_usergroup'] == 1 ){
+				if(! (user_project($this->session->userdata('project_id'),$value['user_id']))){
 					unset($data['users'][$key]);
 				}else{
 					$data['users'][$key]['usergroup_name']=get_user_role($data['users'][$key]['user_id']);

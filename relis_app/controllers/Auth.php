@@ -29,6 +29,8 @@ if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Auth extends CI_Controller {
 
+    private $validationCodeValidityLimit = 86400; // (24* 60 * 60) ;
+
 	function __construct()
 		{
 		parent::__construct();
@@ -81,7 +83,7 @@ class Auth extends CI_Controller {
 		{
 	
 			$data['page']='h_login';
-	
+	        $this->clearNonValidatedAccounts();
 			/*
 			 * Chargement de la vue d'authentification
 			 */
@@ -430,6 +432,8 @@ class Auth extends CI_Controller {
 		//print_test($post_arr);// exit;
 		$this->load->library ( 'form_validation' );
 
+        $recaptchaResponse = trim($this->input->post('g-recaptcha-response'));
+
 		$data ['err_msg'] = '';//for users
 		
 		
@@ -445,7 +449,13 @@ class Auth extends CI_Controller {
 			$data ['content_item'] = $post_arr;
 			$this->new_user($data);
 		}else{
-			if ( !empty( $post_arr ['user_username']) AND !$this->bm_lib->login_available($post_arr ['user_username'])) {
+		    
+		    $validatedCaptcha = $this->validateCaptcha( $recaptchaResponse);
+		    if (! $validatedCaptcha ){
+                $data ['content_item'] = $post_arr;
+                $data ['err_msg'] .= 'Sorry Recaptcha Unsuccessful !! <br/>';
+                $this->new_user($data);
+            }elseif ( !empty( $post_arr ['user_username']) AND !$this->bm_lib->login_available($post_arr ['user_username'])) {
 				$data ['content_item'] = $post_arr;
 				$data ['err_msg'] .= 'Username already used <br/>';
 				$this->new_user($data);
@@ -472,7 +482,7 @@ class Auth extends CI_Controller {
 				$this->db->insert('user_creation', array(
 						'creation_user_id'=>$user_id,
 						'confirmation_code'=>$confimation_code,
-						'confirmation_expiration'=>time() + 86400,
+						'confirmation_expiration'=>time() + $this->validationCodeValidityLimit,
 						'confirmation_try'=>0,
 				));
 				//send message for confirmationm
@@ -481,22 +491,58 @@ class Auth extends CI_Controller {
 					<h2>Relis Validation message</h2>
 					<p>
 					Wecome to ReLiS:<br/>
-					Your validation code is : <b>$confimation_code</b>
+					Your validation code is : <b>$confimation_code</b><br/>
+					This validation code is active for 6 hours
 					</p>";
 				$subject="Validation code";
 				
 				$destination=array($user_array['user_mail']);
 				$res=$this->bm_lib->send_mail($subject,$message,$destination);
 				$data ['user_id']=$user_id;
-				$data ['success_msg']='A validation code has been sent to your email:<br/>Please enter the validation code';
+				$data ['success_msg']='A validation code has been sent to your email:<br/>Please enter the validation. The code is valid for 24 hours';
 				$this->validate_user($data);
 				
 				//echo "Correct ready to save and validate";
 			}
 			
-		}	
-	}
-	
+		}
+
+    }
+
+    private function clearNonValidatedAccounts(){
+	    $limitDate = date('Y-m-d H:i:s' , time() + $this->validationCodeValidityLimit);
+
+        $this->db->where('user_state' , 0);
+        $this->db->where('user_active' , 1);
+        $this->db->where('creation_time < ' , $limitDate);
+        $this->db->delete('users');
+
+        $this->db->where('user_creation_active' , 1);
+        $this->db->where('confirmation_expiration < ' , time() + $this->validationCodeValidityLimit);
+        $this->db->delete('user_creation');
+    }
+
+    private function validateCaptcha( $recaptchaResponse ){
+
+        $secret='6LcKU-4UAAAAAJwSMlWsIkPTByYC6aPwAy4z_PnF';
+        $credential = array(
+            'secret' => $secret,
+            'response' => $recaptchaResponse
+        );
+
+        $verify = curl_init();
+        curl_setopt($verify, CURLOPT_URL, "https://www.google.com/recaptcha/api/siteverify");
+        curl_setopt($verify, CURLOPT_POST, true);
+        curl_setopt($verify, CURLOPT_POSTFIELDS, http_build_query($credential));
+        curl_setopt($verify, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($verify, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($verify);
+
+        $status= json_decode($response, true);
+
+        return $status['success'];
+
+    }
 	
 	/*
 	 * Formulaire pour valider un compte qui vient d'être créer

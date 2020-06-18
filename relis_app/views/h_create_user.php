@@ -1,4 +1,7 @@
-
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+        <script src='https://www.google.com/recaptcha/api.js'></script>
         <!-- page content -->
         <div class="right_col" role="main">
           
@@ -60,6 +63,8 @@
                 <input type="password" class="form-control" placeholder="" name="user_password_validate" 
                 value="" required="" />
               </div>
+
+                <div class="g-recaptcha" data-sitekey="6LcKU-4UAAAAANnmVMyQzOh5WcF4oTB8VIza5Cq5"></div> <br/><br/>
             
               <div>
                 <button type="submit" class="btn btn-primary submit" ><?php echo lng_min('Create')?></button>

@@ -2563,7 +2563,7 @@ public function entity_list_graph($operation_name,$val = "_",$page = 0,$graph='a
 			
 			
 			
-			if((isset($field_info['multi-select']) AND isset($field_info['multi-select'])=='Yes')){//multi- select
+			if(isset($field_info['multi-select']) AND $field_info['multi-select']=='Yes'){//multi- select
 				if(!empty($post_arr[$key])){
 					$multi_select_values[$key]['values']=$post_arr[$key];
 					$multi_select_values[$key]['config']=$field_info;

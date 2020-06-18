@@ -683,7 +683,7 @@ class Install extends CI_Controller {
 			
 			//echo "<h2>initialise stored procedures</h2>";
 			$this->update_stored_procedure('init',FALSE,$project_short_name,TRUE);
-			$this->populate_common_tables_views($project_short_name);
+
 			if($verbose)
 				echo "Database initialised";
 			
@@ -743,7 +743,9 @@ class Install extends CI_Controller {
 				
 			}
 	//		echo $sql_table."<br/>";
-			
+
+            $this->populate_common_tables_views($project_short_name);
+
 			if($verbose)
 				echo "<h3>Project specific tables created</h3>";
 				
@@ -1084,7 +1086,7 @@ class Install extends CI_Controller {
 			}
 		}
 		
-		if(!empty($reference_tables)){
+		if(!empty($generated_tables)){
 			foreach ($generated_tables as $key => $value) {
 				if($i==1)
 					$sql="DROP TABLE IF EXISTS `".$value."` ";
@@ -1102,7 +1104,7 @@ class Install extends CI_Controller {
 		//print_test($res_sql);
 		//echo $sql;
 		
-		$sql="DELETE from ref_tables where reftab_id !=1";
+		$sql="DELETE from ref_tables where reftab_id !=0";
 		
 		$res_sql = $this->manage_mdl->run_query($sql);
 		

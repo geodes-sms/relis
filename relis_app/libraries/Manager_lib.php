@@ -128,12 +128,17 @@ class Manager_lib
 					}
 	
 	
-					if(isset($ref_table_config['fields'][$fields]['input_select_source']) AND $ref_table_config['fields'][$fields]['input_select_source']=='array'){
-	
-						$select_values=$ref_table_config['fields'][$fields]['input_select_values'];
-	
-						$result[$value['refId']]= $select_values[$result[$value['refId']]];
-	
+					if(isset($ref_table_config['fields'][$fields]['input_select_source']) ){
+					    $source = $ref_table_config['fields'][$fields]['input_select_source'];
+
+					    if( $source == 'array'){
+                            $select_values=$ref_table_config['fields'][$fields]['input_select_values'];
+                        }elseif($source == 'yes_no'){
+                            $select_values = array( 0 =>'No', 1 => 'Yes');
+                        }
+
+	                    if(!empty($select_values[$result[$value['refId']]]))
+						    $result[$value['refId']]= $select_values[$result[$value['refId']]];
 					}
 	
 	
