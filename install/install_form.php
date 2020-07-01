@@ -69,14 +69,14 @@ function install_form($values=array(),$error=array()){?>
 			$db_host=(!empty($values['db_host']))?$values['db_host']:'localhost' ;
 			$db_user=(!empty($values['db_user']))?$values['db_user']:'root' ;
 		//	$db_pass=(!empty($values['db_pass']))?$values['db_pass']:'' ;
-			$db_name=(!empty($values['db_name']))?$values['db_name']:'' ;
+			$db_name=(!empty($values['db_name']))?$values['db_name']:'relis_db' ;
 			
 			$full_name=(!empty($values['full_name']))?$values['full_name']:'Admin' ;
-			$user_mail=(!empty($values['user_mail']))?$values['user_mail']:'' ;
-			$user_name=(!empty($values['user_name']))?$values['user_name']:'' ;
+			$user_mail=(!empty($values['user_mail']))?$values['user_mail']:'info@relis.ca' ;
+			$user_name=(!empty($values['user_name']))?$values['user_name']:'admin' ;
 			
-			$dsl_url=(!empty($values['dsl_url']))?$values['dsl_url']:'' ;
-			$dsl_workspace=(!empty($values['dsl_workspace']))?$values['dsl_workspace']:'' ;
+			$dsl_url=(!empty($values['dsl_url']))?$values['dsl_url']:'http://localhost:8088/relis/texteditor' ;
+			$dsl_workspace=(!empty($values['dsl_workspace']))?$values['dsl_workspace']:'/u/relis/public_html/workspace/dslforge_workspace' ;
 			
 			$array_fields_db=array();
 			$array_fields_admin=array();
@@ -178,7 +178,7 @@ function install_form($values=array(),$error=array()){?>
 			$field=array(
 					'type'=>'password',
 					'id'=>'user_password',
-					'value'=>'',
+					'value'=>'123',
 					'label'=>'Administrator Password',
 					'extra_note'=>'Set the password for your Super User account and confirm it in the field below',
 					'is_required'=>True
@@ -188,7 +188,7 @@ function install_form($values=array(),$error=array()){?>
 			$field=array(
 					'type'=>'password',
 					'id'=>'user_password_v',
-					'value'=>'',
+					'value'=>'123',
 					'label'=>'Confirm Administrator Password',
 					'extra_note'=>'',
 					'is_required'=>True

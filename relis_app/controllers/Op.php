@@ -1561,12 +1561,12 @@ public function entity_list_graph($operation_name,$val = "_",$page = 0,$graph='a
 	 */
 	
 	
-	public function add_element_modal($operation_name, $data = "", $operation ='new',$display_type="normal",$op_type="Add") {
+	public function add_element_modal($operation_name, $data = [], $operation ='new',$display_type="normal",$op_type="Add") {
 		
 		$this->add_element($operation_name, $data , $operation ,'modal',$op_type);
 	}
 	
-	public function add_element($operation_name, $data = "", $operation ='new',$display_type="normal",$op_type="Add") {
+	public function add_element($operation_name, $data = [], $operation ='new',$display_type="normal",$op_type="Add") {
 		
 		$op=check_operation($operation_name,$op_type);
 		$ref_table=$op['tab_ref'];
@@ -1627,7 +1627,7 @@ public function entity_list_graph($operation_name,$val = "_",$page = 0,$graph='a
 			 * Prépartions des valeurs qui vont apparaitres dans le formulaire
 			 */
 		//	$title_append=$table_config['reference_title_min'];
-			
+
 			$data['table_config']=$table_config;
 			
 			//print_test($data);

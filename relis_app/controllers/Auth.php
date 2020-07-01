@@ -39,18 +39,11 @@ class Auth extends CI_Controller {
 		}
 		
 	/*
-	 * Page d'authentification
+	 * Home page
 	 * 
-	 * */
+	 */
 	public function index()
 	{
-	
-		
-		
-		
-			
-		//get	info to display
-		
 		$data['home_info'] = $this->db->order_by('info_order', 'ASC')
 			->get_where('info', array('info_active'=>1,'info_type'=>'Home'))
 			->row_array();
@@ -58,38 +51,37 @@ class Auth extends CI_Controller {
 		$data['home_ref'] = $this->db->order_by('info_order', 'ASC')
 			->get_where('info', array('info_active'=>1,'info_type'=>'Reference'))
 			->row_array();
-		
-			
-			$data['home_features'] = $this->db->order_by('info_order', 'ASC')
+
+		$data['home_features'] = $this->db->order_by('info_order', 'ASC')
 			->get_where('info', array('info_active'=>1,'info_type'=>'Features'))
 			->result_array();
-		//print_test($data);	
+
 		$data['page']='h_home';
 		$this->load->view('h_body',$data);
-	
+
+		return;
 	}
-	
-	
+
+    /*
+     * Authentication page
+     *
+     */
 	public function login()
 	{
-	
-	
-		if(($this->session->userdata('user_id')))
-		
-		{
-			//Si l'utilisateur a déjà une session ouverte il est redirigé vers la page d'acceuil
+		if(($this->session->userdata('user_id'))) {
+
 			redirect('home');
-		}else
-		{
-	
-			$data['page']='h_login';
-	        $this->clearNonValidatedAccounts();
-			/*
-			 * Chargement de la vue d'authentification
-			 */
-			$this->load->view('h_body',$data);
+
+			return;
 		}
+        $this->clearNonValidatedAccounts();
+
+        $data['page']='h_login';
+        $this->load->view('h_body',$data);
+
+        return;
 	}
+
 	public function help()
 	{
 	
@@ -398,118 +390,137 @@ class Auth extends CI_Controller {
 		echo "done";
 	
 	}
-	
-	
-	/*
-	 * Formulaire pour ajouter un nouvel utilisateur
-	 *
-	 * */
-	public function new_user($data=array())
+
+    /**
+     * Form to create a user account
+     *
+     * @param array $data
+     */
+    public function new_user($data = [])
 	{
-	
-	
-		if(($this->session->userdata('user_id')))
-	
-		{
-			//Si l'utilisateur a déjà une session ouverte il est redirigé vers la page d'acceuil
+		if(($this->session->userdata('user_id'))) {
+			//If there is an open user session the user is redirected to the home page
 			redirect('home');
-		}else
-		{
+		}else {
 			$data['page']='h_create_user';
 	
 			$this->load->view('h_body',$data);
 		}
+
+		return;
 	}
-		
-	/*
-	 * Ajout d'un nouvel utilisateur
-	 */
-	public function check_create_user(){
-		/*
-		 * Récupération des valeurs saisie per l'utilisateur
-		 */
+
+
+    /**
+     *Add new user
+     */
+    public function check_create_user()
+    {
 		$post_arr=$this->input->post();
-		//print_test($post_arr);// exit;
 		$this->load->library ( 'form_validation' );
-
-        $recaptchaResponse = trim($this->input->post('g-recaptcha-response'));
-
-		$data ['err_msg'] = '';//for users
-		
-		
 		$this->form_validation->set_rules ( 'user_name','Name', 'trim|required' );
 		$this->form_validation->set_rules ( 'user_mail','Email', 'trim|valid_email' );
 		$this->form_validation->set_rules ( 'user_username','Username', 'trim|required' );
 		$this->form_validation->set_rules ( 'user_password','Password', 'trim|required|matches[user_password_validate]' );
 		$this->form_validation->set_rules ( 'user_password_validate','Validate password', 'trim|required' );
-		
-		
-		///vérify if the username is unique
-		if ($this->form_validation->run () == FALSE ) {
-			$data ['content_item'] = $post_arr;
-			$this->new_user($data);
-		}else{
-		    
-		    $validatedCaptcha = $this->validateCaptcha( $recaptchaResponse);
-		    if (! $validatedCaptcha ){
-                $data ['content_item'] = $post_arr;
-                $data ['err_msg'] .= 'Sorry Recaptcha Unsuccessful !! <br/>';
-                $this->new_user($data);
-            }elseif ( !empty( $post_arr ['user_username']) AND !$this->bm_lib->login_available($post_arr ['user_username'])) {
-				$data ['content_item'] = $post_arr;
-				$data ['err_msg'] .= 'Username already used <br/>';
-				$this->new_user($data);
-				
-			}else{
-				
-				
-				
-				$user_array=array(
-						'user_name'=>$post_arr['user_name'],
-						'user_mail'=>$post_arr['user_mail'],
-						'user_username'=>$post_arr['user_username'],
-						'user_usergroup'=>2,
-						'user_state'=>0,
-						'user_password'=>md5($post_arr['user_password'])
-						
-				);
-				//add user in the db
-				$this->db->insert('users', $user_array);
-				$user_id=$this->db->insert_id();
-				
-				$confimation_code=$res=$this->bm_lib->random_str(12);;
-		
-				$this->db->insert('user_creation', array(
-						'creation_user_id'=>$user_id,
-						'confirmation_code'=>$confimation_code,
-						'confirmation_expiration'=>time() + $this->validationCodeValidityLimit,
-						'confirmation_try'=>0,
-				));
-				//send message for confirmationm
-				
-				$message="
-					<h2>Relis Validation message</h2>
-					<p>
-					Wecome to ReLiS:<br/>
-					Your validation code is : <b>$confimation_code</b><br/>
-					This validation code is active for 6 hours
-					</p>";
-				$subject="Validation code";
-				
-				$destination=array($user_array['user_mail']);
-				$res=$this->bm_lib->send_mail($subject,$message,$destination);
-				$data ['user_id']=$user_id;
-				$data ['success_msg']='A validation code has been sent to your email:<br/>Please enter the validation. The code is valid for 24 hours';
-				$this->validate_user($data);
-				
-				//echo "Correct ready to save and validate";
-			}
-			
-		}
 
+        $data ['err_msg'] = '';
+		if ($this->form_validation->run () == FALSE ) {
+            $data ['content_item'] = $post_arr;
+            $this->new_user($data);
+
+            return;
+        }
+
+        $recaptchaResponse = trim($this->input->post('g-recaptcha-response'));
+        $validatedCaptcha = $this->validateCaptcha( $recaptchaResponse);
+        if (!$validatedCaptcha) {
+            $data ['content_item'] = $post_arr;
+            $data ['err_msg'] .= 'Sorry Recaptcha Unsuccessful !! <br/>';
+            $this->new_user($data);
+
+            return;
+        }
+
+        if (!empty( $post_arr ['user_username'])
+                AND !$this->bm_lib->login_available($post_arr ['user_username'])) {
+            $data ['content_item'] = $post_arr;
+            $data ['err_msg'] .= 'Username already used <br/>';
+            $this->new_user($data);
+
+            return;
+        }
+
+        $user_array = array(
+                'user_name' => $post_arr['user_name'],
+                'user_mail' => $post_arr['user_mail'],
+                'user_username' => $post_arr['user_username'],
+                'user_usergroup' => 2,
+                'user_state' => 0,
+                'user_password' => md5($post_arr['user_password'])
+
+        );
+        //add user in the db
+        $this->db->insert('users', $user_array);
+        $user_id = $this->db->insert_id();
+
+        $confimation_code = $res=$this->bm_lib->random_str(12);;
+
+        $this->db->insert('user_creation', array(
+                'creation_user_id'=>$user_id,
+                'confirmation_code'=>$confimation_code,
+                'confirmation_expiration'=>time() + $this->validationCodeValidityLimit,
+                'confirmation_try'=>0,
+        ));
+
+        //send confirmation mail
+        $this->sendConfirmationMail($user_array, $confimation_code);
+        $data ['user_id'] = $user_id;
+        $data ['success_msg'] = 'A validation code has been sent to your email:<br/>
+                                Please enter the validation. The code is valid for 24 hours';
+        $this->validate_user($data);
+
+        return;
     }
 
-    private function clearNonValidatedAccounts(){
+    private function sendConfirmationMail($userInfo, $confirmationCode)
+    {
+        $message = "
+                    <h2>Relis Validation message</h2>
+                    <p>
+                    Welcome to ReLiS:<br/>
+                    Your validation code is : <b>$confirmationCode</b><br/>
+                    This validation code is active for 6 hours
+                    </p>";
+        $subject = "Validation code";
+
+        $destination = [$userInfo['user_mail']];
+        $res = $this->bm_lib->send_mail($subject, $message, $destination);
+
+        return;
+    }
+
+    public function testMail()
+    {
+        $message = "
+                    <h2>Relis Validation message</h2>
+                    <p>
+                    Welcome to ReLiS:<br/>
+                    Here is a f..g test message
+                    </p>";
+        $subject = "test validation code";
+
+        $destination = ['bbigendako@gmail.com'];
+        $res=$this->bm_lib->send_mail($subject, $message, $destination);
+
+        print_test($res);
+
+        return;
+    }
+
+
+    private function clearNonValidatedAccounts()
+    {
 	    $limitDate = date('Y-m-d H:i:s' , time() + $this->validationCodeValidityLimit);
 
         $this->db->where('user_state' , 0);
@@ -520,10 +531,13 @@ class Auth extends CI_Controller {
         $this->db->where('user_creation_active' , 1);
         $this->db->where('confirmation_expiration < ' , time() + $this->validationCodeValidityLimit);
         $this->db->delete('user_creation');
+
+        return;
     }
 
-    private function validateCaptcha( $recaptchaResponse ){
-
+    private function validateCaptcha($recaptchaResponse)
+    {
+        //TODO put recaptcha secret in the config file
         $secret='6LcKU-4UAAAAAJwSMlWsIkPTByYC6aPwAy4z_PnF';
         $credential = array(
             'secret' => $secret,
@@ -537,30 +551,26 @@ class Auth extends CI_Controller {
         curl_setopt($verify, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($verify, CURLOPT_RETURNTRANSFER, true);
         $response = curl_exec($verify);
-
         $status= json_decode($response, true);
 
         return $status['success'];
-
     }
 	
 	/*
-	 * Formulaire pour valider un compte qui vient d'être créer
-	 *
-	 * */
-	public function validate_user($data=array())
+	 * Form for account validation
+	 */
+	public function validate_user($data = [])
 	{
-		//print_test($data);
-		$user_id=$data['user_id'];
-		
 		$data['page']='validate_user';
 		
 		$this->load->view('validate_user',$data);
+
+		return;
 	}
 	
 	
 	/*
-	 * Ajout d'un nouvel utilisateur
+	 * Process validation form data
 	 */
 	public function check_validation(){
 		/*

@@ -1,9 +1,0 @@
-echarts 12 MB
-
-moment 5MB
-
-parsleyjs 3 MB
-
-pdfmake 4Mb
-
-raphael 1MB
