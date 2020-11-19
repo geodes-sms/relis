@@ -1,17 +1,14 @@
 .DS_Store
 !index.php
 relis_app/cache/*
-!application/cache/index.html
-!application/cache/.htaccess
 
 relis_app/logs/*
-!application/logs/index.html
-!application/logs/.htaccess
 
 cside/sessions/relis_session*
 relis_app/libraries/table_config/project/install_config*
 relis_app/libraries/table_config/project/temp/install_config*
 workspace/dslforge_workspace/*
+relis_app/config/database.php
 
 /vendor/
 derby*
