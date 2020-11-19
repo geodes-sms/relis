@@ -42,7 +42,7 @@ The project is run locally using docker. Make sure to follow the pre-requisite s
 4. From your browser go to url **localhost:8083** to access the application, default credentials  are admin::123.
 
 ### Usefull command
-To connect inside your docker container run the command "docker-compose exec relis-application-service bash" from the directory **deployment/**
+To connect inside your docker container run the command "docker-compose exec relis-application-service bash" from the directory **relis_deployment/**
 
 
 # Distribution
