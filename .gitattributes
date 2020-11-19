@@ -1,1 +1,1 @@
-deployment/local/docker/*.sh text eol=lf
+relis_deployment/docker/*.sh text eol=lf
