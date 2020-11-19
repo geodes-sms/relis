@@ -39,7 +39,7 @@ The project is run locally using docker. Make sure to follow the pre-requisite s
 2. Run command "docker-compose build" from the directory **relis_deployment/**
 3. Run command "docker-compose up -d" from the directory **relis_deployment/**
 (For **windows users** , if you get the error ``relis-application-service | standard_init_linux.go:211: exec user process caused "no such file or directory"``: check if the file ``deployment/docker/entrypoint.sh`` EOL is not CRLF;  if it is, convert it from CRLF to LF and go back to step 2.)
-4. From your browser go to url **localhost:8083** to access the application.
+4. From your browser go to url **localhost:8083** to access the application, default credentials  are admin::123.
 
 ### Usefull command
 To connect inside your docker container run the command "docker-compose exec relis-application-service bash" from the directory **deployment/**
