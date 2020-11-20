@@ -643,9 +643,40 @@ class Install extends CI_Controller {
 		$this->load->view ( 'body', $data );
 		
 	}
+
+	private function dbConnectionConfigExist($connectionName){
+        $db=[];
+        //  Load the database config file.
+        if(file_exists($file_path = APPPATH.'config/database.php'))
+        {
+            include($file_path);
+        }
+
+        if(empty($db[$connectionName]))
+        {
+            return false;
+        }
+        $config = $db[$connectionName];
+
+        //  Check database connection if using mysqli driver
+        if( $config['dbdriver'] === 'mysqli' )
+        {
+            $mysqli = new mysqli( $config['hostname'] , $config['username'] , $config['password'] , $config['database'] );
+            if( !$mysqli->connect_error )
+            {
+                $mysqli->close();
+                return true;
+            }
+
+            $mysqli->close();
+        }
+
+        return false;
+
+    }
 	
-	public function save_new_project_part2($project_short_name ,$verbose=false){
-		
+	public function save_new_project_part2($project_short_name ,$verbose=false, $reloadTimes = -1){
+
 			$error_array=array();
 			$success_array=array();
 			
@@ -666,10 +697,26 @@ class Install extends CI_Controller {
 			array_push($success_array, lng('New database created'));
 				
 			//setting CI database configuration
-			$this->add_database_config($project_short_name);
+
+            if($reloadTimes = -1){
+                $this->add_database_config($project_short_name);
+            }
+
 			
 			//sleep to wait for config to be update (to correct for something really sure)
-			sleep(5);
+			sleep(2);
+
+
+			if( !$this->dbConnectionConfigExist($project_short_name) && $reloadTimes != 0 ){
+			    if($reloadTimes == -1){
+                    $reloadTimes = 5;
+                }
+
+                $reloadTimes = $reloadTimes - 1;
+                $error_array=array();
+                $success_array=array();
+                redirect('install/save_new_project_part2/'.$project_short_name.'/0/'.$reloadTimes);
+            }
 			
 			//echo "<h2>initialise database</h2>";
 		
