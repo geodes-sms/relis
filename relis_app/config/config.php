@@ -330,4 +330,5 @@ $config['mail_reply_to']    = "example@gmail.com";
 $config['sess_save_path'] = "/u/relis/public_html/cside/sessions";
 $config['base_url'] = "http://localhost:8083";
 $config['project_db_user'] = "root";
+$config['project_db_host'] = "localhost";
 $config['project_db_pass'] = "";

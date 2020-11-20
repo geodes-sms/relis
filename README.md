@@ -40,6 +40,7 @@ The project can be installed locally using docker. Make sure to follow the pre-r
 3. Run command "docker-compose up -d" from the directory **relis_deployment/**
 (For **windows users** , if you get the error ``relis-application-service | standard_init_linux.go:211: exec user process caused "no such file or directory"``: check if the file ``relis_deployment/docker/entrypoint.sh`` EOL is not CRLF;  if it is, convert it from CRLF to LF and go back to step 2.)
 4. From your browser go to url **localhost:8083** to access the application, default credentials  are admin::123.
+5. For test purpose you can also access the database using PHPMyAdmin on **localhost:8083/phpmyadmin**, the user is root, no password required (You should use this feature only on the local environment).
 
 ### Usefull command
 To connect inside your docker container run the command "docker-compose exec relis-application-service bash" from the directory **relis_deployment/**
