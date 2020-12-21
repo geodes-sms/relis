@@ -9,6 +9,7 @@ relis_app/libraries/table_config/project/install_config*
 relis_app/libraries/table_config/project/temp/install_config*
 workspace/dslforge_workspace/*
 relis_app/config/database.php
+phpmyadmin/tmp/*
 
 /vendor/
 derby*

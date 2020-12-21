@@ -278,7 +278,7 @@ $config['proxy_ips'] = '';
 // My configurations
 
 $config['rec_per_page'] = '50'; 
-$config['free_controllers'] = array('0' => 'auth','1' => 'api');
+$config['free_controllers'] = ['auth','api','apiquery'];
 
 
 //For image upload

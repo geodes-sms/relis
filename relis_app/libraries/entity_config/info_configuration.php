@@ -63,7 +63,7 @@ function get_info() {
 	$fields['info_desc']=array(
 			'field_title'=>"Content",
 			'field_type'=>'text', 
-			'field_size'=>2000,  
+			'field_size'=>10000,
 			'input_type'=>'textarea',
 	);
 	$fields['info_link']=array(

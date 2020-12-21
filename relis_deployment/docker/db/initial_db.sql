@@ -123,7 +123,7 @@ DROP TABLE IF EXISTS `info`;
 CREATE TABLE `info` (
   `info_id` int(11) NOT NULL AUTO_INCREMENT,
   `info_title` varchar(500) NOT NULL,
-  `info_desc` varchar(1000) DEFAULT NULL,
+  `info_desc` varchar(10000) DEFAULT NULL,
   `info_link` varchar(500) DEFAULT NULL,
   `info_type` enum('Home','Features','Help','Reference') NOT NULL DEFAULT 'Help',
   `info_order` int(2) NOT NULL DEFAULT '1',
