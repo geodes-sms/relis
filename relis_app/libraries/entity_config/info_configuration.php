@@ -67,7 +67,7 @@ function get_info() {
 			'input_type'=>'textarea',
 	);
 	$fields['info_link']=array(
-			'field_title'=>"Links",
+			'field_title'=>"Youtube video",
 			'field_type'=>'text', 
 			'field_size'=>500,  
 			'input_type'=>'text',
