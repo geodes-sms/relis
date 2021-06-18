@@ -32,7 +32,19 @@ The project can be installed locally using docker. Make sure to follow the pre-r
 ### Pre-requisite:
 - Install docker on your local environment (download at: https://www.docker.com/products/docker-desktop)
 - Install docker-compose on your local environment (it comes by default with docker on mac and windows)
-- Run command "docker-compose" to check that docker is correctly installed and keep going
+- Run command "docker-compose" to check that docker is correctly installed
+- For Windows users, if Docker cannot start with the following error : 
+  "Hardware assisted virtualization and data execution protection must be enabled in the BIOS" then excute following steps:
+  - Enable features : Virtual Machine Platform, Windows Subsystem for Linux and Hyper-V using "Windows Features"
+    (See https://docs.docker.com/docker-for-windows/troubleshoot/#virtualization for more information)
+  - Restart you system and press esc key or any correspondent key to enter the BIOS settings in windows 
+  - Press f10 or other key to enter BIOS Setup
+  - Go to System Configuration then Device Configuration 
+  - Enable Virtualization 
+  - Restart your aystem
+  If Docker still not start with the error "Docker.ApiServices.WSL2.WslKernet NotInstalledException" then excute following steps:
+  - use the link https://docs.microsoft.com/en-us/windows/wsl/install-win10#step-4---download-the-linux-kernel-update-package to download and intall linux kernal update 
+  - Restart you system if Docker not start 
 
 ### Build and run the application:
 1. Clone the project from GitHub (git clone https://github.com/geodes-sms/relis.git)
