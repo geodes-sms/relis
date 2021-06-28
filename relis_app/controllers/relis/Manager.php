@@ -451,7 +451,7 @@ class Manager extends CI_Controller {
 
 			if($value['title']=='Author' AND !empty($value['val2'])){
 
-				if(count($value['val2']>1)){
+				if(count($value['val2'])>1){
 					$authors='<table class="table table-hover" ><tr><td> '.$value['val2'][0].'</td></tr>';
 					foreach ($value['val2'] as $k => $v) {
 						if($k>0){
@@ -4179,7 +4179,7 @@ class Manager extends CI_Controller {
 				$venue=$value['val2'][0];
 			}elseif($value['field_id']=='authors' AND !empty($value['val2'])){
 
-				if(count($value['val2']>1)){
+				if(count($value['val2'])>1){
 					$authors='<table class="table table-hover" ><tr><td> '.$value['val2'][0].'</td></tr>';
 					foreach ($value['val2'] as $k => $v) {
 						if($k>0){
@@ -4380,7 +4380,7 @@ class Manager extends CI_Controller {
 				$venue=$value['val2'][0];
 			}elseif($value['field_id']=='authors' AND !empty($value['val2'])){
 
-				if(count($value['val2']>1)){
+				if(count($value['val2'])>1){
 					$authors='<table class="table table-hover" ><tr><td> '.$value['val2'][0].'</td></tr>';
 					foreach ($value['val2'] as $k => $v) {
 						if($k>0){
