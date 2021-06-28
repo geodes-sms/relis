@@ -1,0 +1,16 @@
+version: "3.7"
+services:
+  relis-application-service:
+    container_name: relis-application
+    image: relis-application
+    build:
+      context: ./docker
+      args:
+        DIRECTORY_INDEX: index.php
+        DOCUMENT_ROOT: /u/relis/public_html
+    entrypoint: /usr/local/bin/entrypoint.sh
+    ports:
+        - 8083:80
+        - 8088:8080
+    volumes:
+      - ..:/u/relis/public_html

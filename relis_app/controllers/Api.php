@@ -47,7 +47,7 @@ class Api extends CI_Controller
 				$this->db_project = $this->load->database($project_label, TRUE);
 			
 				$protocol=array();
-			
+
 			$protocol['schema']=$this->get_scheme($project_label);
 			$protocol['data']=$this->get_data($project_label);
 			}
