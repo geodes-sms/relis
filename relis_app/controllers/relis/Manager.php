@@ -451,7 +451,7 @@ class Manager extends CI_Controller {
 
 			if($value['title']=='Author' AND !empty($value['val2'])){
 
-				if(count($value['val2'])>1){
+				if(count($value['val2']>1)){
 					$authors='<table class="table table-hover" ><tr><td> '.$value['val2'][0].'</td></tr>';
 					foreach ($value['val2'] as $k => $v) {
 						if($k>0){
@@ -2725,7 +2725,7 @@ class Manager extends CI_Controller {
 	
 
 
-	public function pre_assignment_screen($data=array()){
+	public function pre_assignment_screen($data=""){
 		$data['screening_phases']= $this->manager_lib->get_reference_select_values('screen_phase;phase_title',True,False);
 
 		$source_papers= $data['screening_phases'];
@@ -2736,6 +2736,7 @@ class Manager extends CI_Controller {
 		$data ['top_buttons'] = get_top_button ( 'back', 'Back', 'manage' );
 
 		$data ['page'] = 'relis/pre_assign_papers_screen_auto';
+
 		//	print_test($data);
 
 		/*
@@ -2744,11 +2745,12 @@ class Manager extends CI_Controller {
 		$this->load->view ( 'body', $data );
 	}
 
-	public function assignment_screen($data=array()){
+	public function assignment_screen($data=""){
 		if(! active_screening_phase())
 		{	redirect('home');
 		exit;
 		}
+			
 		/*$error=FALSE;
 		 if(empty($data))
 		 {
@@ -4177,7 +4179,7 @@ class Manager extends CI_Controller {
 				$venue=$value['val2'][0];
 			}elseif($value['field_id']=='authors' AND !empty($value['val2'])){
 
-				if(count($value['val2'])>1){
+				if(count($value['val2']>1)){
 					$authors='<table class="table table-hover" ><tr><td> '.$value['val2'][0].'</td></tr>';
 					foreach ($value['val2'] as $k => $v) {
 						if($k>0){
@@ -4378,7 +4380,7 @@ class Manager extends CI_Controller {
 				$venue=$value['val2'][0];
 			}elseif($value['field_id']=='authors' AND !empty($value['val2'])){
 
-				if(count($value['val2'])>1){
+				if(count($value['val2']>1)){
 					$authors='<table class="table table-hover" ><tr><td> '.$value['val2'][0].'</td></tr>';
 					foreach ($value['val2'] as $k => $v) {
 						if($k>0){
@@ -4750,7 +4752,7 @@ class Manager extends CI_Controller {
 		$result['papers_in_conflict']=$conflicts;
 		return $result;
 	}
-	public function validate_screen_set($data=array()){
+	public function validate_screen_set($data=""){
 		if(! active_screening_phase())
 		{	redirect('home');
 		exit;
@@ -4828,7 +4830,7 @@ class Manager extends CI_Controller {
 	}
 
 
-	public function validate_screen_from_previous_set($data=array()){//old vesion updated
+	public function validate_screen_from_previous_set($data=""){//old vesion updated
 		if(! active_screening_phase())
 		{	redirect('home');
 		exit;
@@ -5235,7 +5237,7 @@ class Manager extends CI_Controller {
 
 	}
 
-	public function qa_assignment_validation_set($data=array()){
+	public function qa_assignment_validation_set($data=""){
 		//d
 
 		//$sql="SELECT * from paper  where paper_active = 1 AND screening_status='Included' ";
@@ -5278,7 +5280,7 @@ class Manager extends CI_Controller {
 		$this->load->view ( 'body', $data );
 	}
 
-	public function class_assignment_validation_set($data=array()){
+	public function class_assignment_validation_set($data=""){
 
 
 		$papers_for_qa=$this->get_papers_for_class_validation();
@@ -5320,7 +5322,7 @@ class Manager extends CI_Controller {
 	}
 
 
-	public function qa_assignment_set($data=array()){
+	public function qa_assignment_set($data=""){
 		//d
 
 		//$sql="SELECT * from paper  where paper_active = 1 AND screening_status='Included' ";
@@ -5363,7 +5365,7 @@ class Manager extends CI_Controller {
 		$this->load->view ( 'body', $data );
 	}
 
-	public function class_assignment_set($data=array()){
+	public function class_assignment_set($data=""){
 		//d
 
 		//$sql="SELECT * from paper  where paper_active = 1 AND screening_status='Included' ";
