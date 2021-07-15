@@ -277,7 +277,7 @@ $config['proxy_ips'] = '';
 
 // My configurations
 
-$config['rec_per_page'] = '50';
+$config['rec_per_page'] = '50'; 
 $config['free_controllers'] = array('0' => 'auth','1' => 'api');
 
 
@@ -300,8 +300,6 @@ $config['csv_field_separator_export'] = ',';
 $config['csv_string_dellimitter'] = '"';
 
 
-$config['base_url'] = "http://localhost/relis/relis_dev";
-
 $config['sess_save_path'] = "C:/xampp/htdocs/relis/relis_dev/cside/sessions";
 $config['editor_generated_path'] = "D:\www\dslforge\workspace";
 $config['editor_generated_path'] = "C:/dslforge_workspace";
@@ -310,31 +308,34 @@ $config['editor_url'] = "http://127.0.0.1:8080/relis/texteditor";
 $config['metrics_save_path'] = "C:/xampp/htdocs/relis/relis_dev/cside/metrics";
 $config['root_path'] = "C:/xampp/htdocs/relis/relis_dev";
 
-//$config['screening_conflict_type'] = "IncludeExclude";//can also have ExclusionCriteria
-//$config['screening_conflict_type'] = "ExclusionCriteria";//can also have IncludeExclude
-//$config['screening_conflict_resolution'] = "Unanimity";//can also have Majority
-//$config['screening_conflict_resolution'] = "Majority";//can also have Unanimity
 
 // Common configurations in relis
 $config['common_relis_configs'] = array('assignation','author','config','exclusion','papers',
-    'paper_author','ref_exclusioncrieria','str_mng','venue',
-    'assignment_screen','screening','screening_validate',
-    'assignment_screen_validate','operations');
+								'paper_author','ref_exclusioncrieria','str_mng','venue',
+								'assignment_screen','screening','screening_validate',
+									'assignment_screen_validate','operations');
+
 
 $config['project_specific_config_folder']="relis_app/libraries/table_config/project/";
 
 // The prefix that will have the new databases for projects  installed
-$config['project_db_prefix'] = "relis_dev_correct_";
+$config['project_db_prefix'] = "relis_";
 $config['server_OS'] = "WINDOWS";
 $config['support_contact'] = "info@relis.iro.umontreal.ca";
 
-//Mail config
-$config['mail_protocol']    = "smtp";
-$config['mail_host']        = "ssl://smtp.gmail.com";
-$config['mail_port']        = "465";
-$config['mail_user']        = "example@gmail.com";
-$config['mail_password']    = "Password";
-$config['mail_from']        = "example@gmail.com";
-$config['mail_reply_to']    = "example@gmail.com";
+// User used in the application as Demo user
+
+$config ['demo_user_id']=5;
+
+//Mail Server configuration
+
 
 // Added configuration
+
+
+$config['project_db_host'] = "localhost";
+ 	$config['project_db_user'] = "root";
+ 	$config['project_db_pass'] = "";
+ 
+
+$config['base_url'] = "http://localhost/relis/relis";
