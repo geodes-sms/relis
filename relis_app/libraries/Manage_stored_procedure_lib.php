@@ -1540,26 +1540,58 @@ END";
 			$this->CI->db2 = $this->CI->load->database($target_db, TRUE);
 		
 		
-			
-		
-			$procedure="
+			if($config['stored_procedure_name'] == 'remove_paper'){
+			    $config['table_one'] = 'screening_paper';
+                $config['table_two'] = 'paperauthor';
+                $config['table_one_field'] = 'paper_id';
+                $config['table_two_field'] = 'paperId';
+                $config['table_one_active_field'] = 'screening_active';
+                $config['table_two_active_field'] = 'paperId';
+
+
+                $procedure="
 				DROP PROCEDURE IF EXISTS ".$config['stored_procedure_name'].";
 				";
-		
-			if($run_query)
-				$res = $this->CI->db2->query ( $procedure );
-		
-				if($verbose)
-					echo "<p>$procedure</p>";
-		
-		
-					$procedure="CREATE PROCEDURE ".$config['stored_procedure_name']."(IN _element_id INT)
-BEGIN
-START TRANSACTION;
-UPDATE ".$config['table_name']." SET ".$config['table_active_field']."=0
-WHERE ".$config['table_id']."= _element_id;
-COMMIT;
-END";
+
+                if($run_query)
+                    $res = $this->CI->db2->query ( $procedure );
+
+                if($verbose)
+                    echo "<p>$procedure</p>";
+
+                $procedure="CREATE PROCEDURE ".$config['stored_procedure_name']."(IN _element_id INT)
+            BEGIN
+            START TRANSACTION;
+            UPDATE ".$config['table_name']." SET ".$config['table_active_field']."=0
+            WHERE ".$config['table_id']."= _element_id;
+            UPDATE ".$config['table_one']." SET ".$config['table_one_active_field']."=0
+            WHERE ".$config['table_one_field']."= _element_id;
+            UPDATE ".$config['table_two']." SET ".$config['table_two_active_field']."=0
+            WHERE ".$config['table_two_field']."= _element_id;
+            COMMIT;
+            END";
+            }
+		    else {
+            $procedure="
+				DROP PROCEDURE IF EXISTS ".$config['stored_procedure_name'].";
+				";
+
+            if($run_query)
+                $res = $this->CI->db2->query ( $procedure );
+
+            if($verbose)
+                echo "<p>$procedure</p>";
+
+
+            $procedure="CREATE PROCEDURE ".$config['stored_procedure_name']."(IN _element_id INT)
+            BEGIN
+            START TRANSACTION;
+            UPDATE ".$config['table_name']." SET ".$config['table_active_field']."=0
+            WHERE ".$config['table_id']."= _element_id;
+            COMMIT;
+            END";
+        }
+
 					if($verbose)
 						echo "<p>$procedure</p>";
 		

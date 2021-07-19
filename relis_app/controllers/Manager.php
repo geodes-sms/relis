@@ -2441,9 +2441,20 @@ class Manager extends CI_Controller {
 
 	}
 
-    public function clear_papers(){
+	public function clear_papers(){
 
-        $sql="DELETE FROM paperauthor WHERE 	paperauthor_active=1 OR paperauthor_active=3 ";
+		/////////////////For deleting authors and venues and everything when all papers are deleted.
+		
+		$sql="DELETE FROM author WHERE 	author_active=1 OR author_active=3 ";
+        $res=$this->db_current->query($sql);
+
+		$sql="DELETE FROM venue WHERE 	venue_active=1 OR venue_active=3 ";
+        $res=$this->db_current->query($sql);
+
+        ////// $sql="DELETE FROM paper WHERE 	paper_active=1 OR paper_active=3 ";
+        ////// $res=$this->db_current->query($sql);
+
+		$sql="DELETE FROM paperauthor WHERE 	paperauthor_active=1 OR paperauthor_active=3 ";
         $res=$this->db_current->query($sql);
 
         $sql="DELETE FROM assigned WHERE assigned_active=1 OR assigned_active=3 ";
@@ -2473,10 +2484,12 @@ class Manager extends CI_Controller {
         $sql="DELETE FROM paper WHERE paper_active = 1 OR  paper_active=3 ";
         $res=$this->db_current->query($sql);
 
-        set_top_msg('Clear papers cancelled');
+        set_top_msg('All papers deleted');
+		// set_top_msg('Clear papers cancelled');
         redirect ('op/entity_list/list_all_papers');
 
     }
+
 
 
 	public function cancel_clear_papers(){
