@@ -26,8 +26,7 @@ class Op extends CI_Controller {
 
 	function __construct()
 	{
-		parent::__construct();
-					
+		parent::__construct();			
 	}
 	
 	/*
@@ -37,7 +36,8 @@ class Op extends CI_Controller {
 	 * 			$val : valeur de recherche si une recherche a été faite sur la table en cours
 	 * 			$page: la page affiché : ulilisé dans la navigation
 	 */
-	public function entity_list($operation_name,$val = "_", $page = 0 ,$dynamic_table=1){
+	public function entity_list($operation_name,$val = "_", $page = 0 ,$dynamic_table=1)
+	{
 		$project_published=project_published();
 		//print_test($project_published);
 		$op=check_operation($operation_name,'List');
@@ -100,14 +100,11 @@ class Op extends CI_Controller {
 		$data=$this->DBConnection_mdl->get_list_mdl($ref_table_config,$val,$page,$rec_per_page);
 		
 	
-	//	print_test($data);
+		//	print_test($data);
 	
 		/*
 		 * récupération des correspondances des clés externes pour l'affichage  suivant la structure de la table
 		 */
-	
-		
-		
 		$dropoboxes=array();
 		foreach ($ref_table_config['operations'][$ref_table_operation]['fields'] as $k_field => $v) {
 			if(!empty($ref_table_config['fields'][$k_field])){
@@ -253,7 +250,7 @@ class Op extends CI_Controller {
 			
 			}
 		}
-	//print_test($link_field_list);
+		//print_test($link_field_list);
 		$i=1;
 		$list_to_display=array();
 		
@@ -371,7 +368,7 @@ class Op extends CI_Controller {
 		}
 	
 	
-	 $data ['list']=$list_to_display;
+	 	$data ['list']=$list_to_display;
 	 
 	 
 		/*
@@ -412,7 +409,7 @@ class Op extends CI_Controller {
 		
 		
 		
-	//	
+		//	
 		if(!empty($ref_table_config['operations'][$ref_table_operation]['top_links']))
 		$data ['top_buttons']=$this->create_top_buttons($ref_table_config['operations'][$ref_table_operation]['top_links']);
 		/*
@@ -662,7 +659,7 @@ class Op extends CI_Controller {
 			//print_test($ref_table_config['report']);
 			$table_id=$ref_table_config['table_id'];
 	
-	//	exit;
+			//	exit;
 			/*
 			 * Appel du model pour récupérer la liste à aficher dans la Base de donnés
 			 */
@@ -889,7 +886,7 @@ class Op extends CI_Controller {
 			}
 	
 	
-	//	print_test($dropoboxes);
+			//	print_test($dropoboxes);
 		
 			/*
 			 * Préparation de la liste à afficher sur base du contenu et  stucture de la table
@@ -1062,10 +1059,10 @@ class Op extends CI_Controller {
 		//print_test($T_result);	
 			
 			//Clean graph
-	//exit;
-	$result=array();
-	$Tzresult=array();
-	//print_test($graph_config);
+			//exit;
+			$result=array();
+			$Tzresult=array();
+			//print_test($graph_config);
 			foreach ($graph_config as $key => $value) {
 				
 				$value['link']=!empty($value['multi_value'])?False:True;
@@ -1188,37 +1185,39 @@ class Op extends CI_Controller {
 	}
 	
 	
-//fonction pour afficher un graphique à partir de la liste- specialisé pour la classifcation
-public function entity_list_graph($operation_name,$val = "_",$page = 0,$graph='all'){
-	$dynamic_table=1;//permet de recuperer toute la liste pas de filtre
-	
-	//récupertaion de la configuration correspondant à l'opération
-	$op=check_operation($operation_name,'List');	
-	$ref_table=$op['tab_ref'];
-	$ref_table_operation=$op['operation_id'];
-	
-	/*
-	* Vérification si il y a une condition de recherche pour redidiger la page 
-	* et appliquer la condition de recherche
-	* Utilisable pour les tableux nob dynamique
-	*/
-	$val = urldecode ( urldecode ( $val ) );
-	$filter = array ();
-	if (isset ( $_POST ['search_all'] )) {
-		$filter = $this->input->post ();
-		unset ( $filter ['search_all'] );
-		$val = "_";
-		if (isset ( $filter ['valeur'] ) and ! empty ( $filter ['valeur'] )) {
-			$val = $filter ['valeur'];
-			$val = urlencode ( urlencode ( $val ) );
-		}
-	
-		/*
-		 * mis à jours de l'url en ajoutant la valeur recherché dans le lien puis rechargement de l'url
-		*/
-		$url = "op/entity_list/" . $operation_name ."/". $val ."/0/".$graph;
-		redirect ( $url );
-	}
+	//fonction pour afficher un graphique à partir de la liste- specialisé pour la classifcation
+
+	public function entity_list_graph($operation_name,$val = "_",$page = 0,$graph='all'){
+			$dynamic_table=1;//permet de recuperer toute la liste pas de filtre
+			
+			//récupertaion de la configuration correspondant à l'opération
+			$op=check_operation($operation_name,'List');	
+			$ref_table=$op['tab_ref'];
+			$ref_table_operation=$op['operation_id'];
+			
+			/*
+			* Vérification si il y a une condition de recherche pour redidiger la page 
+			* et appliquer la condition de recherche
+			* Utilisable pour les tableux nob dynamique
+			*/
+			$val = urldecode ( urldecode ( $val ) );
+			$filter = array ();
+			if (isset ( $_POST ['search_all'] )) 
+			{
+				$filter = $this->input->post ();
+				unset ( $filter ['search_all'] );
+				$val = "_";
+				if (isset ( $filter ['valeur'] ) and ! empty ( $filter ['valeur'] )) {
+					$val = $filter ['valeur'];
+					$val = urlencode ( urlencode ( $val ) );
+				}
+			
+				/*
+				 * mis à jours de l'url en ajoutant la valeur recherché dans le lien puis rechargement de l'url
+				*/
+				$url = "op/entity_list/" . $operation_name ."/". $val ."/0/".$graph;
+				redirect ( $url );
+			}
 	
 	/*
 	* Récupération de la configuration(structure) de la table à afficher
@@ -3694,13 +3693,30 @@ public function entity_list_graph($operation_name,$val = "_",$page = 0,$graph='a
 		
 	}
 	
-	public function remove_picture($ref_table,$table_name,$table_id,$field,$element_id){
-		$table_name=mysql_real_escape_string($table_name);
-		$table_id=mysql_real_escape_string($table_id);
-		$field=mysql_real_escape_string($field);
-		$element_id=mysql_real_escape_string($element_id);
+	/**
+	 * Function, used to manage user's picture within general section.
+	 *
+	 * @todo potentially insecure function, as the permissions are not checked
+	 *       (as far as I can see), and so everyone can delete anybodys picture.
+	 *
+	 * Revision: Changed the usage of mysql_real_escape_string function
+	 * 					 to use a more generic one provided by Codeigniter.
+	 * 					 
+	 * @param  string $ref_table  [description]
+	 * @param  string $table_name [description]
+	 * @param  string $table_id   [description]
+	 * @param  string $field      [description]
+	 * @param  string $element_id [description]
+	 * @return [type]             [description]
+	 */
+	public function remove_picture($ref_table,$table_name,$table_id,$field,$element_id)
+	{
+		$table_name = $this->manage_mdl->query_escape_str($table_name, 'default');
+		$table_id = $this->manage_mdl->query_escape_str($table_id, 'default');
+		$field = $this->manage_mdl->query_escape_str($field, 'default');
+		$element_id = $this->manage_mdl->query_escape($element_id, 'default');
 		
-		$sql = "UPDATE $table_name SET $field = NULL WHERE $table_id ='".$element_id."'";
+		$sql = "UPDATE $table_name SET $field = NULL WHERE $table_id = ".$element_id;
 		
 		$res =	$this->manage_mdl->run_query($sql,False,'default');
 		
@@ -3717,9 +3733,12 @@ public function entity_list_graph($operation_name,$val = "_",$page = 0,$graph='a
 		
 	}
 	
-	
-	
-	
+	/**
+	 * [new_assignment_screen description]
+	 * @param  [type] $paper_id [description]
+	 * @param  string $redirect [description]
+	 * @return [type]           [description]
+	 */
 	public function new_assignment_screen($paper_id,$redirect="paper_screen"){
 	
 		if(!empty($paper_id) AND $redirect=='paper_screen'){
@@ -3733,6 +3752,12 @@ public function entity_list_graph($operation_name,$val = "_",$page = 0,$graph='a
 		$this->add_element('assignment_screen',$data);
 	}
 	
+	/**
+	 * [create_top_buttons description]
+	 * @param  [type]  $top_links       [description]
+	 * @param  integer $current_element [description]
+	 * @return [type]                   [description]
+	 */
 	private function create_top_buttons($top_links,$current_element=0){
 		$project_published=project_published();
 		//print_test($top_links);
