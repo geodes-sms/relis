@@ -41,7 +41,7 @@ The project can be installed locally using docker. Make sure to follow the pre-r
   - Press f10 or other key to enter BIOS Setup
   - Go to System Configuration then Device Configuration 
   - Enable Virtualization 
-  - Restart your aystem
+  - Restart your system
   If Docker still not start with the error "Docker.ApiServices.WSL2.WslKernet NotInstalledException" then excute following steps:
   - use the link https://docs.microsoft.com/en-us/windows/wsl/install-win10#step-4---download-the-linux-kernel-update-package to download and intall linux kernal update 
   - Restart you system if Docker not start 
@@ -59,11 +59,11 @@ To connect inside your docker container run the command "docker-compose exec rel
 
 
 #Application structure on GIT
-###Branch names:
-- prod: is the branch that is used as is in production
-- master: is the main branch with used for final testing
+###Branch naming convention:
+- prod: is the branch that is used in production
+- master: is the main branch used for final testing
 - develop: is the branch on which we develop 
-- feature-X: X represents the features we are working on (the number of the ticket if the feature is a task in git or a keyword for the task).
+- feature-X _(feature branch)_: X represents the feature we are working on (the number of the ticket if the feature is a task in github or a keyword for the task).
  
 ###Development process:
 1. Create new task : For any new task create a feature branch from develop before getting the last version of develop:
@@ -71,13 +71,13 @@ To connect inside your docker container run the command "docker-compose exec rel
 	- git pull origin develop
 	- git checkout -b feature-taskNumber
 2. Add your code :add all changes needed in your feature branch
-3. Create a pull request(PR) to the branch develop: when the code is ready to be merged create a pull request to the branch develop. To avoid conficts while merging the code, make sure to pull the last version of develop  in the feature branch before creating an PR.
-4. Repeate steps 1 to 3 for each new task.
+3. Create a pull request(PR) to the branch develop: when the code is ready to be merged, create a pull request to the branch develop. To avoid conficts while merging the code, make sure to pull the last version of develop  in the feature branch before creating an PR.
+4. Repeat steps 1 to 3 for each new task.
 
 ###Deployment process:
-1. Merge develop to master : when the code is ready to be fully tested the code is merged to master
+1. Merge develop to master: when the code is ready to be fully tested the code is merged to master
 2. Deploy the branch master on a test server and proceed with testing,
-3. Deploy in production : merge the master branch in prod branch and pull the changes on the production server.
+3. Deploy in production: merge the master branch in prod and pull the changes on the production server.
 
 
 # Distribution
