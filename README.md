@@ -58,6 +58,28 @@ The project can be installed locally using docker. Make sure to follow the pre-r
 To connect inside your docker container run the command "docker-compose exec relis-application-service bash" from the directory **relis_deployment/**
 
 
+#Application structure on GIT
+###Branch names:
+- prod: is the branch that is used as is in production
+- master: is the main branch with used for final testing
+- develop: is the branch on which we develop 
+- feature-X: X represents the features we are working on (the number of the ticket if the feature is a task in git or a keyword for the task).
+ 
+###Development process:
+1. Create new task : For any new task create a feature branch from develop before getting the last version of develop:
+	- git checkout develop
+	- git pull origin develop
+	- git checkout -b feature-taskNumber
+2. Add your code :add all changes needed in your feature branch
+3. Create a pull request(PR) to the branch develop: when the code is ready to be merged create a pull request to the branch develop. To avoid conficts while merging the code, make sure to pull the last version of develop  in the feature branch before creating an PR.
+4. Repeate steps 1 to 3 for each new task.
+
+###Deployment process:
+1. Merge develop to master : when the code is ready to be fully tested the code is merged to master
+2. Deploy the branch master on a test server and proceed with testing,
+3. Deploy in production : merge the master branch in prod branch and pull the changes on the production server.
+
+
 # Distribution
 
 
