@@ -801,8 +801,20 @@ function admin_config($config,$config_name=True,$type='config'){
 	}
 
 	
-}	
+}
 
+
+function check_guest(){
+    $ci = get_instance ();
+    $userid = $_SESSION['user_id'];
+        $sql = "SELECT * from userproject where user_role='Guest' AND user_id=$userid";
+        $res = $ci->db->query($sql)->num_rows();
+        if($res >0){
+            return TRUE;
+        }else {
+            return FALSE;
+        }
+}
 
 /**
  * Function to verify if a user has access to a project

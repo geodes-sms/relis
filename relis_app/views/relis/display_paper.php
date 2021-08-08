@@ -20,11 +20,13 @@
                 <div class="x_panel" >
                   <div class="x_title">
                     <h2><?php echo isset($page_title) ? $page_title :"" ; ?></h2>
-                    <?php 
-                    if(isset($top_buttons)){
-                    	echo "<ul class='nav navbar-right panel_toolbox'>$top_buttons</ul>";
-                    
-                    }                    
+                    <?php
+//                    $is_guest = check_guest();
+//                    if(!$is_guest){
+                    if(isset($top_buttons)) {
+                        echo "<ul class='nav navbar-right panel_toolbox'>$top_buttons</ul>";
+                    }
+//                    }
                     ?>
                     
                     
@@ -62,11 +64,13 @@
 							
 							</h2>
 							<ul class='nav navbar-right panel_toolbox'>
-							 <?php 
-		                    if(isset($remove_exclusion_button)){//put 
-		                    	echo "$remove_exclusion_button ";
-		                    
-		                    }                    
+							 <?php
+                             $is_guest = check_guest();
+                             if(!$is_guest){
+                                if(isset($remove_exclusion_button)) {//put
+                                    echo "$remove_exclusion_button ";
+                                }
+                             }
 		                    ?>
 							<li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                       </li></ul>
@@ -124,11 +128,13 @@
 							</h2>
 							<ul class='nav navbar-right panel_toolbox'>
 							
-							 <?php 
-		                    if(isset($classification_button)){
-		                    	echo "$classification_button ";
-		                    
-		                    }                    
+							 <?php
+                             $is_guest = check_guest();
+                             if(!$is_guest){
+                                if(isset($classification_button)) {
+                                    echo "$classification_button ";
+                                }
+		                    }
 		                    ?>
 		                    
 							<li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
@@ -197,11 +203,13 @@
 							?>
 							</h2>
 							<ul class='nav navbar-right panel_toolbox'>
-							 <?php 
-		                    if(isset($add_assignation_buttons)){
-		                    	echo "$add_assignation_buttons ";
-		                    
-		                    }                    
+							 <?php
+                             $is_guest = check_guest();
+                             if(!$is_guest){
+                                if(isset($add_assignation_buttons)) {
+                                    echo "$add_assignation_buttons ";
+                                }
+		                    }
 		                    ?>
 							<li><a class="collapse-link"><i class="fa fa-chevron-down"></i></a>
                       </li></ul>
@@ -225,10 +233,13 @@
 									
 							
 									echo "<table class='table table-striped'>";
-									if(isset($remove_assignation_button[$key])){
-										echo "<tr><th colspan='2'><ul class='nav navbar-right panel_toolbox'>".$remove_assignation_button[$key]."</th><tr></ul>";
-											
-									}
+									$is_guest = check_guest();
+									if(!$is_guest) {
+                                        if (isset($remove_assignation_button[$key])) {
+                                            echo "<tr><th colspan='2'><ul class='nav navbar-right panel_toolbox'>" . $remove_assignation_button[$key] . "</th><tr></ul>";
+
+                                        }
+                                    }
 									foreach($assignation as $k=>$v){
 										echo "<tr>";
 										echo "<th style='width:20%'>".lng($v['title'])."</th><td>".$v['val']."</td>";
