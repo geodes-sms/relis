@@ -1731,7 +1731,7 @@ public function entity_list_graph($operation_name,$val = "_",$page = 0,$graph='a
 	
 	
 	//public function add_element_child($operation_name,$child_field,$ref_table_parent,$parent_id, $data = "",$operation="new",$display_type="normal") {
-	public function add_element_child($operation_name,$parent_id, $data = "",$operation="new",$display_type="normal") {
+	public function add_element_child($operation_name,$parent_id, $data = array(),$operation="new",$display_type="normal") {
 		if((! is_array ($data )) AND $data=='_')
 			$data=array();
 			
