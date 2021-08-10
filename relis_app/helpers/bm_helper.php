@@ -66,20 +66,27 @@ function get_top_button($type='add',$title='',$link='',$label=" ",$icon=' fa-plu
 		$title=lng_min($title);
 	switch ($type) {
 		case 'add':
-			$button=anchor($link,'<button class="btn btn-success"><i class="fa fa-plus"></i>'.$label.'</button>','title="'.$title.'"');
-
+		    $is_guest = check_guest();
+		    if(!$is_guest) {
+                $button = anchor($link, '<button class="btn btn-success"><i class="fa fa-plus"></i>' . $label . '</button>', 'title="' . $title . '"');
+            }
 			break;
 		case 'edit':
-			$button=anchor($link,'<button class="btn btn-info"><i class="fa fa-pencil"></i>'.$label.'</button>','title="'.$title.'"');
-
+            $is_guest = check_guest();
+            if(!$is_guest) {
+                $button = anchor($link, '<button class="btn btn-info"><i class="fa fa-pencil"></i>' . $label . '</button>', 'title="' . $title . '"');
+            }
 			break;
 		case 'close':
 			$button=anchor($link,'<button class="btn btn-danger"><i class="fa fa-close"></i> </button>','title="'.$title.'"  ');
 			break;
 
 		case 'delete':
-			$button=anchor($link,'<button type="button" class="btn btn-danger"><i class="fa fa-trash"></i> '.$label.'
-                          </button>','title="'.$title.'"  onClick="return confirm_delete()" ');
+            $is_guest = check_guest();
+            if(!$is_guest) {
+                $button = anchor($link, '<button type="button" class="btn btn-danger"><i class="fa fa-trash"></i> ' . $label . '
+                          </button>', 'title="' . $title . '"  onClick="return confirm_delete()" ');
+            }
 			break;
 
 		case 'back'://	$button='<a href="javascript:history.go(-1)" title="'.$title.'"><button type="button" class="btn btn-danger"><i class="icon-arrow-left  icon-white"></i></button></a>';
