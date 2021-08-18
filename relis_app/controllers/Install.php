@@ -865,7 +865,7 @@ class Install extends CI_Controller {
 				 
 				$sql_add_user_project="INSERT INTO userproject  (	user_id,project_id,	user_role,added_by	 )
 									VALUES ('".$creator."','".$project_id."','Project admin','".$creator."')";
-				echo $sql_add_user_project;
+				// echo $sql_add_user_project;
 				$res_sql = $this->manage_mdl->run_query($sql_add_user_project,false,'default');
 			}	
 			// Update config editor according to general values
