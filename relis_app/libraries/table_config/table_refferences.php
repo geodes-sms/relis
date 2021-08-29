@@ -54,7 +54,7 @@ function get_refference($table,$title) {
 			'field_size'=>100,
 			'mandatory'=>' mandatory '
 	);
-	 
+
 	$fields['ref_desc']=array(
 			'field_title'=>'Description',
 			'field_type'=>'text',
@@ -65,7 +65,49 @@ function get_refference($table,$title) {
 			'field_size'=>240,
 			'input_type'=>'textarea'
 	);
-	 
+
+    $fields['ref_method']=array(
+        'field_title'=>'Method',
+	   	  'field_type'=>'text',
+		  'field_value'=>'method',
+	   	  'field_size'=>200,
+        'input_type'=>'text',
+        'mandatory'=>' mandatory ',
+
+
+    );
+
+
+
+//    $fields['ref_method_vals']=array(
+//        'field_title'=>'Method',
+//        'field_type'=>'text',
+//        'field_value'=>'method',
+//        'field_size'=>200,
+//        'input_type'=>'select',
+//        'input_select_source'=>'array',
+//        'input_select_values'=>array(
+//            'Manual' => 'Manual',
+//            'Automatic' => 'Automatic',
+//        ),
+//        'number_of_values'=>'*',
+//        'category_type'=>'WithMultiValues',
+//        'multi-select' => 'Yes',
+//        'not_in_db'=>True,
+//    );
+
+
+    $fields['ref_search_query']=array(
+        'field_title'=>'Search Query',
+        'field_type'=>'text',
+        'field_value'=>'normal',
+        'on_add'=>'enabled',
+        'on_edit'=>'enabled',
+        'on_list'=>'show',
+        'field_size'=>240,
+        'input_type'=>'textarea'
+    );
+
 	$fields['ref_active']=array(
 			'field_title'=>'Active',
 			'field_type'=>'0_1',

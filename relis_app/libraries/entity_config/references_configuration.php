@@ -59,6 +59,62 @@ function get_reference($table,$title,$config_id,$value_label="Value",$descriptio
 			'field_size'=>1000,  
 			'input_type'=>'textarea',
 	);
+
+    $fields['ref_method']=array(
+        'field_type'=>'text',
+        'field_size'=>100,
+        'input_type'=>'select',
+        'input_select_source'=>'array',
+        'input_select_values'=>array(
+            ''=>'',
+            'Manual' => 'Manual',
+            'Automatic' => 'Automatic',
+        ),
+//        'number_of_values'=>'*',
+//        'category_type'=>'DynamicCategory',
+////        'multi-select' => 'Yes',
+//        'not_in_db'=>True,
+        'mandatory'=>' mandatory '
+    );
+
+//    $fields['ref_method']=array(
+//        'field_title'=>'Method',
+//        'field_type'=>'text',
+//        'field_value'=>'method',
+//        'field_size'=>200,
+//        'input_type'=>'text',
+//        'mandatory'=>' mandatory ',
+//
+//
+//    );
+//
+//
+//
+//    $fields['ref_method_vals']=array(
+//        'field_title'=>'Method',
+//        'field_type'=>'text',
+//        'field_value'=>'method',
+//        'field_size'=>200,
+//        'input_type'=>'select',
+//        'input_select_source'=>'array',
+//        'input_select_values'=>array(
+//            'Manual' => 'Manual',
+//            'Automatic' => 'Automatic',
+//        ),
+//        'number_of_values'=>'*',
+//        'category_type'=>'WithMultiValues',
+//        'multi-select' => 'Yes',
+//        'not_in_db'=>True,
+//    );
+
+
+
+    $fields['ref_search_query']=array(
+        'field_title'=>$description_label,
+        'field_type'=>'text',
+        'field_size'=>1000,
+        'input_type'=>'textarea',
+    );
 	 
 	$fields['ref_active']=array(
 			'field_title'=>'Active',
@@ -68,7 +124,7 @@ function get_reference($table,$title,$config_id,$value_label="Value",$descriptio
 			'default_value'=>'1'
 	);
 	$config['fields']=$fields;
-	 
+
 	$operations['list_'.$config_id]=array(
 			'operation_type'=>'List',
 			'operation_title'=>'List of '.$title,
@@ -79,7 +135,7 @@ function get_reference($table,$title,$config_id,$value_label="Value",$descriptio
 		  
 			'data_source'=>'get_list_'.$config_id,
 			'generate_stored_procedure'=>True,
-	
+
 			'fields'=>array(
 				//	'ref_id'=>array(),
 					'ref_value'=>array('link'=>array(
@@ -87,7 +143,8 @@ function get_reference($table,$title,$config_id,$value_label="Value",$descriptio
 								'id_field'=>'ref_id',
 								'trim'=>'0'
 							)),
-					'ref_desc'=>array()		   	
+					'ref_desc'=>array()
+
 	
 			),
 			'order_by'=>'ref_value ASC ',
@@ -128,8 +185,9 @@ function get_reference($table,$title,$config_id,$value_label="Value",$descriptio
 		
 			
 	);
+
 	
-	
+	if($config_id!= 'papers_sources'){
 	$operations['add_'.$config_id]=array(
 			'operation_type'=>'Add',
 			'operation_title'=>'Add '.$title,
@@ -146,7 +204,9 @@ function get_reference($table,$title,$config_id,$value_label="Value",$descriptio
 					'ref_id'=>array('mandatory'=>'','field_state'=>'hidden'),
 					'ref_value'=>array('mandatory'=>'mandatory','field_state'=>'enabled'),
 					'ref_desc'=>array('mandatory'=>'','field_state'=>'enabled'),
-					
+//                'ref_method'=>array('mandatory'=>'mandatory','field_state'=>'enabled','field_title'=>'Method'),
+//                'ref_search_query'=>array('mandatory'=>'','field_state'=>'enabled','field_title'=>'Search Query'),
+
 						
 			),
 	
@@ -161,7 +221,43 @@ function get_reference($table,$title,$config_id,$value_label="Value",$descriptio
 	
 			),
 				
-	);
+	);}
+	else{
+        $operations['add_papers_sources']=array(
+            'operation_type'=>'Add',
+            'operation_title'=>'Add '.$title,
+            'operation_description'=>'Add '.$title,
+            'page_title'=>'Add a '.$title,
+            'save_function'=>'op/save_element',
+            'page_template'=>'general/frm_entity',
+            'redirect_after_save'=>'op/entity_list/list_'.$config_id,
+            'db_save_model'=>'add_'.$config_id,
+
+            'generate_stored_procedure'=>True,
+
+            'fields'=>array(
+                'ref_id'=>array('mandatory'=>'','field_state'=>'hidden'),
+                'ref_value'=>array('mandatory'=>'mandatory','field_state'=>'enabled'),
+                'ref_desc'=>array('mandatory'=>'','field_state'=>'enabled'),
+                'ref_method'=>array('mandatory'=>'mandatory','field_state'=>'enabled', 'field_title'=>'Method'),
+                'ref_search_query'=>array('mandatory'=>'','field_state'=>'enabled','field_title'=>'Search Query'),
+
+
+            ),
+
+            'top_links'=>array(
+
+                'back'=>array(
+                    'label'=>'',
+                    'title'=>'Close',
+                    'icon'=>'close',
+                    'url'=>'home',
+                )
+
+            ),
+
+        );
+    }
 	
 	$operations['edit_'.$config_id]=array(
 			'operation_type'=>'Edit',

@@ -1172,26 +1172,43 @@ class Install extends CI_Controller {
 		
 		//print_test($res_sql);
 		
-	
-		$sql="CREATE TABLE IF NOT EXISTS ".$table_name." (
+	if($table_name=='ref_papers_sources'){
+        $sql = "CREATE TABLE IF NOT EXISTS " . $table_name . " (
+		`ref_id` int(11) NOT NULL AUTO_INCREMENT,
+		  `ref_value` varchar(50) NOT NULL,
+		  `ref_desc` varchar(250) DEFAULT NULL,
+		  `ref_method` varchar(250) DEFAULT NULL,
+		  `ref_search_query` varchar(250) DEFAULT NULL,
+		  `ref_active` int(1) NOT NULL DEFAULT '1',
+		  PRIMARY KEY (`ref_id`)
+		) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;";
+    }
+	else {
+        $sql = "CREATE TABLE IF NOT EXISTS " . $table_name . " (
 		`ref_id` int(11) NOT NULL AUTO_INCREMENT,
 		  `ref_value` varchar(50) NOT NULL,
 		  `ref_desc` varchar(250) DEFAULT NULL,
 		  `ref_active` int(1) NOT NULL DEFAULT '1',
 		  PRIMARY KEY (`ref_id`)
 		) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;";
-	
+    }
 		$res_sql = $this->manage_mdl->run_query($sql,False,$target_db);
 		
 		//print_test($res_sql);
 		//Add initial values
 		$sql1="";
 		if(!empty($ref_value['values'])){
-		$sql1="INSERT INTO ".$table_name." ( ref_value, ref_desc) VALUES ";
+		    if ($table_name=='ref_papers_sources')
+            {
+                $sql1="INSERT INTO ".$table_name." ( ref_value, ref_desc, ref_method, ref_search_query) VALUES ";
+            }
+		    else {
+                $sql1 = "INSERT INTO " . $table_name . " ( ref_value, ref_desc) VALUES ";
+            }
 		$ri=1;
 		foreach ($ref_value['values'] as $r_key => $r_value) {
 			if($ri==1){
-				$sql1.="('".$r_value."','".$r_value."')";
+				$sql1.="('".$r_value."','".$r_value."''".$r_value."','".$r_value."','".$r_value."','".$r_value."')";
 			}else{
 				$sql1.=",('".$r_value."','".$r_value."')";
 			}
@@ -1574,119 +1591,151 @@ class Install extends CI_Controller {
 		
 	}
 	
-	private function update_screening_values($screening,$target_db='current'){
-		$target_db=($target_db=='current')?project_db():$target_db;
-		$this->db3 = $this->load->database($target_db, TRUE);
-		
-		/*
-		$screening=array(
-				'review_per_paper'=>2,
-				'conflict_type'=>'IncludeExclude',
-				'conflict_resolution'=>'Unanimity',
-				'validation_percentage'=>20,
-				'validation_assigment_mode'=>'Normal',
-				'phases'=>array(
-						'1'=>array(
-								'title'=>'Phase 1',
-								'description'=>'Screen per title',
-								'fields'=>'Title',
-						),
-						'2'=>array(
-								'title'=>'Phase 2',
-								'description'=>'Screen per title  and abstract',
-								'fields'=>'Title|Abstract',
-						),
-						
-						
-				),
-				'exclusion_criteria'=>array('Criteria 1','Criteria 2','Criteria3' ),
-				'source_papers'=>array('Scopus','IEEE','Science direct' ),
-				'search_startegy'=>array('Snowballing','Database search' ),
-		);
-		
-		*/
-		
-		//Addd general values in configuration	
-		
-		
-		$config['screening_reviewer_number']=!empty($screening['review_per_paper'])?$screening['review_per_paper']:"2";	
-		$config['screening_screening_conflict_resolution']=!empty($screening['conflict_resolution'])?$screening['conflict_resolution']:"Unanimity";
-		$config['screening_conflict_type']=!empty($screening['conflict_type'])?$screening['conflict_type']:"IncludeExclude";
-		$config['validation_default_percentage']=!empty($screening['validation_percentage'])?$screening['validation_percentage']:"20";
-		$config['screening_validator_assignment_type']=!empty($screening['validation_assigment_mode'])?$screening['validation_assigment_mode']:"Normal";
-		$config['screening_on']=1;
-	
-	
-	
-		$result=$this->db3->update ('config',$config,"config_id=1");
-		
-	
-		
-		//add new phases
-		if(!empty($screening['phases'])){
-			
-			//clean existing
-			$result=$this->db3->update ('screen_phase',array('screen_phase_active'=>0));
-			
-			//get total number
-			$nbr_phase=count($screening['phases']);
-			$i=1;
-			$all_phases=array();
-			foreach ($screening['phases'] as $key => $value) {		
-				$conf_phase['phase_title']=!empty($value['title'])?$value['title']:"Phase ".$i;
-				$conf_phase['description']=!empty($value['description'])?$value['description']:"";
-				$conf_phase['displayed_fields']=!empty($value['fields'])?$value['fields']:"Title";
-				$conf_phase['screen_phase_final']=($nbr_phase==$i)?'1':"0";
-				$conf_phase['screen_phase_order ']=$i*10;
-				$conf_phase['added_by']=active_user_id();
-				
-				array_push($all_phases, $conf_phase);
-				$i++;
-				
-				
-			}
-			
-			//print_test($all_phases);
-			$result=$this->db3->insert_batch('screen_phase', $all_phases);
-			
-			//print_test($result);
-		}
-		
-		
-		// Add exclusion criteria , sourcepapers,and searc_strategy
-		
-		$screen_configs_to_save=array(
-				'exclusion_criteria'=>array('table'=>'ref_exclusioncrieria'),
-				'source_papers'=>array('table'=>'ref_papers_sources'),
-				'search_startegy'=>array('table'=>'ref_search_strategy'),
-		);
-		
-		foreach ($screen_configs_to_save as $s_config_id => $s_config_value) {
-		
-			if(!empty($screening[$s_config_id])){
-					
-				//clean existing
-				$result=$this->db3->update ($s_config_value['table'],array('ref_active'=>0));
-			
-				$all_elements=array();
-				foreach ($screening[$s_config_id] as $key => $value) {
-					$conf_element['ref_value']=$value;
-					$conf_element['ref_desc']=$value;
-					array_push($all_elements, $conf_element);
-				
-				}
-					
-			//	print_test($all_elements);
-				$result=$this->db3->insert_batch($s_config_value['table'], $all_elements);
-					
-				////print_test($result);
-			}
-			
-		}
-		
-		
-	}
-	
+	private function update_screening_values($screening,$target_db='current')
+    {
+        $target_db = ($target_db == 'current') ? project_db() : $target_db;
+        $this->db3 = $this->load->database($target_db, TRUE);
+
+        /*
+        $screening=array(
+                'review_per_paper'=>2,
+                'conflict_type'=>'IncludeExclude',
+                'conflict_resolution'=>'Unanimity',
+                'validation_percentage'=>20,
+                'validation_assigment_mode'=>'Normal',
+                'phases'=>array(
+                        '1'=>array(
+                                'title'=>'Phase 1',
+                                'description'=>'Screen per title',
+                                'fields'=>'Title',
+                        ),
+                        '2'=>array(
+                                'title'=>'Phase 2',
+                                'description'=>'Screen per title  and abstract',
+                                'fields'=>'Title|Abstract',
+                        ),
+
+
+                ),
+                'exclusion_criteria'=>array('Criteria 1','Criteria 2','Criteria3' ),
+                'source_papers'=>array('Scopus','IEEE','Science direct' ),
+                'search_startegy'=>array('Snowballing','Database search' ),
+        );
+
+        */
+
+        //Addd general values in configuration
+
+
+        $config['screening_reviewer_number'] = !empty($screening['review_per_paper']) ? $screening['review_per_paper'] : "2";
+        $config['screening_screening_conflict_resolution'] = !empty($screening['conflict_resolution']) ? $screening['conflict_resolution'] : "Unanimity";
+        $config['screening_conflict_type'] = !empty($screening['conflict_type']) ? $screening['conflict_type'] : "IncludeExclude";
+        $config['validation_default_percentage'] = !empty($screening['validation_percentage']) ? $screening['validation_percentage'] : "20";
+        $config['screening_validator_assignment_type'] = !empty($screening['validation_assigment_mode']) ? $screening['validation_assigment_mode'] : "Normal";
+        $config['screening_on'] = 1;
+
+
+        $result = $this->db3->update('config', $config, "config_id=1");
+
+
+        //add new phases
+        if (!empty($screening['phases'])) {
+
+            //clean existing
+            $result = $this->db3->update('screen_phase', array('screen_phase_active' => 0));
+
+            //get total number
+            $nbr_phase = count($screening['phases']);
+            $i = 1;
+            $all_phases = array();
+            foreach ($screening['phases'] as $key => $value) {
+                $conf_phase['phase_title'] = !empty($value['title']) ? $value['title'] : "Phase " . $i;
+                $conf_phase['description'] = !empty($value['description']) ? $value['description'] : "";
+                $conf_phase['displayed_fields'] = !empty($value['fields']) ? $value['fields'] : "Title";
+                $conf_phase['screen_phase_final'] = ($nbr_phase == $i) ? '1' : "0";
+                $conf_phase['screen_phase_order '] = $i * 10;
+                $conf_phase['added_by'] = active_user_id();
+
+                array_push($all_phases, $conf_phase);
+                $i++;
+
+
+            }
+
+            //print_test($all_phases);
+            $result = $this->db3->insert_batch('screen_phase', $all_phases);
+
+            //print_test($result);
+        }
+
+
+        // Add exclusion criteria , sourcepapers,and searc_strategy
+
+        $screen_configs_to_save = array(
+            'exclusion_criteria' => array('table' => 'ref_exclusioncrieria'),
+//            'source_papers' => array('table' => 'ref_papers_sources'),
+            'search_startegy' => array('table' => 'ref_search_strategy'),
+        );
+
+
+
+            foreach ($screen_configs_to_save as $s_config_id => $s_config_value) {
+
+                if (!empty($screening[$s_config_id])) {
+
+                    //clean existing
+                    $result = $this->db3->update($s_config_value['table'], array('ref_active' => 0));
+
+                    $all_elements = array();
+                    foreach ($screening[$s_config_id] as $key => $value) {
+                        $conf_element['ref_value'] = $value;
+                        $conf_element['ref_desc'] = $value;
+
+
+                        array_push($all_elements, $conf_element);
+
+                    }
+
+                    //	print_test($all_elements);
+                    $result = $this->db3->insert_batch($s_config_value['table'], $all_elements);
+
+                    ////print_test($result);
+                }
+
+            }
+
+
+$screen_configs_to_save1 = array(
+//'exclusion_criteria' => array('table' => 'ref_exclusioncrieria'),
+     'source_papers' => array('table' => 'ref_papers_sources'),
+//'search_startegy' => array('table' => 'ref_search_strategy'),
+);
+        foreach ($screen_configs_to_save1 as $s_config_id => $s_config_value) {
+
+            if (!empty($screening[$s_config_id])) {
+
+                //clean existing
+                $result = $this->db3->update($s_config_value['table'], array('ref_active' => 0));
+
+                $all_elements = array();
+                foreach ($screening[$s_config_id] as $key => $value) {
+                    $conf_element['ref_value'] = $value;
+                    $conf_element['ref_desc'] = $value;
+                    $conf_element['ref_method'] = $value;
+                    $conf_element['ref_search_query'] = $value;
+
+
+                    array_push($all_elements, $conf_element);
+
+                }
+
+                //	print_test($all_elements);
+                $result = $this->db3->insert_batch($s_config_value['table'], $all_elements);
+
+                ////print_test($result);
+            }
+        }
+        }
 	
 	private function update_qa_values($qa,$target_db='current'){
 		$target_db=($target_db=='current')?project_db():$target_db;
