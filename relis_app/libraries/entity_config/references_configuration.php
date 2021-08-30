@@ -66,9 +66,9 @@ function get_reference($table,$title,$config_id,$value_label="Value",$descriptio
         'input_type'=>'select',
         'input_select_source'=>'array',
         'input_select_values'=>array(
-            ''=>'',
-            'Manual' => 'Manual',
             'Automatic' => 'Automatic',
+            'Manual' => 'Manual',
+
         ),
 //        'number_of_values'=>'*',
 //        'category_type'=>'DynamicCategory',

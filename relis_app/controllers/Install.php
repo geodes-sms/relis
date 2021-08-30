@@ -1721,7 +1721,7 @@ $screen_configs_to_save1 = array(
                 foreach ($screening[$s_config_id] as $key => $value) {
                     $conf_element['ref_value'] = $value;
                     $conf_element['ref_desc'] = $value;
-                    $conf_element['ref_method'] = $value;
+                    $conf_element['ref_method'] = 'Automatic';
                     $conf_element['ref_search_query'] = $value;
 
 
