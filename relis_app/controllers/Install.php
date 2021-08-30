@@ -573,7 +573,7 @@ class Install extends CI_Controller {
 			
 		//adding Qality assessment values
 	//	print_test($res_install_config);
-		if(!empty($res_install_config['qa'])  AND !(!empty($res_install_config['qa_action']) AND $res_install_config['qa_action']!='override')){
+		if(!empty($res_install_config['qa'])  AND !empty($res_install_config['qa_action'] AND $res_install_config['qa_action']=='override')){
 			$this->update_qa_values($res_install_config['qa'],$project_short_name);
 				
 			array_push($success_array, 'Quality assessment configuration set');
@@ -581,7 +581,8 @@ class Install extends CI_Controller {
 			if(empty($res_install_config['qa'])){
 				set_appconfig_element('qa_on', 0);
 			}
-		}
+            array_push($success_array, 'Retained Quality assessment configuration set');
+        }
 		
 		
 		$this->project_install_result($error_array,$success_array,'update_project');
@@ -1699,8 +1700,6 @@ class Install extends CI_Controller {
 	         $this->db3->query($sql);
             $this->db3->query($sql2);
         }else {
-
-
 
 
 		$config['qa_cutt_off_score']=!empty($qa['cutt_off_score'])?$qa['cutt_off_score']:"2";
