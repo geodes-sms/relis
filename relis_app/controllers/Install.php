@@ -1172,18 +1172,7 @@ class Install extends CI_Controller {
 		
 		//print_test($res_sql);
 		
-	if($table_name=='ref_papers_sources'){
-        $sql = "CREATE TABLE IF NOT EXISTS " . $table_name . " (
-		`ref_id` int(11) NOT NULL AUTO_INCREMENT,
-		  `ref_value` varchar(50) NOT NULL,
-		  `ref_desc` varchar(250) DEFAULT NULL,
-		  `ref_method` varchar(250) DEFAULT NULL,
-		  `ref_search_query` varchar(250) DEFAULT NULL,
-		  `ref_active` int(1) NOT NULL DEFAULT '1',
-		  PRIMARY KEY (`ref_id`)
-		) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;";
-    }
-	else {
+
         $sql = "CREATE TABLE IF NOT EXISTS " . $table_name . " (
 		`ref_id` int(11) NOT NULL AUTO_INCREMENT,
 		  `ref_value` varchar(50) NOT NULL,
@@ -1191,25 +1180,22 @@ class Install extends CI_Controller {
 		  `ref_active` int(1) NOT NULL DEFAULT '1',
 		  PRIMARY KEY (`ref_id`)
 		) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;";
-    }
+
 		$res_sql = $this->manage_mdl->run_query($sql,False,$target_db);
 		
 		//print_test($res_sql);
 		//Add initial values
 		$sql1="";
 		if(!empty($ref_value['values'])){
-		    if ($table_name=='ref_papers_sources')
-            {
-                $sql1="INSERT INTO ".$table_name." ( ref_value, ref_desc, ref_method, ref_search_query) VALUES ";
-            }
-		    else {
+
                 $sql1 = "INSERT INTO " . $table_name . " ( ref_value, ref_desc) VALUES ";
-            }
-		$ri=1;
+                $ri=1;
+
+
 		foreach ($ref_value['values'] as $r_key => $r_value) {
-			if($ri==1){
-				$sql1.="('".$r_value."','".$r_value."''".$r_value."','".$r_value."','".$r_value."','".$r_value."')";
-			}else{
+            if($ri==1){
+                $sql1.="('".$r_value."','".$r_value."')";
+            }else{
 				$sql1.=",('".$r_value."','".$r_value."')";
 			}
 			$ri++;
@@ -1673,44 +1659,12 @@ class Install extends CI_Controller {
 
         $screen_configs_to_save = array(
             'exclusion_criteria' => array('table' => 'ref_exclusioncrieria'),
-//            'source_papers' => array('table' => 'ref_papers_sources'),
+            'source_papers' => array('table' => 'ref_papers_sources'),
             'search_startegy' => array('table' => 'ref_search_strategy'),
         );
 
 
-
-            foreach ($screen_configs_to_save as $s_config_id => $s_config_value) {
-
-                if (!empty($screening[$s_config_id])) {
-
-                    //clean existing
-                    $result = $this->db3->update($s_config_value['table'], array('ref_active' => 0));
-
-                    $all_elements = array();
-                    foreach ($screening[$s_config_id] as $key => $value) {
-                        $conf_element['ref_value'] = $value;
-                        $conf_element['ref_desc'] = $value;
-
-
-                        array_push($all_elements, $conf_element);
-
-                    }
-
-                    //	print_test($all_elements);
-                    $result = $this->db3->insert_batch($s_config_value['table'], $all_elements);
-
-                    ////print_test($result);
-                }
-
-            }
-
-
-$screen_configs_to_save1 = array(
-//'exclusion_criteria' => array('table' => 'ref_exclusioncrieria'),
-     'source_papers' => array('table' => 'ref_papers_sources'),
-//'search_startegy' => array('table' => 'ref_search_strategy'),
-);
-        foreach ($screen_configs_to_save1 as $s_config_id => $s_config_value) {
+        foreach ($screen_configs_to_save as $s_config_id => $s_config_value) {
 
             if (!empty($screening[$s_config_id])) {
 
@@ -1721,8 +1675,6 @@ $screen_configs_to_save1 = array(
                 foreach ($screening[$s_config_id] as $key => $value) {
                     $conf_element['ref_value'] = $value;
                     $conf_element['ref_desc'] = $value;
-                    $conf_element['ref_method'] = 'Automatic';
-                    $conf_element['ref_search_query'] = $value;
 
 
                     array_push($all_elements, $conf_element);
@@ -1734,9 +1686,11 @@ $screen_configs_to_save1 = array(
 
                 ////print_test($result);
             }
+
         }
-        }
-	
+
+
+    }
 	private function update_qa_values($qa,$target_db='current'){
 		$target_db=($target_db=='current')?project_db():$target_db;
 		$this->db3 = $this->load->database($target_db, TRUE);

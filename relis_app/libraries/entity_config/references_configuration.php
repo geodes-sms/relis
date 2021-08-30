@@ -33,97 +33,103 @@ function get_reference($table,$title,$config_id,$value_label="Value",$descriptio
 	//list view
 	$config['order_by']='ref_value ASC '; //mettre la valeur à mettre dans la requette
 	$config['search_by']='ref_value';// separer les champs par virgule
-	
-	
-	 
-	$fields['ref_id']=array(
-			'field_title'=>'#',
-			'field_type'=>'int',
-			'field_size'=>11,
-	   		'field_value'=>'auto_increment',
-			'default_value'=>'auto_increment'
-	);
-	 
-	 
-	$fields['ref_value']=array(
-			'field_title'=>$value_label,
-			'field_type'=>'text', 
-			'field_size'=>100,  
-			'input_type'=>'text',
-			'mandatory'=>' mandatory '
-	);
-	 
-	$fields['ref_desc']=array(
-			'field_title'=>$description_label,
-			'field_type'=>'text', 
-			'field_size'=>1000,  
-			'input_type'=>'textarea',
-	);
 
-    $fields['ref_method']=array(
-        'field_title'=>'Method',
-        'field_type'=>'text',
-        'field_size'=>100,
-        'input_type'=>'select',
-        'input_select_source'=>'array',
-        'input_select_values'=>array(
-            'Automatic' => 'Automatic',
-            'Manual' => 'Manual',
 
-        ),
-//        'number_of_values'=>'*',
-//        'category_type'=>'DynamicCategory',
-////        'multi-select' => 'Yes',
-//        'not_in_db'=>True,
-        'mandatory'=>' mandatory '
-    );
+	 if($config['table_name']=='ref_papers_sources') {
+         $fields['ref_id'] = array(
+             'field_title' => '#',
+             'field_type' => 'int',
+             'field_size' => 11,
+             'field_value' => 'auto_increment',
+             'default_value' => 'auto_increment'
+         );
 
-//    $fields['ref_method']=array(
-//        'field_title'=>'Method',
-//        'field_type'=>'text',
-//        'field_value'=>'method',
-//        'field_size'=>200,
-//        'input_type'=>'text',
-//        'mandatory'=>' mandatory ',
-//
-//
-//    );
-//
-//
-//
-//    $fields['ref_method_vals']=array(
-//        'field_title'=>'Method',
-//        'field_type'=>'text',
-//        'field_value'=>'method',
-//        'field_size'=>200,
-//        'input_type'=>'select',
-//        'input_select_source'=>'array',
-//        'input_select_values'=>array(
-//            'Manual' => 'Manual',
-//            'Automatic' => 'Automatic',
-//        ),
-//        'number_of_values'=>'*',
-//        'category_type'=>'WithMultiValues',
-//        'multi-select' => 'Yes',
-//        'not_in_db'=>True,
-//    );
+
+         $fields['ref_value'] = array(
+             'field_title' => $value_label,
+             'field_type' => 'text',
+             'field_size' => 100,
+             'input_type' => 'text',
+             'mandatory' => ' mandatory '
+         );
+
+         $fields['ref_desc'] = array(
+             'field_title' => $description_label,
+             'field_type' => 'text',
+             'field_size' => 1000,
+             'input_type' => 'textarea',
+         );
 
 
 
-    $fields['ref_search_query']=array(
-        'field_title'=>'Search Query',
-        'field_type'=>'text',
-        'field_size'=>1000,
-        'input_type'=>'textarea',
-    );
-	 
-	$fields['ref_active']=array(
-			'field_title'=>'Active',
-	   		'field_type'=>'int',
-	   		'field_size'=>'1',
-	   		'field_value'=>'1',
-			'default_value'=>'1'
-	);
+         $fields['ref_method'] = array(
+             'field_title' => 'Method',
+             'field_type' => 'text',
+             'field_size' => 100,
+             'input_type' => 'select',
+             'input_select_source' => 'array',
+             'input_select_values' => array(
+                 'Automatic' => 'Automatic',
+                 'Manual' => 'Manual',
+
+             ),
+
+             'mandatory' => ' mandatory '
+         );
+
+
+         $fields['ref_search_query'] = array(
+             'field_title' => 'Search Query',
+             'field_type' => 'text',
+             'field_size' => 1000,
+             'input_type' => 'textarea',
+         );
+
+
+         $fields['ref_active'] = array(
+             'field_title' => 'Active',
+             'field_type' => 'int',
+             'field_size' => '1',
+             'field_value' => '1',
+             'default_value' => '1'
+         );
+     }
+	 else{
+         $fields['ref_id'] = array(
+             'field_title' => '#',
+             'field_type' => 'int',
+             'field_size' => 11,
+             'field_value' => 'auto_increment',
+             'default_value' => 'auto_increment'
+         );
+
+
+         $fields['ref_value'] = array(
+             'field_title' => $value_label,
+             'field_type' => 'text',
+             'field_size' => 100,
+             'input_type' => 'text',
+             'mandatory' => ' mandatory '
+         );
+
+         $fields['ref_desc'] = array(
+             'field_title' => $description_label,
+             'field_type' => 'text',
+             'field_size' => 1000,
+             'input_type' => 'textarea',
+         );
+
+
+         $fields['ref_active'] = array(
+             'field_title' => 'Active',
+             'field_type' => 'int',
+             'field_size' => '1',
+             'field_value' => '1',
+             'default_value' => '1'
+         );
+     }
+
+
 	$config['fields']=$fields;
 
 	$operations['list_'.$config_id]=array(
@@ -205,8 +211,6 @@ function get_reference($table,$title,$config_id,$value_label="Value",$descriptio
 					'ref_id'=>array('mandatory'=>'','field_state'=>'hidden'),
 					'ref_value'=>array('mandatory'=>'mandatory','field_state'=>'enabled'),
 					'ref_desc'=>array('mandatory'=>'','field_state'=>'enabled'),
-//                'ref_method'=>array('mandatory'=>'mandatory','field_state'=>'enabled','field_title'=>'Method'),
-//                'ref_search_query'=>array('mandatory'=>'','field_state'=>'enabled','field_title'=>'Search Query'),
 
 						
 			),
