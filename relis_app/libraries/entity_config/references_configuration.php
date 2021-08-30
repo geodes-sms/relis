@@ -61,6 +61,7 @@ function get_reference($table,$title,$config_id,$value_label="Value",$descriptio
 	);
 
     $fields['ref_method']=array(
+        'field_title'=>'Method',
         'field_type'=>'text',
         'field_size'=>100,
         'input_type'=>'select',
@@ -110,7 +111,7 @@ function get_reference($table,$title,$config_id,$value_label="Value",$descriptio
 
 
     $fields['ref_search_query']=array(
-        'field_title'=>$description_label,
+        'field_title'=>'Search Query',
         'field_type'=>'text',
         'field_size'=>1000,
         'input_type'=>'textarea',
@@ -239,8 +240,8 @@ function get_reference($table,$title,$config_id,$value_label="Value",$descriptio
                 'ref_id'=>array('mandatory'=>'','field_state'=>'hidden'),
                 'ref_value'=>array('mandatory'=>'mandatory','field_state'=>'enabled'),
                 'ref_desc'=>array('mandatory'=>'','field_state'=>'enabled'),
-                'ref_method'=>array('mandatory'=>'mandatory','field_state'=>'enabled', 'field_title'=>'Method'),
-                'ref_search_query'=>array('mandatory'=>'','field_state'=>'enabled','field_title'=>'Search Query'),
+                'ref_method'=>array('mandatory'=>'mandatory','field_state'=>'enabled'),
+                'ref_search_query'=>array('mandatory'=>'','field_state'=>'enabled'),
 
 
             ),
