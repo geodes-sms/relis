@@ -3100,9 +3100,11 @@ class Manager extends CI_Controller {
 
 		//Get screening criteria
 		$exclusion_crit=$this->manager_lib->get_reference_select_values('exclusioncrieria;ref_value');
+        $inclusion_crit=$this->manager_lib->get_reference_select_values('inclusioncriteria;ref_value');
 
-		$data['exclusion_criteria']=$exclusion_crit;
 
+        $data['exclusion_criteria']=$exclusion_crit;
+        $data['inclusion_criteria']=$inclusion_crit;
 		if(!empty($data['content_item'])){
 			//edit screening: used for conflict resolution
 			$data['the_paper']=$data['content_item']['paper_id'] ;
@@ -4508,7 +4510,9 @@ class Manager extends CI_Controller {
 
 		$users=$this->manager_lib->get_reference_select_values('users;user_name');
 		$exclusion_crit=$this->manager_lib->get_reference_select_values('exclusioncrieria;ref_value');
-		//print_test($users);
+        $inclusion_crit=$this->manager_lib->get_reference_select_values('inclusioncriteria;ref_value');
+
+        //print_test($users);
 		$ref_table_config=get_table_configuration('papers');
 
 		$ref_table_config['current_operation']='list_papers_screen';
@@ -4612,7 +4616,9 @@ class Manager extends CI_Controller {
 		$res_screening['users']=array();
 		$res_screening['criteria']=array();
 		$res_screening['all_criteria']=0;
-		$key=0;
+        $res_screening['all_criteria_two']=0;
+
+        $key=0;
 		//	print_test($screenings);
 		foreach ($screenings['list'] as $key => $value) {
 
@@ -4648,7 +4654,29 @@ class Manager extends CI_Controller {
 
 			}
 
-		}
+			// inclusion criteria
+            if($value['screening_decision']=='Included' AND !empty($value['inclusion_criteria'])){
+                if(empty($res_screening['criteria'][$value['inclusion_criteria']])){
+                    //	echo "<p>bbb</p>";
+                    $res_screening['criteria'][$value['inclusion_criteria']]=1;
+                }else{
+                    //	echo "<p>cccc</p>";
+                    $res_screening['criteria'][$value['inclusion_criteria']] = $res_screening['criteria'][$value['inclusion_criteria']]+1;
+                }
+
+                $res_screening['all_criteria_two']++;
+                //critérias per user
+                if(empty($res_screening['users'][$value['user_id']]['criteria'][$value['inclusion_criteria']])){
+                    //	echo "<p>bbb</p>";
+                    $res_screening['users'][$value['user_id']]['criteria'][$value['inclusion_criteria']]=1;
+                }else{
+                    //	echo "<p>cccc</p>";
+                    $res_screening['users'][$value['user_id']]['criteria'][$value['inclusion_criteria']] = $res_screening['users'][$value['user_id']]['criteria'][$value['inclusion_criteria']]+1;
+                }
+
+            }
+
+        }
 
 		//  list to be displayed for  result per user
 		$result_per_user=array();
@@ -4679,7 +4707,7 @@ class Manager extends CI_Controller {
 
 		$result_per_criteria=array();
 
-		if(!empty ($res_screening['criteria'] ));
+		if(!empty ($res_screening['criteria'] ))
 		{
 			$result_per_criteria[0]=array(
 					'criteria'=>'Criteria ',
@@ -4696,7 +4724,31 @@ class Manager extends CI_Controller {
 				$i++;
 			}
 
+
 		}
+        $result_per_criteria_two=array();
+
+        if(!empty ($res_screening['criteria'] ))
+        {
+            $result_per_criteria_two[0]=array(
+                'criteria'=>'Criteria ',
+                'Nbr'=>'Nbr',
+                'pourc'=>'%'
+            );
+            $i=1;
+            foreach ($res_screening['criteria'] as $key => $value) {
+                $result_per_criteria_two[$i]=array(
+                    'criteria'=>!empty($inclusion_crit[$key])?$inclusion_crit[$key]:'Criteria '.$key,
+                    'Nbr'=>$value,
+                    'pourc'=>!empty($res_screening['all_criteria_two'])?round(($value*100/$res_screening['all_criteria_two']),2):0,
+                );
+                $i++;
+            }
+
+
+        }
+
+
 		//test if kappa is enabled
 		if(get_appconfig_element('use_kappa')){
 			$kappa=$this->calculate_kappa();
@@ -4713,7 +4765,9 @@ class Manager extends CI_Controller {
 			$data['kappa_meaning']=$kappa_meaning;
 		}
 		$data['result_per_criteria']=$result_per_criteria;
-		$data ['page_title'] = lng('Screening Statistics');//.$k_display;
+        $data['result_per_criteria_two']=$result_per_criteria_two;
+
+        $data ['page_title'] = lng('Screening Statistics');//.$k_display;
 		$data ['top_buttons'] = get_top_button ( 'back', 'Back', 'manage' );
 		$data['left_menu_perspective']='left_menu_screening';
 		$data['project_perspective']='screening';
