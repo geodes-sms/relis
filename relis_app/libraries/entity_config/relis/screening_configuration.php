@@ -164,6 +164,16 @@ function get_screening() {
 	   			'input_select_values'=>'exclusioncrieria;ref_value',//the reference table and the field to be displayed
 
 		);
+
+        $fields['inclusion_criteria']=array(
+            'field_title'=>'Inclusion criteria',
+            'field_type'=>'int',
+            'field_size'=>11,
+            'input_type'=>'select',
+            'input_select_source'=>'table',
+            'input_select_values'=>'inclusioncriteria;ref_value',//the reference table and the field to be displayed
+
+        );
 		
 		
 		$fields['screening_note']=array(
