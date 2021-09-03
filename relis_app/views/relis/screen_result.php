@@ -129,6 +129,7 @@
                        }else{
                            echo "<p>Empty!</p>";
                        }
+
            echo  box_footer();
 
 

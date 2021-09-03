@@ -116,6 +116,7 @@
                     <?php
 
                     echo '<div class="exclusion_crit" >'.dropdown_form_bm('Excluded criteria','criteria_ex','criteria_ex',$exclusion_criteria,!empty($content_item['exclusion_criteria'])?$content_item['exclusion_criteria']:0)."</div>";
+
                     echo '<div class="inclusion_crit" style="display: none">'.dropdown_form_bm('Included criteria','criteria_in','criteria_in',$inclusion_criteria,!empty($content_item['inclusion_criteria'])?$content_item['inclusion_criteria']:0)."</div>";
 
                     echo input_textarea_bm('Note ','note','note',!empty($content_item['screening_note'])?$content_item['screening_note']:''); 
@@ -192,12 +193,12 @@
 			 return true;
 			}
 
-      // if ( $('.inclusion_crit').css('display') != 'none' ){
-      //     // var crit=$('#criteria_in').val();
-      //     return true;
-      // }else{
-      //     return true;
-      // }
+      if ( $('.inclusion_crit').css('display') != 'none' ){
+          var crit=$('#criteria_in').val();
+          return true;
+      }else{
+          return true;
+      }
 	  
 
 	  }

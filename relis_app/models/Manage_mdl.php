@@ -223,6 +223,13 @@ class Manage_mdl extends CI_Model
 			return $result;
 			
 		}
+
+        function get_inclusion($paper_id){
+            $result=$this->DBConnection_mdl->get_inclusion($paper_id);
+
+            return $result;
+
+        }
 		
 		
 		

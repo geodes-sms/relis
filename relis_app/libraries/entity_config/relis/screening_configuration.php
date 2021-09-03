@@ -443,6 +443,7 @@ function get_screening() {
 	   					'user_id'=>array(),
 	   					'screening_decision'=>array(),
 	   					'exclusion_criteria'=>array(),
+	   					'inclusion_criteria'=>array(),
 	   					'screening_time'=>array(),
 	   					 
 	   	
@@ -541,6 +542,7 @@ function get_screening() {
 	   					'user_id'=>array(),
 	   					'screening_decision'=>array(),
 	   					'exclusion_criteria'=>array(),
+	   					'inclusion_criteria'=>array(),
 	   					'screening_time'=>array(),
 	   					 
 	   	
@@ -761,6 +763,7 @@ function get_screening() {
 	   					'screening_phase'=>array('mandatory'=>'mandatory','field_state'=>'hidden'),
 						'screening_decision'=>array('mandatory'=>'mandatory','field_state'=>'enabled'),
 	   					'exclusion_criteria'=>array('mandatory'=>'mandatory','field_state'=>'enabled'),
+	   					'inclusion_criteria'=>array('mandatory'=>'','field_state'=>'enabled'),
 	   					'screening_time'=>array('mandatory'=>'mandatory','field_state'=>'hidden'),
 	   					'screening_status'=>array('mandatory'=>'mandatory','field_state'=>'hidden','field_value'=>'Done'),
 	   			),
@@ -842,6 +845,7 @@ function get_screening() {
 	   					'user_id'=>array(),
 	   					'screening_decision'=>array(),
 	   					'exclusion_criteria'=>array(),
+	   					'inclusion_criteria'=>array(),
 	   					'screening_note'=>array(),
 	   					'screening_time'=>array(),
 	   					

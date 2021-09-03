@@ -1121,7 +1121,7 @@ function user_project($project_id , $user=0,$user_role=""){
 		$ci->db2 = $ci->load->database(project_db(), TRUE);
 		
 		
-		$sql= "select A.*,S.screening_id,S.decision,S.exclusion_criteria,S.note as screening_note,S.screening_time from assignment_screen A 	LEFT JOIN screening S ON (A.assignment_id = S.assignment_id AND S.	screening_active=1)  where A.paper_id = $paper_id AND 	A.assignment_active  ";
+		$sql= "select A.*,S.screening_id,S.decision,S.exclusion_criteria,S.inclusion_criteria,S.note as screening_note,S.screening_time from assignment_screen A 	LEFT JOIN screening S ON (A.assignment_id = S.assignment_id AND S.	screening_active=1)  where A.paper_id = $paper_id AND 	A.assignment_active  ";
 		
 		$res_assignment=$ci->db2->query($sql)->result_array();
 		
@@ -1219,7 +1219,7 @@ function user_project($project_id , $user=0,$user_role=""){
 		$ci->db2 = $ci->load->database(project_db(), TRUE);
 	
 	
-		$sql= "select A.*,S.screening_id,S.decision,S.exclusion_criteria,S.note,S.screening_time from assignment_screen A 	LEFT JOIN screening S ON (A.assignment_id = S.assignment_id AND S.	screening_active=1)  where A.paper_id = $paper_id AND 	A.assignment_active  ";
+		$sql= "select A.*,S.screening_id,S.decision,S.exclusion_criteria,S.inclusion_criteria,S.note,S.screening_time from assignment_screen A 	LEFT JOIN screening S ON (A.assignment_id = S.assignment_id AND S.	screening_active=1)  where A.paper_id = $paper_id AND 	A.assignment_active  ";
 	
 		$res_assignment=$ci->db2->query($sql)->result_array();
 	
@@ -1430,10 +1430,11 @@ function user_project($project_id , $user=0,$user_role=""){
 		
 		$users=	$ci->manager_lib->get_reference_select_values('users;user_name');
 		$criteria=$ci->manager_lib->get_reference_select_values('exclusioncrieria;ref_value');
-		
-		
-		
-		///-------
+        $criteria2=$ci->manager_lib->get_reference_select_values('inclusioncriteria;ref_value');
+
+
+
+        ///-------
 		
 		
 		//$sql= "select A.*,S.screening_id,S.decision,S.exclusion_criteria,S.note,S.screening_time from assignment_screen A 	LEFT JOIN screening S ON (A.assignment_id = S.assignment_id AND S.	screening_active=1)  where A.paper_id = $paper_id AND 	A.assignment_active  ";
@@ -1483,6 +1484,8 @@ function user_project($project_id , $user=0,$user_role=""){
 			
 			
 			$res_assignment[$key]['exclusion_criteria']=empty($criteria[$value['exclusion_criteria']])?"":$criteria[$value['exclusion_criteria']];
+            $res_assignment[$key]['inclusion_criteria']=empty($criteria[$value['inclusion_criteria']])?"":$criteria[$value['inclusion_criteria']];
+
 			//----------
 			//$ass_type=$value['assignment_type'];
 			${$value['assignment_type']}['number']++;
