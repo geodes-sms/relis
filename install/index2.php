@@ -51,24 +51,24 @@ if(isset($_POST['submit_form'])){
 		
 		$result_array=array();
 		
-		$link = mysql_connect($db_host, $db_user, $db_pass);
+		$link = mysqli_connect($db_host, $db_user, $db_pass);
 		if (!$link) {
 			//die('Database hosts connection error : ' . mysql_error());
-			install_form($_POST,array('Database hosts connection error : '. mysql_error()));
+			install_form($_POST,array('Database hosts connection error : '. mysqli_connect_error()));
 		}else{
 			//echo "<h2>Relis installation</h2>";
 			$sql = 'CREATE DATABASE IF NOT EXISTS '.$db_name;
-			if (mysql_query($sql, $link)) {
+			if (mysqli_query($link,$sql)) {
 		
 				
 				//echo "<h2>database created</h2>";
 				array_push($result_array, 'Database created');
 				//select_database
 		
-				$db_selected = mysql_select_db($db_name, $link);
+				$db_selected = mysqli_select_db($link, $db_name);
 				if (!$db_selected) {
 					//die ('Database connection error  : ' . mysql_error());
-					install_form($_POST,array('Database connection error : '. mysql_error()));
+					install_form($_POST,array('Database connection error : '. mysqli_connect_error()));
 				}else{
 		
 					//initialisation des données
@@ -83,9 +83,9 @@ if(isset($_POST['submit_form'])){
 						$sql=trim($v_sql);
 						//echo $sql."<br/><br/><br/>";
 						if( !empty($sql ) ){
-							$result = mysql_query($sql);
+							$result = mysqli_query($$link, $sql);
 							if (!$result) {
-								die('Invalid query : ' . mysql_error());
+								die('Invalid query : ' . mysqli_connect_error());
 							}
 		
 						}
@@ -98,9 +98,9 @@ if(isset($_POST['submit_form'])){
 					
 					// Add admin user
 					$sql="INSERT INTO users (user_name,user_username,user_password,user_mail,user_usergroup) VALUES('".$full_name."','".$user_name."','".$user_password."','".$user_mail."',1)";
-					$result = mysql_query($sql);
+					$result = mysqli_query($$link, $sql);
 					if (!$result) {
-						die('Invalid query : ' . mysql_error());
+						die('Invalid query : ' . mysqli_connect_error());
 					}
 					
 					// Add to CodeIgniter the database configuration
@@ -118,7 +118,7 @@ if(isset($_POST['submit_form'])){
 		
 			} else {
 				
-				install_form($_POST,array('Database not created : '. mysql_error()));
+				install_form($_POST,array('Database not created : '. mysqli_connect_error()));
 			}
 		
 		}
