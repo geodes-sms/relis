@@ -1,3 +1,49 @@
+
+
+@media (min-width: 768px){
+  .whole{
+    display:flex;
+  }
+  .paper{
+    width:50%;
+    height:auto;
+    margin-right: 10%;
+  }
+  .decision{
+
+    margin-left: 5%;
+    width:50%;
+    height:auto;
+  }
+  .vl_solid{
+    border-left: 1px solid #e5e5e5;
+    color: #ffffff;
+    background-color: #ffffff;
+    height: auto;
+    margin: 20px 0;
+  }
+  /*.ln_solid{*/
+  /*    border-top: 0px solid #e5e5e5;*/
+  /*}*/
+  /*#decision{*/
+  /*    text-align: center;*/
+  /*}*/
+}
+@media (max-width: 768px)
+{
+  .vl_solid{
+    border-top: 1px solid #e5e5e5;
+    color: #ffffff;
+    background-color: #ffffff;
+    height: 1px;
+    margin: 20px 0;
+  }
+}
+
+
+
+
+
 .nav-sm .container.body .left_col {
   width: 70px;
   padding: 0;
