@@ -573,7 +573,7 @@ class Install extends CI_Controller {
 			
 		//adding Qality assessment values
 	//	print_test($res_install_config);
-		if(!empty($res_install_config['qa'])  AND !(!empty($res_install_config['qa_action']) AND $res_install_config['qa_action']!='override')){
+		if(!empty($res_install_config['qa'])  AND !empty($res_install_config['qa_action'] AND $res_install_config['qa_action']=='override')){
 			$this->update_qa_values($res_install_config['qa'],$project_short_name);
 				
 			array_push($success_array, 'Quality assessment configuration set');
@@ -581,7 +581,8 @@ class Install extends CI_Controller {
 			if(empty($res_install_config['qa'])){
 				set_appconfig_element('qa_on', 0);
 			}
-		}
+            array_push($success_array, 'Retained Quality assessment configuration set');
+        }
 		
 		
 		$this->project_install_result($error_array,$success_array,'update_project');
@@ -1689,8 +1690,17 @@ class Install extends CI_Controller {
 	
 	
 	private function update_qa_values($qa,$target_db='current'){
-		$target_db=($target_db=='current')?project_db():$target_db;
-		$this->db3 = $this->load->database($target_db, TRUE);
+	    $res_install_config = $this->entity_configuration_lib->get_install_config();
+	    $qa_action = $res_install_config['qa_action'];
+        $target_db=($target_db=='current')?project_db():$target_db;
+        $this->db3 = $this->load->database($target_db, TRUE);
+	    if($qa_action == 'override'){
+	        $sql = "DELETE FROM qa_result";
+	        $sql2 = "UPDATE qa_assignment SET qa_assignment_active=0, qa_status='Pending'";
+	         $this->db3->query($sql);
+            $this->db3->query($sql2);
+        }else {
+
 
 		$config['qa_cutt_off_score']=!empty($qa['cutt_off_score'])?$qa['cutt_off_score']:"2";
 		$config['qa_on']=1;
@@ -1744,7 +1754,7 @@ class Install extends CI_Controller {
 			$result=$this->db3->insert_batch('qa_responses', $all_responses);
 		
 		}
-	
+        }
 	}
 	
 	private function get_last_added_project(){
