@@ -33,103 +33,232 @@ function get_reference($table,$title,$config_id,$value_label="Value",$descriptio
 	//list view
 	$config['order_by']='ref_value ASC '; //mettre la valeur à mettre dans la requette
 	$config['search_by']='ref_value';// separer les champs par virgule
-	
-	
-	 
-	$fields['ref_id']=array(
-			'field_title'=>'#',
-			'field_type'=>'int',
-			'field_size'=>11,
-	   		'field_value'=>'auto_increment',
-			'default_value'=>'auto_increment'
-	);
-	 
-	 
-	$fields['ref_value']=array(
-			'field_title'=>$value_label,
-			'field_type'=>'text', 
-			'field_size'=>100,  
-			'input_type'=>'text',
-			'mandatory'=>' mandatory '
-	);
-	 
-	$fields['ref_desc']=array(
-			'field_title'=>$description_label,
-			'field_type'=>'text', 
-			'field_size'=>1000,  
-			'input_type'=>'textarea',
-	);
-	 
-	$fields['ref_active']=array(
-			'field_title'=>'Active',
-	   		'field_type'=>'int',
-	   		'field_size'=>'1',
-	   		'field_value'=>'1',
-			'default_value'=>'1'
-	);
+
+
+	 if($config['table_name']=='ref_papers_sources') {
+         $fields['ref_id'] = array(
+             'field_title' => '#',
+             'field_type' => 'int',
+             'field_size' => 11,
+             'field_value' => 'auto_increment',
+             'default_value' => 'auto_increment'
+         );
+
+
+         $fields['ref_value'] = array(
+             'field_title' => $value_label,
+             'field_type' => 'text',
+             'field_size' => 100,
+             'input_type' => 'text',
+             'mandatory' => ' mandatory '
+         );
+
+         $fields['ref_desc'] = array(
+             'field_title' => $description_label,
+             'field_type' => 'text',
+             'field_size' => 1000,
+             'input_type' => 'textarea',
+         );
+
+
+
+         $fields['ref_method'] = array(
+             'field_title' => 'Method',
+             'field_type' => 'text',
+             'field_size' => 100,
+             'input_type' => 'select',
+             'input_select_source' => 'array',
+             'input_select_values' => array(
+                 'Automatic' => 'Automatic',
+                 'Manual' => 'Manual',
+
+             ),
+
+             'mandatory' => ' mandatory '
+         );
+
+
+         $fields['ref_search_query'] = array(
+             'field_title' => 'Search Query',
+             'field_type' => 'text',
+             'field_size' => 1000,
+             'input_type' => 'textarea',
+         );
+
+
+         $fields['ref_active'] = array(
+             'field_title' => 'Active',
+             'field_type' => 'int',
+             'field_size' => '1',
+             'field_value' => '1',
+             'default_value' => '1'
+         );
+     }
+	 else{
+         $fields['ref_id'] = array(
+             'field_title' => '#',
+             'field_type' => 'int',
+             'field_size' => 11,
+             'field_value' => 'auto_increment',
+             'default_value' => 'auto_increment'
+         );
+
+
+         $fields['ref_value'] = array(
+             'field_title' => $value_label,
+             'field_type' => 'text',
+             'field_size' => 100,
+             'input_type' => 'text',
+             'mandatory' => ' mandatory '
+         );
+
+         $fields['ref_desc'] = array(
+             'field_title' => $description_label,
+             'field_type' => 'text',
+             'field_size' => 1000,
+             'input_type' => 'textarea',
+         );
+
+
+         $fields['ref_active'] = array(
+             'field_title' => 'Active',
+             'field_type' => 'int',
+             'field_size' => '1',
+             'field_value' => '1',
+             'default_value' => '1'
+         );
+     }
+
+
 	$config['fields']=$fields;
-	 
-	$operations['list_'.$config_id]=array(
-			'operation_type'=>'List',
-			'operation_title'=>'List of '.$title,
-			'operation_description'=>'List of '.$title,
-			'page_title'=>'List  of '.$title,
-		  
-			//'page_template'=>'list',
-		  
-			'data_source'=>'get_list_'.$config_id,
-			'generate_stored_procedure'=>True,
+    if($config_id!= 'papers_sources') {
+        $operations['list_' . $config_id] = array(
+            'operation_type' => 'List',
+            'operation_title' => 'List of ' . $title,
+            'operation_description' => 'List of ' . $title,
+            'page_title' => 'List  of ' . $title,
+
+            //'page_template'=>'list',
+
+            'data_source' => 'get_list_' . $config_id,
+            'generate_stored_procedure' => True,
+
+            'fields' => array(
+                //	'ref_id'=>array(),
+                'ref_value' => array('link' => array(
+                    'url' => 'op/edit_element/edit_' . $config_id . '/',
+                    'id_field' => 'ref_id',
+                    'trim' => '0'
+                )),
+                'ref_desc' => array()
+
+
+            ),
+            'order_by' => 'ref_value ASC ',
+            'search_by' => 'ref_value',
+
+
+            'list_links' => array(
+
+                'edit' => array(
+                    'label' => 'Edit',
+                    'title' => 'Edit',
+                    'icon' => 'edit',
+                    'url' => 'op/edit_element/edit_' . $config_id . '/',
+                ),
+                'delete' => array(
+                    'label' => 'Delete',
+                    'title' => 'Delete the user',
+                    'icon' => 'trash',
+                    'url' => 'op/delete_element/remove_' . $config_id . '/'
+                )
+            ),
+
+            'top_links' => array(
+                'add' => array(
+                    'label' => '',
+                    'title' => 'Add ' . $title,
+                    'icon' => 'add',
+                    'url' => 'op/add_element/add_' . $config_id,
+                ),
+                'back' => array(
+                    'label' => '',
+                    'title' => 'Close',
+                    'icon' => '',
+                    'url' => 'home',
+                )
+
+            ),
+
+
+        );
+    }
+    else{
+        $operations['list_' . $config_id] = array(
+            'operation_type' => 'List',
+            'operation_title' => 'List of ' . $title,
+            'operation_description' => 'List of ' . $title,
+            'page_title' => 'List  of ' . $title,
+
+            //'page_template'=>'list',
+
+            'data_source' => 'get_list_' . $config_id,
+            'generate_stored_procedure' => True,
+
+            'fields' => array(
+                //	'ref_id'=>array(),
+                'ref_value' => array('link' => array(
+                    'url' => 'op/edit_element/edit_' . $config_id . '/',
+                    'id_field' => 'ref_id',
+                    'trim' => '0'
+                )),
+                'ref_desc' => array(),
+                'ref_method'=>array(),
+                'ref_search_query'=>array()
+
+
+            ),
+            'order_by' => 'ref_value ASC ',
+            'search_by' => 'ref_value',
+
+
+            'list_links' => array(
+
+                'edit' => array(
+                    'label' => 'Edit',
+                    'title' => 'Edit',
+                    'icon' => 'edit',
+                    'url' => 'op/edit_element/edit_' . $config_id . '/',
+                ),
+                'delete' => array(
+                    'label' => 'Delete',
+                    'title' => 'Delete the user',
+                    'icon' => 'trash',
+                    'url' => 'op/delete_element/remove_' . $config_id . '/'
+                )
+            ),
+
+            'top_links' => array(
+                'add' => array(
+                    'label' => '',
+                    'title' => 'Add ' . $title,
+                    'icon' => 'add',
+                    'url' => 'op/add_element/add_' . $config_id,
+                ),
+                'back' => array(
+                    'label' => '',
+                    'title' => 'Close',
+                    'icon' => '',
+                    'url' => 'home',
+                )
+
+            ),
+
+
+        );
+    }
 	
-			'fields'=>array(
-				//	'ref_id'=>array(),
-					'ref_value'=>array('link'=>array(
-								'url'=>'op/edit_element/edit_'.$config_id.'/',
-								'id_field'=>'ref_id',
-								'trim'=>'0'
-							)),
-					'ref_desc'=>array()		   	
-	
-			),
-			'order_by'=>'ref_value ASC ',
-			'search_by'=>'ref_value',
-			 
-			 
-			'list_links'=>array(
-					/*
-					'edit'=>array(
-							'label'=>'Edit',
-							'title'=>'Edit',
-							'icon'=>'edit',
-							'url'=>'op/edit_element/edit_'.$config_id.'/',
-								),*/
-					'delete'=>array(
-							'label'=>'Delete',
-							'title'=>'Delete the user',
-							'icon'=>'trash',
-							'url'=>'op/delete_element/remove_'.$config_id.'/'
-					) 
-			),
-		  
-			'top_links'=>array(
-							'add'=>array(
-										'label'=>'',
-										'title'=>'Add '.$title,
-										'icon'=>'add',
-										'url'=>'op/add_element/add_'.$config_id,
-									),
-							'back'=>array(
-										'label'=>'',
-										'title'=>'Close',
-										'icon'=>'',
-										'url'=>'home',
-									)
-				
-				),
-		
-			
-	);
-	
-	
+	if($config_id!= 'papers_sources'){
 	$operations['add_'.$config_id]=array(
 			'operation_type'=>'Add',
 			'operation_title'=>'Add '.$title,
@@ -146,7 +275,7 @@ function get_reference($table,$title,$config_id,$value_label="Value",$descriptio
 					'ref_id'=>array('mandatory'=>'','field_state'=>'hidden'),
 					'ref_value'=>array('mandatory'=>'mandatory','field_state'=>'enabled'),
 					'ref_desc'=>array('mandatory'=>'','field_state'=>'enabled'),
-					
+
 						
 			),
 	
@@ -161,8 +290,45 @@ function get_reference($table,$title,$config_id,$value_label="Value",$descriptio
 	
 			),
 				
-	);
-	
+	);}
+	else{
+        $operations['add_papers_sources']=array(
+            'operation_type'=>'Add',
+            'operation_title'=>'Add '.$title,
+            'operation_description'=>'Add '.$title,
+            'page_title'=>'Add a '.$title,
+            'save_function'=>'op/save_element',
+            'page_template'=>'general/frm_entity',
+            'redirect_after_save'=>'op/entity_list/list_'.$config_id,
+            'db_save_model'=>'add_'.$config_id,
+
+            'generate_stored_procedure'=>True,
+
+            'fields'=>array(
+                'ref_id'=>array('mandatory'=>'','field_state'=>'hidden'),
+                'ref_value'=>array('mandatory'=>'mandatory','field_state'=>'enabled'),
+                'ref_desc'=>array('mandatory'=>'','field_state'=>'enabled'),
+                'ref_method'=>array('mandatory'=>'mandatory','field_state'=>'enabled'),
+                'ref_search_query'=>array('mandatory'=>'','field_state'=>'enabled'),
+
+
+            ),
+
+            'top_links'=>array(
+
+                'back'=>array(
+                    'label'=>'',
+                    'title'=>'Close',
+                    'icon'=>'close',
+                    'url'=>'home',
+                )
+
+            ),
+
+        );
+    }
+
+    if($config_id!= 'papers_sources'){
 	$operations['edit_'.$config_id]=array(
 			'operation_type'=>'Edit',
 			'operation_title'=>'Edit '.$title,
@@ -195,7 +361,45 @@ function get_reference($table,$title,$config_id,$value_label="Value",$descriptio
 	
 			),
 				
-	);
+	);}
+    else{$operations['edit_'.$config_id]=array(
+        'operation_type'=>'Edit',
+        'operation_title'=>'Edit '.$title,
+        'operation_description'=>'Edit '.$title,
+        'page_title'=>'Edit '.$title,
+        'save_function'=>'op/save_element',
+        'page_template'=>'general/frm_entity',
+
+        'redirect_after_save'=>'op/entity_list/list_'.$config_id,
+        'data_source'=>'get_detail_'.$config_id,
+        'db_save_model'=>'update_'.$config_id,
+
+        'generate_stored_procedure'=>True,
+
+        'fields'=>array(
+            'ref_id'=>array('mandatory'=>'','field_state'=>'hidden'),
+            'ref_value'=>array('mandatory'=>'mandatory','field_state'=>'enabled'),
+            'ref_desc'=>array('mandatory'=>'','field_state'=>'enabled'),
+            'ref_method'=>array('mandatory'=>'mandatory','field_state'=>'enabled'),
+            'ref_search_query'=>array('mandatory'=>'','field_state'=>'enabled'),
+
+
+        ),
+
+        'top_links'=>array(
+
+            'back'=>array(
+                'label'=>'',
+                'title'=>'Close',
+                'icon'=>'close',
+                'url'=>'home',
+            )
+
+        ),
+
+    );
+
+    }
 	
 	$operations['detail_'.$config_id]=array(
 			'operation_type'=>'Detail',

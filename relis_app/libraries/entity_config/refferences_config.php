@@ -73,8 +73,43 @@ function get_refference($table,$title) {
 			'field_size'=>240,
 			'input_type'=>'textarea'
 	);
-	 
-	$fields['ref_active']=array(
+
+
+
+//
+//    $fields['ref_method']=array(
+//        'field_title'=>'Method',
+//        'field_type'=>'text',
+//        'field_value'=>'method',
+//        'field_size'=>200,
+//        'input_type'=>'select',
+//        'input_select_source'=>'array',
+//        'input_select_values'=>array(
+//            'Automatic' => 'Automatic',
+//            'Manual' => 'Manual',
+//
+//        ),
+//        'mandatory'=>' mandatory ',
+//
+//
+//    );
+//
+//
+//
+//    $fields['ref_search_query']=array(
+//        'field_title'=>'Search Query',
+//        'field_type'=>'text',
+//        'field_value'=>'normal',
+//        'on_add'=>'enabled',
+//        'on_edit'=>'enabled',
+//        'on_list'=>'show',
+//        'field_size'=>240,
+//        'input_type'=>'textarea'
+//    );
+//
+
+
+    $fields['ref_active']=array(
 			'field_title'=>'Active',
 			'field_type'=>'0_1',
 			'field_value'=>'normal',

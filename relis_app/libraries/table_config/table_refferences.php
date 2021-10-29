@@ -54,7 +54,7 @@ function get_refference($table,$title) {
 			'field_size'=>100,
 			'mandatory'=>' mandatory '
 	);
-	 
+
 	$fields['ref_desc']=array(
 			'field_title'=>'Description',
 			'field_type'=>'text',
@@ -65,7 +65,9 @@ function get_refference($table,$title) {
 			'field_size'=>240,
 			'input_type'=>'textarea'
 	);
-	 
+
+
+
 	$fields['ref_active']=array(
 			'field_title'=>'Active',
 			'field_type'=>'0_1',

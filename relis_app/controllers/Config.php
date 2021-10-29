@@ -571,15 +571,15 @@ class Config extends CI_Controller {
 		$table_name="z".$ref_conf;
 	//	
 		$del_line="DROP TABLE IF EXISTS ".$table_name.";";
-		
-		$sql="CREATE TABLE IF NOT EXISTS ".$table_name." (
+
+		$sql = "CREATE TABLE IF NOT EXISTS " . $table_name . " (
 		`ref_id` int(11) NOT NULL AUTO_INCREMENT,
 		  `ref_value` varchar(50) NOT NULL,
 		  `ref_desc` varchar(250) DEFAULT NULL,
 		  `ref_active` int(1) NOT NULL DEFAULT '1',
 		  PRIMARY KEY (`ref_id`)
 		) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;";
-		
+
 		//Add in the list of reference tables
 		
 		$req="select * from ref_tables where reftab_active=1 AND reftab_label='$ref_conf'";
