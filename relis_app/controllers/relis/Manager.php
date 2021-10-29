@@ -799,87 +799,91 @@ class Manager extends CI_Controller {
 	 * 			$operation: type de l'opération ajout (new) ou modification(edit)
 	 *
 	 */
-	public function new_exclusion($paper_id, $data = "",$operation="new") {
+	public function new_exclusion($paper_id, $data = "",$operation="new")
+    {
 
-		$ref_table_child= 'exclusion';
-		$child_field= 'exclusion_paper_id';
-		$ref_table_parent= 'papers';
+        $ref_table_child = 'exclusion';
+        $child_field = 'exclusion_paper_id';
+        $ref_table_parent = 'papers';
 
-		/*
-		 * Récupération de la configuration(structure) de la table exclusion
-		 */
-		$table_config_child=get_table_config($ref_table_child);
-		$table_config_child['config_id']=$ref_table_child;
+        /*
+         * Récupération de la configuration(structure) de la table exclusion
+         */
+        $table_config_child = get_table_config($ref_table_child);
+        $table_config_child['config_id'] = $ref_table_child;
 
-
-		/*
-		 * Récupération de la configuration(structure) de la table des papiers
-		 */
-		$table_config_parent=get_table_config($ref_table_parent);
-
-		$table_config_child['fields'][$child_field]['on_add']="hidden";
-		$table_config_child['fields'][$child_field]['on_edit']="hidden";
-		$table_config_child['fields'][$child_field]['input_type']="text";
+        $is_guest = check_guest();
+        if (!$is_guest) {
 
 
+            /*
+             * Récupération de la configuration(structure) de la table des papiers
+             */
+            $table_config_parent = get_table_config($ref_table_parent);
+
+            $table_config_child['fields'][$child_field]['on_add'] = "hidden";
+            $table_config_child['fields'][$child_field]['on_edit'] = "hidden";
+            $table_config_child['fields'][$child_field]['input_type'] = "text";
 
 
-		foreach ($table_config_child['fields'] as $k => $v) {
+            foreach ($table_config_child['fields'] as $k => $v) {
 
-			if(!empty($v['input_type']) AND $v['input_type']=='select'){
-				if($v['input_select_source']=='table'){
-					$table_config_child['fields'][$k]['input_select_values']= $this->manager_lib->get_reference_select_values($v['input_select_values']);
-				}
-			}
+                if (!empty($v['input_type']) and $v['input_type'] == 'select') {
+                    if ($v['input_select_source'] == 'table') {
+                        $table_config_child['fields'][$k]['input_select_values'] = $this->manager_lib->get_reference_select_values($v['input_select_values']);
+                    }
+                }
 
-		}
-
-
-		/*
-		 * Prépartions des valeurs qui vont apparaitres dans le formulaire
-		 */
-		$data['content_item'][$child_field]=$paper_id;
-		$data['table_config']=$table_config_child;
-		$data['operation_type']=$operation;
-		$data['operation_source']="exclusion";
-		$data['child_field']=$child_field;
-		$data['table_config_parent']=$ref_table_parent;
-		$data['parent_id']=$paper_id;
+            }
 
 
-
-		/*
-		 * Titre de la page
-		 */
-		$parrent_names=$this->manager_lib->get_reference_select_values($table_config_child['fields'][$child_field]['input_select_values']);
-		if($operation=='edit'){
-			$data ['page_title'] = 'Edit Exclusion of the '.$table_config_parent['reference_title_min']." : ".$parrent_names[$paper_id];
-		}else{
-			$data ['page_title'] = 'Exclusion of the '.$table_config_parent['reference_title_min']." : ".$parrent_names[$paper_id];
-
-		}
-
+            /*
+             * Prépartions des valeurs qui vont apparaitres dans le formulaire
+             */
+            $data['content_item'][$child_field] = $paper_id;
+            $data['table_config'] = $table_config_child;
+            $data['operation_type'] = $operation;
+            $data['operation_source'] = "exclusion";
+            $data['child_field'] = $child_field;
+            $data['table_config_parent'] = $ref_table_parent;
+            $data['parent_id'] = $paper_id;
 
 
+            /*
+             * Titre de la page
+             */
+            $parrent_names = $this->manager_lib->get_reference_select_values($table_config_child['fields'][$child_field]['input_select_values']);
+            if ($operation == 'edit') {
+                $data ['page_title'] = 'Edit Exclusion of the ' . $table_config_parent['reference_title_min'] . " : " . $parrent_names[$paper_id];
+            } else {
+                $data ['page_title'] = 'Exclusion of the ' . $table_config_parent['reference_title_min'] . " : " . $parrent_names[$paper_id];
 
-		/*
-		 * Création des boutons qui vont s'afficher en haut de la page (top_buttons)
-		 */
-		$data ['top_buttons'] = get_top_button ( 'back', 'Back', 'manage' );
-
-
-		/*
-		 * La vue qui va s'afficher
-		 */
-		$data ['page'] = 'general/frm_reference';
-
+            }
 
 
-		/*
-		 * Chargement de la vue avec les données préparés dans le controleur suivant le type d'affichage : (popup modal ou pas)
-		 */
-		$this->load->view ( 'body', $data );
-	}
+            /*
+             * Création des boutons qui vont s'afficher en haut de la page (top_buttons)
+             */
+            $data ['top_buttons'] = get_top_button('back', 'Back', 'manage');
+
+
+            /*
+             * La vue qui va s'afficher
+             */
+            $data ['page'] = 'general/frm_reference';
+
+
+            /*
+             * Chargement de la vue avec les données préparés dans le controleur suivant le type d'affichage : (popup modal ou pas)
+             */
+            $this->load->view('body', $data);
+        }
+        else{
+            set_top_msg('No access to this operation!', 'error');
+            redirect('relis/manager/display_paper/'.$paper_id);
+
+        }
+    }
 
 
 	public function remove_exclusion ($id,$paper_id){
@@ -891,11 +895,18 @@ class Manager extends CI_Controller {
 		redirect ( 'relis/manager/display_paper/' .$paper_id  );
 	}
 
-	public function remove_assignation ($id,$paper_id){
-		$res=$this->DBConnection_mdl->remove_element($id,'remove_class_assignment',true);
-		set_top_msg(lng_min('Assignment removed'));
-		redirect ( 'relis/manager/display_paper/' .$paper_id  );
-	}
+	public function remove_assignation ($id,$paper_id)
+    {
+        $is_guest = check_guest();
+        if (!$is_guest) {
+            $res = $this->DBConnection_mdl->remove_element($id, 'remove_class_assignment', true);
+            set_top_msg(lng_min('Assignment removed'));
+            redirect('relis/manager/display_paper/' . $paper_id);
+        }else{
+            set_top_msg('No access to this operation!', 'error');
+            redirect('relis/manager/display_paper/'.$paper_id);
+        }
+    }
 
 	public function remove_classification ($id,$paper_id){
 		$res=$this->DBConnection_mdl->remove_element($id,'classification');
@@ -4274,7 +4285,7 @@ class Manager extends CI_Controller {
 			}
 
 			if((has_usergroup(1)
-					OR is_project_creator(active_user_id() , project_db()))
+					OR is_project_creator(active_user_id() , project_db()) OR can_manage_project(active_user_id(),project_db()))
 					AND !$project_published)
 				$data ['assign_new_button'] =get_top_button ( 'add', 'Add a reviewer', 'op/add_element_child/add_reviewer/'.$ref_id, 'Add a reviewer')." ";
 
