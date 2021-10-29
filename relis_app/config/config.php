@@ -306,8 +306,8 @@ $config['metrics_save_path'] = "/u/relis/public_html/cside/metrics";
 $config['root_path'] = "/u/relis/public_html/";
 
 // Common configurations in relis
-$config['common_relis_configs'] = array('assignation','author','config','exclusion','papers',
-								'paper_author','ref_exclusioncrieria','str_mng','venue',
+$config['common_relis_configs'] = array('assignation','author','config','inclusion','exclusion','papers',
+								'paper_author','ref_exclusioncrieria','ref_inclusioncriteria','str_mng','venue',
 								'assignment_screen','screening','screening_validate',
 									'assignment_screen_validate','operations');
 

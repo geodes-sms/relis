@@ -365,8 +365,20 @@ class DBConnection_mdl extends CI_Model
 		
 			return $results;
 		}
-		
-		
+
+    /*
+     * Fonction pour récupérer les informations sur l'inclusion d'un papier
+     */
+    function get_inclusion($paper_id){
+        $this->db2 = $this->load->database(project_db(), TRUE);
+        $data=$this->db2->query ( "CALL get_paper_inclusion_info(".$paper_id.") " );
+
+        mysqli_next_result( $this->db2->conn_id );
+
+        $results=$data->row_array();
+
+        return $results;
+    }
 		/*
 		 * Fonction pour récupérer le nom de la table utilisé pas une table de reference
 		 * Function to retrieve the name of the table used by a reference table

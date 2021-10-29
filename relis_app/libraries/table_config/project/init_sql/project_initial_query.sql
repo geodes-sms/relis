@@ -87,6 +87,18 @@ CREATE TABLE IF NOT EXISTS `exclusion` (
   PRIMARY KEY (`exclusion_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;;;;
 
+DROP TABLE IF EXISTS `inclusion`;;;;
+CREATE TABLE IF NOT EXISTS `inclusion` (
+    `inclusion_id` int(11) NOT NULL AUTO_INCREMENT,
+    `inclusion_paper_id` int(11) NOT NULL,
+    `inclusion_criteria` int(11) ,
+    `inclusion_note` text,
+    `inclusion_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `inclusion_by` int(11) NOT NULL,
+    `inclusion_active` int(1) NOT NULL DEFAULT '1',
+    PRIMARY KEY (`inclusion_id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=latin1;;;;
+
 
 DROP TABLE IF EXISTS `paper`;;;;
 CREATE TABLE IF NOT EXISTS `paper` (
@@ -201,6 +213,13 @@ DROP PROCEDURE IF EXISTS  get_paper_exclusion_info ;;;;
 CREATE   PROCEDURE  get_paper_exclusion_info  ( _paperId  INT)  BEGIN
 START TRANSACTION;
 SELECT * FROM exclusion WHERE (exclusion_paper_id = _paperId AND exclusion_active=1);
+COMMIT;
+END;;;;
+
+DROP PROCEDURE IF EXISTS  get_paper_inclusion_info ;;;;
+CREATE   PROCEDURE  get_paper_inclusion_info  ( _paperId  INT)  BEGIN
+START TRANSACTION;
+SELECT * FROM inclusion WHERE (inclusion_paper_id = _paperId AND inclusion_active=1);
 COMMIT;
 END;;;;
 
