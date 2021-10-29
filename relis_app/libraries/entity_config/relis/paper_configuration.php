@@ -300,7 +300,7 @@ function get_papers() {
 			'name'=>'view_paper_decision',
 			'desc'=>'',
 			
-			'script'=>'SELECT S.screening_id,S.screening_phase,S.user_id,P.id, P.bibtexKey,P.title,P.paper_active,IFNULL(D.screening_decision,"Pending") as screening_status ,IFNULL(D.decision_source,"Pending") as decision_source from screening_paper S 
+			'script'=>'SELECT S.screening_id,S.screening_phase,S.user_id,P.id, P.bibtexKey,P.title,P.doi,P.papers_sources,P.paper_active,IFNULL(D.screening_decision,"Pending") as screening_status ,IFNULL(D.decision_source,"Pending") as decision_source from screening_paper S 
 LEFT JOIN  paper P ON(S.paper_id=P.id AND P.paper_active=1 ) 
 LEFT JOIN  screen_decison D ON (S.paper_id=D.paper_id AND S.screening_phase=D.screening_phase AND D.decision_active=1 ) 
 WHERE screening_active=1  GROUP BY P.id,S.screening_phase',
@@ -311,7 +311,7 @@ WHERE screening_active=1  GROUP BY P.id,S.screening_phase',
 			'name'=>'view_paper_decision_det',
 			'desc'=>'',
 				
-			'script'=>'SELECT S.screening_id,S.screening_phase,S.user_id,P.id, P.bibtexKey,P.title,P.paper_active,IFNULL(D.screening_decision,"Pending") as screening_status ,IFNULL(D.decision_source,"Pending") as decision_source from screening_paper S
+			'script'=>'SELECT S.screening_id,S.screening_phase,S.user_id,P.id, P.bibtexKey,P.title,P.doi,P.papers_sources,P.paper_active,IFNULL(D.screening_decision,"Pending") as screening_status ,IFNULL(D.decision_source,"Pending") as decision_source from screening_paper S
 LEFT JOIN  paper P ON(S.paper_id=P.id AND P.paper_active=1 )
 LEFT JOIN  screen_decison D ON (S.paper_id=D.paper_id AND S.screening_phase=D.screening_phase AND D.decision_active=1 )
 WHERE screening_active=1',
@@ -532,6 +532,7 @@ WHERE screening_active=1',
 					//'authors'=>array(),
 					'doi'=>array(),
 					'screening_status'=>array('field_title'=>'Decision'),
+                'papers_sources'=>array(),
 					 
 			),
 			'order_by'=>'id ASC ',
@@ -637,7 +638,7 @@ WHERE screening_active=1',
 							)),
 					'doi'=>array(),
 					'screening_status'=>array('field_title'=>'Decision'),
-					 
+					 'papers_sources'=>array(),
 			),
 			'order_by'=>'id ASC ',
 			'conditions'=>array(
