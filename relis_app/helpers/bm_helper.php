@@ -66,20 +66,27 @@ function get_top_button($type='add',$title='',$link='',$label=" ",$icon=' fa-plu
 		$title=lng_min($title);
 	switch ($type) {
 		case 'add':
-			$button=anchor($link,'<button class="btn btn-success"><i class="fa fa-plus"></i>'.$label.'</button>','title="'.$title.'"');
-
+		    $is_guest = check_guest();
+		    if(!$is_guest) {
+                $button = anchor($link, '<button class="btn btn-success"><i class="fa fa-plus"></i>' . $label . '</button>', 'title="' . $title . '"');
+            }
 			break;
 		case 'edit':
-			$button=anchor($link,'<button class="btn btn-info"><i class="fa fa-pencil"></i>'.$label.'</button>','title="'.$title.'"');
-
+            $is_guest = check_guest();
+            if(!$is_guest) {
+                $button = anchor($link, '<button class="btn btn-info"><i class="fa fa-pencil"></i>' . $label . '</button>', 'title="' . $title . '"');
+            }
 			break;
 		case 'close':
 			$button=anchor($link,'<button class="btn btn-danger"><i class="fa fa-close"></i> </button>','title="'.$title.'"  ');
 			break;
 
 		case 'delete':
-			$button=anchor($link,'<button type="button" class="btn btn-danger"><i class="fa fa-trash"></i> '.$label.'
-                          </button>','title="'.$title.'"  onClick="return confirm_delete()" ');
+            $is_guest = check_guest();
+            if(!$is_guest) {
+                $button = anchor($link, '<button type="button" class="btn btn-danger"><i class="fa fa-trash"></i> ' . $label . '
+                          </button>', 'title="' . $title . '"  onClick="return confirm_delete()" ');
+            }
 			break;
 
 		case 'back'://	$button='<a href="javascript:history.go(-1)" title="'.$title.'"><button type="button" class="btn btn-danger"><i class="icon-arrow-left  icon-white"></i></button></a>';
@@ -801,8 +808,20 @@ function admin_config($config,$config_name=True,$type='config'){
 	}
 
 	
-}	
+}
 
+
+function check_guest(){
+    $ci = get_instance ();
+    $userid = $_SESSION['user_id'];
+        $sql = "SELECT * from userproject where user_role='Guest' AND user_id=$userid";
+        $res = $ci->db->query($sql)->num_rows();
+        if($res >0){
+            return TRUE;
+        }else {
+            return FALSE;
+        }
+}
 
 /**
  * Function to verify if a user has access to a project
@@ -881,7 +900,7 @@ function user_project($project_id , $user=0,$user_role=""){
 		if($user==0){
 			$user=$ci->session->userdata('user_id');
 		}
-		$sql="select project_id from projects where project_creator=$user AND $use='$project_id' AND project_active=1 ";
+		$sql="select project_id from projects where project_creator=$user AND project_active=1 ";
 	
 		$user_projects = $ci->db->query($sql)->num_rows();
 	
@@ -1121,7 +1140,7 @@ function user_project($project_id , $user=0,$user_role=""){
 		$ci->db2 = $ci->load->database(project_db(), TRUE);
 		
 		
-		$sql= "select A.*,S.screening_id,S.decision,S.exclusion_criteria,S.note as screening_note,S.screening_time from assignment_screen A 	LEFT JOIN screening S ON (A.assignment_id = S.assignment_id AND S.	screening_active=1)  where A.paper_id = $paper_id AND 	A.assignment_active  ";
+		$sql= "select A.*,S.screening_id,S.decision,S.exclusion_criteria,S.inclusion_criteria,S.note as screening_note,S.screening_time from assignment_screen A 	LEFT JOIN screening S ON (A.assignment_id = S.assignment_id AND S.	screening_active=1)  where A.paper_id = $paper_id AND 	A.assignment_active  ";
 		
 		$res_assignment=$ci->db2->query($sql)->result_array();
 		
@@ -1219,7 +1238,7 @@ function user_project($project_id , $user=0,$user_role=""){
 		$ci->db2 = $ci->load->database(project_db(), TRUE);
 	
 	
-		$sql= "select A.*,S.screening_id,S.decision,S.exclusion_criteria,S.note,S.screening_time from assignment_screen A 	LEFT JOIN screening S ON (A.assignment_id = S.assignment_id AND S.	screening_active=1)  where A.paper_id = $paper_id AND 	A.assignment_active  ";
+		$sql= "select A.*,S.screening_id,S.decision,S.exclusion_criteria,S.inclusion_criteria,S.note,S.screening_time from assignment_screen A 	LEFT JOIN screening S ON (A.assignment_id = S.assignment_id AND S.	screening_active=1)  where A.paper_id = $paper_id AND 	A.assignment_active  ";
 	
 		$res_assignment=$ci->db2->query($sql)->result_array();
 	
@@ -1430,10 +1449,11 @@ function user_project($project_id , $user=0,$user_role=""){
 		
 		$users=	$ci->manager_lib->get_reference_select_values('users;user_name');
 		$criteria=$ci->manager_lib->get_reference_select_values('exclusioncrieria;ref_value');
-		
-		
-		
-		///-------
+        $criteria2=$ci->manager_lib->get_reference_select_values('inclusioncriteria;ref_value');
+
+
+
+        ///-------
 		
 		
 		//$sql= "select A.*,S.screening_id,S.decision,S.exclusion_criteria,S.note,S.screening_time from assignment_screen A 	LEFT JOIN screening S ON (A.assignment_id = S.assignment_id AND S.	screening_active=1)  where A.paper_id = $paper_id AND 	A.assignment_active  ";
@@ -1483,6 +1503,8 @@ function user_project($project_id , $user=0,$user_role=""){
 			
 			
 			$res_assignment[$key]['exclusion_criteria']=empty($criteria[$value['exclusion_criteria']])?"":$criteria[$value['exclusion_criteria']];
+            $res_assignment[$key]['inclusion_criteria']=empty($criteria[$value['inclusion_criteria']])?"":$criteria[$value['inclusion_criteria']];
+
 			//----------
 			//$ass_type=$value['assignment_type'];
 			${$value['assignment_type']}['number']++;

@@ -1978,20 +1978,105 @@ class Manage extends CI_Controller {
 		 */
 		$this->load->view ( 'body', $data );
 	}
-	
-	
-	
-	
-	
-	
-/*
-	 * Fonction  pour afficher la page avec un formulaire d'ajout ou modification d'un élément
-	 *
-	 * Input: 	$ref_table: nom de la structure de la table pour l'élément à afficher
-	 * 			$data : informations sur l'élément si la fonction est utilisé pour la mis à jour(modification)
-	 * 			$operation: type de l'opération ajout (new) ou modification(edit)
-	 * 			$display_type: indique comment le formulaire va être afficher normal ou modal(pop- up)
-	 */
+
+
+
+
+
+    public function new_inclusion($paper_id, $data = "",$operation="new") {
+
+        $ref_table_child= 'inclusion';
+        $child_field= 'inclusion_paper_id';
+        $ref_table_parent= 'papers';
+
+        /*
+         * Récupération de la configuration(structure) de la table inclusion
+         */
+        $table_config_child=$this->ref_table_config($ref_table_child);
+        $table_config_child['config_id']=$ref_table_child;
+
+
+        /*
+         * Récupération de la configuration(structure) de la table des papiers
+         */
+        $table_config_parent=$this->ref_table_config($ref_table_parent);
+
+        $table_config_child['fields'][$child_field]['on_add']="hidden";
+        $table_config_child['fields'][$child_field]['on_edit']="hidden";
+        $table_config_child['fields'][$child_field]['input_type']="text";
+
+
+
+
+        foreach ($table_config_child['fields'] as $k => $v) {
+
+            if(!empty($v['input_type']) AND $v['input_type']=='select'){
+                if($v['input_select_source']=='table'){
+                    $table_config_child['fields'][$k]['input_select_values']= $this->get_reference_select_values($v['input_select_values']);
+                }
+            }
+
+        }
+
+
+        /*
+         * Prépartions des valeurs qui vont apparaitres dans le formulaire
+         */
+        $data['content_item'][$child_field]=$paper_id;
+        $data['table_config']=$table_config_child;
+        $data['operation_type']=$operation;
+        $data['operation_source']="inclusion";
+        $data['child_field']=$child_field;
+        $data['table_config_parent']=$ref_table_parent;
+        $data['parent_id']=$paper_id;
+
+
+
+        /*
+         * Titre de la page
+         */
+        $parrent_names=$this->get_reference_select_values($table_config_child['fields'][$child_field]['input_select_values']);
+        if($operation=='edit'){
+            $data ['page_title'] = 'Edit Inclusion of the '.$table_config_parent['reference_title_min']." : ".$parrent_names[$paper_id];
+        }else{
+            $data ['page_title'] = 'Inclusion of the '.$table_config_parent['reference_title_min']." : ".$parrent_names[$paper_id];
+
+        }
+
+
+
+
+        /*
+         * Création des boutons qui vont s'afficher en haut de la page (top_buttons)
+         */
+        $data ['top_buttons'] = get_top_button ( 'back', 'Back', 'manage' );
+
+
+        /*
+         * La vue qui va s'afficher
+         */
+        $data ['page'] = 'frm_reference';
+
+
+
+        /*
+         * Chargement de la vue avec les données préparés dans le controleur suivant le type d'affichage : (popup modal ou pas)
+         */
+        $this->load->view ( 'body', $data );
+    }
+
+
+
+
+
+    /*
+         * Fonction  pour afficher la page avec un formulaire d'ajout ou modification d'un élément
+         *
+         * Input: 	$ref_table: nom de la structure de la table pour l'élément à afficher
+         * 			$data : informations sur l'élément si la fonction est utilisé pour la mis à jour(modification)
+         * 			$operation: type de l'opération ajout (new) ou modification(edit)
+         * 			$display_type: indique comment le formulaire va être afficher normal ou modal(pop- up)
+         */
 	public function add_ref($ref_table, $data = "", $operation ='new',$display_type="normal") {
 		old_version();
 		if(admin_config($ref_table))
@@ -2894,15 +2979,89 @@ class Manage extends CI_Controller {
 		
 		$data['data_exclusion']=$item_data_exclusion;
 		$data['remove_exclusion_button']=$edit_exclusion.$delete_exclusion;
-		
-		
-		
-		
-		
-		
-		/*
-		 * Information sur la clstification du papier si le papiers est déjà classé
-		 */
+
+
+
+
+
+
+
+        /*
+     * Informations sur inclusion du papier
+     */
+
+        $inclusion = $this->DBConnection_mdl->get_inclusion ($ref_id );
+
+        $table_config3=$this->ref_table_config("inclusion");
+        $dropoboxes=array();
+        foreach ($table_config3['fields'] as $k => $v) {
+
+            if(!empty($v['input_type']) AND $v['input_type']=='select' AND $k!='inclusion_paper_id'){
+                if($v['input_select_source']=='array'){
+                    $dropoboxes[$k]=$v['input_select_values'];
+                }elseif($v['input_select_source']=='table'){
+                    $dropoboxes[$k]= $this->get_reference_select_values($v['input_select_values']);
+                }
+            }
+            ;
+        }
+
+
+        $T_item_data_inclusion=array();
+        $T_remove_inclusion_button =array();
+        $item_data_inclusion=array();
+        $delete_inclusion="";
+        $edit_inclusion="";
+
+        if (!empty($inclusion)) {
+
+            //put values from reference tables
+            foreach ($dropoboxes as $k => $v) {
+                if(($inclusion[$k])){
+                    if(isset($v[$inclusion[$k]])){
+                        $inclusion[$k]=$v[$inclusion[$k]];}
+                }
+                else{
+                    $inclusion[$k]="";
+                }
+            }
+
+
+            foreach ($table_config3['fields'] as $k_t => $v_t) {
+
+                if(!(isset($v_t['on_view']) AND $v_t['on_view']=='hidden' ) AND  $k_t!='inclusion_paper_id'){
+
+                    $array['title']=$v_t['field_title'];
+                    $array['val']=isset($inclusion[$k_t])?": ".$inclusion[$k_t]:': ';
+
+                    array_push($item_data_inclusion, $array);
+
+                }
+            }
+
+            $delete_inclusion= get_top_button ( 'delete', 'Cancel the inclusion', 'manage/remove_inclusion/'.$inclusion['inclusion_id']."/".$ref_id , 'Cancel the inclusion')." ";
+
+            $edit_inclusion= get_top_button ( 'edit', 'Edit the inclusion', 'manage/edit_inclusion/'.$inclusion['inclusion_id'], 'Edit the inclusion')." ";
+
+
+        }
+
+
+        $data['data_inclusion']=$item_data_inclusion;
+        $data['remove_inclusion_button']=$edit_inclusion.$delete_inclusion;
+
+
+
+
+
+
+
+
+
+
+        /*
+         * Information sur la clstification du papier si le papiers est déjà classé
+         */
 		
 		$classification = $this->DBConnection_mdl->get_classifications ($ref_id );
 		

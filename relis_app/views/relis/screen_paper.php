@@ -24,13 +24,13 @@
                         <?php
                         if(isset($top_buttons)){
                             echo "<ul class='nav navbar-right panel_toolbox'>$top_buttons</ul>";
-
                         }
                         ?>
 
 
 
                         <div class="clearfix"></div>
+
                     </div>
 
 
@@ -173,12 +173,6 @@
                     </div>
 
 
-
-
-
-
-
-
                     <script>
 
                         function validate_screen(){
@@ -225,6 +219,7 @@
                         <?php }?>
 
                     </script>
+
 
 
 

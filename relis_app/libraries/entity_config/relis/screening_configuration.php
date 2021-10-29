@@ -164,6 +164,16 @@ function get_screening() {
 	   			'input_select_values'=>'exclusioncrieria;ref_value',//the reference table and the field to be displayed
 
 		);
+
+        $fields['inclusion_criteria']=array(
+            'field_title'=>'Inclusion criteria',
+            'field_type'=>'int',
+            'field_size'=>11,
+            'input_type'=>'select',
+            'input_select_source'=>'table',
+            'input_select_values'=>'inclusioncriteria;ref_value',//the reference table and the field to be displayed
+
+        );
 		
 		
 		$fields['screening_note']=array(
@@ -433,6 +443,7 @@ function get_screening() {
 	   					'user_id'=>array(),
 	   					'screening_decision'=>array(),
 	   					'exclusion_criteria'=>array(),
+	   					'inclusion_criteria'=>array(),
 	   					'screening_time'=>array(),
 	   					 
 	   	
@@ -531,6 +542,7 @@ function get_screening() {
 	   					'user_id'=>array(),
 	   					'screening_decision'=>array(),
 	   					'exclusion_criteria'=>array(),
+	   					'inclusion_criteria'=>array(),
 	   					'screening_time'=>array(),
 	   					 
 	   	
@@ -751,6 +763,7 @@ function get_screening() {
 	   					'screening_phase'=>array('mandatory'=>'mandatory','field_state'=>'hidden'),
 						'screening_decision'=>array('mandatory'=>'mandatory','field_state'=>'enabled'),
 	   					'exclusion_criteria'=>array('mandatory'=>'mandatory','field_state'=>'enabled'),
+	   					'inclusion_criteria'=>array('mandatory'=>'','field_state'=>'enabled'),
 	   					'screening_time'=>array('mandatory'=>'mandatory','field_state'=>'hidden'),
 	   					'screening_status'=>array('mandatory'=>'mandatory','field_state'=>'hidden','field_value'=>'Done'),
 	   			),
@@ -832,6 +845,7 @@ function get_screening() {
 	   					'user_id'=>array(),
 	   					'screening_decision'=>array(),
 	   					'exclusion_criteria'=>array(),
+	   					'inclusion_criteria'=>array(),
 	   					'screening_note'=>array(),
 	   					'screening_time'=>array(),
 	   					

@@ -1570,6 +1570,42 @@ END";
             WHERE ".$config['table_two_field']."= _element_id;
             COMMIT;
             END";
+            }else if($config['stored_procedure_name'] == 'remove_qa_result'){
+                $procedure="
+				DROP PROCEDURE IF EXISTS ".$config['stored_procedure_name'].";
+				";
+
+                if($run_query)
+                    $res = $this->CI->db2->query ( $procedure );
+
+                if($verbose)
+                    echo "<p>$procedure</p>";
+
+
+                $procedure="CREATE PROCEDURE ".$config['stored_procedure_name']."(IN _element_id INT)
+            BEGIN
+            START TRANSACTION;
+            DELETE FROM ".$config['table_name'].";
+            COMMIT;
+            END";
+            }
+            else if($config['stored_procedure_name'] == 'remove_qa_assignment' ) {
+                $procedure="
+				DROP PROCEDURE IF EXISTS ".$config['stored_procedure_name'].";
+				";
+
+                if($run_query)
+                    $res = $this->CI->db2->query ( $procedure );
+
+                if($verbose)
+                    echo "<p>$procedure</p>";
+                $status = 'Pending';
+                $procedure="CREATE PROCEDURE ".$config['stored_procedure_name']."(IN _element_id INT)
+            BEGIN
+            START TRANSACTION;
+            UPDATE ".$config['table_name']." SET ".$config['table_active_field']."=0, qa_status ='Pending';
+            COMMIT;
+            END";
             }
 		    else {
             $procedure="

@@ -79,6 +79,11 @@ public function get_table_config($_table,$target_db='current')
 					require_once("entity_config/relis/exclusion_config.php");
 					$table_configurations['exclusion']=get_exclusion();
 					break;
+
+            case 'inclusion':
+                require_once("entity_config/relis/inclusion_config.php");
+                $table_configurations['inclusion']=get_inclusion();
+                break;
 				
 				case 'assignation':
 					require_once("entity_config/relis/assignation_config.php");

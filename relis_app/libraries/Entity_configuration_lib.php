@@ -175,6 +175,11 @@ if (!defined('BASEPATH')) exit('No direct script access allowed');
 					require_once("entity_config/relis/exclusion_config.php");
 					$table_configurations['exclusion']=get_exclusion();
 					break;
+
+                case 'inclusion':
+                    require_once("entity_config/relis/inclusion_config.php");
+                    $table_configurations['inclusion']=get_inclusion();
+                    break;
 				
 			
 					

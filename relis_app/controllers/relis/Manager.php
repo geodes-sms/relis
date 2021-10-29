@@ -600,9 +600,82 @@ class Manager extends CI_Controller {
 		}
 
 
-		/*
-		 * Information sur la classification du papier si le papiers est déjà classé
-		 */
+
+        /*
+     * Informations sur inclusion du papier
+     */
+
+        $inclusion = $this->DBConnection_mdl->get_inclusion ($ref_id );
+
+        $table_config3=$this->ref_table_config("inclusion");
+        $dropoboxes=array();
+        foreach ($table_config3['fields'] as $k => $v) {
+
+            if(!empty($v['input_type']) AND $v['input_type']=='select' AND $k!='inclusion_paper_id'){
+                if($v['input_select_source']=='array'){
+                    $dropoboxes[$k]=$v['input_select_values'];
+                }elseif($v['input_select_source']=='table'){
+                    $dropoboxes[$k]= $this->get_reference_select_values($v['input_select_values']);
+                }
+            }
+            ;
+        }
+
+
+        $T_item_data_inclusion=array();
+        $T_remove_inclusion_button =array();
+        $item_data_inclusion=array();
+        $delete_inclusion="";
+        $edit_inclusion="";
+
+        if (!empty($inclusion)) {
+
+            //put values from reference tables
+            foreach ($dropoboxes as $k => $v) {
+                if(($inclusion[$k])){
+                    if(isset($v[$inclusion[$k]])){
+                        $inclusion[$k]=$v[$inclusion[$k]];}
+                }
+                else{
+                    $inclusion[$k]="";
+                }
+            }
+
+
+            foreach ($table_config3['fields'] as $k_t => $v_t) {
+
+                if(!(isset($v_t['on_view']) AND $v_t['on_view']=='hidden' ) AND  $k_t!='inclusion_paper_id'){
+
+                    $array['title']=$v_t['field_title'];
+                    $array['val']=isset($inclusion[$k_t])?": ".$inclusion[$k_t]:': ';
+
+                    array_push($item_data_inclusion, $array);
+
+                }
+            }
+
+            $delete_inclusion= get_top_button ( 'delete', 'Cancel the inclusion', 'manage/remove_inclusion/'.$inclusion['inclusion_id']."/".$ref_id , 'Cancel the inclusion')." ";
+
+            $edit_inclusion= get_top_button ( 'edit', 'Edit the inclusion', 'manage/edit_inclusion/'.$inclusion['inclusion_id'], 'Edit the inclusion')." ";
+
+
+        }
+
+
+        $data['data_inclusion']=$item_data_inclusion;
+        $data['remove_inclusion_button']=$edit_inclusion.$delete_inclusion;
+
+
+
+
+
+
+
+
+
+        /*
+         * Information sur la classification du papier si le papiers est déjà classé
+         */
 
 		$classification = $this->DBConnection_mdl->get_classifications ($ref_id );
 
@@ -799,87 +872,91 @@ class Manager extends CI_Controller {
 	 * 			$operation: type de l'opération ajout (new) ou modification(edit)
 	 *
 	 */
-	public function new_exclusion($paper_id, $data = "",$operation="new") {
+	public function new_exclusion($paper_id, $data = "",$operation="new")
+    {
 
-		$ref_table_child= 'exclusion';
-		$child_field= 'exclusion_paper_id';
-		$ref_table_parent= 'papers';
+        $ref_table_child = 'exclusion';
+        $child_field = 'exclusion_paper_id';
+        $ref_table_parent = 'papers';
 
-		/*
-		 * Récupération de la configuration(structure) de la table exclusion
-		 */
-		$table_config_child=get_table_config($ref_table_child);
-		$table_config_child['config_id']=$ref_table_child;
+        /*
+         * Récupération de la configuration(structure) de la table exclusion
+         */
+        $table_config_child = get_table_config($ref_table_child);
+        $table_config_child['config_id'] = $ref_table_child;
 
-
-		/*
-		 * Récupération de la configuration(structure) de la table des papiers
-		 */
-		$table_config_parent=get_table_config($ref_table_parent);
-
-		$table_config_child['fields'][$child_field]['on_add']="hidden";
-		$table_config_child['fields'][$child_field]['on_edit']="hidden";
-		$table_config_child['fields'][$child_field]['input_type']="text";
+        $is_guest = check_guest();
+        if (!$is_guest) {
 
 
+            /*
+             * Récupération de la configuration(structure) de la table des papiers
+             */
+            $table_config_parent = get_table_config($ref_table_parent);
+
+            $table_config_child['fields'][$child_field]['on_add'] = "hidden";
+            $table_config_child['fields'][$child_field]['on_edit'] = "hidden";
+            $table_config_child['fields'][$child_field]['input_type'] = "text";
 
 
-		foreach ($table_config_child['fields'] as $k => $v) {
+            foreach ($table_config_child['fields'] as $k => $v) {
 
-			if(!empty($v['input_type']) AND $v['input_type']=='select'){
-				if($v['input_select_source']=='table'){
-					$table_config_child['fields'][$k]['input_select_values']= $this->manager_lib->get_reference_select_values($v['input_select_values']);
-				}
-			}
+                if (!empty($v['input_type']) and $v['input_type'] == 'select') {
+                    if ($v['input_select_source'] == 'table') {
+                        $table_config_child['fields'][$k]['input_select_values'] = $this->manager_lib->get_reference_select_values($v['input_select_values']);
+                    }
+                }
 
-		}
-
-
-		/*
-		 * Prépartions des valeurs qui vont apparaitres dans le formulaire
-		 */
-		$data['content_item'][$child_field]=$paper_id;
-		$data['table_config']=$table_config_child;
-		$data['operation_type']=$operation;
-		$data['operation_source']="exclusion";
-		$data['child_field']=$child_field;
-		$data['table_config_parent']=$ref_table_parent;
-		$data['parent_id']=$paper_id;
+            }
 
 
-
-		/*
-		 * Titre de la page
-		 */
-		$parrent_names=$this->manager_lib->get_reference_select_values($table_config_child['fields'][$child_field]['input_select_values']);
-		if($operation=='edit'){
-			$data ['page_title'] = 'Edit Exclusion of the '.$table_config_parent['reference_title_min']." : ".$parrent_names[$paper_id];
-		}else{
-			$data ['page_title'] = 'Exclusion of the '.$table_config_parent['reference_title_min']." : ".$parrent_names[$paper_id];
-
-		}
-
+            /*
+             * Prépartions des valeurs qui vont apparaitres dans le formulaire
+             */
+            $data['content_item'][$child_field] = $paper_id;
+            $data['table_config'] = $table_config_child;
+            $data['operation_type'] = $operation;
+            $data['operation_source'] = "exclusion";
+            $data['child_field'] = $child_field;
+            $data['table_config_parent'] = $ref_table_parent;
+            $data['parent_id'] = $paper_id;
 
 
+            /*
+             * Titre de la page
+             */
+            $parrent_names = $this->manager_lib->get_reference_select_values($table_config_child['fields'][$child_field]['input_select_values']);
+            if ($operation == 'edit') {
+                $data ['page_title'] = 'Edit Exclusion of the ' . $table_config_parent['reference_title_min'] . " : " . $parrent_names[$paper_id];
+            } else {
+                $data ['page_title'] = 'Exclusion of the ' . $table_config_parent['reference_title_min'] . " : " . $parrent_names[$paper_id];
 
-		/*
-		 * Création des boutons qui vont s'afficher en haut de la page (top_buttons)
-		 */
-		$data ['top_buttons'] = get_top_button ( 'back', 'Back', 'manage' );
-
-
-		/*
-		 * La vue qui va s'afficher
-		 */
-		$data ['page'] = 'general/frm_reference';
-
+            }
 
 
-		/*
-		 * Chargement de la vue avec les données préparés dans le controleur suivant le type d'affichage : (popup modal ou pas)
-		 */
-		$this->load->view ( 'body', $data );
-	}
+            /*
+             * Création des boutons qui vont s'afficher en haut de la page (top_buttons)
+             */
+            $data ['top_buttons'] = get_top_button('back', 'Back', 'manage');
+
+
+            /*
+             * La vue qui va s'afficher
+             */
+            $data ['page'] = 'general/frm_reference';
+
+
+            /*
+             * Chargement de la vue avec les données préparés dans le controleur suivant le type d'affichage : (popup modal ou pas)
+             */
+            $this->load->view('body', $data);
+        }
+        else{
+            set_top_msg('No access to this operation!', 'error');
+            redirect('relis/manager/display_paper/'.$paper_id);
+
+        }
+    }
 
 
 	public function remove_exclusion ($id,$paper_id){
@@ -891,11 +968,18 @@ class Manager extends CI_Controller {
 		redirect ( 'relis/manager/display_paper/' .$paper_id  );
 	}
 
-	public function remove_assignation ($id,$paper_id){
-		$res=$this->DBConnection_mdl->remove_element($id,'remove_class_assignment',true);
-		set_top_msg(lng_min('Assignment removed'));
-		redirect ( 'relis/manager/display_paper/' .$paper_id  );
-	}
+	public function remove_assignation ($id,$paper_id)
+    {
+        $is_guest = check_guest();
+        if (!$is_guest) {
+            $res = $this->DBConnection_mdl->remove_element($id, 'remove_class_assignment', true);
+            set_top_msg(lng_min('Assignment removed'));
+            redirect('relis/manager/display_paper/' . $paper_id);
+        }else{
+            set_top_msg('No access to this operation!', 'error');
+            redirect('relis/manager/display_paper/'.$paper_id);
+        }
+    }
 
 	public function remove_classification ($id,$paper_id){
 		$res=$this->DBConnection_mdl->remove_element($id,'classification');
@@ -3100,9 +3184,11 @@ class Manager extends CI_Controller {
 
 		//Get screening criteria
 		$exclusion_crit=$this->manager_lib->get_reference_select_values('exclusioncrieria;ref_value');
+        $inclusion_crit=$this->manager_lib->get_reference_select_values('inclusioncriteria;ref_value');
 
-		$data['exclusion_criteria']=$exclusion_crit;
 
+        $data['exclusion_criteria']=$exclusion_crit;
+        $data['inclusion_criteria']=$inclusion_crit;
 		if(!empty($data['content_item'])){
 			//edit screening: used for conflict resolution
 			$data['the_paper']=$data['content_item']['paper_id'] ;
@@ -3287,13 +3373,15 @@ class Manager extends CI_Controller {
 			$this->db2 = $this->load->database(project_db(), TRUE);
 			$screening_phase = !empty($post_arr['screening_phase'])?$post_arr['screening_phase']:1;
 			$exclusion_criteria=($post_arr['decision'] == 'excluded')?$post_arr['criteria_ex']:NULL;
-			$screening_decision=($post_arr['decision'] == 'excluded')?'Excluded':'Included';
+            $inclusion_criteria=($post_arr['decision'] == 'accepted')?$post_arr['criteria_in']:NULL;
+            $screening_decision=($post_arr['decision'] == 'excluded')?'Excluded':'Included';
 			$screening_save=array(
 
 					'screening_note'=>$post_arr['note'],
 					'screening_decision'=>$screening_decision,
 					'exclusion_criteria'=>$exclusion_criteria,
-					'screening_time'=>bm_current_time('Y-m-d H:i:s'),
+                    'inclusion_criteria'=>$inclusion_criteria,
+                    'screening_time'=>bm_current_time('Y-m-d H:i:s'),
 					'screening_status'=>'Done',
 			);
 
@@ -3320,6 +3408,7 @@ class Manager extends CI_Controller {
 					'user'=>active_user_id(),
 					'decision'=>$screening_decision,
 					'criteria'=>$exclusion_criteria,
+					'criteria2'=>$inclusion_criteria,
 					'note'=>$post_arr['note'],
 					'paper_status'=>$paper_status,
 					'screening_time'=>bm_current_time('Y-m-d H:i:s'),
@@ -4274,7 +4363,7 @@ class Manager extends CI_Controller {
 			}
 
 			if((has_usergroup(1)
-					OR is_project_creator(active_user_id() , project_db()))
+					OR is_project_creator(active_user_id() , project_db()) OR can_manage_project(active_user_id(),project_db()))
 					AND !$project_published)
 				$data ['assign_new_button'] =get_top_button ( 'add', 'Add a reviewer', 'op/add_element_child/add_reviewer/'.$ref_id, 'Add a reviewer')." ";
 
@@ -4508,7 +4597,9 @@ class Manager extends CI_Controller {
 
 		$users=$this->manager_lib->get_reference_select_values('users;user_name');
 		$exclusion_crit=$this->manager_lib->get_reference_select_values('exclusioncrieria;ref_value');
-		//print_test($users);
+        $inclusion_crit=$this->manager_lib->get_reference_select_values('inclusioncriteria;ref_value');
+
+        //print_test($users);
 		$ref_table_config=get_table_configuration('papers');
 
 		$ref_table_config['current_operation']='list_papers_screen';
@@ -4611,8 +4702,11 @@ class Manager extends CI_Controller {
 		$res_screening['total']=0;
 		$res_screening['users']=array();
 		$res_screening['criteria']=array();
+        $res_screening['in_criteria']=array();
 		$res_screening['all_criteria']=0;
-		$key=0;
+        $res_screening['all_criteria_two']=0;
+
+        $key=0;
 		//	print_test($screenings);
 		foreach ($screenings['list'] as $key => $value) {
 
@@ -4648,7 +4742,29 @@ class Manager extends CI_Controller {
 
 			}
 
-		}
+			// inclusion criteria
+            if($value['screening_decision']=='Included' AND !empty($value['inclusion_criteria'])){
+                if(empty($res_screening['in_criteria'][$value['inclusion_criteria']])){
+                    //	echo "<p>bbb</p>";
+                    $res_screening['in_criteria'][$value['inclusion_criteria']]=1;
+                }else{
+                    //	echo "<p>cccc</p>";
+                    $res_screening['in_criteria'][$value['inclusion_criteria']] = $res_screening['in_criteria'][$value['inclusion_criteria']]+1;
+                }
+
+                $res_screening['all_criteria_two']++;
+                //critérias per user
+                if(empty($res_screening['users'][$value['user_id']]['in_criteria'][$value['inclusion_criteria']])){
+                    //	echo "<p>bbb</p>";
+                    $res_screening['users'][$value['user_id']]['in_criteria'][$value['inclusion_criteria']]=1;
+                }else{
+                    //	echo "<p>cccc</p>";
+                    $res_screening['users'][$value['user_id']]['in_criteria'][$value['inclusion_criteria']] = $res_screening['users'][$value['user_id']]['in_criteria'][$value['inclusion_criteria']]+1;
+                }
+
+            }
+
+        }
 
 		//  list to be displayed for  result per user
 		$result_per_user=array();
@@ -4679,7 +4795,7 @@ class Manager extends CI_Controller {
 
 		$result_per_criteria=array();
 
-		if(!empty ($res_screening['criteria'] ));
+		if(!empty ($res_screening['criteria'] ))
 		{
 			$result_per_criteria[0]=array(
 					'criteria'=>'Criteria ',
@@ -4696,7 +4812,31 @@ class Manager extends CI_Controller {
 				$i++;
 			}
 
+
 		}
+        $result_per_criteria_two=array();
+
+        if(!empty ($res_screening['in_criteria'] ))
+        {
+            $result_per_criteria_two[0]=array(
+                'criteria'=>'Criteria ',
+                'Nbr'=>'Nbr',
+                'pourc'=>'%'
+            );
+            $i=1;
+            foreach ($res_screening['in_criteria'] as $key => $value) {
+                $result_per_criteria_two[$i]=array(
+                    'criteria'=>!empty($inclusion_crit[$key])?$inclusion_crit[$key]:'Criteria '.$key,
+                    'Nbr'=>$value,
+                    'pourc'=>!empty($res_screening['all_criteria_two'])?round(($value*100/$result['Included']),2):0,
+                );
+                $i++;
+            }
+
+
+        }
+
+
 		//test if kappa is enabled
 		if(get_appconfig_element('use_kappa')){
 			$kappa=$this->calculate_kappa();
@@ -4713,7 +4853,9 @@ class Manager extends CI_Controller {
 			$data['kappa_meaning']=$kappa_meaning;
 		}
 		$data['result_per_criteria']=$result_per_criteria;
-		$data ['page_title'] = lng('Screening Statistics');//.$k_display;
+        $data['result_per_criteria_two']=$result_per_criteria_two;
+
+        $data ['page_title'] = lng('Screening Statistics');//.$k_display;
 		$data ['top_buttons'] = get_top_button ( 'back', 'Back', 'manage' );
 		$data['left_menu_perspective']='left_menu_screening';
 		$data['project_perspective']='screening';

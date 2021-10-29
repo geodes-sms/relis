@@ -56,7 +56,15 @@ class DBConnection_mdl extends CI_Model
 	 * 		$rec_per_page : nombre d'elements à recupérer
 	 * 		$extra_condition : autre critères de recherche
 	 * 		
-	 */	
+	 */
+    /*
+     * Function to call the stored procedure which retrieves the list of elements according to the parameters received
+     * Input: $ ref_table_config: the name given to the structure of the table to retrieve
+     * $ val: contains a search criteria if there is if not contains '_'
+     * $ page: return the list from which element?
+     * $ rec_per_page: number of items to recover
+     * $ extra_condition: other search criteria
+     */
 
 		function get_list($ref_table_config,$val='_',$page=0,$rec_per_page=0,$extra_condition=''){
 				
@@ -119,6 +127,9 @@ class DBConnection_mdl extends CI_Model
 		 * 		$language : la langue recherché
 		 *
 		 */
+        /*
+         * Function to call the stored procedure which retrieves the list of character strings according to the language
+         */
 		
 		function get_list_str_mng($ref_table_config,$val='_',$page=0,$rec_per_page=0,$language='en'){
 		
@@ -158,6 +169,10 @@ class DBConnection_mdl extends CI_Model
 		 * Fonction pour appeler la procédure stockée qui récupère les intentions pour une classification donnée
 		 * INPUT : $classification_id: l'identifiant de la classification
 		 */
+        /*
+         * Function to call the stored procedure that retrieves the intents for a given classification
+         * INPUT: $ classification_id: the classification identifier
+         */
 		function get_classification_intents($classification_id){
 
 			$this->db2 = $this->load->database(project_db(), TRUE);
@@ -173,6 +188,7 @@ class DBConnection_mdl extends CI_Model
 		
 		/*
 		 * Fonction pour récupérer la liste des utilisateurs
+		 * Function to retrieve the list of users
 		 */
 		function get_users_all(){
 
@@ -189,6 +205,7 @@ class DBConnection_mdl extends CI_Model
 		
 		/*
 		 * Fonction pour retourner le nombre de papiers suivant la catégorie(all,pending,processed, ...)
+		 * Function to return the number of papers according to the category (all, pending, processed, ...)
 		 */
 		function count_papers($paper_cat="all"){
 			
@@ -245,6 +262,7 @@ class DBConnection_mdl extends CI_Model
 		
 		/*
 		 * Fonction pour exclure un papier
+		 * Function to exclude a paper
 		 */
 		function exclude_paper($id) {
 			$this->db2 = $this->load->database(project_db(), TRUE);
@@ -256,6 +274,7 @@ class DBConnection_mdl extends CI_Model
 		
 		/*
 		 * Fonction pour inclure un papier qui était exclus
+		 * Function to include a paper that was excluded
 		 */
 		function include_paper($id) {
 			$this->db2 = $this->load->database(project_db(), TRUE);
@@ -267,6 +286,7 @@ class DBConnection_mdl extends CI_Model
 		
 		/*
 		 * Fonction pour pour récupérer les personnés à qui un papier est assigné
+		 * Function to retrieve the people to whom a paper is assigned
 		 */
 		function get_assignations($paper_id){
 			$this->db2 = $this->load->database(project_db(), TRUE);
@@ -281,6 +301,7 @@ class DBConnection_mdl extends CI_Model
 		
 		/*
 		 * Fonction pour pour récupérer les caractéristiques du'un papier associé à une classification
+		 * Function to retrieve the characteristics of a paper associated with a classification
 		 */
 		function get_classification_paper($classification_id){
 			$this->db2 = $this->load->database(project_db(), TRUE);
@@ -314,6 +335,8 @@ class DBConnection_mdl extends CI_Model
 		
 		/*
 		 * Fonction pour récupérer la classification d'un papier
+		 * Function to retrieve the classification of a paper
+
 		 */
 		function get_classifications($paper_id){
 			$this->db2 = $this->load->database(project_db(), TRUE);
@@ -330,6 +353,7 @@ class DBConnection_mdl extends CI_Model
 		
 		/*
 		 * Fonction pour récupérer les informations sur l'exclusion d'un papier
+		 * Function to retrieve information on the exclusion of a paper
 		 */
 		function get_exclusion($paper_id){
 			$this->db2 = $this->load->database(project_db(), TRUE);
@@ -341,10 +365,23 @@ class DBConnection_mdl extends CI_Model
 		
 			return $results;
 		}
-		
-		
+
+    /*
+     * Fonction pour récupérer les informations sur l'inclusion d'un papier
+     */
+    function get_inclusion($paper_id){
+        $this->db2 = $this->load->database(project_db(), TRUE);
+        $data=$this->db2->query ( "CALL get_paper_inclusion_info(".$paper_id.") " );
+
+        mysqli_next_result( $this->db2->conn_id );
+
+        $results=$data->row_array();
+
+        return $results;
+    }
 		/*
 		 * Fonction pour récupérer le nom de la table utilisé pas une table de reference
+		 * Function to retrieve the name of the table used by a reference table
 		 */
 		function get_reference_corresponding_table($ref_config){
 			$this->db2 = $this->load->database(project_db(), TRUE);
@@ -360,6 +397,7 @@ class DBConnection_mdl extends CI_Model
 		
 		/*
 		 * Fonction pour récupérer le detail d'un élément de la table de reference
+		 * Function to retrieve the detail of an element from the reference table
 		 */
 		function get_reference_details($table_name,$table_id,$ref_id) {
 			$this->db2 = $this->load->database(project_db(), TRUE);
@@ -375,6 +413,8 @@ class DBConnection_mdl extends CI_Model
 		
 		/*
 		 * Fonction pour récupérer le détail d'un élément de la table de référence
+		 * Function to retrieve the detail of an element from the reference table
+
 		 */
 		function get_row_details($config,$ref_id,$stored_procedure_provided=False,$tab_config="") {
 			if(empty($tab_config)){
@@ -411,6 +451,7 @@ class DBConnection_mdl extends CI_Model
 		
 		/*
 		 * Fonction pour récuperer la liste de papiers suivant la catégorie
+		 * Function to retrieve the list of papers according to the category
 		 */
 		function get_papers($paper_cat="all",$ref_table_config,$val='_',$page=0,$rec_per_page=0){
 				
@@ -490,6 +531,9 @@ class DBConnection_mdl extends CI_Model
 		 * $ref_table_field: le champs concerné
 		 * $extra_condition: critère de recherche
 		 */
+        /*
+         *  Function to retrieve the values to put in a select box for a given element;
+         */
 		function get_reference_select_values($ref_table_config,$ref_table_field,$extra_condition=""){
 		
 			$extra_condition=str_replace("'", "\'", $extra_condition);
@@ -529,6 +573,7 @@ class DBConnection_mdl extends CI_Model
 		
 		/*
 		 * Fonction pour récupérer la liste des tables de réferences
+		 * Function to retrieve the list of reference tables
 		 */
 		function get_reference_tables_list($target_db='current'){
 	
@@ -546,6 +591,7 @@ class DBConnection_mdl extends CI_Model
 		
 		/*
 		 * Fonction pour supprimer un élément
+		 * Function to delete an element
 		 */
 		function remove_element($id,$config,$strored_procedure_provided=False) {
 			if($strored_procedure_provided){
@@ -573,6 +619,11 @@ class DBConnection_mdl extends CI_Model
 		 * INPUT : $content : un tableux avec la stucture de la tables et les info à mettre
 		 * $type: sortie attendue: Id de lélement enregistré ou resultat de la requête d'insertion ou de modification
 		 */
+        /*
+         * Function to call stored procedures used to save a new element, or an element to modify
+         * INPUT: $ content: a table with the structure of the tables and the info to put
+         * $ type: expected output: Id of the recorded element or result of the insertion or modification request
+         */
 		function save_reference($content,$type='normal') {
 				
 			
@@ -805,6 +856,7 @@ class DBConnection_mdl extends CI_Model
 		
 		/*
 		 * Fonction pour récupérer la correspondance d'une chaine de caractère dans une langue donnée
+		 * Function to retrieve the correspondence of a character string in a given language
 		 */
 		function get_str($str,$category="default",$lang='en'){
 			$this->db2 = $this->load->database(project_db(), TRUE);
@@ -816,6 +868,7 @@ class DBConnection_mdl extends CI_Model
 		
 		/*
 		 * Fonction pour ajouter la correspondance d'une chaine de caractère dans une langue donnée
+		 * Function to add the correspondence of a character string in a given language
 		 */
 		function set_str($str,$category="default",$lang='en'){
 			$this->db2 = $this->load->database(project_db(), TRUE);
@@ -836,6 +889,7 @@ class DBConnection_mdl extends CI_Model
 		
 		/*
 		 * Fonction pour vérifier si un nom d'utilisateur est déjà utilisé ou pas
+		 * Function to check if a username is already in use or not
 		 */
 		function login_available($login){
 		
@@ -856,6 +910,7 @@ class DBConnection_mdl extends CI_Model
 		
 		/*
 		 * Fonction pour récuperer les champs supplementaires à afficher dans la liste des classification (Scope, Intent, Intent relation)
+		 * Function to retrieve additional fields to display in the classification list (Scope, Intent, Intent relation)
 		 */
 		function get_extra_fields($class_id ){
 		
@@ -930,7 +985,9 @@ class DBConnection_mdl extends CI_Model
 		 * 		$extra_condition : autre critères de recherche
 		 *
 		 */
-		
+		/*
+		 * Function to call the stored procedure which retrieves the list of elements according to the parameters received
+		 */
 		function get_list_mdl($ref_table_config,$val='_',$page=0,$rec_per_page=0,$extra_condition=''){
 		
 			$current_operation=	$ref_table_config['current_operation'];

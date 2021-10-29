@@ -87,6 +87,11 @@ public function ref_table_config($_table,$target_db='current')
 			require_once("table_config/table_exclusion.php");
 			$table_configurations['exclusion']=get_exclusion();
 			break;
+
+            case 'inclusion':
+                require_once("table_config/table_inclusion.php");
+                $table_configurations['inclusion']=get_inclusion();
+                break;
 	
 			case 'assignation': 
 			require_once("table_config/table_assignation.php");

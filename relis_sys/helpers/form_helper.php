@@ -383,7 +383,8 @@ if ( ! function_exists('form_dropdown'))
 		{
 			$defaults = array('name' => $data);
 		}
-
+        // Print the data passed in dropdown to above the respected form field
+//        print_r($options);
 		is_array($selected) OR $selected = array($selected);
 		is_array($options) OR $options = array($options);
 

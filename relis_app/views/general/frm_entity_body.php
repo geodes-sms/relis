@@ -209,6 +209,7 @@
                     				echo dropdown_multi_form_bm($value['field_title'],$key,$key,$value['input_select_values'],isset($content_item[$key])?$content_item[$key]:'',$extra_class.$mandatory,$readonly,$number_of_values);
                     				 
                     			}else{
+                                    $value['input_select_values'] = array(""=>"Select...")+$value['input_select_values'] ;
                     				echo dropdown_form_bm($value['field_title'],$key,$key,$value['input_select_values'],isset($content_item[$key])?$content_item[$key]:'',$extra_class.$mandatory,$readonly);
                     				 
                     			}

@@ -1368,7 +1368,9 @@ class Manager_lib
 				
 				if(can_validate_project())
 					$menu['adm']['menu']['plan']['sub_menu']['validate_screen_assign']=array( 'label'=>'Assign Validation', 'url'=>'relis/manager/validate_screen_set', 'icon'=>'');
-				
+
+                    $menu['adm']['menu']['plan']['sub_menu']['inclusioncriteria']=array( 'label'=>'Inclusion Criteria', 'url'=>'op/entity_list/list_inclusioncriteria', 'icon'=>'');
+
 					$menu['adm']['menu']['plan']['sub_menu']['exclusioncrieria']=array('label'=>'Exclusion Criteria','url'=>'op/entity_list/list_exclusioncrieria','icon'=>'');
 				
 				if(can_validate_project())
