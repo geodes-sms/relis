@@ -900,7 +900,7 @@ function user_project($project_id , $user=0,$user_role=""){
 		if($user==0){
 			$user=$ci->session->userdata('user_id');
 		}
-		$sql="select project_id from projects where project_creator=$user AND $use='$project_id' AND project_active=1 ";
+		$sql="select project_id from projects where project_creator=$user AND project_active=1 ";
 	
 		$user_projects = $ci->db->query($sql)->num_rows();
 	

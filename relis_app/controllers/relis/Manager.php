@@ -4285,7 +4285,7 @@ class Manager extends CI_Controller {
 			}
 
 			if((has_usergroup(1)
-					OR is_project_creator(active_user_id() , project_db()))
+					OR is_project_creator(active_user_id() , project_db()) OR can_manage_project(active_user_id(),project_db()))
 					AND !$project_published)
 				$data ['assign_new_button'] =get_top_button ( 'add', 'Add a reviewer', 'op/add_element_child/add_reviewer/'.$ref_id, 'Add a reviewer')." ";
 

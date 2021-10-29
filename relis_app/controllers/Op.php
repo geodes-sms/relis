@@ -1929,7 +1929,7 @@ public function entity_list_graph($operation_name,$val = "_",$page = 0,$graph='a
             redirect($after_save_redirect);
         }
     }
-	
+
 	
 	
 	
