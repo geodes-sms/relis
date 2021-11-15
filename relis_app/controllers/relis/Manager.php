@@ -798,7 +798,7 @@ class Manager extends CI_Controller {
 	 * 			$operation: type de l'opération ajout (new) ou modification(edit)
 	 *
 	 */
-	public function new_exclusion($paper_id, $data = "",$operation="new")
+	public function new_exclusion($paper_id, $data = array(),$operation="new")
     {
 
         $ref_table_child = 'exclusion';
