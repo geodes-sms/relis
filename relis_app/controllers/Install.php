@@ -1693,7 +1693,7 @@ class Install extends CI_Controller {
 
     }
 	private function update_qa_values($qa,$target_db='current'){
-	    $res_install_config = $this->entity_configuration_lib->get_install_config();
+	    $res_install_config = $this->entity_configuration_lib->get_install_config($target_db);
 	    $qa_action = $res_install_config['qa_action'];
         $target_db=($target_db=='current')?project_db():$target_db;
         $this->db3 = $this->load->database($target_db, TRUE);
