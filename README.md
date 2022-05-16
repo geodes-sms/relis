@@ -6,7 +6,7 @@ Systematic review is a technique used to search for evidence in scientific liter
 
 Unlike other systematic review tools, ReLiS is an online tool that automatically installs and configures your projects. You conduct reviews collaboratively and iteratively on the cloud. ReLiS is engineered following a model-driven development approach. It features a domain-specific modeling editor and an architecture that enables on-the-fly installation and (re)configuration of multiple concurrently running projects.
 
-You can use a publically available instance of ReLiS at [http://relis.iro.umontreal.ca/](http://relis.iro.umontreal.ca/). This GitHub repository allows you to install ReLiS on your servers.
+You can use a publicly available instance of ReLiS at [http://relis.iro.umontreal.ca/](http://relis.iro.umontreal.ca/). This GitHub repository allows you to install ReLiS on your servers.
 
 ## Features
 High-level features supported:
@@ -63,9 +63,11 @@ The project can be installed locally using docker. Make sure to follow the pre-r
    
 7. If you get the error "Incorrect permissions on the configuration file, it should not be write to everyone!" then add the statement **`$cfg['CheckConfigurationPermissions'] = false;`** to the phpmyadmin config file: **relis-docker-implementation\phpmyadmin\config.inc.php**
 
-### Usefull command
+### Useful command
 To connect inside your docker container run the following command from the directory **relis_deployment/** 
  > docker-compose exec relis-application-service bash 
+
+Make sure the user has the rights to access and edit the `workspace/` folder.
 
 ### PHP Container Debug with Xdebug and PhpStorm
 
