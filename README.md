@@ -48,20 +48,17 @@ The project can be installed locally using docker. Make sure to follow the pre-r
 
 ### Build and run the application:
 1. Clone the project from GitHub (git clone https://github.com/geodes-sms/relis.git)
-2. Run following command from the directory **relis_deployment/**
-   > docker-compose build 
-   
 
-3. Run following command from the directory **relis_deployment/**
+2. Run following command from the directory **relis_deployment/**
     > docker-compose up -d
    
-4. (For **windows users** , if you get the error `relis-application-service | standard_init_linux.go:211: exec user process caused "no such file or directory"`: check if the file **relis_deployment/docker/entrypoint.sh** EOL is not CRLF;  if it is, convert it from CRLF to LF and go back to step 3.)
-5. From your browser go to url **localhost:8083** to access the application. Default credentials  are: `Username: admin` `Password: 123`
-6. For test purpose you can also access the database using PHPMyAdmin on **localhost:8083/phpmyadmin**. Default credentials are: `Username: root` `Password:`
+3. (For **windows users** , if you get the error `relis-application-service | standard_init_linux.go:211: exec user process caused "no such file or directory"`: check if the file **relis_deployment/docker/entrypoint.sh** EOL is not CRLF;  if it is, convert it from CRLF to LF and go back to step 2.)
+4. From your browser go to url **localhost:8083** to access the application. Default credentials  are: `Username: admin` `Password: 123`
+5. For test purpose you can also access the database using PHPMyAdmin on **localhost:8083/phpmyadmin**. Default credentials are: `Username: root` `Password:`
    
    **No password required** (You should use this feature only on the local environment). 
    
-7. If you get the error "Incorrect permissions on the configuration file, it should not be write to everyone!" then add the statement **`$cfg['CheckConfigurationPermissions'] = false;`** to the phpmyadmin config file: **relis-docker-implementation\phpmyadmin\config.inc.php**
+6. If you get the error "Incorrect permissions on the configuration file, it should not be write to everyone!" then add the statement **`$cfg['CheckConfigurationPermissions'] = false;`** to the phpmyadmin config file: **relis-docker-implementation\phpmyadmin\config.inc.php**
 
 ### Useful command
 To connect inside your docker container run the following command from the directory **relis_deployment/** 

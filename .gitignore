@@ -25,3 +25,8 @@ derby*
 *.stTheme.cache
 *.sublime-workspace
 *.sublime-project
+
+# Custom Files
+#-------------------------
+SourcesForTests/*
+
