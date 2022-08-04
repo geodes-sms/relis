@@ -1,0 +1,53 @@
+version: '3.7'
+services:
+  db:
+    container_name: relis-db
+    image: mariadb
+    restart: always
+    environment:
+      MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: yes
+
+    volumes:
+      - ./docker/db/initial_db.sql:/docker-entrypoint-initdb.d/initial_db.sql
+
+  phpmyadmin:
+    depends_on:
+      - db
+    image: phpmyadmin
+    restart: always
+    ports:
+      - 8080:80
+    environment:
+      - PMA_ARBITRARY=1
+    volumes:
+      - ./docker/db/config.inc.php:/etc/phpmyadmin/config.inc.php
+
+  tomcat:
+    depends_on:
+      - db
+    image: tomcat:8.5.51-jdk8-openjdk-slim
+    volumes:
+      - ./docker/tomcat/relis.war:/usr/local/tomcat/webapps/relis.war
+    environment:
+      MYSQL_DATABASE: db
+      CATALINA_OPTS: '-Xms512M -Xmx1024M -server -XX:+UseParallelGC'
+      JAVA_OPTS: '-Djava.security.egd=file:///dev/urandom'
+    ports:
+      - 8088:8080
+
+  relis-application:
+    depends_on:
+      - db
+    image: relis-app
+    container_name: relis-app
+    build:
+      context: ./docker/
+      args:
+        DIRECTORY_INDEX: index.php
+        DOCUMENT_ROOT: /u/relis/public_html
+    entrypoint: /usr/local/bin/entrypoint.sh
+    ports:
+      - 8083:80
+      - 9003:9003
+    volumes:
+      - ../:/u/relis/public_html
