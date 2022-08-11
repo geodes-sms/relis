@@ -9,6 +9,7 @@ services:
 
     volumes:
       - ./docker/db/initial_db.sql:/docker-entrypoint-initdb.d/initial_db.sql
+      - ../:/u/relis/public_html
 
   phpmyadmin:
     depends_on:
@@ -21,6 +22,7 @@ services:
       - PMA_ARBITRARY=1
     volumes:
       - ./docker/db/config.inc.php:/etc/phpmyadmin/config.inc.php
+      - ../:/u/relis/public_html
 
   tomcat:
     depends_on:
@@ -28,6 +30,7 @@ services:
     image: tomcat:8.5.51-jdk8-openjdk-slim
     volumes:
       - ./docker/tomcat/relis.war:/usr/local/tomcat/webapps/relis.war
+      - ../:/u/relis/public_html
     environment:
       MYSQL_DATABASE: db
       CATALINA_OPTS: '-Xms512M -Xmx1024M -server -XX:+UseParallelGC'
@@ -51,4 +54,4 @@ services:
     volumes:
       - ../:/u/relis/public_html
     extra_hosts:
-      - host.docker.internal:host-gateway
+      - "host.docker.internal:host-gateway"
