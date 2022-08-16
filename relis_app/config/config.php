@@ -19,7 +19,7 @@
  * 
  *  :Author: Brice Michel Bigendako
  */
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
 
 $config['base_url'] = 'http://localhost/relis/relis_dev';
@@ -277,8 +277,8 @@ $config['proxy_ips'] = '';
 
 // My configurations
 
-$config['rec_per_page'] = '50'; 
-$config['free_controllers'] = ['auth','api','apiquery'];
+$config['rec_per_page'] = '50';
+$config['free_controllers'] = ['auth', 'api', 'apiquery'];
 
 
 //For image upload
@@ -306,12 +306,14 @@ $config['metrics_save_path'] = "/u/relis/public_html/cside/metrics";
 $config['root_path'] = "/u/relis/public_html/";
 
 // Common configurations in relis
-$config['common_relis_configs'] = array('assignation','author','config','inclusion','exclusion','papers',
-								'paper_author','ref_exclusioncrieria','ref_inclusioncriteria','str_mng','venue',
-								'assignment_screen','screening','screening_validate',
-									'assignment_screen_validate','operations');
+$config['common_relis_configs'] = array(
+	'assignation', 'author', 'config', 'inclusion', 'exclusion', 'papers',
+	'paper_author', 'ref_exclusioncrieria', 'ref_inclusioncriteria', 'str_mng', 'venue',
+	'assignment_screen', 'screening', 'screening_validate',
+	'assignment_screen_validate', 'operations'
+);
 
-$config['project_specific_config_folder']="relis_app/libraries/table_config/project/";
+$config['project_specific_config_folder'] = "relis_app/libraries/table_config/project/";
 
 // The prefix that will have the new databases for projects  installed
 $config['project_db_prefix'] = "relis_project_";
@@ -330,5 +332,5 @@ $config['mail_reply_to']    = "example@gmail.com";
 $config['sess_save_path'] = "/u/relis/public_html/cside/sessions";
 $config['base_url'] = "http://localhost:8083";
 $config['project_db_user'] = "root";
-$config['project_db_host'] = "localhost";
+$config['project_db_host'] = "db";
 $config['project_db_pass'] = "";
