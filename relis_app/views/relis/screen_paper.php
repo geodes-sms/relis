@@ -199,6 +199,7 @@
                             var content =$('.screen_decision_include').html();
                             $('.screen_decision').html(content);
                             $('.exclusion_crit').hide();
+                            $('.inclusion_crit').show();
                             $('#decision').val('accepted');
 
                         }
@@ -207,6 +208,7 @@
                             var content =$('.screen_decision_exclude').html();
                             $('.screen_decision').html(content);
                             $('.exclusion_crit').show();
+                            $('.inclusion_crit').hide();
                             $('#decision').val('excluded');
                         }
 
