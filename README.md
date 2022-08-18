@@ -65,9 +65,10 @@ The project can be installed locally using docker. Make sure to follow the pre-r
 
 ### Useful command
 To connect inside your docker container run the following command from the directory **relis_deployment/** 
- > docker-compose exec relis-application-service bash 
+ > docker-compose exec relis-application bash 
 
-Make sure the user has the rights to access and edit the `workspace/` folder.
+Make sure the user has the rights to access and edit the `workspace/` folder. For example, run
+ > chmod -R 755 workspace
 
 ### PHP Container Debug with Xdebug and PhpStorm
 
