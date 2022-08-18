@@ -1,5 +1,5 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 /* ReLiS - A Tool for conducting systematic literature reviews and mapping studies.
  * Copyright (C) 2018  Eugene Syriani
  *
@@ -93,8 +93,8 @@ $active_group = 'default';
 $query_builder = TRUE;
 
 $db['default'] = array(
-    'dsn'	=> '',
-    'hostname' => 'localhost',
+    'dsn'    => '',
+    'hostname' => 'db',
     'username' => 'root',
     'password' => '',
     'database' => 'relis_db',
