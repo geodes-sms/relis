@@ -648,7 +648,7 @@ class Manager extends CI_Controller
 
 				$delete_button = get_top_button('delete', 'Remove the assignment', 'relis/manager/remove_assignation/' . $v_class['assigned_id'] . "/" . $ref_id, 'Remove the assignment') . " ";
 
-				$edit_button = get_top_button('edit', 'Edit the assignment', 'op/edit_element/edit_assignment_class' . $v_class['assigned_id'], 'Edit the assignment') . " ";
+				$edit_button = get_top_button('edit', 'Edit the assignment', 'op/edit_element/edit_assignment_class/' . $v_class['assigned_id'], 'Edit the assignment') . " ";
 
 				$T_remove_assignation_button[$k_class] = $edit_button . $delete_button;
 			}
