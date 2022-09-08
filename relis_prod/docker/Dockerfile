@@ -2,8 +2,6 @@ FROM php:7.1-apache-buster
 
 ARG DIRECTORY_INDEX
 ARG DOCUMENT_ROOT
-
-# Fixing user file permissions 
 ARG USER_ID
 ARG GROUP_ID
 
@@ -61,5 +59,5 @@ RUN a2enmod rewrite
 COPY ./entrypoint.sh /usr/local/bin
 RUN sed 's/\r$//g' /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
-RUN chown -R relis:relis ${DOCUMENT_ROOT}
+
 WORKDIR ${DOCUMENT_ROOT}

@@ -1,5 +1,5 @@
 #!/bin/bash
-
+chown -R relis:relis /u/relis/
 chmod -R 777 /u/relis/public_html/cside/sessions
 chmod -R 777 /u/relis/public_html/relis_app/config
 cd /u/relis/public_html/relis_app/config  && cp --no-clobber database.example.php database.php

@@ -40,10 +40,11 @@ services:
   tomcat:
     depends_on:
       - db
-    image: tomcat
+    image: tomcat-relis
     build:
-      context: ./docker/
-      dockerfile: Dockerfile.tomcat
+      context: ./tomcat/
+      dockerfile: Dockerfile
+    entrypoint: /usr/local/bin/entrypoint.sh
     env_file:
       - .env
     volumes:
@@ -80,5 +81,3 @@ services:
         condition: on-failure
     volumes:
       - ../:/u/relis/public_html
-    extra_hosts:
-      - "host.docker.internal:host-gateway"

@@ -1,5 +1,7 @@
 FROM tomcat:8.5.51-jdk8-openjdk-slim
 
+ARG DOCUMENT_ROOT
+
 # Fixing user file permissions 
 ARG USER_ID
 ARG GROUP_ID
@@ -15,3 +17,7 @@ RUN addgroup --gid ${GROUP_ID} relis
 RUN adduser --disabled-password --gecos '' --uid ${USER_ID} --gid ${GROUP_ID} relis
 
 COPY ./docker/tomcat/relis.war /usr/local/tomcat/webapps/relis.war
+COPY ./entrypoint.sh /usr/local/bin
+RUN sed 's/\r$//g' /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+WORKDIR ${DOCUMENT_ROOT}
