@@ -16,7 +16,7 @@ ENV GROUP_ID=${GROUP_ID:-1001}
 RUN addgroup --gid ${GROUP_ID} relis
 RUN adduser --disabled-password --gecos '' --uid ${USER_ID} --gid ${GROUP_ID} relis
 
-COPY ./docker/tomcat/relis.war /usr/local/tomcat/webapps/relis.war
+COPY ./relis.war /usr/local/tomcat/webapps/relis.war
 COPY ./entrypoint.sh /usr/local/bin
 RUN sed 's/\r$//g' /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
