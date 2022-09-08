@@ -2,6 +2,7 @@ FROM php:7.1-apache-buster
 
 ARG DIRECTORY_INDEX
 ARG DOCUMENT_ROOT
+
 ARG USER_ID
 ARG GROUP_ID
 
@@ -60,4 +61,5 @@ COPY ./entrypoint.sh /usr/local/bin
 RUN sed 's/\r$//g' /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
+ARG DOCUMENT_ROOT
 WORKDIR ${DOCUMENT_ROOT}

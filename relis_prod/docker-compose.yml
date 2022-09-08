@@ -9,9 +9,6 @@ services:
       - 443:443
     deploy:
       replicas: 1
-      update_config:
-        parallelism: 1
-        delay: 10s
       restart_policy:
         condition: on-failure
 
@@ -27,9 +24,7 @@ services:
 
     deploy:
       replicas: 1
-      update_config:
-        parallelism: 1
-        delay: 10s
+
       restart_policy:
         condition: on-failure
 
@@ -51,9 +46,7 @@ services:
       - ../:/u/relis/public_html
     deploy:
       replicas: 1
-      update_config:
-        parallelism: 1
-        delay: 10s
+
       restart_policy:
         condition: on-failure
     environment:
@@ -74,9 +67,6 @@ services:
     restart: always
     deploy:
       replicas: 3
-      update_config:
-        parallelism: 1
-        delay: 10s
       restart_policy:
         condition: on-failure
     volumes:
