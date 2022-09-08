@@ -38,7 +38,11 @@ services:
     image: tomcat-relis
     build:
       context: ./tomcat/
-      dockerfile: Dockerfile
+      args:
+        - DOCUMENT_ROOT=/u/relis/public_html
+        - DIRECTORY_INDEX=index.php
+        - GROUP_ID=510
+        - USER_ID=16001
     entrypoint: /usr/local/bin/entrypoint.sh
     env_file:
       - .env
@@ -61,6 +65,11 @@ services:
     container_name: relis-app
     build:
       context: ./docker/
+      args:
+        - DOCUMENT_ROOT=/u/relis/public_html
+        - DIRECTORY_INDEX=index.php
+        - GROUP_ID=510
+        - USER_ID=16001
     env_file:
       - .env
     entrypoint: /usr/local/bin/entrypoint.sh
