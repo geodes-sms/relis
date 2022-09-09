@@ -41,7 +41,7 @@ services:
   tomcat:
     depends_on:
       - db
-    image: tomcat-relis
+    image: relis/tomcat-relis
     build:
       context: ./tomcat/
       args:
@@ -70,7 +70,7 @@ services:
   relis-application:
     depends_on:
       - db
-    image: relis-app
+    image: relis/relis-app
     container_name: relis-app
     build:
       context: ./docker/
