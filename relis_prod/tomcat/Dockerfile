@@ -20,4 +20,5 @@ COPY ./relis.war /usr/local/tomcat/webapps/relis.war
 COPY ./entrypoint.sh /usr/local/bin
 RUN sed 's/\r$//g' /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
-WORKDIR ${DOCUMENT_ROOT}
+
+ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]

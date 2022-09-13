@@ -26,7 +26,7 @@ services:
       MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: "yes"
 
     deploy:
-      replicas: 1
+      replicas: 3
 
       restart_policy:
         condition: on-failure
@@ -49,7 +49,6 @@ services:
         - DIRECTORY_INDEX=index.php
         - GROUP_ID=510
         - USER_ID=16001
-    entrypoint: /usr/local/bin/entrypoint.sh
     env_file:
       - .env
     volumes:
