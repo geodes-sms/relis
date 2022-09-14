@@ -1,3 +1,3 @@
 #!/bin/bash
-chown -R grpdef:relis /u/relis/
+chown -R relis:grpdef /u/relis/
 ./catalina.sh run
