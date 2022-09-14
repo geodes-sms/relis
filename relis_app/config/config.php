@@ -300,7 +300,7 @@ $config['csv_field_separator_export'] = ',';
 $config['csv_string_dellimitter'] = '"';
 
 $config['editor_generated_path'] = "/u/relis/public_html/workspace/dslforge_workspace";
-$config['editor_url'] = "http://relis_tomcat:8080/relis/texteditor";
+$config['editor_url'] = "http://relistomcat:8080/relis/texteditor";
 
 $config['metrics_save_path'] = "/u/relis/public_html/cside/metrics";
 $config['root_path'] = "/u/relis/public_html/";

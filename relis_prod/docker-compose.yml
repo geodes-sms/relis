@@ -53,6 +53,10 @@ services:
       - .env
     volumes:
       - ../:/u/relis/public_html
+    networks:
+      default:
+        aliases:
+          - relistomcat
     deploy:
       replicas: 1
 
