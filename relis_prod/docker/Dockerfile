@@ -13,7 +13,7 @@ ENV USER_ID=${USER_ID:-1001}
 ENV GROUP_ID=${GROUP_ID:-1001}
 
 # Add group and user based on build arguments
-RUN addgroup --gid ${GROUP_ID} relis
+RUN addgroup --gid ${GROUP_ID} grpdef
 RUN adduser --disabled-password --gecos '' --uid ${USER_ID} --gid ${GROUP_ID} relis
 
 RUN apt-get autoclean && apt-get update && apt-get install -y \

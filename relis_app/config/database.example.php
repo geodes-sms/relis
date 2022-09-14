@@ -94,7 +94,7 @@ $query_builder = TRUE;
 
 $db['default'] = array(
     'dsn'    => '',
-    'hostname' => 'db',
+    'hostname' => 'relis_db',
     'username' => 'root',
     'password' => '',
     'database' => 'relis_db',

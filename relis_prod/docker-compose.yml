@@ -26,7 +26,7 @@ services:
       MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: "yes"
 
     deploy:
-      replicas: 3
+      replicas: 1
 
       restart_policy:
         condition: on-failure
@@ -36,7 +36,7 @@ services:
 
     volumes:
       - ./docker/db/initial_db.sql:/docker-entrypoint-initdb.d/initial_db.sql
-      - ../data/db:/var/lib/mysql
+      - /u/relis/relisdb:/var/lib/mysql
 
   tomcat:
     depends_on:
@@ -76,8 +76,8 @@ services:
       args:
         - DOCUMENT_ROOT=/u/relis/public_html
         - DIRECTORY_INDEX=index.php
-        - GROUP_ID=510
-        - USER_ID=16001
+        - GROUP_ID=1000
+        - USER_ID=1000
     env_file:
       - .env
     entrypoint: /usr/local/bin/entrypoint.sh

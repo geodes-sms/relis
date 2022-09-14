@@ -193,3 +193,4 @@ derby*
 
 workspace/
 
+.dockerignore

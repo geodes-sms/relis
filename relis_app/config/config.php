@@ -300,7 +300,7 @@ $config['csv_field_separator_export'] = ',';
 $config['csv_string_dellimitter'] = '"';
 
 $config['editor_generated_path'] = "/u/relis/public_html/workspace/dslforge_workspace";
-$config['editor_url'] = "http://127.0.0.1:8088/relis/texteditor";
+$config['editor_url'] = "http://relis_tomcat:8080/relis/texteditor";
 
 $config['metrics_save_path'] = "/u/relis/public_html/cside/metrics";
 $config['root_path'] = "/u/relis/public_html/";
@@ -332,5 +332,5 @@ $config['mail_reply_to']    = "example@gmail.com";
 $config['sess_save_path'] = "/u/relis/public_html/cside/sessions";
 $config['base_url'] = "http://localhost:8083";
 $config['project_db_user'] = "root";
-$config['project_db_host'] = "db";
+$config['project_db_host'] = "relis_db";
 $config['project_db_pass'] = "";
