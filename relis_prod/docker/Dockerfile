@@ -61,5 +61,6 @@ COPY ./entrypoint.sh /usr/local/bin
 RUN sed 's/\r$//g' /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
-ARG DOCUMENT_ROOT
+
+USER relis:grpdef
 WORKDIR ${DOCUMENT_ROOT}

@@ -80,8 +80,8 @@ services:
       args:
         - DOCUMENT_ROOT=/u/relis/public_html
         - DIRECTORY_INDEX=index.php
-        - GROUP_ID=1000
-        - USER_ID=1000
+        - GROUP_ID=510
+        - USER_ID=16001
     env_file:
       - .env
     entrypoint: /usr/local/bin/entrypoint.sh
