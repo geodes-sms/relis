@@ -194,3 +194,4 @@ derby*
 workspace/
 
 .dockerignore
+SourcesForTests/
