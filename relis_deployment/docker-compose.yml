@@ -38,6 +38,11 @@ services:
     ports:
       - 8088:8080
 
+  bibler:
+    container_name: bibler
+    image: relis/bibler
+    restart: always
+
   relis-application:
     depends_on:
       - db
