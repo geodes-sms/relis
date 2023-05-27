@@ -24,7 +24,7 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 class Biblerproxy_lib
 {
 	private  $instance;
-	private  $url='http://tron.iro.umontreal.ca/bibler/';
+	private  $url='http://relis_bibler:80/';
 	public function __construct()
 	{
 
@@ -55,14 +55,15 @@ class Biblerproxy_lib
 	private function httpPost($url, $data)
 	{
 
-		$ch = curl_init( $url );
-		curl_setopt( $ch, CURLOPT_POST, 1);
-		curl_setopt( $ch, CURLOPT_POSTFIELDS, urlencode($data));
-		curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1);
-		curl_setopt( $ch, CURLOPT_HEADER, 0);
-		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1);
-
-		$response = curl_exec( $ch );
+		$ch = curl_init($url);
+		curl_setopt($ch, CURLOPT_POST, 1);
+		$payload = json_encode(array("bibtex" => utf8_encode($data)));
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+		// var_dump(json_last_error());
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		$response = curl_exec($ch);
 		return $response;
 	}
 
@@ -110,6 +111,10 @@ class Biblerproxy_lib
 	
 	public function importendnotestringforrelis($data) {
 		return $this->httpPost($this->url."importendnotestringforrelis/",$data);
+	}
+	public function generatereport($data)
+	{
+		return $this->httpPost($this->url . "generateReport/", $data);
 	}
 
 	public  function fixJSON($json) {
