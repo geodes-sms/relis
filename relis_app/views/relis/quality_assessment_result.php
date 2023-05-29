@@ -40,6 +40,14 @@
                   
                 <?php 
                 if(!empty($qa_list)){
+                  // Sorting function
+                function sortListByScore($a, $b)
+                {
+                  return $b['q_result_score'] - $a['q_result_score'];
+                }
+  
+                // Sort the data array by score
+                usort($qa_list, 'sortListByScore');
                  $tmpl = array (
                  				'heading_cell_start'    => '<th>',
                  				'heading_cell_end'      => '</th>',
