@@ -242,6 +242,29 @@ function get_papers() {
 			'on_list'=>'hidden',
 			
 	);
+
+	$fields['your_decision']=array(
+		'field_title'=>'Your Decision',
+		'field_type'=>'text',	   						
+		'field_size'=>20,	   			
+		'on_list'=>'hidden',
+	);
+
+	$fields['conflicting_users']=array(
+		'field_title'=>'Conflicting Users',
+		'field_type'=>'longtext',	   						
+		'field_size'=>2000,	   			
+		'input_type'=>'textarea',
+		'on_list'=>'hidden',
+	);
+
+	$fields['assigned_users']=array(
+		'field_title'=>'Assigned Users',
+		'field_type'=>'longtext',	   						
+		'field_size'=>2000,	   			
+		'input_type'=>'textarea',
+		'on_list'=>'hidden',
+	);
 	
 	$fields['classification_status']=array(
 			'field_title'=>'Screening status',
@@ -300,22 +323,37 @@ function get_papers() {
 			'name'=>'view_paper_decision',
 			'desc'=>'',
 			
-			'script'=>'SELECT S.screening_id,S.screening_phase,S.user_id,P.id, P.bibtexKey,P.title,P.doi,P.papers_sources,P.paper_active,IFNULL(D.screening_decision,"Pending") as screening_status ,IFNULL(D.decision_source,"Pending") as decision_source from screening_paper S 
-LEFT JOIN  paper P ON(S.paper_id=P.id AND P.paper_active=1 ) 
-LEFT JOIN  screen_decison D ON (S.paper_id=D.paper_id AND S.screening_phase=D.screening_phase AND D.decision_active=1 ) 
-WHERE screening_active=1  GROUP BY P.id,S.screening_phase',
+			'script'=>'SELECT S.screening_id,S.screening_phase,S.user_id,P.id, P.bibtexKey,P.title,P.doi,P.papers_sources,P.paper_active,IFNULL(D.screening_decision,"Pending") as screening_status ,IFNULL(D.decision_source,"Pending") as decision_source,
+			GROUP_CONCAT(U.user_name SEPARATOR ', ') as assigned_users
+			FROM screening_paper S 
+			LEFT JOIN  paper P ON(S.paper_id=P.id AND P.paper_active=1 ) 
+			LEFT JOIN  screen_decison D ON (S.paper_id=D.paper_id AND S.screening_phase=D.screening_phase AND D.decision_active=1 ) 
+			LEFT JOIN relis_db.users U ON (S.user_id=U.user_id)
+			WHERE screening_active=1  GROUP BY P.id,S.screening_phase;',
 			
 	);
 	
-	$table_views['paper_decision_det']=array(
-			'name'=>'view_paper_decision_det',
-			'desc'=>'',
+// 	$table_views['paper_decision_det']=array(
+// 			'name'=>'view_paper_decision_det',
+// 			'desc'=>'',
 				
-			'script'=>'SELECT S.screening_id,S.screening_phase,S.user_id,P.id, P.bibtexKey,P.title,P.doi,P.papers_sources,P.paper_active,IFNULL(D.screening_decision,"Pending") as screening_status ,IFNULL(D.decision_source,"Pending") as decision_source from screening_paper S
-LEFT JOIN  paper P ON(S.paper_id=P.id AND P.paper_active=1 )
-LEFT JOIN  screen_decison D ON (S.paper_id=D.paper_id AND S.screening_phase=D.screening_phase AND D.decision_active=1 )
-WHERE screening_active=1',
+// 			'script'=>'SELECT S.screening_id,S.screening_phase,S.user_id,P.id, P.bibtexKey,P.title,P.doi,P.papers_sources,P.paper_active,IFNULL(D.screening_decision,"Pending") as screening_status ,IFNULL(D.decision_source,"Pending") as decision_source from screening_paper S
+// LEFT JOIN  paper P ON(S.paper_id=P.id AND P.paper_active=1 )
+// LEFT JOIN  screen_decison D ON (S.paper_id=D.paper_id AND S.screening_phase=D.screening_phase AND D.decision_active=1 )
+// WHERE screening_active=1',
 				
+// 	);
+
+	$table_views['conflicting_users']=array(
+		'name'=>'view_conflicting_users',
+		'desc'=>'',
+		
+		'script'=>'SELECT S.screening_id,S.screening_phase,S.user_id,S.screening_decision, P.id, P.bibtexKey, P.title, P.papers_sources, P.doi, P.paper_active, IFNULL(D.screening_decision,"Pending") as screening_status, IFNULL(D.decision_source,"Pending") as decision_source, U.user_name as users 
+				FROM screening_paper S 
+				LEFT JOIN paper P ON(S.paper_id=P.id AND P.paper_active=1) 
+				LEFT JOIN screen_decison D ON (S.paper_id=D.paper_id AND S.screening_phase=D.screening_phase AND D.decision_active=1) 
+				LEFT JOIN relis_db.users U ON (S.user_id=U.user_id)
+				WHERE D.screening_decision="In conflict";',
 	);
 
 	$config['table_views']=$table_views;
@@ -709,12 +747,16 @@ WHERE screening_active=1',
 	
 	$operations['list_papers_screen_conflict']=$operations['list_papers_screen_excluded'];
 	$operations['list_papers_screen_conflict']['page_title']='In conflict papers for this phase';
+	$operations['list_papers_screen_conflict']['fields']['assigned_users'] = $fields['assigned_users'];
 	$operations['list_papers_screen_conflict']['conditions']['screening_status']['value']='In conflict';
 	
 	$operations['list_papers_screen_my_conflict']=$operations['list_papers_screen_conflict'];
 	$operations['list_papers_screen_my_conflict']['page_title']='My conflict papers in this phase';
-	$operations['list_papers_screen_my_conflict']['table_name']='view_paper_decision_det';
-	$operations['list_papers_screen_my_conflict']['data_source']='get_list_papers_my_screen_per_status';
+	$operations['list_papers_screen_my_conflict']['table_name']='view_conflicting_users';
+	unset($operations['list_papers_screen_my_conflict']['fields']['assigned_users']);
+	$operations['list_papers_screen_my_conflict']['fields']['your_decision'] = $fields['your_decision'];
+	$operations['list_papers_screen_my_conflict']['fields']['conflicting_users'] = $fields['conflicting_users'];
+	$operations['list_papers_screen_my_conflict']['data_source']='get_list_papers_conflicting_users';
 	$operations['list_papers_screen_my_conflict']['generate_stored_procedure']=TRUE;
 	$operations['list_papers_screen_my_conflict']['conditions']['user']=array(
 																				'field'=>'user_id',

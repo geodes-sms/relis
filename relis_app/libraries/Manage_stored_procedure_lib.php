@@ -1406,8 +1406,57 @@ END";
 							if($verbose)
 								print_test($res);
 						}
-								
-		}
+			
+
+						//conflicting users display
+			
+			
+			$procedure_p="
+			DROP PROCEDURE IF EXISTS get_list_papers_conflicting_users
+			";
+		if($run_query)
+			$res = $this->CI->db2->query ( $procedure_p );
+		
+			if($verbose){
+				echo "<p>$procedure_p</p>";
+				print_test($res);
+			}
+		
+$procedure_p="CREATE   PROCEDURE  get_list_papers_conflicting_users  (IN  _start_by  INT, IN  _range  INT, IN  _search  VARCHAR(500), IN  _screening_phase  VARCHAR(10), IN  _screening_status  VARCHAR(20), IN  _user_id  VARCHAR(20))  BEGIN 
+ START TRANSACTION;
+IF _range < 1 THEN
+SELECT *,
+GROUP_CONCAT(CASE WHEN tab.screening_decision != lis.your_decision THEN tab.users END SEPARATOR ', ') AS conflicting_users 
+FROM view_conflicting_users AS tab 
+LEFT JOIN (SELECT id, screening_decision AS your_decision FROM view_conflicting_users AS tab WHERE tab.user_id = _user_id) AS lis 
+ON (tab.id=lis.id) 
+WHERE screening_phase=_screening_phase AND paper_active=1
+GROUP BY tab.id
+ORDER BY tab.id ASC ;
+
+ELSE
+SELECT *,
+GROUP_CONCAT(CASE WHEN tab.screening_decision != lis.your_decision THEN tab.users END SEPARATOR ', ') AS conflicting_users 
+FROM view_conflicting_users AS tab 
+LEFT JOIN (SELECT id, screening_decision AS your_decision FROM view_conflicting_users AS tab WHERE tab.user_id = _user_id) AS lis 
+ON (tab.id=lis.id) 
+WHERE screening_phase=_screening_phase AND paper_active=1 
+GROUP BY tab.id
+ORDER BY tab.id ASC  LIMIT _start_by , _range;
+END IF;
+
+COMMIT;
+END";
+
+		
+		if($run_query)
+			$res = $this->CI->db2->query ( $procedure_p );
+				
+			if($verbose){
+				echo "<p>$procedure_p</p>";
+				print_test($res);
+			}
+ 		}
 		
 		
 		
