@@ -324,7 +324,7 @@ function get_papers() {
 			'desc'=>'',
 			
 			'script'=>'SELECT S.screening_id,S.screening_phase,S.user_id,P.id, P.bibtexKey,P.title,P.doi,P.papers_sources,P.paper_active,IFNULL(D.screening_decision,"Pending") as screening_status ,IFNULL(D.decision_source,"Pending") as decision_source,
-			GROUP_CONCAT(U.user_name SEPARATOR ', ') as assigned_users
+			GROUP_CONCAT(U.user_name) as assigned_users
 			FROM screening_paper S 
 			LEFT JOIN  paper P ON(S.paper_id=P.id AND P.paper_active=1 ) 
 			LEFT JOIN  screen_decison D ON (S.paper_id=D.paper_id AND S.screening_phase=D.screening_phase AND D.decision_active=1 ) 
