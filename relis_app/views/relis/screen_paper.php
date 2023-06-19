@@ -98,6 +98,8 @@
                                     </p>
 
                                 <?php }?>
+
+                                <button class="btn btn-info btn-lg" type="button" > <a href="<?php echo base_url(). "op/edit_element/edit_paper/" . $the_paper . "?from=screen_paper"?>">Edit</a> </button>
                             </div>
                             <div class='vl_solid'></div>
                             <div class='decision' >

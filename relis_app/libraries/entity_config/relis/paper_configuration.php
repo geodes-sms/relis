@@ -415,8 +415,11 @@ function get_papers() {
 			'save_function'=>'op/save_element',
 			'page_template'=>'general/frm_entity',
 		  
-			'redirect_after_save'=>'op/entity_list/list_papers',
-			'redirect_after_save'=>'op/entity_list/list_all_papers',
+			// 'redirect_after_save'=>'op/entity_list/list_papers',
+			// 'redirect_after_save'=>'op/entity_list/list_all_papers',
+			// Editing from screening or all papers
+			'redirect_after_save' => isset($_GET['from']) && $_GET['from'] === 'screen_paper' ? 'relis/manager/screen_paper' : 'op/entity_list/list_all_papers',
+
 			'data_source'=>'get_detail_papers',
 			'db_save_model'=>'update_paper',
 			
