@@ -1702,7 +1702,7 @@ class Install extends CI_Controller {
 	        $sql2 = "UPDATE qa_assignment SET qa_assignment_active=0, qa_status='Pending'";
 	         $this->db3->query($sql);
             $this->db3->query($sql2);
-        }else {
+        }
 
 
 		$config['qa_cutt_off_score']=!empty($qa['cutt_off_score'])?$qa['cutt_off_score']:"2";
@@ -1757,7 +1757,7 @@ class Install extends CI_Controller {
 			$result=$this->db3->insert_batch('qa_responses', $all_responses);
 		
 		}
-        }
+        
 	}
 	
 	private function get_last_added_project(){

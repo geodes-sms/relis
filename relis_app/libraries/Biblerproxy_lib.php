@@ -24,7 +24,7 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 class Biblerproxy_lib
 {
 	private  $instance;
-	private  $url='http://relis_bibler:80/';
+	private  $url='http://bibler:8000/';
 	public function __construct()
 	{
 
