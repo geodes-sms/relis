@@ -62,8 +62,10 @@
                          
                          $i=1;
                         foreach ($users as $user_id => $user_name) {
-                        	echo checkbox_form_bm($user_name,'user_'.$i,'user_'.$user_id,$user_id);
-                        	$i++;
+                          if(!has_user_role('Guest',$user_id)){
+                            echo checkbox_form_bm($user_name,'user_'.$i,'user_'.$user_id,$user_id);
+                        	  $i++;
+                          }
                         }
                        
                   
