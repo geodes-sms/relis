@@ -2739,7 +2739,8 @@ class Manager extends CI_Controller
 		$_assign_user = array();
 		foreach ($users['list'] as $key => $value) {
 
-			if ((user_project($this->session->userdata('project_id'), $value['user_id']))) {
+			if ((user_project($this->session->userdata('project_id'), $value['user_id']))
+				and !has_user_role('Guest',$value['user_id'])) {
 
 				$_assign_user[$value['user_id']] = $value['user_name'];
 			}
@@ -5195,7 +5196,9 @@ class Manager extends CI_Controller
 		$users = $this->DBConnection_mdl->get_list($user_table_config, '_', 0, -1);
 		$_assign_user = array();
 		foreach ($users['list'] as $key => $value) {
-			if ((user_project($this->session->userdata('project_id'), $value['user_id'])) and can_review_project($value['user_id'])) {
+			if ((user_project($this->session->userdata('project_id'), $value['user_id'])) 
+			and can_review_project($value['user_id'])
+			and !has_user_role('Guest',$value['user_id'])) {
 
 				$_assign_user[$value['user_id']] = $value['user_name'];
 			}
@@ -5282,7 +5285,9 @@ class Manager extends CI_Controller
 		$users = $this->DBConnection_mdl->get_list($user_table_config, '_', 0, -1);
 		$_assign_user = array();
 		foreach ($users['list'] as $key => $value) {
-			if ((user_project($this->session->userdata('project_id'), $value['user_id'])) and can_review_project($value['user_id'])) {
+			if ((user_project($this->session->userdata('project_id'), $value['user_id'])) 
+				and can_review_project($value['user_id'])
+				and !has_user_role('Guest',$value['user_id'])) {
 
 				$_assign_user[$value['user_id']] = $value['user_name'];
 			}
@@ -5326,7 +5331,9 @@ class Manager extends CI_Controller
 		$users = $this->DBConnection_mdl->get_list($user_table_config, '_', 0, -1);
 		$_assign_user = array();
 		foreach ($users['list'] as $key => $value) {
-			if ((user_project($this->session->userdata('project_id'), $value['user_id'])) and can_review_project($value['user_id'])) {
+			if ((user_project($this->session->userdata('project_id'), $value['user_id'])) 
+			and can_review_project($value['user_id'])
+			and !has_user_role('Guest',$value['user_id'])) {
 
 				$_assign_user[$value['user_id']] = $value['user_name'];
 			}
