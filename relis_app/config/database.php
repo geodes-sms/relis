@@ -181,3 +181,47 @@ $db['mt'] = array(
 		'failover' => array(),
 		'save_queries' => TRUE
 );
+
+$db['demoProject'] = array(
+		'dsn'	=> '',
+		'hostname' => 'db',
+		'username' => 'root',
+		'password' => '',
+		'database' => 'relis_project_demoProject',
+		'dbdriver' => 'mysqli',
+		'dbprefix' => '',
+		'pconnect' => FALSE,
+		'db_debug' => (ENVIRONMENT !== 'production'),
+		'cache_on' => FALSE,
+		'cachedir' => '',
+		'char_set' => 'utf8',
+		'dbcollat' => 'utf8_general_ci',
+		'swap_pre' => '',
+		'encrypt' => FALSE,
+		'compress' => FALSE,
+		'stricton' => FALSE,
+		'failover' => array(),
+		'save_queries' => TRUE
+);
+
+$db['mbambiProject'] = array(
+		'dsn'	=> '',
+		'hostname' => 'db',
+		'username' => 'root',
+		'password' => '',
+		'database' => 'relis_project_mbambiProject',
+		'dbdriver' => 'mysqli',
+		'dbprefix' => '',
+		'pconnect' => FALSE,
+		'db_debug' => (ENVIRONMENT !== 'production'),
+		'cache_on' => FALSE,
+		'cachedir' => '',
+		'char_set' => 'utf8',
+		'dbcollat' => 'utf8_general_ci',
+		'swap_pre' => '',
+		'encrypt' => FALSE,
+		'compress' => FALSE,
+		'stricton' => FALSE,
+		'failover' => array(),
+		'save_queries' => TRUE
+);

@@ -80,8 +80,8 @@ $autoload['packages'] = array();
 */
 $autoload['libraries'] = array('database','profiler', 'session','table','bm_lib','table_ref_lib',
 		'manage_stored_procedure_lib','user_agent','entity_config_lib',
-		'entity_configuration_lib','manager_lib','biblerproxy_lib','Entityconf_lib');
-//$autoload['libraries'] = array('database','session','table','bm_lib','table_ref_lib','manage_stored_procedure_lib','user_agent','entity_config_lib','entity_configuration_lib','manager_lib','biblerproxy_lib');
+		'entity_configuration_lib','manager_lib','Entityconf_lib');
+//$autoload['libraries'] = array('database','session','table','bm_lib','table_ref_lib','manage_stored_procedure_lib','user_agent','entity_config_lib','entity_configuration_lib','manager_lib');
 
 /*
 | -------------------------------------------------------------------
@@ -155,4 +155,4 @@ $autoload['language'] = array();
 |
 |	$autoload['model'] = array('first_model' => 'first');
 */
-$autoload['model'] = array('manage_mdl','DBConnection_mdl','Relis_mdl');
+$autoload['model'] = array('manage_mdl','DBConnection_mdl', 'Paper_dataAccess', 'User_dataAccess', 'Data_extraction_dataAccess', 'Project_dataAccess', 'Quality_assessment_dataAccess', 'Reporting_dataAccess', 'Screening_dataAccess');

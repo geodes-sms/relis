@@ -1,4 +1,5 @@
 <?php
+//The get_operations_operations() function generates operations for the 'operations' table
 function get_operations_operations() {
 	
 

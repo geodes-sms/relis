@@ -139,31 +139,31 @@
            
           
            <tr >
-           <td>Classification</td><td><a href="<?php echo base_url();?>relis/manager/download/relis_classification_<?php echo project_db();?>.csv"><?php echo $class_dsc?></a></td><td><a href="<?php echo base_url();?>relis/manager/result_export_classification"><i class="fa fa-refresh"></i><?php echo lng('Update file')?></a></td><td></td>
+           <td>Classification</td><td><a href="<?php echo base_url();?>reporting/download/relis_classification_<?php echo project_db();?>.csv"><?php echo $class_dsc?></a></td><td><a href="<?php echo base_url();?>reporting/result_export_classification"><i class="fa fa-refresh"></i><?php echo lng('Update file')?></a></td><td></td>
            </tr>
            <tr >
-           <td>Papers</td><td><a href="<?php echo base_url();?>relis/manager/download/relis_paper_<?php echo project_db();?>.csv"><?php echo  $paper_dsc?></a></td><td><a href="<?php echo base_url();?>relis/manager/result_export_papers"><i class="fa fa-refresh"></i><?php echo lng('Update file')?></a></td>
+           <td>Papers</td><td><a href="<?php echo base_url();?>reporting/download/relis_paper_<?php echo project_db();?>.csv"><?php echo  $paper_dsc?></a></td><td><a href="<?php echo base_url();?>reporting/result_export_papers"><i class="fa fa-refresh"></i><?php echo lng('Update file')?></a></td>
            </tr>
            
             
            <tr >
-           <td>Papers (BibTeX)</td><td><a href="<?php echo base_url();?>relis/manager/download/relis_paper_bibtex_<?php echo project_db();?>.bib"><?php echo  $paper_bib_dsc?></a></td><td><a href="<?php echo base_url();?>relis/manager/result_export_papers_bib"><i class="fa fa-refresh"></i><?php echo lng('Update file')?></a></td>
+           <td>Papers (BibTeX)</td><td><a href="<?php echo base_url();?>reporting/download/relis_paper_bibtex_<?php echo project_db();?>.bib"><?php echo  $paper_bib_dsc?></a></td><td><a href="<?php echo base_url();?>reporting/result_export_papers_bib"><i class="fa fa-refresh"></i><?php echo lng('Update file')?></a></td>
            </tr>
            
            <tr >
-           <td>Papers included (BibTeX)</td><td><a href="<?php echo base_url();?>relis/manager/download/relis_paper_bibtex_Included_<?php echo project_db();?>.bib"><?php echo  $paper_bib_dsc_Included?></a></td><td><a href="<?php echo base_url();?>relis/manager/result_export_included_papers_bib"><i class="fa fa-refresh"></i><?php echo lng('Update file')?></a></td>
+           <td>Papers included (BibTeX)</td><td><a href="<?php echo base_url();?>reporting/download/relis_paper_bibtex_Included_<?php echo project_db();?>.bib"><?php echo  $paper_bib_dsc_Included?></a></td><td><a href="<?php echo base_url();?>reporting/result_export_included_papers_bib"><i class="fa fa-refresh"></i><?php echo lng('Update file')?></a></td>
            </tr>
            
            <tr >
-           <td>Papers Excluded (BibTeX)</td><td><a href="<?php echo base_url();?>relis/manager/download/relis_paper_bibtex_Excluded_<?php echo project_db();?>.bib"><?php echo  $paper_bib_dsc_Excluded?></a></td><td><a href="<?php echo base_url();?>relis/manager/result_export_excluded_papers_bib"><i class="fa fa-refresh"></i><?php echo lng('Update file')?></a></td>
+           <td>Papers Excluded (BibTeX)</td><td><a href="<?php echo base_url();?>reporting/download/relis_paper_bibtex_Excluded_<?php echo project_db();?>.bib"><?php echo  $paper_bib_dsc_Excluded?></a></td><td><a href="<?php echo base_url();?>reporting/result_export_excluded_papers_bib"><i class="fa fa-refresh"></i><?php echo lng('Update file')?></a></td>
            </tr>
            
            <tr >
-           <td>Papers Excluded Screening(CSV)</td><td><a href="<?php echo base_url();?>relis/manager/download/relis_paper_excluded_screen_<?php echo project_db();?>.csv"><?php echo  $screen_excluded_dsc?></a></td><td><a href="<?php echo base_url();?>relis/manager/result_export_excluded_screen"><i class="fa fa-refresh"></i><?php echo lng('Update file')?></a></td>
+           <td>Papers Excluded Screening(CSV)</td><td><a href="<?php echo base_url();?>reporting/download/relis_paper_excluded_screen_<?php echo project_db();?>.csv"><?php echo  $screen_excluded_dsc?></a></td><td><a href="<?php echo base_url();?>reporting/result_export_excluded_screen"><i class="fa fa-refresh"></i><?php echo lng('Update file')?></a></td>
            </tr>
            
            <tr >
-           <td>Papers Excluded Classification (CSV)</td><td><a href="<?php echo base_url();?>relis/manager/download/relis_paper_excluded_class_<?php echo project_db();?>.csv"><?php echo  $class_excluded_dsc?></a></td><td><a href="<?php echo base_url();?>relis/manager/result_export_excluded_class"><i class="fa fa-refresh"></i><?php echo lng('Update file')?></a></td>
+           <td>Papers Excluded Classification (CSV)</td><td><a href="<?php echo base_url();?>reporting/download/relis_paper_excluded_class_<?php echo project_db();?>.csv"><?php echo  $class_excluded_dsc?></a></td><td><a href="<?php echo base_url();?>reporting/result_export_excluded_class"><i class="fa fa-refresh"></i><?php echo lng('Update file')?></a></td>
            </tr>
            
           

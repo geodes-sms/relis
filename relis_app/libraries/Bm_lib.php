@@ -1,4 +1,5 @@
-<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php if (!defined('BASEPATH'))
+	exit('No direct script access allowed');
 /* ReLiS - A Tool for conducting systematic literature reviews and mapping studies.
  * Copyright (C) 2018  Eugene Syriani
  *
@@ -19,67 +20,67 @@
  *
  *  :Author: Brice Michel Bigendako
  */
-class Bm_lib
+
+ //provides functionalities related to authentication, pagination, email sending, and random string generation within a CodeIgniter application
+ class Bm_lib
 {
 	public function __construct()
 	{
-		
+
 		$this->CI =& get_instance();
-		
-		if(!in_array($this->CI->router->fetch_class(), $this->CI->config->item('free_controllers'))){
-			
-			$this->checkauthentification();
-			
+		$this->CI->load->library('user/user_lib');
+
+		/*
+			checks if the current class (retrieved using $this->CI->router->fetch_class()) is not in the list of "free_controllers" specified in the configuration file. 
+			The configuration item 'free_controllers' holds an array of class names that do not require authentication.
+			If it's not a free controller, it calls the checkauthentification() method.
+		*/
+		if (!in_array($this->CI->router->fetch_class(), $this->CI->config->item('free_controllers'))) {
+
+			$this->CI->user_lib->checkauthentification();
 		}
-		
+
 		$sections = array(
-		'config'  => FALSE,
-		'http_headers'  => FALSE,
-		'session_data' => FALSE,
-		'queries' => FALSE
+			'config' => FALSE,
+			'http_headers' => FALSE,
+			'session_data' => FALSE,
+			'queries' => FALSE
 		);
-//	echo 	print_test($this->CI->load->database('default',true));
-		$f = APPPATH.'config/database.php';
+		//	echo 	print_test($this->CI->load->database('default',true));
+		$f = APPPATH . 'config/database.php';
 		include($f);
+
+		//The variable $db_settings is assigned the value of $db, which holds the database configuration settings.
 		$db_settings = $db;
 		//print_test($db_settings);
-	//	print_test(empty($db_settings[project_db()]));
+		//	print_test(empty($db_settings[project_db()]));
 		//exit;
-		if(!empty($db_settings[project_db()])){
-			
-			$this->CI->db_current= $this->CI->load->database(project_db(), TRUE);
-		}else{
-		//	set_top_msg("There is a problem with the selected project!",'error');
-		
-			$this->CI->db_current= $this->CI->load->database('default', TRUE);
-			$this->CI->session->set_userdata ( 'project_db','' );
-			$this->CI->session->set_userdata ( 'project_id','' );
-			$this->CI->session->set_userdata ( 'project_title','' );
-			echo "<script>alert('There is a problem with the selected project!');window.location.href='".base_url()."home';</script>";
+
+		//checks if the database settings for the current project (retrieved using project_db()) exist in $db_settings.
+		if (!empty($db_settings[project_db()])) {
+
+			$this->CI->db_current = $this->CI->load->database(project_db(), TRUE);
+		} else {
+			//	set_top_msg("There is a problem with the selected project!",'error');
+
+			$this->CI->db_current = $this->CI->load->database('default', TRUE);
+			$this->CI->session->set_userdata('project_db', '');
+			$this->CI->session->set_userdata('project_id', '');
+			$this->CI->session->set_userdata('project_title', '');
+			echo "<script>alert('There is a problem with the selected project!');window.location.href='" . base_url() . "home';</script>";
 			//redirect('home');
 			exit;
 		}
 	}
-		
-	/*
-	 * Vérifiaction si l'utilisateur encours est authentifier, si non redirection vers la page d'authentification
-	 */
-	function checkauthentification()
-	{
-		if(!($this->CI->session->userdata('user_id'))){
-			redirect('auth');
-		}
-	}
 
-	
 	/*
 	 * Géneration de la pagination des pages
 	 */
-		function get_pagination($url, $total_rows,$uri_segment=3){
-
+	function get_pagination($url, $total_rows, $uri_segment = 3)
+	{
 		$this->CI->load->library('pagination');
 		$config['uri_segment'] = $uri_segment;
-		$config['base_url'] = base_url().$url;
+		$config['base_url'] = base_url() . $url;
 		$config['total_rows'] = $total_rows;
 		$config['per_page'] = $this->CI->config->item('rec_per_page');
 		$config['first_link'] = 'First';
@@ -97,64 +98,17 @@ class Bm_lib
 		$config['first_tag_close'] = '</li>';
 		$config['last_tag_open'] = '<li class="paginate_button">';
 		$config['last_tag_close'] = '</li>';
-		$config['cur_tag_open']="<li class='paginate_button active'><a>";
-		$config['cur_tag_close']="</a></li>";
+		$config['cur_tag_open'] = "<li class='paginate_button active'><a>";
+		$config['cur_tag_close'] = "</a></li>";
 		$config['num_links'] = 3;
-		
+
 		$this->CI->pagination->initialize($config);
 		echo $this->CI->pagination->create_links();
-		
-		}
-		
-		
-		/*
-		 * Verification si un nom d'utilisateur est déjà utilisé ou pas
-		 */
-		function login_available($login){
-				$result=$this->CI->DBConnection_mdl->login_available($login);
-				
-				return $result;
-				
-			}
-			
-			
-	public function send_mail($subject,$message,$destination) {
-		$ci = get_instance();
-		$ci->load->library('email');
-		$config['protocol'] = get_ci_config('mail_protocol');
-		$config['smtp_host'] = get_ci_config('mail_host');
-		$config['smtp_port'] = get_ci_config('mail_port');
-		$config['smtp_user'] = get_ci_config('mail_user');
-		$config['smtp_pass'] = get_ci_config('mail_password');
-		$config['charset'] = "utf-8";
-		$config['mailtype'] = "html";
-		$config['newline'] = "\r\n";
-
-		$mailFrom = get_ci_config('mail_from');
-		$replyTo = get_ci_config('mail_reply_to');
-
-		$ci->email->initialize($config);
-			
-		$ci->email->from($mailFrom, 'ReLiS');
-		$ci->email->to($destination);
-		$ci->email->reply_to($replyTo, 'ReLiS');
-		$ci->email->subject($subject);
-		$ci->email->message($message);
-			
-		if($ci->email->send()){
-			//echo "Email sent successfully.";
-			return 1;
-		}
-		else{
-			
-			//echo $ci->email->print_debugger();
-			return 0;
-		}
-		
 	}
-	
+
 	/**
-	 * Generate a random string, 	
+	 * generates a random string of a specified length. 
+	 * It takes an integer parameter $length that specifies the length of the random string.	
 	 * @param int $length      How many characters do we want?
 	 * @return string
 	 */
@@ -168,7 +122,4 @@ class Bm_lib
 		}
 		return $randomString;
 	}
-			
-
-		}
-	
+}

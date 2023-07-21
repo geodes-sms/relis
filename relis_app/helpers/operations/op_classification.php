@@ -1,4 +1,7 @@
 <?php
+/*
+	function returns an array of operations related to the classification entity
+*/
 function get_operations_classification() {
 	
 	//Assignments

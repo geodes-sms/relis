@@ -19,7 +19,7 @@
                   <?php
                   $attributes = array('class' => 'form-horizontal form_content');
                   //echo form_open('manage/save_ref',$attributes);
-                  echo form_open_multipart('op/save_element',$attributes);
+                  echo form_open_multipart('element/save_element',$attributes);
 
                   $this->load->view('general/frm_entity_body');
                 
@@ -61,7 +61,7 @@
                 		 
                 	         $.ajax({
                 	     type: "POST",
-                	 url: "<?php echo base_url();?>op/save_element",
+                	 url: "<?php echo base_url();?>element/save_element",
                         	 
                 	 data: $('form.form_content').serialize(),
                 	         success: function(msg){

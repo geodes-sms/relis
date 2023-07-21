@@ -19,6 +19,8 @@
  *
  *  :Author: Brice Michel Bigendako
  */
+
+//function is used to generate an HTML <i> element with a Font Awesome icon class.
 function icon($icon,$action='display') {
 	if($action=='diplay')
 		echo '<i class="fa fa-'.$icon.'"></i>';
@@ -26,7 +28,7 @@ function icon($icon,$action='display') {
 		return '<i class="fa fa-'.$icon.'"></i>';
 }
 
-
+// used to generate an HTML anchor tag (<a>) with a truncated label
 function string_anchor($link,$text,$trim_size=0,$title=True){
 	if(empty($trim_size)){
 		$label=$text;
@@ -47,7 +49,7 @@ function string_anchor($link,$text,$trim_size=0,$title=True){
 	
 }
 
-
+//used to generate the HTML markup for a box header section
 function box_header($title="",$content="",$w1=6,$w2=6,$w6=12,$button=""){
 	echo  '<div class="col-md-'.$w1.' col-sm-'.$w2.' col-xs-'.$w1.'">
               <div class="x_panel tile  overflow_hidden">
@@ -56,16 +58,16 @@ function box_header($title="",$content="",$w1=6,$w2=6,$w6=12,$button=""){
                   <div class="clearfix"></div>
                 </div>
                 <div class="x_content">'.$content;
-
 }
 
-
+//used in conjunction with the box_header() function to wrap the content within a box section
 function box_footer(){
 	echo "</div>
               </div>
             </div>";
 }
 
+//function is used to generate a completion gauge with associated statistics and counts
 function add_completion_gauge($data=array(),$div_id='foo_test',$box_size=6){
 	$all_papers=37;
 	$processed_papers=30;
