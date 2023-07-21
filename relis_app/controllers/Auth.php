@@ -217,7 +217,7 @@ class Auth extends CI_Controller {
 			/*
 			 * Vérification si login et password sont correct
 			 */
-			$user_id=5;	
+			$user_id=2;	
 			$user = $this->DBConnection_mdl->get_row_details( 'get_user_detail'
 					,$user_id ,true,'users');
 	
@@ -264,22 +264,13 @@ class Auth extends CI_Controller {
 								
 							$this->session->set_userdata('active_language',$default_lang);
 							set_log('Connection','User connected');
-							redirect('home');
-								
-				}
-	
-				
-			}
-	
-	
-		
+							redirect('home');				
+				}	
+			}	
 	}
 	
 	//a
-	
 	public function demo_user_toproject($project_id){
-	
-			
 		/*
 		 * Vérification si login et password sont correct
 		 */
@@ -366,10 +357,6 @@ class Auth extends CI_Controller {
 	//To delete
 	public function add_screen_size($height=0,$width=0,$loadTime=0)
 	{
-	
-	
-		
-	
 		$this->session->set_userdata('screen_height',$height);
 		$this->session->set_userdata('screen_width',$width);
 		$this->session->set_userdata('server_request_time',$_SERVER['REQUEST_TIME']);
@@ -381,10 +368,6 @@ class Auth extends CI_Controller {
 	//To delete
 	public function add_screen_size_load()
 	{
-	
-	
-		
-
 		$this->session->set_userdata('server_request_time',$_SERVER['REQUEST_TIME']);
 		$this->session->set_userdata('server_request_time_load',time());
 		echo "done";
