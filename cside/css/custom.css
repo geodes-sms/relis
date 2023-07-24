@@ -5678,16 +5678,6 @@ ul.notifications {
     background-color: rgba(1, 0, 0, 0.7);
     /* Set the alpha value to 1 for full opacity */
     z-index: 999;
-}
-
-.popup-content {
-    background-color: #fff;
-    padding: 20px;
-    max-width: 600px;
-    margin: 20px auto;
-    text-align: justify;
-    border-radius: 5px;
-    max-height: 80vh;
     overflow-y: auto;
 }
 
@@ -5700,27 +5690,6 @@ ul.notifications {
     outline: 0;
     box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
 } */
-
-.popup-container {
-    position: absolute;
-    /* Use "absolute" to position the popup relative to the "overlay" */
-    top: 50%;
-    /* Move the popup 50% down from the top of the screen */
-    left: 50%;
-    /* Move the popup 50% from the left of the screen */
-    transform: translate(-50%, -50%);
-    /* Center the popup perfectly */
-    background-color: #fff;
-    border: 1px solid #999;
-    border-radius: 6px;
-    padding: 20px;
-    /* Add padding to give some space to the content inside */
-    box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
-    max-width: 500px;
-    /* Set the maximum width of the popup */
-    z-index: 1000;
-    /* Ensure the popup is above other content on the page */
-}
 
 #privacy-policy-popup {
     display: none;
@@ -5744,19 +5713,9 @@ ul.notifications {
 .long-line {
     border: 0;
     /* Remove default border */
-    height: 2px;
+    height: 0.5px;
     /* Set the height of the line */
     background-color: black;
     /* Set the color of the line */
     /* You can also add other styles like margin, padding, etc. to control spacing */
-}
-
-
-/* Add the desired styling for the box with a black outline */
-
-.box-with-outline {
-    border: 20px solid black;
-    /* Set the border properties */
-    padding: 200px;
-    /* Add some padding to create space between the text and the border */
 }

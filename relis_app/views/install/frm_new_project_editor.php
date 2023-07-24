@@ -83,7 +83,7 @@
           By creating this project, you agree to the open access (OA) terms of ReLiS. 
           OA allows any user to read the configuration and data produced by this project. 
           ReLiS follows an OA policy where all data is shared and open. Using the data includes, but is not limited to, viewing the results of a systematic review project, accessing the data produced in the project, and analyzing the data for research purposes, such as tertiary reviews. <br>
-          <br> <a href="#privacy-policy-popup" style="text-decoration: underline;">View Privacy Policy</a>
+          <br> <a href="#relisformModal" style="text-decoration: underline;">View Privacy Policy</a>
         </label>
     </div>
       <br>
@@ -94,8 +94,8 @@
 
   <!-- Popup for displaying the privacy policy -->
   
-  <div id="privacy-policy-popup" class="popup-overlay">
-      <div class="modal-dialog modal-lg">
+  <div id="relisformModal" class="popup-overlay" style="overflow-y: auto;">
+      <div class="modal-dialog modal-lg" style="overflow-y: auto;">
         <div class="modal-content">
           <div class="modal-header">
             <button href="#close-popup" type ="button" class="close" data-dismiss="modal" >
@@ -103,39 +103,39 @@
             </button>
             <h4 class="modal-title" >Privacy Policy</h4>
           </div>
-          <div class="modal-body">
+          <div class="modal-body" >
             <div style="border: 0.1px solid #E6E9ED; padding: 15px;">
               <p>
                 <h5>Data collection disclosure</h5>
                 To offer our services, we collect basic information for identification and to ensure the segregation of your data from other users. The fundamental information we collect consists of your name, email address, password, username, and your involvement in systematic review projects. You provide us with all of this information voluntarily, and we have a strict policy of not sharing it with any third parties under any circumstances.
               </p>
-              <hr class="long-line">
+              <hr style="border: 0;height: 0.5px;background-color: black;">
               <p>
                 <h5>Ensuring security of your data</h5> 
                 To ensure the basic functionality of ReLiS and maintain the separation of your data from other users, we collect and associate the information you provide within the ReLiS platform with your user account. To enhance data security, we recommend selecting a unique username specifically for ReLiS, as it is less frequently shared compared to email addresses. Additionally, choosing a strong and distinct password is crucial to safeguard your account information. We encourage the use of lengthy passwords, as their length is more significant than complexity. For your protection, your password is stored in our database in a hashed form, making it virtually impossible to retrieve the original plain text even if our database is compromised. However, it is vital to use different passwords for different services, so we kindly request that you create a password exclusive to your ReLiS account. While we implement extensive measures to secure your data and uphold your rights, it is important to note that no online service can guarantee absolute security. We strive to take every possible precaution to protect your data, and we kindly request that you do the same.
               </p>
-              <hr class="long-line">
+              <hr style="border: 0;height: 0.5px;background-color: black;">
               <p>
                 <h5>Data retention period</h5>
                   We do not have a limit on how long we retain your account information and/or data.
               </p>
-              <hr class="long-line">
+              <hr style="border: 0;height: 0.5px;background-color: black;">
               <p>
                 <h5>Right to access</h5>
                   You have the right to request access to the information we have stored about you in our records. If you would like to obtain a copy of all the information associated with your account, please contact us via the provided email address.
               </p>
-              <hr class="long-line">
+              <hr style="border: 0;height: 0.5px;background-color: black;">
               <p>
                 <h5>Right to delete your information</h5>
                   If you wish to remove your personal information from our records, please contact us at the email below.
                   Note that you will no longer have access to ReLiS after this operation.
               </p>
-              <hr class="long-line">
+              <hr style="border: 0;height: 0.5px;background-color: black;">
               <p>
                 <h5>Disclosure of data sharing with 3rd parties</h5>
                   We do not share any information with third parties.
               </p>
-              <hr class="long-line">
+              <hr style="border: 0;height: 0.5px;background-color: black;">
               <p>
                 <h5>Contact</h5>
                 If you have any questions about this data sharing policy, please feel free to contact us at <a href="mailto:info@relis.iro.umontreal.ca" style="text-decoration: underline;">info@relis.iro.umontreal.ca</a>.
@@ -159,14 +159,14 @@
   <script>
     $(document).ready(function() {
       // Show privacy policy popup when the link is clicked
-      $('a[href="#privacy-policy-popup"]').click(function(e) {
+      $('a[href="#relisformModal"]').click(function(e) {
         e.preventDefault();
-        $('#privacy-policy-popup').show();
+        $('#relisformModal').show();
       });
 
       // Close the privacy policy popup when clicked outside or on close button
-      $('#privacy-policy-popup, #close-popup').on('click', function() {
-        $('#privacy-policy-popup').hide();
+      $('#relisformModal, #close-popup').on('click', function() {
+        $('#relisformModal').hide();
       });
 
       // Disable/enable submit button based on checkbox state
