@@ -23,7 +23,7 @@
                   
                   box_header('Actions','',12,12);
                   	if(!empty($action_but_screen)){
-                  		box_header('Screening','',12,12);
+                  		box_header('Quality assessment','',12,12);
                   ?>
                   
                     

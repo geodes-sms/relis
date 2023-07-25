@@ -89,7 +89,7 @@ class User_lib
 	 */
 	function login_available($login)
 	{
-		$result = $this->User_dataAccess->login_available($login);
+		$result = $this->CI->User_dataAccess->login_available($login);
 
 		return $result;
 	}

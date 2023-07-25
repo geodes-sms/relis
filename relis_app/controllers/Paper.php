@@ -1153,15 +1153,15 @@ class Paper extends CI_Controller
             $i = 1;
             $res = "init";
             while ($i < 10) {
-                //$res=$this->paper->biblerproxy_lib->addEntry($bibtex);
-                //$res=$this->paper->biblerproxy_lib->bibtextobibtex($bibtex);
-                //$res=$this->paper->biblerproxy_lib->bibtextosql($bibtex);
-                //$res=$this->paper->biblerproxy_lib->addEntry($bibtex);
-                //$res=$this->paper->biblerproxy_lib->previewEntry($bibtex);
-                //$res=$this->paper->biblerproxy_lib->bibtextocsv($bibtex);
-                //$res=$this->paper->biblerproxy_lib->bibtextohtml($bibtex);
-                //$res=$this->paper->biblerproxy_lib->formatBibtex($bibtex);
-                $res = $this->paper->biblerproxy_lib->createentryforreliS($bibtex);
+                //$res=$this->biblerproxy_lib->addEntry($bibtex);
+                //$res=$this->biblerproxy_lib->bibtextobibtex($bibtex);
+                //$res=$this->biblerproxy_lib->bibtextosql($bibtex);
+                //$res=$this->biblerproxy_lib->addEntry($bibtex);
+                //$res=$this->biblerproxy_lib->previewEntry($bibtex);
+                //$res=$this->biblerproxy_lib->bibtextocsv($bibtex);
+                //$res=$this->biblerproxy_lib->bibtextohtml($bibtex);
+                //$res=$this->biblerproxy_lib->formatBibtex($bibtex);
+                $res = $this->biblerproxy_lib->createentryforreliS($bibtex);
                 $correct = False;
                 if (strpos($res, 'Internal Server Error') !== false or empty($res)) {
                     //	echo " error - ".$i;
@@ -1181,7 +1181,7 @@ class Paper extends CI_Controller
                 //print_test($res);
                 $res = str_replace("True,", "'True',", $res);
                 $res = str_replace("False,", "'False',", $res);
-                $res = $this->paper->biblerproxy_lib->fixJSON($res);
+                $res = $this->biblerproxy_lib->fixJSON($res);
                 //tou correct the error in venu from the webservice
                 //$res=substr($res,0,strpos($res,', "venue_full":')).'}';
                 $Tres = json_decode($res, True);
@@ -1661,9 +1661,9 @@ class Paper extends CI_Controller
         $res = "init";
         while ($i < 10) { //up to ten attempt to connect to server if the connection does not work
             if ($operation == 'endnote') {
-                $res = $this->paper->biblerproxy_lib->importendnotestringforrelis($bibtex);
+                $res = $this->biblerproxy_lib->importendnotestringforrelis($bibtex);
             } else {
-                $res = $this->paper->biblerproxy_lib->importbibtexstringforrelis($bibtex);
+                $res = $this->biblerproxy_lib->importbibtexstringforrelis($bibtex);
             }
             $correct = False;
             //if there is an error messag in the result retry
@@ -1857,15 +1857,15 @@ month={Aug},}
         $i = 1;
         $res = "init";
         while ($i < 10) {
-            //$res=$this->paper->biblerproxy_lib->addEntry($bibtex);
-            //$res=$this->paper->biblerproxy_lib->bibtextobibtex($bibtex);
-            //$res=$this->paper->biblerproxy_lib->bibtextosql($bibtex);
-            //$res=$this->paper->biblerproxy_lib->addEntry($bibtex);
-            //$res=$this->paper->biblerproxy_lib->previewEntry($bibtex);
-            //$res=$this->paper->biblerproxy_lib->bibtextocsv($bibtex);
-            //$res=$this->paper->biblerproxy_lib->bibtextohtml($bibtex);
-            //$res=$this->paper->biblerproxy_lib->formatBibtex($bibtex);
-            $res = $this->paper->biblerproxy_lib->createentryforreliS($bibtex);
+            //$res=$this->biblerproxy_lib->addEntry($bibtex);
+            //$res=$this->biblerproxy_lib->bibtextobibtex($bibtex);
+            //$res=$this->biblerproxy_lib->bibtextosql($bibtex);
+            //$res=$this->biblerproxy_lib->addEntry($bibtex);
+            //$res=$this->biblerproxy_lib->previewEntry($bibtex);
+            //$res=$this->biblerproxy_lib->bibtextocsv($bibtex);
+            //$res=$this->biblerproxy_lib->bibtextohtml($bibtex);
+            //$res=$this->biblerproxy_lib->formatBibtex($bibtex);
+            $res = $this->biblerproxy_lib->createentryforreliS($bibtex);
             echo "zzzz";
             print_test($res);
             echo "yyyy";
@@ -1889,7 +1889,7 @@ month={Aug},}
             //fputs($fp, $res);
             $res = str_replace("True,", "'True',", $res);
             $res = str_replace("False,", "'False',", $res);
-            $res = $this->paper->biblerproxy_lib->fixJSON($res);
+            $res = $this->biblerproxy_lib->fixJSON($res);
             $Tres = json_decode($res, True);
             if (json_last_error() === JSON_ERROR_NONE) {
                 //do something with $json. It's ready to use
