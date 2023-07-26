@@ -165,10 +165,14 @@ fabric.properties
 
 # Custom
 .DS_Store
-!index.php
+index.php
 relis_app/cache/*
+!application/cache/index.html
+!application/cache/.htaccess
 
 relis_app/logs/*
+!application/logs/index.html
+!application/logs/.htaccess
 
 cside/sessions/relis_session*
 relis_app/libraries/table_config/project/install_config*
@@ -177,7 +181,6 @@ workspace/dslforge_workspace/*
 phpmyadmin/tmp/*
 
 /vendor/
-derby*
 
 # IDE Files
 #-------------------------

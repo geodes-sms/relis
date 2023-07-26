@@ -72,19 +72,19 @@ function get_info()
 		'input_type' => 'text',
 		'mandatory' => ' mandatory '
 	);
-
-	$fields['info_desc'] = array(
-		'field_title' => "Content",
-		'field_type' => 'text',
-		'field_size' => 10000,
-		'input_type' => 'textarea',
+	 
+	$fields['info_desc']=array(
+			'field_title'=>"Content",
+			'field_type'=>'text', 
+			'field_size'=>2000,  
+			'input_type'=>'textarea',
 	);
-	$fields['info_link'] = array(
-		'field_title' => "Youtube video",
-		'field_type' => 'text',
-		'field_size' => 500,
-		'input_type' => 'text',
-		'mandatory' => ''
+	$fields['info_link']=array(
+			'field_title'=>"Links",
+			'field_type'=>'text', 
+			'field_size'=>500,  
+			'input_type'=>'text',
+			'mandatory'=>''
 	);
 
 	$fields['info_type'] = array(
