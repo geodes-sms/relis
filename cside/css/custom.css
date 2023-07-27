@@ -5660,3 +5660,18 @@ ul.notifications {
 
 
 /** /Dropzone.js **/
+
+//** popup-overlay needed **/
+.popup-overlay {
+display: none;
+/* Hide the overlay by default */
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background-color: rgba(1, 0, 0, 0.7);
+/* Set the alpha value to 1 for full opacity */
+z-index: 999;
+overflow-y: auto;
+}
