@@ -5661,7 +5661,7 @@ ul.notifications {
 
 /** /Dropzone.js **/
 
-//** popup-overlay needed **/
+/** popup-overlay needed **/
 .popup-overlay {
 display: none;
 /* Hide the overlay by default */
