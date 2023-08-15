@@ -950,6 +950,40 @@ class Home extends CI_Controller
 		print_test($kappa);
 	}
 
+	/**
+     * This function retrieves screening information for calculating the kappa statistic, 
+     * which measures inter-rater agreement between screeners
+     */
+    public function get_screen_for_kappa()
+    {
+        $screening_phase_info = active_screening_phase_info();
+        $current_phase = active_screening_phase();
+        //	print_test($screening_phase_info);
+
+        $result = $this->Screening_dataAccess->select_from_screening_paper($current_phase);
+
+        //	print_test($result);
+        $result_kappa = array();
+        foreach ($result as $key => $value) {
+            if (!isset($result_kappa[$value['paper_id']])) {
+                $result_kappa[$value['paper_id']] = array(
+                    'Included' => 0,
+                    'Excluded' => 0,
+                );
+            }
+            if (!empty($value['screening_decision']) and ($value['screening_decision'] == 'Included' or $value['screening_decision'] == 'Excluded')) {
+                $result_kappa[$value['paper_id']][$value['screening_decision']] += 1;
+            }
+        }
+        //print_test($result_kappa);
+        $result_kappa_clean = array();
+        foreach ($result_kappa as $k => $v) {
+            array_push($result_kappa_clean, array($v['Included'], $v['Excluded']));
+        }
+        //print_test($result_kappa_clean);
+        return $result_kappa_clean;
+    }
+
 	//send a test email using CodeIgniter's Email library.
 	public function test_mail_old()
 	{

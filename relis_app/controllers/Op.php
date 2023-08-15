@@ -189,22 +189,4 @@ class Op extends CI_Controller
 		//redirect ( 'element/display_element/' .$ref_table.'/'.$element_id  );
 		redirect('element/display_element/' . $ref_table . '/' . $element_id);
 	}
-
-	/*
-		create a new assignment process for screening for a paper. It takes two parameters:
-			$paper_id: The ID of the paper for which the assignment screen is being created.
-			$redirect: Optional parameter that determines the redirect behavior after saving the assignment screen. The default value is "paper_screen".
-	*/
-	public function new_assignment_screen($paper_id, $redirect = "paper_screen")
-	{
-		if (!empty($paper_id) and $redirect == 'paper_screen') {
-			$this->session->set_userdata('after_save_redirect', "screening/display_paper_screen/$paper_id");
-			$data['content_item']['paper_id'] = $paper_id;
-		} else {
-			$this->session->set_userdata('after_save_redirect', "screening/display_paper_screen/all_assign");
-		}
-		$data['content_item']['assignment_mode'] = 'manualy_single';
-		//redirect("manager/add_element/assignment_screen");
-		$this->add_element('assignment_screen', $data);
-	}
 }
