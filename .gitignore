@@ -165,7 +165,7 @@ fabric.properties
 
 # Custom
 .DS_Store
-index.php
+#index.php
 relis_app/cache/*
 !application/cache/index.html
 !application/cache/.htaccess
