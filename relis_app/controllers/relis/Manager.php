@@ -2170,7 +2170,7 @@ class Manager extends CI_Controller
 
 	public function download($file_name)
 	{
-		$url = "http://127.0.0.1/cside/export_r/" . $file_name;
+		$url = base_url(). "cside/export_r/" . $file_name;
 		header("Content-Type: application/octet-stream");
 		header("Content-Transfer-Encoding: Binary");
 		header("Content-disposition: attachment; filename=\"" . $file_name . "\"");
@@ -3317,7 +3317,8 @@ class Manager extends CI_Controller
 		$_assign_user = array();
 		foreach ($users['list'] as $key => $value) {
 
-			if ((user_project($this->session->userdata('project_id'), $value['user_id']))) {
+			if ((user_project($this->session->userdata('project_id'), $value['user_id']))
+			and !has_user_role('Guest', $value['user_id'])) {
 
 				$_assign_user[$value['user_id']] = $value['user_name'];
 			}
@@ -5773,7 +5774,7 @@ class Manager extends CI_Controller
 		$users = $this->DBConnection_mdl->get_list($user_table_config, '_', 0, -1);
 		$_assign_user = array();
 		foreach ($users['list'] as $key => $value) {
-			if ((user_project($this->session->userdata('project_id'), $value['user_id'])) and can_review_project($value['user_id'])) {
+			if ((user_project($this->session->userdata('project_id'), $value['user_id'])) and can_review_project($value['user_id']) and !has_user_role('Guest',$value['user_id'])) {
 
 				$_assign_user[$value['user_id']] = $value['user_name'];
 			}
@@ -5860,7 +5861,7 @@ class Manager extends CI_Controller
 		$users = $this->DBConnection_mdl->get_list($user_table_config, '_', 0, -1);
 		$_assign_user = array();
 		foreach ($users['list'] as $key => $value) {
-			if ((user_project($this->session->userdata('project_id'), $value['user_id'])) and can_review_project($value['user_id'])) {
+			if ((user_project($this->session->userdata('project_id'), $value['user_id'])) and can_review_project($value['user_id']) and !has_user_role('Guest',$value['user_id'])) {
 
 				$_assign_user[$value['user_id']] = $value['user_name'];
 			}
@@ -5904,7 +5905,7 @@ class Manager extends CI_Controller
 		$users = $this->DBConnection_mdl->get_list($user_table_config, '_', 0, -1);
 		$_assign_user = array();
 		foreach ($users['list'] as $key => $value) {
-			if ((user_project($this->session->userdata('project_id'), $value['user_id'])) and can_review_project($value['user_id'])) {
+			if ((user_project($this->session->userdata('project_id'), $value['user_id'])) and can_review_project($value['user_id']) and !has_user_role('Guest',$value['user_id'])) {
 
 				$_assign_user[$value['user_id']] = $value['user_name'];
 			}
@@ -6808,7 +6809,7 @@ class Manager extends CI_Controller
 		} else {
 			//$this->db_current->update('qa_assignment',array('qa_status'=>'Pending'),array('paper_id'=>$paper_id));
 		}
-		header("Location: " . "http://127.0.0.1/" . $after_after_save_redirect . '.html#paper_' . $paper_id);
+		header("Location: " . base_url() . $after_after_save_redirect . '.html#paper_' . $paper_id);
 		die();
 	}
 
@@ -6928,7 +6929,7 @@ class Manager extends CI_Controller
 		}
 
 
-		header("Location: " . "http://127.0.0.1/" . $after_after_save_redirect . '.html#paper_' . $paper_id);
+		header("Location: " . base_url() . $after_after_save_redirect . '.html#paper_' . $paper_id);
 		die();
 	}
 
