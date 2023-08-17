@@ -679,9 +679,7 @@ articles','ReLiS allows you to add references manually or import a list of them 
                     "text-decoration: underline;\">the quality assurance</a>, <a href=\ "http://relis.iro.umontreal.ca/auth/help_det/13\" style=\ "text-decoration: underline;\">the data extraction</a>, or <a href=\ "http://relis.iro.umontreal.ca/auth/help_det/18\" style=\
                     "text-decoration: underline;\">the reporting</a>). It may also be needed if you want to start a calibration phase to make sure that reviewers are in agreement with the inclusion/exclusion decisions of a small sample of your corpus of references.</p>\r\n
             <p>To remove all the references from your project, go to the home page of your project and click in the menu Papers > All. Then press the Delete all button and confirm.</p>\r\n
-            <p style=\ "font-weight: bold;\">WARNING: this will erase all references in your project and it cannot be undone. All associated data, like the screening results and data extraction, will be cleared as well.</p>','','Help',8,1); #privacy-policy-popup { display: none; /* Hide
-            the popup by default */ position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: #fff; border: 1px solid #999; border-radius: 6px; padding: 20px; box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5); max-width: 500px;
-            z-index: 1000; }
+            <p style=\ "font-weight: bold;\">WARNING: this will erase all references in your project and it cannot be undone. All associated data, like the screening results and data extraction, will be cleared as well.</p>','','Help',8,1);
 /*!40000 ALTER TABLE `info` ENABLE KEYS */;
 UNLOCK TABLES;
 
