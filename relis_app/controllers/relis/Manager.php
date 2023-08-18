@@ -2399,7 +2399,7 @@ class Manager extends CI_Controller
 		}
 
 
-		$array_header = array('#', "key", 'Title', 'Preview', 'Excluded By / Criteria / Note');
+		$array_header = array('#', "key", 'Title', 'Preview', 'Excluded By', 'Criteria', 'Note');
 
 		array_unshift($papers, $array_header);
 
