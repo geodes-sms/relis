@@ -679,7 +679,77 @@ articles','ReLiS allows you to add references manually or import a list of them 
                     "text-decoration: underline;\">the quality assurance</a>, <a href=\ "http://relis.iro.umontreal.ca/auth/help_det/13\" style=\ "text-decoration: underline;\">the data extraction</a>, or <a href=\ "http://relis.iro.umontreal.ca/auth/help_det/18\" style=\
                     "text-decoration: underline;\">the reporting</a>). It may also be needed if you want to start a calibration phase to make sure that reviewers are in agreement with the inclusion/exclusion decisions of a small sample of your corpus of references.</p>\r\n
             <p>To remove all the references from your project, go to the home page of your project and click in the menu Papers > All. Then press the Delete all button and confirm.</p>\r\n
-            <p style=\ "font-weight: bold;\">WARNING: this will erase all references in your project and it cannot be undone. All associated data, like the screening results and data extraction, will be cleared as well.</p>','','Help',8,1);
+            <p style=\ "font-weight: bold;\">WARNING: this will erase all references in your project and it cannot be undone. All associated data, like the screening results and data extraction, will be cleared as well.</p>','','Help',8,1),(20,'Exporting','<p>
+ReLiS allows you to export different information from the project.
+To export the information, open the Classification phase of your project. Under the Result menu, select Export.
+Click on corresponding <code>Update file</code> to generate the latest version of the file you wish to export.
+</p>
+<a name="classification"><h3><b>Classification</b></h3></a>
+<p>This is a CSV file of the classification table with all the data extracted. Each row correponds to a reference. The columns correspond to the categories listed in the <a href="/auth/help_det/13" style="text-decoration: underline;">classification form</a>. Categories, for which multiple values are specified, are separated with a <code>|</code>.</p>
+
+<h3><b>Papers</b></h3>
+<p>This is a CSV file of all the references imported in the project. The columns are: the reference ID, the BibTeX key, the title, the URL of the reference, the preview of the reference in HTML format, the abstract, the year published, and the search strategy.</p>
+
+<h3><b>Papers (BibTeX)</b></h3>
+<p>This is a BibTeX file of all the references imported in the project.</p>
+
+<h3><b>Papers included (BibTeX)</b></h3>
+<p>This is a BibTeX file of all the references included after the last screening phase.</p>
+
+<h3><b>Papers excluded (BibTeX)</b></h3>
+<p>This is a BibTeX file of all the references excluded after the last screening phase.</p>
+
+<h3><b>Papers Excluded Screening(CSV)</b></h3>
+<p>This is a CSV file of all the references excluded after the last screening phase. The columns are: the reference ID, the BibTeX key, the title, the preview of the reference in HTML format, the search strategy, the user who excluded the reference, the exclusion criteria selected, and the note left by the user as a comment.</p>
+
+<h3><b>Papers Excluded Classification (CSV)</b></h3>
+<p>This is a CSV file of all the references excluded only during the classification phase. The columns are: the reference ID, the BibTeX key, the title, the preview of the reference in HTML format, the user who excluded the reference, the exclusion criteria selected, the note left by the user as a comment, and the search strategy.</p>
+
+<a name="r_config"><h3><b>R configuration script</b></h3></a>
+<p>This redirects you to the R export configuration page. See the <a href="#export_r" style="text-decoration: underline;">Export to R</a> section below for more information on that page. Clicking on Generate R redirects you to the Exports page. From there, you can download the R scripts which you can run using R to compute different statistics on the results of the classification.</p>
+<p>This page allows you to specify the type of variable scale for each category. We support the following scales:</p>
+<ul>
+  <li><code>Continuous</code>: For variables that are numeric and continuous in nature. This is typically for <code>int</code> and <code>real</code> simple categories.</li>
+  <li><code>Nominal</code>: For categorical variables. This is typically for <code>lists</code> and <code>dynamic lists</code>, including if they have multiple values. But it can also be used for other categories, such as <code>simple bool</code>.</li>
+  <li><code>Text</code>: For textual fields. If this scale type is assigned to a category, it will be excluded from all of the statistical tests and plots.</li>
+</ul>
+
+<a name="r_lib"><h3><b>R Library</b></h3></a>
+<p>This is an R script file that is required for the R configuration script.</p>
+
+<hr>
+<a name="export_r"><h3>Export to R</h3></a>
+
+<p>You can export the results of the classification to R and run statistical analysis on them. To this end, you must download the following files exported from your project: <a href="#classification" style="text-decoration: underline;">Classification</a>, <a href="#r_config" style="text-decoration: underline;">R configuration script</a>, and <a href="#r_lib" style="text-decoration: underline;">R Library</a>.</p>
+
+<p>The file to execute in R is the R configuration script. It contains a list of commented lines which consist of all possible statistical tests and plots available in the R library. Uncomment the lines plots/tests you wish to consider then run the script.</p>
+<p><strong>Note:</strong> You may need to change the path to the R library file based on your download locations.</p>
+
+<p>The R library supports the following plots and statistical tests:</p>
+<h3><b>Descriptive statistics</b></h3>
+<ul>
+    <li>Descriptive frequency tables (for all nominal variables)</li>
+    <li>Bar plots (for all nominal variables)</li>
+    <li>Statistics (for all continuous variables)</li>
+    <li>Box plots (for all continuous variables)</li>
+    <li>Violin plots (for all continuous variables)</li>
+</ul>
+<h3><b>Evolution statistics</b></h3>
+<ul>
+    <li>Evolution frequency tables (for each nominal variables, with respect to the publication years of the references)</li>
+    <li>Evolution plots (for all nominal variables, with respect to the publication years of the references)</li>
+</ul>
+<h3><b>Comparative statistics</b></h3>
+<ul>
+    <li>Comparative frequency tables (for all nominal variables)</li>
+    <li>Stacked bar plots (for all nominal variables)</li>
+    <li>Grouped bar plots (for all nominal variables)</li>
+    <li>Bubble charts (for all nominal variables)</li>
+    <li>Fishers exact test (for all nominal variables)</li>
+    <li>Shapiro Wilks test (for all continuous variables)</li>
+    <li>Spearmans correlation test (for all continuous variables)</li>
+    <li>Pearsons correlation test (for all continuous variables)</li>
+</ul>','','Help',9,1);
 /*!40000 ALTER TABLE `info` ENABLE KEYS */;
 UNLOCK TABLES;
 
