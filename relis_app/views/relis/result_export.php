@@ -188,7 +188,7 @@
            </tr>
            
            <tr>
-          <td>R configuration file</td><td><a href="<?php echo base_url();?>relis/manager/download/relis_r_config_<?php echo project_db();?>.R"><?php echo $r_config_dsc?></a></td><td><a href="<?php echo base_url();?>relis/manager/r_export_configurations"><i class="fa fa-refresh"></i><?php echo lng('Update file')?></a></td>
+          <td>R configuration script</td><td><a href="<?php echo base_url();?>relis/manager/download/relis_r_config_<?php echo project_db();?>.R"><?php echo $r_config_dsc?></a></td><td><a href="<?php echo base_url();?>relis/manager/r_export_configurations"><i class="fa fa-refresh"></i><?php echo lng('Update file')?></a></td>
            </tr>
 
            <tr>
