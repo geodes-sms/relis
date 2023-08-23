@@ -474,7 +474,7 @@ class Reporting extends CI_Controller
 			$papers[$value['id']]['criteria_' . $value['user_id']] = $value['criteria'];
 			$papers[$value['id']]['screening_note' . $value['user_id']] = $value['screening_note'];
 		}
-		$array_header = array('#', "key", 'Title', 'Preview', 'Excluded By / Criteria / Note');
+		$array_header = array('#', "key", 'Title', 'Preview', 'Excluded By', 'Criteria', 'Note');
 		array_unshift($papers, $array_header);
 		$filename = "cside/export_r/relis_paper_excluded_screen_" . project_db() . ".csv";
 		//print_test($papers);
