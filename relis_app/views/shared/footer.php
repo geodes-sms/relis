@@ -39,7 +39,7 @@
                   
                    <!-- info  : http://v4-alpha.getbootstrap.com/components/modal/ -->
                   
-                  <script>
+<script>
 
 
                   $('#relisformModal').on('show.bs.modal', function (event) {
@@ -77,7 +77,7 @@
                 		location.reload(); 
 					})
                   
-                  </script>
+</script>
 
 
         

@@ -181,12 +181,21 @@ $db['mt'] = array(
 		'failover' => array(),
 		'save_queries' => TRUE
 );
+<<<<<<< HEAD
 $db['demoProject'] = array(
+=======
+
+$db['demo_relis'] = array(
+>>>>>>> 5e3a61d1eef4577c4a5fc9c18c5d877acdd2fec5
 		'dsn'	=> '',
 		'hostname' => 'db',
 		'username' => 'root',
 		'password' => '',
+<<<<<<< HEAD
 		'database' => 'relis_project_demoProject',
+=======
+		'database' => 'relis_project_demo_relis',
+>>>>>>> 5e3a61d1eef4577c4a5fc9c18c5d877acdd2fec5
 		'dbdriver' => 'mysqli',
 		'dbprefix' => '',
 		'pconnect' => FALSE,
@@ -203,12 +212,20 @@ $db['demoProject'] = array(
 		'save_queries' => TRUE
 );
 
+<<<<<<< HEAD
 $db['mbambiProject'] = array(
+=======
+$db['demo_relis'] = array(
+>>>>>>> 5e3a61d1eef4577c4a5fc9c18c5d877acdd2fec5
 		'dsn'	=> '',
 		'hostname' => 'db',
 		'username' => 'root',
 		'password' => '',
+<<<<<<< HEAD
 		'database' => 'relis_project_mbambiProject',
+=======
+		'database' => 'relis_project_demo_relis',
+>>>>>>> 5e3a61d1eef4577c4a5fc9c18c5d877acdd2fec5
 		'dbdriver' => 'mysqli',
 		'dbprefix' => '',
 		'pconnect' => FALSE,
@@ -225,11 +242,16 @@ $db['mbambiProject'] = array(
 		'save_queries' => TRUE
 );
 
+<<<<<<< HEAD
 $db['adminProject'] = array(
+=======
+$db['demo_relis'] = array(
+>>>>>>> 5e3a61d1eef4577c4a5fc9c18c5d877acdd2fec5
 		'dsn'	=> '',
 		'hostname' => 'db',
 		'username' => 'root',
 		'password' => '',
+<<<<<<< HEAD
 		'database' => 'relis_project_adminProject',
 		'dbdriver' => 'mysqli',
 		'dbprefix' => '',
@@ -253,6 +275,9 @@ $db['mbambiProject'] = array(
 		'username' => 'root',
 		'password' => '',
 		'database' => 'relis_project_mbambiProject',
+=======
+		'database' => 'relis_project_demo_relis',
+>>>>>>> 5e3a61d1eef4577c4a5fc9c18c5d877acdd2fec5
 		'dbdriver' => 'mysqli',
 		'dbprefix' => '',
 		'pconnect' => FALSE,

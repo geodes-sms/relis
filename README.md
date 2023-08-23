@@ -130,8 +130,9 @@ You can also check debug setting, Debug port : 9000
 	>
     > git checkout -b feature-taskNumber
 2. **Add your code**: Add all changes needed in your feature branch
-3. **Create a pull request(PR) to the branch develop**: When the code is ready to be merged, create a pull request to the branch develop. To avoid conficts while merging the code, make sure to pull the last version of develop  in the feature branch before creating an PR.
-4. Repeat steps 1 to 3 for each new task.
+3. **Update documentation**: Go to [initial_db.sql](https://github.com/geodes-sms/relis/blob/develop/relis_deployment/docker/db/initial_db.sql) by updating or inserting the text in the `info` table (starting at line 141).
+4. **Create a pull request(PR) to the branch develop**: When the code is ready to be merged, create a pull request to the branch develop. To avoid conficts while merging the code, make sure to pull the last version of develop  in the feature branch before creating an PR.
+5. Repeat steps 1 to 3 for each new task.
 
 ### Deployment process:
 1. Merge develop to master: when the code is ready to be fully tested the code is merged to master

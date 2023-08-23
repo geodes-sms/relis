@@ -5,7 +5,7 @@
           
            if(!empty($home_help)){
 
-           	box_header("Help","",12,12,12);
+           	box_header("Getting Started","",12,12,12);
           ?>
           
             <div class="row">
