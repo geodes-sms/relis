@@ -2061,7 +2061,7 @@ function path_separator()
 {
 	$syst = get_ci_config('server_OS');
 	if ($syst == 'WINDOWS') {
-		return '\\';
+		return '/';
 	} else {
 		return '/';
 	}

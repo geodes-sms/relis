@@ -38,19 +38,11 @@
               <div class="menu_section">
                 
                 <ul class="nav side-menu">
-<<<<<<< HEAD:relis_app/views/shared/h_header.php
                   <li><a href="<?php echo base_url()?>user"><i class="fa fa-home"></i> About </span></a></li>
                   <li><a href="<?php echo base_url()?>user/user_help"><i class="fa fa-question-circle"></i> Help </span></a></li>
                   <li><a href="<?php echo base_url()?>user/login"><i class="fa fa-sign-in"></i> Go to ReLiS </span></a></li>
                   <li><a href="<?php echo base_url()?>user/new_user"><i class="fa fa-plus"></i><i class="fa fa-user"></i>Create Account </span></a></li>
                   <li><a href="<?php echo base_url()?>user/demo_user"></i><i class="fa fa-user"></i>Demo user </span></a></li>
-=======
-                  <li><a href="<?php echo base_url()?>auth"><i class="fa fa-home"></i> About </span></a></li>
-                  <li><a href="<?php echo base_url()?>auth/help"><i class="fa fa-question-circle"></i> Getting Started </span></a></li>
-                  <li><a href="<?php echo base_url()?>auth/login"><i class="fa fa-sign-in"></i> Go to ReLiS </span></a></li>
-                  <li><a href="<?php echo base_url()?>auth/new_user"><i class="fa fa-plus"></i><i class="fa fa-user"></i>Create Account </span></a></li>
-                  <li><a href="<?php echo base_url()?>auth/demo_user"></i><i class="fa fa-user"></i>Demo user </span></a></li>
->>>>>>> 5e3a61d1eef4577c4a5fc9c18c5d877acdd2fec5:relis_app/views/h_header.php
                   
                 </ul>
               </div>

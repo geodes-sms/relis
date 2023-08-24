@@ -195,6 +195,7 @@ class Project extends CI_Controller
         $data['top_buttons'] .= get_top_button('back', 'Back', 'project/choose_project/');
         $data['page'] = 'project/frm_new_project_editor';
         $data['left_menu_admin'] = True;
+        
         /*
          * Chargement de la vue avec les données préparés dans le controleur suivant le type d'affichage : (popup modal ou pas)
          */
