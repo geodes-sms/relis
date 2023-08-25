@@ -1,4 +1,5 @@
 <?php
+//The get_operations_project() function generates operations for the 'project' and 'user_project' tables.
 function get_operations_project() {
 	//Projects
 

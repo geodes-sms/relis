@@ -1,13 +1,13 @@
 <div class="col-md-3 left_col">
           <div class="left_col scroll-view">
             <div class="navbar nav_title" style="border: 0;">
-              <a href="<?php echo site_url();?>auth.html" class="site_title"><i class="fa fa-book"></i> <span>ReLiS</span></a>
+              <a href="<?php echo site_url();?>user.html" class="site_title"><i class="fa fa-book"></i> <span>ReLiS</span></a>
             </div>
 
             <div class="clearfix"></div>
 
             <!-- menu profile quick info -->
-            <a href="<?php echo base_url();?>op/display_element/detail_user_min_ed/<?php echo active_user_id()?>">
+            <a href="<?php echo base_url();?>element/display_element/detail_user_min_ed/<?php echo active_user_id()?>">
             <div class="profile">
               <div class="profile_pic">
               <?php 
@@ -117,18 +117,18 @@
 
             <!-- /menu footer buttons -->
             <div class="sidebar-footer hidden-small">
-              <a data-toggle="tooltip" data-placement="top" title="<?php echo lng_min('Main')?>" href="<?php echo base_url() ?>manager/projects_list.html">
+              <a data-toggle="tooltip" data-placement="top" title="<?php echo lng_min('Main')?>" href="<?php echo base_url() ?>project/projects_list.html">
                 <span class="glyphicon glyphicon-transfer" aria-hidden="true"></span>
               </a>
               
-              <a  data-toggle="tooltip" data-placement="top" title="<?php echo lng_min('Home')?>" href="<?php echo base_url()?>home/screening_select.html">
+              <a  data-toggle="tooltip" data-placement="top" title="<?php echo lng_min('Home')?>" href="<?php echo base_url()?>screening/screening_select.html">
                 <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
               </a>
               
               <a  data-toggle="tooltip" data-placement="top" title="<?php echo lng_min('Dashboard')?>" href="<?php echo base_url()?>home.html">
                 <span class="glyphicon glyphicon-th" aria-hidden="true"></span>
               </a>
-              <a data-toggle="tooltip" data-placement="top" title="<?php echo lng_min('Log Out')?>" href="<?php echo base_url()?>/auth/discon">
+              <a data-toggle="tooltip" data-placement="top" title="<?php echo lng_min('Log Out')?>" href="<?php echo base_url()?>/user/discon">
                 <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
               </a>
             </div>

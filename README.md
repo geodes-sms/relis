@@ -142,6 +142,9 @@ You can also check debug setting, Debug port : 9000
 
 # Distribution
 
+# Source code
+To compile the source code, you need the following dependencies:
+- 
 
 The source code is licensed under a [GNU GENERAL PUBLIC LICENSE 3](https://www.gnu.org/copyleft/gpl.html) ![GNU GPL v3](https://img.shields.io/badge/license-GPLv3-blue.svg)
 

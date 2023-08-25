@@ -1,5 +1,14 @@
 <?php 
 
+/*
+	The function creates a configuration array with various settings for managing references. 
+	Here are the key components of the configuration:
+		- table_name: The name of the table associated with references.
+		- table_id: The primary key field for the references table.
+		- table_active_field: The field used to determine whether a record is active or deleted.
+		- reference_title: The title used for referencing references.
+		- reference_title_min: A shorter version of the reference title.
+*/
 function get_refference($table,$title) {
 
 	$config['table_name']=$table;
@@ -8,7 +17,12 @@ function get_refference($table,$title) {
 	$config['reference_title']=$title;
 	$config['reference_title_min']=$title;
 	 
-	//list view
+	/*
+		The configuration also includes settings for the list view:
+			- order_by: The sorting order for the references in the list view.
+			- links: An array defining links for adding, editing, viewing, deleting references.
+			- The configuration includes a fields array, which defines the fields of the references table.
+	*/
 	$config['order_by']='ref_value ASC '; //mettre la valeur à mettre dans la requette
 	$config['search_by']='ref_value';// separer les champs par virgule
 	

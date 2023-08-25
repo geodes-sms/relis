@@ -1,4 +1,5 @@
 <?php
+//retrieves the generated tables and reference tables from the database and creates corresponding operations for each table
 function get_operations_generated() {
 	$ci = get_instance();
 	$sql="select * from installation_info where install_active=1 ";
