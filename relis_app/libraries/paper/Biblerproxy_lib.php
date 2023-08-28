@@ -31,6 +31,7 @@ class Biblerproxy_lib
 		It holds the base URL of the remote BibTeX management system. The default value is set to 'http://relis_bibler:80/', 
 		but it can be changed using the setURL() method.
 	*/
+
 	private  $url='http://bibler:8000/';
 
 	public function __construct()

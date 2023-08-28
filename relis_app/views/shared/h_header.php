@@ -39,7 +39,7 @@
                 
                 <ul class="nav side-menu">
                   <li><a href="<?php echo base_url()?>user"><i class="fa fa-home"></i> About </span></a></li>
-                  <li><a href="<?php echo base_url()?>user/user_help"><i class="fa fa-question-circle"></i> Help </span></a></li>
+                  <li><a href="<?php echo base_url()?>user/user_help"><i class="fa fa-question-circle"></i> Getting Started </span></a></li>
                   <li><a href="<?php echo base_url()?>user/login"><i class="fa fa-sign-in"></i> Go to ReLiS </span></a></li>
                   <li><a href="<?php echo base_url()?>user/new_user"><i class="fa fa-plus"></i><i class="fa fa-user"></i>Create Account </span></a></li>
                   <li><a href="<?php echo base_url()?>user/demo_user"></i><i class="fa fa-user"></i>Demo user </span></a></li>

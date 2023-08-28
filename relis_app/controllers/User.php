@@ -110,8 +110,22 @@ class User extends CI_Controller
             ->get_where('info', array('info_active' => 1, 'info_id' => $help_id))
             ->row_array();
         //	print_test($data);
-        $data['top_buttons'] = get_top_button('back', 'Back', 'auth/help', '', '', '', '', FALSE);
+        $data['top_buttons'] = get_top_button('back', 'Back', 'user/help', '', '', '', '', FALSE);
         $data['page'] = 'h_help_det';
+        /*
+         * Chargement de la vue d'authentification
+         */
+        $this->load->view('shared/h_body', $data);
+    }
+
+    public function help()
+    {
+        $data['home_help'] = $this->db->order_by('info_order', 'ASC')
+            ->get_where('info', array('info_active' => 1, 'info_type' => 'Help'))
+            ->result_array();
+
+        $data['page'] = 'h_help';
+
         /*
          * Chargement de la vue d'authentification
          */
@@ -190,7 +204,7 @@ class User extends CI_Controller
         /*
          * Vérification si login et password sont correct
          */
-        $user_id = 5;
+        $user_id = 2;
         $user = $this->DBConnection_mdl->get_row_details(
             'get_user_detail'
             ,
