@@ -44,7 +44,7 @@
 	
 			foreach ($left_menu as $key_menu_section => $value_menu_section) {
 			?>	
-				<div class="menu_section">
+				<div class="menu_section active">
                 <h3><?php echo lng($value_menu_section['label']) ?></h3>
 				<?php 
 				if(!empty($value_menu_section['menu'])){

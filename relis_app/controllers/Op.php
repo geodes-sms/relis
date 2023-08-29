@@ -30,18 +30,6 @@ class Op extends CI_Controller
 		parent::__construct();
 	}
 
-	//valide whether a string consists of only numeric characters and/or a decimal point
-	function numeric_wcomma($str)
-	{
-		//return preg_match('/^[0-9,]+$/', $str);
-		if (preg_match('/^[0-9.]+$/', $str)) {
-			return True;
-		} else {
-			$this->form_validation->set_message('numeric_wcomma', 'The {field} field must contain a number ');
-			return False;
-		}
-	}
-
 	/*
 		set the working perspective in the session userdata and then redirect the user to the appropriate page
 		The available perspectives are 'screen' for screening, 'class' for classification, and 'qa' for quality assessment

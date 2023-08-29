@@ -1059,6 +1059,18 @@ class Element extends CI_Controller
         }
     }
 
+    //valide whether a string consists of only numeric characters and/or a decimal point
+    function numeric_wcomma($str)
+    {
+        //return preg_match('/^[0-9,]+$/', $str);
+        if (preg_match('/^[0-9\\.]+$/', $str)) {
+            return True;
+        } else {
+            $this->form_validation->set_message('numeric_wcomma', 'The {field} field must be a decimal number');
+            return False;
+        }
+    }
+
     /*
      * Fonction pour la suppression d'un element
      * Input: 	$ref_table : nom de la structure de la table ou se trouve l'élément à supprimer

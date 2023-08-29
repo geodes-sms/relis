@@ -55,7 +55,7 @@
             echo form_open_multipart('project/save_new_project_editor', $attributes);
 
 
-            
+
             if (!empty($project_result)) {
               echo "<div class='form-group '><label id='selected_config' for='selected_config' class='control-label col-md-3 col-sm-3 col-xs-12'> Select the configuration file generated</label>
                   		<div class='col-md-6 col-sm-6 col-xs-12'>
@@ -63,7 +63,7 @@
                   		
                   		";
               $path_separator = path_separator(); // used to diferenciate windows and linux server
-            
+
               foreach ($project_result as $project => $project_detail) {
                 $dir = $project_detail['dir'];
 
@@ -116,16 +116,17 @@
                     <div class="modal-body">
                       <div style="border: 0.1px solid #E6E9ED; padding: 15px;">
                         <p>
-                        <h5>Data collection disclosure</h5>
+                          <h4><b>Data collection disclosure</b></h4>
                         To offer our services, we collect basic information for identification and to ensure the
                         segregation of your data from other users. The fundamental information we collect consists of
                         your name, email address, password, username, and your involvement in systematic review
                         projects. You provide us with all of this information voluntarily, and we have a strict policy
                         of not sharing it with any third parties under any circumstances.
                         </p>
-                        <hr style="border: 0;height: 0.5px;background-color: black;">
+                          <div class="ln_solid"></div>
+                          <h4><b>Ensuring security of your data</b></h4>
                         <p>
-                        <h5>Ensuring security of your data</h5>
+
                         To ensure the basic functionality of ReLiS and maintain the separation of your data from other
                         users, we collect and associate the information you provide within the ReLiS platform with your
                         user account. To enhance data security, we recommend selecting a unique username specifically
@@ -140,34 +141,34 @@
                         absolute security. We strive to take every possible precaution to protect your data, and we
                         kindly request that you do the same.
                         </p>
-                        <hr style="border: 0;height: 0.5px;background-color: black;">
-                        <p>
-                        <h5>Data retention period</h5>
+                          <div class="ln_solid"></div>
+                        <h4><b>Data retention period</b></h4>
+                          <p>
                         We do not have a limit on how long we retain your account information and/or data.
                         </p>
-                        <hr style="border: 0;height: 0.5px;background-color: black;">
-                        <p>
-                        <h5>Right to access</h5>
+                          <div class="ln_solid"></div>
+                        <h4><b>Right to access</b></h4>
+                          <p>
                         You have the right to request access to the information we have stored about you in our records.
                         If you would like to obtain a copy of all the information associated with your account, please
                         contact us via the provided email address.
                         </p>
-                        <hr style="border: 0;height: 0.5px;background-color: black;">
-                        <p>
-                        <h5>Right to delete your information</h5>
+                          <div class="ln_solid"></div>
+                        <h4><b>Right to delete your information</b></h4>
+                          <p>
                         If you wish to remove your personal information from our records, please contact us at the email
                         below.
                         Note that you will no longer have access to ReLiS after this operation.
                         </p>
-                        <hr style="border: 0;height: 0.5px;background-color: black;">
-                        <p>
-                        <h5>Disclosure of data sharing with 3rd parties</h5>
+                          <div class="ln_solid"></div>
+                        <h4><b>Disclosure of data sharing with 3rd parties</b></h4>
+                          <p>
                         We do not share any information with third parties.
                         </p>
-                        <hr style="border: 0;height: 0.5px;background-color: black;">
-                        <p>
-                        <h5>Contact</h5>
-                        If you have any questions about this data sharing policy, please feel free to contact us at <a
+                          <div class="ln_solid"></div>
+                        <h4><b>Contact</b></h4>
+                          <p>
+                        If you have any questions about the privacy policy, please contact us at <a
                           href="mailto:info@relis.iro.umontreal.ca"
                           style="text-decoration: underline;">info@relis.iro.umontreal.ca</a>.
                         </p>

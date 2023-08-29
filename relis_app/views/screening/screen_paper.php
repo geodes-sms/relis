@@ -106,9 +106,7 @@
                                         </p>
 
                                     <?php } ?>
-                                    <button class="btn btn-info btn-lg" type="button"> <a
-                                            href="<?php echo base_url() . "op/edit_element/edit_paper/" . $the_paper . "?from=screen_paper" ?>">Edit</a>
-                                    </button>
+                                    <a href="<?php echo base_url() . "element/edit_element/edit_paper/" . $the_paper . "?from=screen_paper" ?>"><button class="btn btn-info btn-lg" type="button">Edit</button></a>
                                 </div>
                                 <div class='vl_solid'></div>
                                 <div class='decision'>
@@ -135,7 +133,9 @@
 
                                     echo '<div class="exclusion_crit" >' . dropdown_form_bm('Excluded criteria', 'criteria_ex', 'criteria_ex', $exclusion_criteria, !empty($content_item['exclusion_criteria']) ? $content_item['exclusion_criteria'] : 0) . "</div>";
 
-                                    echo '<div class="inclusion_crit" style="display: none">' . dropdown_form_bm('Included criteria', 'criteria_in', 'criteria_in', $inclusion_criteria, !empty($content_item['inclusion_criteria']) ? $content_item['inclusion_criteria'] : 0) . "</div>";
+                                    if (!empty($inclusion_criteria)) {
+                                        echo '<div class="inclusion_crit" style="display: none">' . dropdown_form_bm('Included criteria', 'criteria_in', 'criteria_in', $inclusion_criteria, !empty($content_item['inclusion_criteria']) ? $content_item['inclusion_criteria'] : 0) . "</div>";
+                                    }
 
                                     echo input_textarea_bm('Note ', 'note', 'note', !empty($content_item['screening_note']) ? $content_item['screening_note'] : '');
 
@@ -208,7 +208,7 @@
                                 var crit = $('#criteria_ex').val();
 
                                 if (crit == '0' || crit == '') {
-                                    alert("Please choose the exclusion criteria !");
+                                    alert("You must select an exclusion criteria");
                                     return false;
                                 } else {
                                     return true;

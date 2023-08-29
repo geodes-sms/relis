@@ -271,30 +271,3 @@ if (typeof NProgress != 'undefined') {
     jQuery.fn[sr] = function(fn) { return fn ? this.bind('resize', debounce(fn)) : this.trigger(sr); };
 
 })(jQuery, 'smartresize');
-
-//popup-new-project-plus-privacy-checkbox
-
-import $ from 'https://code.jquery.com/jquery-3.6.0.min.js';
-
-$(document).ready(function() {
-    // Show privacy policy popup when the link is clicked
-
-    $('a[href="#privacy-policy-popup"]').click(function(e) {
-        e.preventDefault();
-        $('#privacy-policy-popup').show();
-    });
-
-    // Close the privacy policy popup when clicked outside or on close button
-    $('#privacy-policy-popup, #close-popup').on('click', function() {
-        $('#privacy-policy-popup').hide();
-    });
-
-    // Disable/enable submit button based on checkbox state
-    $('#privacy-policy-checkbox').change(function() {
-        if ($(this).is(':checked')) {
-            $('#submit-button').prop('disabled', false);
-        } else {
-            $('#submit-button').prop('disabled', true);
-        }
-    });
-});

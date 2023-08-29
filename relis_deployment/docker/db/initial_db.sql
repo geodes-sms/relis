@@ -456,14 +456,14 @@ and many statistics on the screening process.','','Features',3,1),(5,'Create use
 <p>\r\n* means for all projects in ReLiS.<br>\r\nW means write access, thus the user can add, remove or modify any information.<br>\r\nR means read access, thus the user can only see the information without modifying it.\r\n</p>','hWbHN0rJVEw','Help',3,1),(7,'Import
 articles','ReLiS allows you to add references manually or import a list of them from CSV, BibTeX or EndNote files. The content of the article is available if the URL or DOI is provided.','','Features',2,1),(8,'More about ReLiS','
 <p>Read this article about ReLiS, which you can cite via: </p>\r\n
-<p><a href=\ "https://goo.gl/jZoWMg\" style=\ "text-decoration: underline;\">B. Bigendako. and E. Syriani. Modeling a Tool for Conducting Systematic Reviews Iteratively. <i>Proceedings of the 6th International Conference on Model-Driven Engineering and Software Development</i>. SCITEPRESS, pp. 552â€“559. (2018)</a></p>\r\n
+<p><a href=\ "https://goo.gl/jZoWMg\" style=\ "text-decoration: underline;\">B. Bigendako. and E. Syriani. Modeling a Tool for Conducting Systematic Reviews Iteratively. <i>Proceedings of the 6th International Conference on Model-Driven Engineering and Software Development</i>. SCITEPRESS, pp. 552&#8211;559. (2018)</a></p>\r\n
 <p>For more detailed information on ReLiS, you can read <a href=\ "https://goo.gl/33RRK4\" style=\ "text-decoration: underline;\">the thesis of Brice Bigendako</a> (in French).</p>\r\n
 <p></p>\r\n
 <h2 class=\ "lead\">The team</h2>\r\n
-<p>ReLiS is developed and maintained by the software engineering lab <a href=\ "http://geodes.iro.umontreal.ca/en/\" style=\ "text-decoration: underline;\">GEODES</a> in the <a href=\ "http://diro.umontreal.ca/accueil/\" style=\
+<p>ReLiS is developed and maintained by the software engineering lab <a href=\ "http://geodes.iro.umontreal.ca/\" style=\ "text-decoration: underline;\">GEODES</a> in the <a href=\ "http://diro.umontreal.ca/\" style=\
         "text-decoration: underline;\">department of computer science and operations research</a> at the University of Montreal. Under the supervision of <a href=\ "www.iro.umontreal.ca/~syriani\" style=\ "text-decoration: underline;\">Prof. Eugene Syriani</a>, the development is mainly
     supported by the students of the lab.</p>\r\n
-<p>The open source code is available on <a href=\ "https://github.com/esyriani/relis\" style=\ "text-decoration: underline;\">GitHub</a>.','','Reference',1,1),(9,'Assess quality','Reviewers can assess the quality of the selected articles in the corpus using
+<p>The open source code is available on <a href=\ "https://github.com/geodes-sms/relis\" style=\ "text-decoration: underline;\">GitHub</a>.','','Reference',1,1),(9,'Assess quality','Reviewers can assess the quality of the selected articles in the corpus using
     a questionnaire customized for the review. There are also several ways of assessing the quality of the review itself.','','Features',4,1),(10,'Extract relevant data','Reviewers can extract the relevant data from each article according to categories
     and a classification scheme customized for each review. The data extraction form can be modified at any time incrementally.','','Features',5,1),(11,'Export results','All extracted data are automatically synthesized in tables and charts, ready to be
     exported in your favorite tool for further analysis.','','Features',6,1),(12,'Create a project','As the project manager of your systematic review, you create your project in ReLiS as shown in the video.\r\n
