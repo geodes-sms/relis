@@ -702,11 +702,15 @@ class Screening extends CI_Controller
         $user_table_config = get_table_configuration('users');
         $users = $this->DBConnection_mdl->get_list($user_table_config, '_', 0, -1);
         $_assign_user = array();
+
         foreach ($users['list'] as $key => $value) {
-            if ((user_project($this->session->userdata('project_id'), $value['user_id']))) {
+
+
+            if ((user_project($this->session->userdata('project_id'), $value['user_id'])) and !has_user_role('Guest', $value['user_id'])) {
                 $_assign_user[$value['user_id']] = $value['user_name'];
             }
         }
+
         $data['users'] = $_assign_user;
         $data['number_papers'] = count($papers['to_assign']);
         $data['number_papers_assigned'] = count($papers['assigned']);

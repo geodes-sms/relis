@@ -1096,11 +1096,11 @@ class Data_extraction extends CI_Controller
 		$_assign_user = array();
 
 		foreach ($users['list'] as $key => $value) {
-			if ((user_project($this->session->userdata('project_id'), $value['user_id'])) and can_review_project($value['user_id'])) {
+			if ((user_project($this->session->userdata('project_id'), $value['user_id'])) and can_review_project($value['user_id']) and !has_user_role('Guest',$value['user_id'])) {
 				$_assign_user[$value['user_id']] = $value['user_name'];
 			}
 		}
-		
+
 		//	print_test($users);
 		$data['users'] = $_assign_user;
 		$data['number_papers'] = $papers_for_qa['count_papers_to_assign'];
@@ -1181,10 +1181,10 @@ class Data_extraction extends CI_Controller
 	}
 
 	/*
-				 handles the form submission to assign papers for classification.
-				 retrieves the form data, validates the selected users, determines 
-				 the number of papers to assign, assigns papers to users
-			 */
+					handles the form submission to assign papers for classification.
+					retrieves the form data, validates the selected users, determines 
+					the number of papers to assign, assigns papers to users
+				*/
 	function class_assignment_save()
 	{
 		$post_arr = $this->input->post();
@@ -1261,10 +1261,10 @@ class Data_extraction extends CI_Controller
 	}
 
 	/*
-				 handles the form submission to assign papers for classification validation. 
-				 It retrieves the form data, validates the selected users and percentage, 
-				 determines the number of papers to assign, assigns papers to users
-			 */
+					handles the form submission to assign papers for classification validation. 
+					It retrieves the form data, validates the selected users and percentage, 
+					determines the number of papers to assign, assigns papers to users
+				*/
 	function class_validation_assignment_save()
 	{
 		$post_arr = $this->input->post();
@@ -1345,9 +1345,9 @@ class Data_extraction extends CI_Controller
 	}
 
 	/*
-				 updating the validation status of a paper in the database. 
-				 It marks the paper as correct if $op is equal to 1
-			 */
+					updating the validation status of a paper in the database. 
+					It marks the paper as correct if $op is equal to 1
+				*/
 	function class_validate($paper_id, $op = 1)
 	{
 		if ($op == 1) {

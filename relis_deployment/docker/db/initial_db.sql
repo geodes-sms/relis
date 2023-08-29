@@ -685,7 +685,7 @@ To export the information, open the Classification phase of your project. Under 
 Click on corresponding <code>Update file</code> to generate the latest version of the file you wish to export.
 </p>
 <a name="classification"><h4><b>Classification</b></h4></a>
-<p>This is a CSV file of the classification table with all the data extracted. Each row correponds to a reference. The columns correspond to the categories listed in the <a href="/auth/help_det/13" style="text-decoration: underline;">classification form</a>. Categories, for which multiple values are specified, are separated with a <code>|</code>.</p>
+<p>This is a CSV file of the classification table with all the data extracted. Each row correponds to a reference. The columns correspond to the categories listed in the <a href="/user/help_det/13" style="text-decoration: underline;">classification form</a>. Categories, for which multiple values are specified, are separated with a <code>|</code>.</p>
 
 <h4><b>Papers</b></h4>
 <p>This is a CSV file of all the references imported in the project. The columns are: the reference ID, the BibTeX key, the title, the URL of the reference, the preview of the reference in HTML format, the abstract, the year published, and the search strategy.</p>
