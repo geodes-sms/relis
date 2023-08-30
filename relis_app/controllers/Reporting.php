@@ -112,7 +112,7 @@ class Reporting extends CI_Controller
 	//enable the user to download the specified file
 	public function download($file_name)
 	{
-		$url = base_url() . "cside/export_r/" . $file_name;
+		$url = "cside/export_r/" . $file_name;
 		header("Content-Type: application/octet-stream");
 		header("Content-Transfer-Encoding: Binary");
 		header("Content-disposition: attachment; filename=\"" . $file_name . "\"");
