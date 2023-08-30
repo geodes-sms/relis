@@ -116,7 +116,7 @@ class Reporting extends CI_Controller
 		header("Content-Type: application/octet-stream");
 		header("Content-Transfer-Encoding: Binary");
 		header("Content-disposition: attachment; filename=\"" . $file_name . "\"");
-		echo readfile($url);
+		readfile($url);
 		//header("Location: $url");
 	}
 
