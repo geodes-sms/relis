@@ -70,6 +70,9 @@ To connect inside your docker container run the following command from the direc
 Make sure the user has the rights to access and edit the `workspace/` folder. For example, run
  > chmod -R 755 workspace
 
+Make sure the user has the rights to access and edit the `export_r/` folder. For example, run
+ > chmod -R 777 cside/export_r/
+
 ### PHP Container Debug with Xdebug and PhpStorm
 
 1. Update **relis_deployment/docker/Dockerfile** by adding: `RUN pecl install xdebug-2.6.0`
