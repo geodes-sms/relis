@@ -334,6 +334,30 @@ function dropdown_form_bm($label, $name, $id, $values = array(), $selected = 0, 
 	return $bm;
 }
 
+function dropdown_form_bm_for_phases($label, $name, $id, $values = array(), $selected = 0, $classe = " ",$readonly="") {
+
+    if(strpos($classe,'mandatory')){
+        $mandatory='<span class="mandatory"> *</span>';
+        $classe=str_replace('mandatory', "", $classe);
+
+    }else{
+        $mandatory="";
+    }
+
+    if($readonly=='readonly'){
+        $readonly=' disabled=disabled ';
+    }else{
+        $readonly="";
+    }
+    $bm = '
+
+                        <div class="form-group ">' . form_label ( $label.$mandatory, $name, array (
+                                'class' => 'control-label col-md-3 col-sm-3 col-xs-12'
+                        ) ) . '<div class="col-md-6 col-sm-6 col-xs-12">' . form_dropdown_for_phases ( $name, $values, $selected, 'id="' . $id . '" class="form-control col-md-7 col-xs-12  select2_single '.$classe.' "  '.$readonly ) . '</div></div>';
+
+    return $bm;
+}
+
 /*
 	generate consistent HTML code for multi-select dropdown input fields within form groups. 
 	It supports options for specifying the available values, the initially selected values, the presence of a mandatory indicator, the disabled state of the field, and the maximum number of selections. 

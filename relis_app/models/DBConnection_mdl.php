@@ -773,4 +773,22 @@ class DBConnection_mdl extends CI_Model
 		return $result;
 
 	}
+
+	function get_screening_phases()
+	{
+		$this->db2 = $this->load->database(project_db(), TRUE);
+		$sql = "SELECT screen_phase_id,phase_title FROM screen_phase WHERE screen_phase_id NOT IN (SELECT next_phase_id FROM screen_phase WHERE next_phase_id IS NOT NULL) AND screen_phase_active = 1";
+		$query = $this->db2->query($sql);
+
+		if ($query->num_rows() > 0) {
+			// Fetch the data as an array
+			return $query->result_array();
+		} 
+
+		else {
+				// Handle the case when there are no results
+				return NULL;
+		}
+		//print_test($data['phases']);
+	}
 }

@@ -2299,84 +2299,103 @@ class Screening extends CI_Controller
         /*
          * Récuperation des valeurs soumis dans le formulaire
          */
+        //get array of existing screening phases
+        $existing_phase_titles = $this->DBConnection_mdl->get_screening_phases();
+        if(!empty($existing_phase_titles))
+         { 
+            //modifying $existing_phases_titles so that we get only phase_title column
+            $existing_phase_titles = array_column($existing_phase_titles,'phase_title');
+         }
+        
         $post_arr = $this->input->post();
-        //	print_test($post_arr);
-        $table_config = get_table_configuration($post_arr['table_config']);
-        $current_operation = $post_arr['current_operation'];
-        $this->load->library('form_validation');
-        $other_check = true;
-        $this->form_validation->set_rules('phase_title', '"' . $table_config['fields']['phase_title']['field_title'] . '"', 'trim|required');
-        $this->form_validation->set_rules('source_paper', '"' . $table_config['fields']['source_paper']['field_title'] . '"', 'trim|required');
-        $this->form_validation->set_rules('source_paper_status', '"' . $table_config['fields']['source_paper_status']['field_title'] . '"', 'trim|required');
-        $other_check = true;
-        $data['err_msg'] = "";
-        if (empty($post_arr['displayed_fields_vals'])) {
-            $other_check = false;
-            $data['err_msg'] .= lng('You have to select at least one field to be displayed') . ' <br/>';
+
+        if (in_array($post_arr['phase_title'], $existing_phase_titles)) {
+            // Handle the case where the phase_title is not unique (e.g., return an error or throw an exception)
+            $data['err_msg'] = lng('The Reviews per paper cannot exceed the number of selected users  ');
         }
-        $this->db2 = $this->load->database(project_db(), TRUE);
-        $phases = $this->db2->order_by('screen_phase_order', 'ASC')->get_where('screen_phase', array('screen_phase_active' => 1))->result_array();
-        //print_test($phases);
-        $last_order = 0;
-        $final_phase_exist = False;
-        foreach ($phases as $key => $value) {
-            $last_order = $value['screen_phase_order'];
-            if (!empty($value['screen_phase_final'])) {
-                if (!(!empty($post_arr['screen_phase_id']) and $post_arr['screen_phase_id'] == $value['screen_phase_id'])) {
-                    $final_phase_exist = true;
+
+        else{
+         
+        
+            //	print_test($post_arr);
+            $table_config = get_table_configuration($post_arr['table_config']);
+            $current_operation = $post_arr['current_operation'];
+            $this->load->library('form_validation');
+            $other_check = true;
+            $this->form_validation->set_rules('phase_title', '"' . $table_config['fields']['phase_title']['field_title'] . '"', 'trim|required');
+            $this->form_validation->set_rules('source_paper', '"' . $table_config['fields']['source_paper']['field_title'] . '"', 'trim|required');
+            $this->form_validation->set_rules('source_paper_status', '"' . $table_config['fields']['source_paper_status']['field_title'] . '"', 'trim|required');
+            $other_check = true;
+            $data['err_msg'] = "";
+            if (empty($post_arr['displayed_fields_vals'])) {
+                $other_check = false;
+                $data['err_msg'] .= lng('You have to select at least one field to be displayed') . ' <br/>';
+            }
+            $this->db2 = $this->load->database(project_db(), TRUE);
+            $phases = $this->db2->order_by('screen_phase_order', 'ASC')->get_where('screen_phase', array('screen_phase_active' => 1))->result_array();
+            //print_test($phases);
+            $last_order = 0;
+            $final_phase_exist = False;
+            foreach ($phases as $key => $value) {
+                $last_order = $value['screen_phase_order'];
+                if (!empty($value['screen_phase_final'])) {
+                    if (!(!empty($post_arr['screen_phase_id']) and $post_arr['screen_phase_id'] == $value['screen_phase_id'])) {
+                        $final_phase_exist = true;
+                    }
                 }
             }
-        }
-        if ($final_phase_exist and !empty($post_arr['screen_phase_final'])) {
-            $other_check = false;
-            $data['err_msg'] .= lng('There is already a final phase ! ') . ' <br/>';
-        }
-        //print_test($data);
-        //exit;
-        if ($this->form_validation->run() == FALSE or !$other_check) {
-            /*
-             * Si la validation du formulaire n'est pas concluante , retour au formulaire de saisie
-             */
-            $data['content_item'] = $post_arr;
-            if ($this->session->userdata('submit_mode') and $this->session->userdata('submit_mode') == 'modal') {
-                $submit_mode = 'modal';
-            } else {
-                $submit_mode = '';
+            if ($final_phase_exist and !empty($post_arr['screen_phase_final'])) {
+                $other_check = false;
+                $data['err_msg'] .= lng('There is already a final phase ! ') . ' <br/>';
             }
-            if (($table_config['operations'][$current_operation]['operation_type']) == 'Add') {
-                $this->add_element($current_operation, $data, $post_arr['operation_type'], $submit_mode);
-            } elseif ($table_config['operations'][$current_operation]['operation_type'] == 'Edit') {
-                $this->add_element($current_operation, $data, $post_arr['operation_type'], $submit_mode, 'Edit');
-            }
-        } else {
-            //Correct go for save
-            $fields = implode("|", $post_arr['displayed_fields_vals']);
-            $order = !empty($post_arr['screen_phase_order']) ? $post_arr['screen_phase_order'] : $last_order + 10;
-            $to_save = array(
-                'phase_title' => $post_arr['phase_title'],
-                'description' => $post_arr['description'],
-                'source_paper' => $post_arr['source_paper'],
-                'source_paper_status' => $post_arr['source_paper_status'],
-                'displayed_fields' => $fields,
-                'screen_phase_order' => $order,
-                'phase_type' => $post_arr['phase_type'],
-                'screen_phase_final' => $post_arr['screen_phase_final'],
-                'added_by' => $post_arr['added_by'],
-            );
-            //	print_test($to_save); exit;
-            if ($post_arr['operation_type'] == 'new') {
-                $res = $this->db2->insert('screen_phase', $to_save);
+            //print_test($data);
+            //exit;
+            if ($this->form_validation->run() == FALSE or !$other_check) {
+                /*
+                * Si la validation du formulaire n'est pas concluante , retour au formulaire de saisie
+                */
+                $data['content_item'] = $post_arr;
+                if ($this->session->userdata('submit_mode') and $this->session->userdata('submit_mode') == 'modal') {
+                    $submit_mode = 'modal';
+                } else {
+                    $submit_mode = '';
+                }
+                if (($table_config['operations'][$current_operation]['operation_type']) == 'Add') {
+                    $this->add_element($current_operation, $data, $post_arr['operation_type'], $submit_mode);
+                } elseif ($table_config['operations'][$current_operation]['operation_type'] == 'Edit') {
+                    $this->add_element($current_operation, $data, $post_arr['operation_type'], $submit_mode, 'Edit');
+                }
             } else {
-                $res = $this->db2->update(
-                    'screen_phase',
-                    $to_save,
-                    array(
-                        'screen_phase_id' => $post_arr['screen_phase_id']
-                    )
+                //Correct go for save
+                $fields = implode("|", $post_arr['displayed_fields_vals']);
+                $order = !empty($post_arr['screen_phase_order']) ? $post_arr['screen_phase_order'] : $last_order + 10;
+                $to_save = array(
+                    'phase_title' => $post_arr['phase_title'],
+                    'description' => $post_arr['description'],
+                    'source_paper' => $post_arr['source_paper'],
+                    'source_paper_status' => $post_arr['source_paper_status'],
+                    'displayed_fields' => $fields,
+                    'screen_phase_order' => $order,
+                    'phase_type' => $post_arr['phase_type'],
+                    'screen_phase_final' => $post_arr['screen_phase_final'],
+                    'added_by' => $post_arr['added_by'],
                 );
+                //	print_test($to_save); exit;
+                if ($post_arr['operation_type'] == 'new') {
+                    $res = $this->db2->insert('screen_phase', $to_save);
+                } else {
+                    $res = $this->db2->update(
+                        'screen_phase',
+                        $to_save,
+                        array(
+                            'screen_phase_id' => $post_arr['screen_phase_id']
+                        )
+                    );
+                }
+                //	print_test($to_save);
+                redirect($post_arr['redirect_after_save']);
             }
-            //	print_test($to_save);
-            redirect($post_arr['redirect_after_save']);
+
         }
     }
 

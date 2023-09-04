@@ -986,6 +986,11 @@ class Paper extends CI_Controller
         $data['page_title'] = lng('Import papers - BibTeX');
         $data['top_buttons'] = get_top_button('back', 'Back', 'manage');
         $data['page'] = 'paper/import_bibtext_2';
+        $phases=$this->DBConnection_mdl->get_screening_phases();
+        if(!empty($phases))
+         { //$phases= array_column($phases,'screen_phase_id','phase_title');
+            $data['phases']= $phases;
+         }
         /*
          * Chargement de la vue avec les données préparés dans le controleur suivant le type d'affichage : (popup modal ou pas)
          */
