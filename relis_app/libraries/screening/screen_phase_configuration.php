@@ -243,7 +243,7 @@ function get_config_screen_phase()
 		'operation_type' => 'Add',
 		'operation_title' => 'Add a new screening phase',
 		'operation_description' => 'Add a new screening phase',
-		'page_title' => 'Add a new screening phase',
+		'page_title' => 'Add a new screening phase <br> <span style="font-size: 80%; color: #999;">Note: Phase title should be unique</span>',
 		'save_function' => 'element/save_element',
 		'save_function' => 'screening/save_phase_screen',
 		'page_template' => 'general/frm_entity',
