@@ -795,6 +795,7 @@ class Paper extends CI_Controller
         $data_array = json_decode($post_arr['data_array'], True);
         $papers_sources = (!empty($post_arr['papers_sources']) ? $post_arr['papers_sources'] : NULL);
         $search_strategy = (!empty($post_arr['search_strategy']) ? $post_arr['search_strategy'] : NULL);
+        $initial_phase_id = (!empty($post_arr['select_screening_phase']) ? intval($post_arr['select_screening_phase']) : NULL);
         //	$paper_start_from = ((!empty($post_arr['paper_start_from']) AND is_numeric($post_arr['paper_start_from']))?$post_arr['paper_start_from']:2);
         $active_user = active_user_id();
         $added_active_phase = get_active_phase();
@@ -819,6 +820,7 @@ class Paper extends CI_Controller
         foreach ($data_array as $key => $paper) {
             $paper['papers_sources'] = $papers_sources;
             $paper['search_strategy'] = $search_strategy;
+            $paper['initial_phase_id'] = $initial_phase_id;
             $paper['operation_code'] = $operation_code;
             $res = $this->insert_paper_bibtext($paper);
             if ($res == '1') {

@@ -85,6 +85,16 @@ function get_papers()
 		'on_list' => 'show',
 		'mandatory' => ' mandatory '
 	);
+	
+	$fields['initial_phase_id'] = array(
+		'field_title' => 'initial phase id',
+		'field_type' => 'int',
+		'field_size' => 11,
+		'input_type' => 'select',
+		'input_select_source' => 'table',
+		'input_select_values' => 'initial_phase_id;ref_value', //the reference table and the field to be displayed
+		'on_list' => 'hidden',
+	);
 
 
 	$fields['preview'] = array(

@@ -440,21 +440,22 @@ if ( ! function_exists('form_dropdown'))
 	 
 
 	 function form_dropdown_for_phases($data = '', $options = array(), $selected = array(), $extra = '')
-	 {
-		//for reducing duplicacy in the code base
-		 list($form, $options, $selected) = common_form_dropdown($data, $options, $selected, $extra);
-	 
-		 foreach ($options as $key => $row) {
-			 $screen_phase_id = (string) $row['screen_phase_id'];
-			 $label = html_escape($row['screen_phase_id']." ".$row['phase_title']); // Concatenate column1 and column2
-	 
-			 $sel = in_array($screen_phase_id, $selected) ? ' selected="selected"' : '';
-	 
-			 $form .= '<option value="'.$screen_phase_id.'"'.$sel.'>'.$label."</option>\n";
-		 }
-	 
-		 return $form."</select>";
-	 }
+	{
+		// For reducing duplicacy in the code base
+		list($form, $options, $selected) = common_form_dropdown($data, $options, $selected, $extra);
+
+		foreach ($options as $key => $row) {
+			$screen_phase_id = (string) $row['screen_phase_id'];
+			$label = html_escape($row['phase_title']);
+
+			$sel = in_array($screen_phase_id, $selected) ? ' selected="selected"' : '';
+
+			$form .= '<option value="' . html_escape($screen_phase_id) . '"' . $sel . '>' . html_escape($label) . "</option>\n";
+		}
+
+		return $form . "</select>\n";
+	}
+
 	 
 }
 

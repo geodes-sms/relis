@@ -309,6 +309,10 @@ function input_textarea_bm($label, $name, $id, $value = "", $max = 100, $classe 
 	generate consistent HTML code for dropdown/select input fields within form groups. 
 	It supports options for specifying the available values, the initially selected value, the presence of a mandatory indicator, and the disabled state of the field
 */
+
+//reducing code duplicacy between dropdown_form_bm and dropdown_form_bm_for_phases
+
+
 function dropdown_form_bm($label, $name, $id, $values = array(), $selected = 0, $classe = " ", $readonly = "")
 {
 
@@ -350,10 +354,9 @@ function dropdown_form_bm_for_phases($label, $name, $id, $values = array(), $sel
         $readonly="";
     }
     $bm = '
-
-                        <div class="form-group ">' . form_label ( $label.$mandatory, $name, array (
-                                'class' => 'control-label col-md-3 col-sm-3 col-xs-12'
-                        ) ) . '<div class="col-md-6 col-sm-6 col-xs-12">' . form_dropdown_for_phases ( $name, $values, $selected, 'id="' . $id . '" class="form-control col-md-7 col-xs-12  select2_single '.$classe.' "  '.$readonly ) . '</div></div>';
+			<div class="form-group ">' . form_label ( $label.$mandatory, $name, array (
+					'class' => 'control-label col-md-3 col-sm-3 col-xs-12'
+			) ) . '<div class="col-md-6 col-sm-6 col-xs-12">' . form_dropdown_for_phases ( $name, $values, $selected, 'id="' . $id . '" class="form-control col-md-7 col-xs-12  select2_single '.$classe.' "  '.$readonly ) . '</div></div>';
 
     return $bm;
 }

@@ -56,7 +56,7 @@ function get_config_screen_phase()
 	$fields['next_phase_id']=array(
 		'field_title'=>'Next Phase ID',
 		'field_type'=>'int',
-		'field_size'=>'11'
+		'field_size'=>11
 	);
 
 	$fields['phase_title'] = array(

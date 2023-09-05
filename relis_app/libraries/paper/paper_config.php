@@ -109,6 +109,8 @@ function get_papers()
 		'input_type' => ''
 	);
 
+	
+
 
 	$fields['preview'] = array(
 		'field_title' => 'Preview',
