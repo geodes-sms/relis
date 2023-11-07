@@ -195,6 +195,12 @@
           <td>R Library</td><td><a href="<?php echo base_url();?>reporting/download/relis_r_lib_<?php echo project_db();?>.R"><?php echo $r_lib_dsc?></a></td><td><a href="<?php echo base_url();?>reporting/r_export_configurations"><i class="fa fa-refresh"></i><?php echo lng('Update file')?></a></td>
            </tr>
 
+           
+           <tr>
+          <td>Python Library</td><td><a href="<?php echo base_url();?>reporting/python_export"><?php echo $r_lib_dsc?></a></td><td><a href="<?php echo base_url();?>reporting/r_export_configurations"><i class="fa fa-refresh"></i><?php echo lng('Update file')?></a></td>
+           </tr>
+
+
            </table>
             <?php 
            echo  box_footer();

@@ -576,6 +576,25 @@ class Reporting extends CI_Controller
 		redirect('home/export');
 	}
 
+	public function python_export()
+	{
+		try {
+			$table_ref = "classification";
+			$this->db2 = $this->load->database(project_db(), TRUE);
+			$data = $this->db2->query("CALL get_list_" . $table_ref . "(0,0,'') ");
+			$ref_table_config = get_table_config($table_ref);
+			$result = $data->result_array();
+
+			$res_install_config = $this->entity_configuration_lib->get_install_config();
+			$fields = $res_install_config['config']['classification']['fields'];
+			
+			$js_code = 'console.log(' . json_encode($fields) . '); console.log(' . json_encode($result) . ');';
+			echo "<script>$js_code</script>";
+		} catch (Exception $e) {
+			set_top_msg($e);
+		}
+	}
+
 	public function r_export_configurations($data = "", $operation = "new", $display_type = "normal")
 	{
 		$res_install_config = $this->entity_configuration_lib->get_install_config();
