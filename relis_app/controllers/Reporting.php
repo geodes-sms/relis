@@ -660,7 +660,62 @@ class Reporting extends CI_Controller
 			}
 		}
 		unset($result);
-		return $results;;
+		return $results;
+	}
+
+	/**
+	 * Evaluate the cardinality of a field's value.s
+	 */
+	private function python_export_evaluate_multiple($field_size) {
+		if ($field_size > 1) {
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Evaluate the type of a field
+	 */
+	private function python_export_evaluate_field_type_condition($value) {
+		// Taken from the r_export_configurations view
+		if (
+			($value['field_type'] === 'text' && $value['category_type'] != 'FreeCategory') ||
+			($value['field_type'] === 'int' && $value['category_type'] != 'FreeCategory') ||
+			($value['field_type'] === 'int' && $value['category_type'] === 'FreeCategory' &&
+				$value['input_type'] === 'select')
+		) {
+			return 'Nominal';
+		} elseif (
+			($value['field_type'] === 'int' || $value['field_type'] === 'real') && 
+			$value['category_type'] === 'FreeCategory' && 
+			$value['input_type'] != 'select'
+		) {
+			return 'Continuous';
+		} elseif ($value['field_type'] === 'text' && $value['category_type'] === 'FreeCategory') {
+			return 'Text';
+		} else {
+			return '';
+		}
+	}
+
+	/**
+	 * Update and extend the results object with new field data:
+	 * Field title
+	 * Field type
+	 * Field is multiple
+	 */
+	private function python_export_create_dto_object($results, $table_fields) {
+		foreach($results as $key => &$result) {
+			foreach($result as $key_field => &$value) {
+				$field_information = $table_fields[$key_field];
+				$type = $this->python_export_evaluate_field_type_condition($field_information);
+				$multiple = $this->python_export_evaluate_multiple($field_information['number_of_values']);
+				$result[$key_field] = ['title' => $field_information['field_title'], 'value' => $value,
+				 'type' => $type, 'multiple' => $multiple];
+			}
+		}
+		unset($result);
+		return $results;
 	}
 	
 	/**
@@ -686,6 +741,7 @@ class Reporting extends CI_Controller
 			 $table_id, $MULTIVALUE_SEPARATOR);
 			$results = $this->python_export_fields_cleaning($results, $CLASSIFICATION_METADATA_FIELDS);
 			$results = $this->python_export_fields_values_cleaning($results);
+			$results = $this->python_export_create_dto_object($results, $table_fields);
 
 			$js_code = 'console.log(' . json_encode($results) . ')';
 			echo "<script>$js_code</script>";
