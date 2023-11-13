@@ -197,7 +197,7 @@
 
            
            <tr>
-          <td>Python Library</td><td><a href="<?php echo base_url();?>reporting/python_export"><?php echo $r_lib_dsc?></a></td><td><a href="<?php echo base_url();?>reporting/r_export_configurations"><i class="fa fa-refresh"></i><?php echo lng('Update file')?></a></td>
+          <td>Python Library</td><td><a href="<?php echo base_url();?>reporting/python_export"><i class='fa fa-download'></i> Download Python</a></td><td><a href="<?php echo base_url();?>reporting/r_export_configurations"><i class="fa fa-refresh"></i><?php echo lng('Update file')?></a></td>
            </tr>
 
 

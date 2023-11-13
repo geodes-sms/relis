@@ -134,6 +134,7 @@ class Reporting extends CI_Controller
 		//print_test($result);
 		echo $table_ref;
 		$data = $this->DBConnection_mdl->get_list($ref_table_config, '_', 0, -1, '');
+
 		//print_test($data);
 		//exit;
 		$dropoboxes = array();
@@ -189,6 +190,7 @@ class Reporting extends CI_Controller
 			$arrangedPapers[$value_p['id']] = $value_p;
 			$arrangedPapers[$value_p['id']]['reviewers'] = $user_names;
 		}
+
 		$i = 1;
 		$list_to_display = array();
 		foreach ($data['list'] as $key => $value) {
@@ -236,6 +238,7 @@ class Reporting extends CI_Controller
 			array_push($list_to_display, $element_array);
 			$i++;
 		}
+
 		//!!!!!!!!!!!!!!!!!!! this is like a hardcode it doesnt follow anny pathern 
 		unset($field_list_header[0]);
 		unset($field_list_header[1]);
@@ -576,20 +579,117 @@ class Reporting extends CI_Controller
 		redirect('home/export');
 	}
 
+	/**
+	 * Retreived dropboxes fields from the classification data
+	 */
+	private function python_export_get_dropboxes($table_fields) {
+		$dropoboxes = array();
+		foreach ($table_fields as $k => $v) {
+			if (!empty($v['input_type']) and $v['input_type'] == 'select' and $v['on_list'] == 'show') {
+				if ($v['input_select_source'] == 'array') {
+					$dropoboxes[$k] = $v['input_select_values'];
+				} elseif ($v['input_select_source'] == 'table') {
+					$dropoboxes[$k] = $this->manager_lib->get_reference_select_values($v['input_select_values']);
+				} elseif ($v['input_select_source'] == 'yes_no') {
+					$dropoboxes[$k] = array(
+						'0' => "No",
+						'1' => "Yes"
+					);
+				}
+			}
+			;
+		}
+		return $dropoboxes;
+	}
+
+	/**
+	 * Create and add multivalue fields to the classification data
+	 */
+	private function python_export_create_multivalue_fields($results, $table_fields, $dropoboxes,
+	 $table_id, $MULTIVALUE_SEPARATOR) {
+		foreach ($results as $key => $value) {
+			foreach ($dropoboxes as $key_field => $v_field) {
+				if (isset($results[$key][$key_field])) {
+					continue;
+				}
+				
+				if (!(isset($table_fields[$key_field]['number_of_values']) and $table_fields[$key_field]['number_of_values'] > 1)) {
+					continue;
+				}
+
+				if (isset($table_fields[$key_field]['input_select_values']) and isset($table_fields[$key_field]['input_select_key_field'])) {
+					// récuperations des valeurs de cet element
+					$M_values = $this->manager_lib->get_element_multi_values($table_fields[$key_field]['input_select_values'], $table_fields[$key_field]['input_select_key_field'], $results[$key][$table_id]);
+					$S_values = "";
+					foreach ($M_values as $k_m => $v_m) {
+						if (isset($dropoboxes[$key_field][$v_m])) {
+							$M_values[$k_m] = $dropoboxes[$key_field][$v_m];
+						}
+						$S_values .= empty($S_values) ? $M_values[$k_m] : "$MULTIVALUE_SEPARATOR" . $M_values[$k_m];
+					}
+					$results[$key][$key_field] = $S_values;
+				}
+			}
+			
+		}
+		return $results;
+	}
+
+	/**
+	 * Deletes obsolete fields from the classification data
+	 */
+	private function python_export_fields_cleaning($results, $CLASSIFICATION_METADATA_FIELDS) {
+		foreach($results as $key => &$result) {
+			foreach($CLASSIFICATION_METADATA_FIELDS as $field_key) {
+				if (array_key_exists($field_key, $result)) {
+					unset($result[$field_key]);
+				}
+			}
+		}
+		unset($result);
+		return $results;;
+	}
+	
+	/**
+	 * Deletes special field value characters from the classification data
+	 */
+	private function python_export_fields_values_cleaning($results) {
+		foreach($results as $key => &$result) {
+			foreach($result as $key_field => &$value) {
+				$result[$key_field] = str_replace(["\t", "\n"], '', $value);
+			}
+		}
+		unset($result);
+		return $results;;
+	}
+	
+	/**
+	 * Main function for the python statistical classfication scripts generator
+	 */
 	public function python_export()
 	{
 		try {
+			$CLASSIFICATION_METADATA_FIELDS = array('class_active', 'class_id',
+			 'class_paper_id', 'classification_time', 'user_id', 'A_id');
+			$MULTIVALUE_SEPARATOR = ' | ';
 			$table_ref = "classification";
+
 			$this->db2 = $this->load->database(project_db(), TRUE);
 			$data = $this->db2->query("CALL get_list_" . $table_ref . "(0,0,'') ");
 			$ref_table_config = get_table_config($table_ref);
-			$result = $data->result_array();
+			$table_fields = $ref_table_config['fields'];
+			$results = $data->result_array();
+			$table_id = $ref_table_config['table_id'];
 
-			$res_install_config = $this->entity_configuration_lib->get_install_config();
-			$fields = $res_install_config['config']['classification']['fields'];
-			
-			$js_code = 'console.log(' . json_encode($fields) . '); console.log(' . json_encode($result) . ');';
+			$dropoboxes = $this->python_export_get_dropboxes($table_fields);
+			$results = $this->python_export_create_multivalue_fields($results, $table_fields, $dropoboxes,
+			 $table_id, $MULTIVALUE_SEPARATOR);
+			$results = $this->python_export_fields_cleaning($results, $CLASSIFICATION_METADATA_FIELDS);
+			$results = $this->python_export_fields_values_cleaning($results);
+
+			$js_code = 'console.log(' . json_encode($results) . ')';
 			echo "<script>$js_code</script>";
+			
 		} catch (Exception $e) {
 			set_top_msg($e);
 		}
