@@ -675,6 +675,8 @@ class Reporting extends CI_Controller
 	
 	/**
 	 * Evaluate the type of a field
+	 * Null value is returned if the type
+	 * isn't euqal to Nominal or Continuous
 	 */
 	private function python_export_evaluate_field_type_condition($value) {
 		// Taken from the r_export_configurations view
@@ -691,11 +693,12 @@ class Reporting extends CI_Controller
 			$value['input_type'] != 'select'
 		) {
 			return 'Continuous';
-		} elseif ($value['field_type'] === 'text' && $value['category_type'] === 'FreeCategory') {
-			return 'Text';
-		} else {
-			return '';
 		}
+	}
+
+	private function python_export_dto_factory($field_title, $field_value, $field_type, $multiple) {
+		return ['title' => $field_title, 'value' => $field_value,
+		'type' => $field_type, 'multiple' => $multiple];
 	}
 
 	/**
@@ -704,18 +707,24 @@ class Reporting extends CI_Controller
 	 * Field type
 	 * Field is multiple
 	 */
-	private function python_export_create_dto_object($results, $table_fields) {
-		foreach($results as $key => &$result) {
-			foreach($result as $key_field => &$value) {
-				$field_information = $table_fields[$key_field];
+	private function python_export_create_dto_object($papers, $table_fields) {
+		foreach($papers as $key => &$paper) {
+			foreach($paper as $field_name => &$field) {
+				$field_information = $table_fields[$field_name];
 				$type = $this->python_export_evaluate_field_type_condition($field_information);
+
+				// Removing the classification field if the type is unknown
+				if (empty($type)) {
+					unset($paper[$field_name]);
+					continue;
+				}
+
 				$multiple = $this->python_export_evaluate_multiple($field_information['number_of_values']);
-				$result[$key_field] = ['title' => $field_information['field_title'], 'value' => $value,
-				 'type' => $type, 'multiple' => $multiple];
+				$paper[$field_name] = $this->python_export_dto_factory($field_information['field_title'],
+				$field, $type, $multiple);
 			}
 		}
-		unset($result);
-		return $results;
+		return $papers;
 	}
 	
 	/**
@@ -733,7 +742,7 @@ class Reporting extends CI_Controller
 			$data = $this->db2->query("CALL get_list_" . $table_ref . "(0,0,'') ");
 			$ref_table_config = get_table_config($table_ref);
 			$table_fields = $ref_table_config['fields'];
-			$results = $data->result_array();
+			$results = $data->result_array();	
 			$table_id = $ref_table_config['table_id'];
 
 			$dropoboxes = $this->python_export_get_dropboxes($table_fields);
