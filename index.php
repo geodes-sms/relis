@@ -297,3 +297,21 @@ switch (ENVIRONMENT)
  * And away we go...
  */
 require_once BASEPATH.'core/CodeIgniter.php';
+
+/*
+ * --------------------------------------------------------------------
+ * TWIG SETUP
+ * --------------------------------------------------------------------
+ */
+require_once 'vendor/autoload.php';
+
+$loader = new \Twig\Loader\FilesystemLoader('views');
+$twig = new \Twig\Environment($loader, [
+    'cache' => 'cache',
+]);
+
+echo $twig->render('hello.html', array(
+
+	'name' => 'Michael',
+	'age' => 52
+));
