@@ -580,93 +580,122 @@ class Reporting extends CI_Controller
 	}
 
 	/**
-	 * Retreived dropboxes fields from the classification data
+	 * Functions which are used to perform the statistical
+	 * classification analysis of a given project 
 	 */
-	private function python_export_get_dropboxes($table_fields) {
-		$dropoboxes = array();
-		foreach ($table_fields as $k => $v) {
-			if (!empty($v['input_type']) and $v['input_type'] == 'select' and $v['on_list'] == 'show') {
-				if ($v['input_select_source'] == 'array') {
-					$dropoboxes[$k] = $v['input_select_values'];
-				} elseif ($v['input_select_source'] == 'table') {
-					$dropoboxes[$k] = $this->manager_lib->get_reference_select_values($v['input_select_values']);
-				} elseif ($v['input_select_source'] == 'yes_no') {
-					$dropoboxes[$k] = array(
-						'0' => "No",
-						'1' => "Yes"
-					);
-				}
-			}
-			;
-		}
-		return $dropoboxes;
-	}
-
-	/**
-	 * Create and add multivalue fields to the classification data
-	 */
-	private function python_export_create_multivalue_fields($results, $table_fields, $dropoboxes,
-	 $table_id, $MULTIVALUE_SEPARATOR) {
-		foreach ($results as $key => $value) {
-			foreach ($dropoboxes as $key_field => $v_field) {
-				if (isset($results[$key][$key_field])) {
-					continue;
-				}
-				
-				if (!(isset($table_fields[$key_field]['number_of_values']) and $table_fields[$key_field]['number_of_values'] > 1)) {
-					continue;
-				}
-
-				if (isset($table_fields[$key_field]['input_select_values']) and isset($table_fields[$key_field]['input_select_key_field'])) {
-					// récuperations des valeurs de cet element
-					$M_values = $this->manager_lib->get_element_multi_values($table_fields[$key_field]['input_select_values'], $table_fields[$key_field]['input_select_key_field'], $results[$key][$table_id]);
-					$S_values = "";
-					foreach ($M_values as $k_m => $v_m) {
-						if (isset($dropoboxes[$key_field][$v_m])) {
-							$M_values[$k_m] = $dropoboxes[$key_field][$v_m];
-						}
-						$S_values .= empty($S_values) ? $M_values[$k_m] : "$MULTIVALUE_SEPARATOR" . $M_values[$k_m];
-					}
-					$results[$key][$key_field] = $S_values;
-				}
-			}
-			
-		}
-		return $results;
+	private function python_statistical_functions()
+	{
+		return array(
+			$this->python_statistical_function_factory(
+				'generate_desc_frequency_table',
+				'descriptive',
+				'dataframe',
+				'Nominal'
+			),
+			$this->python_statistical_function_factory(
+				'generate_desc_bar_plot',
+				'descriptive',
+				'figure',
+				'Nominal'
+			),
+			$this->python_statistical_function_factory(
+				'generate_desc_statistics',
+				'descriptive',
+				'dataframe',
+				'Continuous'
+			),
+			$this->python_statistical_function_factory(
+				'generate_desc_box_plot',
+				'descriptive',
+				'figure',
+				'Continuous'
+			),
+			$this->python_statistical_function_factory(
+				'generate_desc_violin_plot',
+				'descriptive',
+				'figure',
+				'Continuous'
+			),
+			$this->python_statistical_function_factory(
+				'generate_evo_frequency_table',
+				'evolutive',
+				'dataframe',
+				'Nominal'
+			),
+			$this->python_statistical_function_factory(
+				'generate_evo_plot',
+				'evolutive',
+				'figure',
+				'Nominal'
+			),
+			$this->python_statistical_function_factory(
+				'generate_comp_frequency_table',
+				'comparative',
+				'dataframe',
+				'Nominal'
+			),
+			$this->python_statistical_function_factory(
+				'generate_comp_stacked_bar_plot',
+				'comparative',
+				'figure',
+				'Nominal'
+			),
+			$this->python_statistical_function_factory(
+				'generate_comp_grouped_bar_plot',
+				'comparative',
+				'figure',
+				'Nominal'
+			),
+			$this->python_statistical_function_factory(
+				'generate_comp_bubble_chart',
+				'comparative',
+				'figure',
+				'Nominal'
+			),
+			$this->python_statistical_function_factory(
+				'generate_comp_fisher_exact_test',
+				'comparative',
+				'dataframe',
+				'Nominal'
+			),
+			$this->python_statistical_function_factory(
+				'generate_comp_shapiro_wilk_test',
+				'comparative',
+				'dataframe',
+				'ContinuousVariables'
+			),
+			$this->python_statistical_function_factory(
+				'generate_comp_pearson_cor_test',
+				'comparative',
+				'dataframe',
+				'ContinuousVariables'
+			),
+			$this->python_statistical_function_factory(
+				'generate_comp_spearman_cor_test',
+				'comparative',
+				'dataframe',
+				'ContinuousVariables'
+			)
+		);
 	}
 
 	/**
 	 * Deletes obsolete fields from the classification data
 	 */
-	private function python_export_fields_cleaning($results, $CLASSIFICATION_METADATA_FIELDS) {
-		foreach($results as $key => &$result) {
-			foreach($CLASSIFICATION_METADATA_FIELDS as $field_key) {
-				if (array_key_exists($field_key, $result)) {
-					unset($result[$field_key]);
-				}
+	private function python_fields_cleaning($table_fields, $CLASSIFICATION_METADATA_FIELDS) {
+		foreach($CLASSIFICATION_METADATA_FIELDS as $field_key) {
+			if (array_key_exists($field_key, $table_fields)) {
+				unset($table_fields[$field_key]);
 			}
 		}
-		unset($result);
-		return $results;;
-	}
-	
-	/**
-	 * Deletes special field value characters from the classification data
-	 */
-	private function python_export_fields_values_cleaning($results) {
-		foreach($results as $key => &$result) {
-			foreach($result as $key_field => &$value) {
-				$result[$key_field] = str_replace(["\t", "\n"], '', $value);
-			}
-		}
-		unset($result);
-		return $results;
+		unset($field_value);
+		return $table_fields;
 	}
 
 	/**
 	 * Evaluate the cardinality of a field's value.s
 	 */
-	private function python_export_evaluate_multiple($field_size) {
+	private function python_evaluate_multiple($field_size) {
 		if ($field_size > 1) {
 			return true;
 		}
@@ -678,7 +707,7 @@ class Reporting extends CI_Controller
 	 * Null value is returned if the type
 	 * isn't euqal to Nominal or Continuous
 	 */
-	private function python_export_evaluate_field_type_condition($value) {
+	private function python_evaluate_field_type_condition($value) {
 		// Taken from the r_export_configurations view
 		if (
 			($value['field_type'] === 'text' && $value['category_type'] != 'FreeCategory') ||
@@ -696,9 +725,9 @@ class Reporting extends CI_Controller
 		}
 	}
 
-	private function python_export_dto_factory($field_title, $field_value, $field_type, $multiple) {
-		return ['title' => $field_title, 'value' => $field_value,
-		'type' => $field_type, 'multiple' => $multiple];
+	private function python_classification_field_factory($field_name, $field_title, $field_type, $multiple) {
+		return array('name' => $field_name, 'title' => $field_title,
+		'type' => $field_type, 'multiple' => $multiple);
 	}
 
 	/**
@@ -707,24 +736,91 @@ class Reporting extends CI_Controller
 	 * Field type
 	 * Field is multiple
 	 */
-	private function python_export_create_dto_object($papers, $table_fields) {
-		foreach($papers as $key => &$paper) {
-			foreach($paper as $field_name => &$field) {
-				$field_information = $table_fields[$field_name];
-				$type = $this->python_export_evaluate_field_type_condition($field_information);
+	private function python_classification_model_factory($table_fields) {
+		foreach($table_fields as $field_name => &$field_value) {
+			$type = $this->python_evaluate_field_type_condition($field_value);
 
-				// Removing the classification field if the type is unknown
-				if (empty($type)) {
-					unset($paper[$field_name]);
-					continue;
-				}
+			// Removing the classification field if the type is unknown
+			if (empty($type)) {
+				unset($table_fields[$field_name]);
+				continue;
+			}
 
-				$multiple = $this->python_export_evaluate_multiple($field_information['number_of_values']);
-				$paper[$field_name] = $this->python_export_dto_factory($field_information['field_title'],
-				$field, $type, $multiple);
+			$multiple = $this->python_evaluate_multiple($field_value['number_of_values']);
+			$table_fields[$field_name] = $this->python_classification_field_factory($field_name,
+			$field_value['field_title'], $type, $multiple);
+		}
+		return $table_fields;
+	}
+
+	/**
+	 * Add mandatory fields which are shared between projects to the final data structure 
+	 */
+	private function python_add_static_classification_fields($cm, $CLASSIFICATION_STATIC_FIELDS)
+	{
+		foreach($CLASSIFICATION_STATIC_FIELDS as $field_name => &$field_value) {
+			if (!array_key_exists($field_name, $cm)) {
+				$cm[$field_value['name']] = $field_value;
 			}
 		}
-		return $papers;
+		return $cm;
+	}
+
+	/**
+	 * Creates the project classification fields model which conforms
+	 * to the relis-statistical-classification metamodel
+	 */
+	private function python_create_classification_model($export_config)
+	{
+		$table_ref = "classification";
+
+		$this->db2 = $this->load->database(project_db(), TRUE);
+		$data = $this->db2->query("CALL get_list_" . $table_ref . "(0,0,'') ");
+		$ref_table_config = get_table_config($table_ref);
+		$table_fields = $ref_table_config['fields'];
+		$results = $data->result_array();	
+		$table_id = $ref_table_config['table_id'];
+
+		$results = $this->python_fields_cleaning($table_fields,
+		$export_config['CLASSIFICATION_METADATA_FIELDS']);
+		$cm = $this->python_classification_model_factory($results);
+
+		return $this->python_add_static_classification_fields($cm,
+		$export_config['CLASSIFICATION_STATIC_FIELDS']);
+	}
+
+	private function python_statistical_function_factory($name, $type, $return_type, $variable_type)
+	{
+		return array(
+			'name' => $name,
+			'type' => $type,
+			'return_type' => $return_type,
+			'variable_type' => $variable_type 
+		);
+	}
+
+	private function python_create_export_config($statistical_functions)
+	{
+		$PROJECT_NAME = project_db();
+		$CLASSIFICATION_METADATA_FIELDS = array('class_active', 'class_id',
+		'class_paper_id', 'classification_time', 'user_id', 'A_id');
+		$CLASSIFICATION_STATIC_FIELDS = array(
+			array(
+				'name' => 'publication_year',
+				'title' => 'Publication year',
+				'type' => 'Continuous',
+				'multiple' => false
+			)
+		);
+		$MULTIVALUE_SEPARATOR = '|';
+		$DROP_NA = false;
+
+		return array('PROJECT_NAME' => $PROJECT_NAME,
+		'CLASSIFICATION_METADATA_FIELDS' => $CLASSIFICATION_METADATA_FIELDS,
+		'CLASSIFICATION_STATIC_FIELDS' => $CLASSIFICATION_STATIC_FIELDS,
+		'MULTIVALUE_SEPARATOR' => $MULTIVALUE_SEPARATOR,
+		'DROP_NA' => $DROP_NA,
+		'STATISTICAL_FUNCTIONS' => $statistical_functions);
 	}
 	
 	/**
@@ -733,32 +829,15 @@ class Reporting extends CI_Controller
 	public function python_export()
 	{
 		try {
-			$CLASSIFICATION_METADATA_FIELDS = array('class_active', 'class_id',
-			 'class_paper_id', 'classification_time', 'user_id', 'A_id');
-			$MULTIVALUE_SEPARATOR = ' | ';
-			/**
-			 * Add an array here that has all the statistical functions
-			 */
-			$table_ref = "classification";
+			$statistical_functions = $this->python_statistical_functions();
+			$export_config = $this->python_create_export_config($statistical_functions);
+			$cm = $this->python_create_classification_model($export_config);
 
-			$this->db2 = $this->load->database(project_db(), TRUE);
-			$data = $this->db2->query("CALL get_list_" . $table_ref . "(0,0,'') ");
-			$ref_table_config = get_table_config($table_ref);
-			$table_fields = $ref_table_config['fields'];
-			$results = $data->result_array();
-			$table_id = $ref_table_config['table_id'];
-
-			$dropoboxes = $this->python_export_get_dropboxes($table_fields);
-			$results = $this->python_export_create_multivalue_fields($results, $table_fields, $dropoboxes,
-			 $table_id, $MULTIVALUE_SEPARATOR);
-			$results = $this->python_export_fields_cleaning($results, $CLASSIFICATION_METADATA_FIELDS);
-			$results = $this->python_export_fields_values_cleaning($results);
-			$results = $this->python_export_create_dto_object($results, $table_fields);
-			
-			$this->twig_generate($results, $MULTIVALUE_SEPARATOR);
-
-			$js_code = 'console.log(' . json_encode($results) . ')';
+			$js_code = 'console.log(' . json_encode($cm) . ')';
 			echo "<script>$js_code</script>";
+
+			# Twing business logic should be invoked here
+			$this->twig_generate($results, $MULTIVALUE_SEPARATOR);
 			
 		} catch (Exception $e) {
 			set_top_msg($e);
@@ -822,7 +901,6 @@ class Reporting extends CI_Controller
 		$data['page'] = 'relis/r_export_configurations';
 
 		$this->load->view('shared/body', $data);
-
 	}
 
 	public function result_r_config_file()
