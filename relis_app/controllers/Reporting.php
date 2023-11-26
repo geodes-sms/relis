@@ -736,6 +736,9 @@ class Reporting extends CI_Controller
 			$CLASSIFICATION_METADATA_FIELDS = array('class_active', 'class_id',
 			 'class_paper_id', 'classification_time', 'user_id', 'A_id');
 			$MULTIVALUE_SEPARATOR = ' | ';
+			/**
+			 * Add an array here that has all the statistical functions
+			 */
 			$table_ref = "classification";
 
 			$this->db2 = $this->load->database(project_db(), TRUE);
@@ -751,6 +754,8 @@ class Reporting extends CI_Controller
 			$results = $this->python_export_fields_cleaning($results, $CLASSIFICATION_METADATA_FIELDS);
 			$results = $this->python_export_fields_values_cleaning($results);
 			$results = $this->python_export_create_dto_object($results, $table_fields);
+			
+			twig_generate($results, $MULTIVALUE_SEPARATOR);
 
 			$js_code = 'console.log(' . json_encode($results) . ')';
 			echo "<script>$js_code</script>";
@@ -758,6 +763,43 @@ class Reporting extends CI_Controller
 		} catch (Exception $e) {
 			set_top_msg($e);
 		}
+	}
+
+	/**
+ 	*
+	* 
+ 	* --------------------------------------------------------------------
+ 	* TWIG SETUP
+ 	* --------------------------------------------------------------------
+	*
+	* Function that uses TWIG to generate the 2 python files, relis_statistics_playground.py and relis_statistics_lib.py
+	* 
+	*/
+	public function twig_generate($results, $MULTIVALUE_SEPARATOR){
+		try{
+			require_once 'vendor/autoload.php';
+
+			$loader = new \Twig\Loader\FilesystemLoader('cside/export_python');
+			$twig = new \Twig\Environment($loader, [
+				'cache' => 'cside/cache',
+			]);
+			
+			echo $twig->render('relis_statistics_playground.py', array(
+			
+				'type' => 'Michael'
+				'age' => 52
+			));
+
+			echo $twig->render('relis_statistics_lib.py', array(
+			
+				'type' => 'Michael',
+				'age' => 52
+			));
+
+		}catch (Exception $e) {
+			set_top_msg($e);
+		}
+
 	}
 
 	public function r_export_configurations($data = "", $operation = "new", $display_type = "normal")
