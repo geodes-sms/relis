@@ -836,9 +836,9 @@ class Reporting extends CI_Controller
 			$js_code = 'console.log(' . json_encode($cm) . ')';
 			echo "<script>$js_code</script>";
 
-			# Twing business logic should be invoked here
-			$this->twig_generate($results, $MULTIVALUE_SEPARATOR);
-			
+			# TWIG business logic should be invoked here
+			$this->twig_generate($cm, $export_config['MULTIVALUE_SEPARATOR']);
+
 		} catch (Exception $e) {
 			set_top_msg($e);
 		}
@@ -856,14 +856,17 @@ class Reporting extends CI_Controller
 	*/
 	public function twig_generate($results, $MULTIVALUE_SEPARATOR){
 		try{
+			// Initial setup for TWIG 
 			require_once 'vendor/autoload.php';
 
 			$loader = new \Twig\Loader\FilesystemLoader('cside/export_python');
 			$twig = new \Twig\Environment($loader, [
 				'cache' => 'cside/cache',
 			]);
-			foreach($results as $key => &$result) {
-				foreach($result as $key_field => &$value) {
+
+			// Test to see how the arrays work
+			foreach($results as $result) {
+				foreach($result as $key_field => $value) {
 					echo $result[$key_field];
 				}
 			}
