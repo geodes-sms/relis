@@ -662,19 +662,19 @@ class Reporting extends CI_Controller
 				'generate_comp_shapiro_wilk_test',
 				'comparative',
 				'dataframe',
-				'ContinuousVariables'
+				'Continuous'
 			),
 			$this->python_statistical_function_factory(
 				'generate_comp_pearson_cor_test',
 				'comparative',
 				'dataframe',
-				'ContinuousVariables'
+				'Continuous'
 			),
 			$this->python_statistical_function_factory(
 				'generate_comp_spearman_cor_test',
 				'comparative',
 				'dataframe',
-				'ContinuousVariables'
+				'Continuous'
 			)
 		);
 	}
