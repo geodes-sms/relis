@@ -745,7 +745,7 @@ class Reporting extends CI_Controller
 			$data = $this->db2->query("CALL get_list_" . $table_ref . "(0,0,'') ");
 			$ref_table_config = get_table_config($table_ref);
 			$table_fields = $ref_table_config['fields'];
-			$results = $data->result_array();	
+			$results = $data->result_array();
 			$table_id = $ref_table_config['table_id'];
 
 			$dropoboxes = $this->python_export_get_dropboxes($table_fields);
@@ -755,7 +755,7 @@ class Reporting extends CI_Controller
 			$results = $this->python_export_fields_values_cleaning($results);
 			$results = $this->python_export_create_dto_object($results, $table_fields);
 			
-			twig_generate($results, $MULTIVALUE_SEPARATOR);
+			$this->twig_generate($results, $MULTIVALUE_SEPARATOR);
 
 			$js_code = 'console.log(' . json_encode($results) . ')';
 			echo "<script>$js_code</script>";
@@ -783,17 +783,20 @@ class Reporting extends CI_Controller
 			$twig = new \Twig\Environment($loader, [
 				'cache' => 'cside/cache',
 			]);
+			foreach($results as $key => &$result) {
+				foreach($result as $key_field => &$value) {
+					echo $result[$key_field];
+				}
+			}
+
+			 $twig->render('relis_statistics_playground.py', array(
 			
-			echo $twig->render('relis_statistics_playground.py', array(
-			
-				'type' => 'Michael'
-				'age' => 52
+				
 			));
 
-			echo $twig->render('relis_statistics_lib.py', array(
+			 $twig->render('relis_statistics_lib.py', array(
 			
-				'type' => 'Michael',
-				'age' => 52
+				
 			));
 
 		}catch (Exception $e) {
