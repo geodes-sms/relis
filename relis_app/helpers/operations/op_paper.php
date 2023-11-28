@@ -1,4 +1,5 @@
 <?php
+//The get_operations_paper() function generates operations for the 'papers' table
 function get_operations_paper() {
 	//paper
 

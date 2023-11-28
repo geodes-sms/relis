@@ -1,4 +1,7 @@
 <?php
+/*
+	The get_operations_author() function returns an array of operations related to the author and paper_author entities.
+*/
 function get_operations_author() {
 	//author
 
@@ -83,7 +86,4 @@ function get_operations_author() {
 	);
 	
 	return $operations;
-	
-	
-	
 }
