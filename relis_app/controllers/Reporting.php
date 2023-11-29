@@ -827,7 +827,7 @@ class Reporting extends CI_Controller
 			)
 		);
 		$MULTIVALUE_SEPARATOR = '|';
-		$DROP_NA = false;
+		$DROP_NA = 'false';
 
 		return array('PROJECT_NAME' => $PROJECT_NAME,
 		'CLASSIFICATION_METADATA_FIELDS' => $CLASSIFICATION_METADATA_FIELDS,
@@ -851,7 +851,7 @@ class Reporting extends CI_Controller
 			echo "<script>$js_code</script>";
 
 			# TWIG business logic should be invoked here
-			$this->twig_generate($cm, $export_config['MULTIVALUE_SEPARATOR']);
+			$this->twig_generate($cm, $export_config);
 
 		} catch (Exception $e) {
 			set_top_msg($e);
@@ -868,32 +868,45 @@ class Reporting extends CI_Controller
 	* Function that uses TWIG to generate the 2 python files, relis_statistics_playground.py and relis_statistics_lib.py
 	* 
 	*/
-	public function twig_generate($results, $MULTIVALUE_SEPARATOR){
+	public function twig_generate($cm, $export_config){
 		try{
 			// Initial setup for TWIG 
 			require_once 'vendor/autoload.php';
 
-			$loader = new \Twig\Loader\FilesystemLoader('cside/export_python');
+			$loader = new \Twig\Loader\FilesystemLoader('cside/python_templates');
 			$twig = new \Twig\Environment($loader, [
 				'cache' => 'cside/cache',
 			]);
 
 			// Test to see how the arrays work
-			foreach($results as $result) {
+			var_dump($cm);
+			var_dump($export_config);
+			
+			/*foreach($results as $result) {
 				foreach($result as $key_field => $value) {
 					echo $result[$key_field];
 				}
-			}
+			}*/
 
-			 $twig->render('relis_statistics_playground.py', array(
+			// It works for now, but it prints it on the html page of the download. I want to be able to write a new file with the output instead of the echo
+			echo $twig->render('relis_statistics_lib.py', array(
+				'cm' => $cm,
+				'export_config' => $export_config,
+			));
 			
+
+			$twig->render('relis_statistics_playground.py', array(
+				
 				
 			));
 
-			 $twig->render('relis_statistics_lib.py', array(
-			
-				
-			));
+			// Writing files in the export
+			//$myfile1 = fopen("cside/export_python/relis_statistics_lib.py", "w") or die("Unable to open library!");
+			//fwrite($myfile1, $python_lib);
+			//$myfile2 = fopen("cside/export_python/relis_statistics_playground.py", "w") or die("Unable to open playground!");
+			//fwrite($myfile2, $python_play);
+			//fclose($myfile1);
+			//fclose($myfile2);
 
 		}catch (Exception $e) {
 			set_top_msg($e);
