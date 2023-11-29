@@ -589,93 +589,103 @@ class Reporting extends CI_Controller
 			$this->python_statistical_function_factory(
 				'generate_desc_frequency_table',
 				'descriptive',
-				'dataframe',
+				'Dataframe',
 				'Nominal'
 			),
 			$this->python_statistical_function_factory(
 				'generate_desc_bar_plot',
 				'descriptive',
-				'figure',
+				'Figure',
 				'Nominal'
 			),
 			$this->python_statistical_function_factory(
 				'generate_desc_statistics',
 				'descriptive',
-				'dataframe',
+				'Dataframe',
 				'Continuous'
 			),
 			$this->python_statistical_function_factory(
 				'generate_desc_box_plot',
 				'descriptive',
-				'figure',
+				'Figure',
 				'Continuous'
 			),
 			$this->python_statistical_function_factory(
 				'generate_desc_violin_plot',
 				'descriptive',
-				'figure',
+				'Figure',
 				'Continuous'
 			),
 			$this->python_statistical_function_factory(
 				'generate_evo_frequency_table',
 				'evolutive',
-				'dataframe',
+				'Dataframe',
 				'Nominal'
 			),
 			$this->python_statistical_function_factory(
 				'generate_evo_plot',
 				'evolutive',
-				'figure',
+				'Figure',
 				'Nominal'
 			),
 			$this->python_statistical_function_factory(
 				'generate_comp_frequency_table',
 				'comparative',
-				'dataframe',
+				'Dataframe',
 				'Nominal'
 			),
 			$this->python_statistical_function_factory(
 				'generate_comp_stacked_bar_plot',
 				'comparative',
-				'figure',
+				'Figure',
 				'Nominal'
 			),
 			$this->python_statistical_function_factory(
 				'generate_comp_grouped_bar_plot',
 				'comparative',
-				'figure',
+				'Figure',
 				'Nominal'
 			),
 			$this->python_statistical_function_factory(
 				'generate_comp_bubble_chart',
 				'comparative',
-				'figure',
+				'Figure',
 				'Nominal'
 			),
 			$this->python_statistical_function_factory(
 				'generate_comp_fisher_exact_test',
 				'comparative',
-				'dataframe',
+				'Dataframe',
 				'Nominal'
 			),
 			$this->python_statistical_function_factory(
 				'generate_comp_shapiro_wilk_test',
 				'comparative',
-				'dataframe',
-				'ContinuousVariables'
+				'Dataframe',
+				'Continuous'
 			),
 			$this->python_statistical_function_factory(
 				'generate_comp_pearson_cor_test',
 				'comparative',
-				'dataframe',
-				'ContinuousVariables'
+				'Dataframe',
+				'Continuous'
 			),
 			$this->python_statistical_function_factory(
 				'generate_comp_spearman_cor_test',
 				'comparative',
-				'dataframe',
-				'ContinuousVariables'
+				'Dataframe',
+				'Continuous'
 			)
+		);
+	}
+
+	private function python_statistical_function_factory($name, $type, $return_type, $field_type)
+	{
+		return array(
+			'name' => $name,
+			'type' => $type,
+			'return_data_type' => $return_type,
+			'field_type' => $field_type 
 		);
 	}
 
@@ -725,9 +735,20 @@ class Reporting extends CI_Controller
 		}
 	}
 
-	private function python_classification_field_factory($field_name, $field_title, $field_type, $multiple) {
+	private function python_evaluate_field_statistical_functions($field_type, $STATISTICAL_FUNCTIONS)
+	{
+		$statistical_functions = array_filter($STATISTICAL_FUNCTIONS, function($statistical_function) use ($field_type) {
+			return $statistical_function['field_type'] == $field_type;
+		});
+
+		// Reset the indexes
+		return array_values($statistical_functions);
+	}
+
+	private function python_classification_field_factory($field_name, $field_title, $field_type,
+	 $multiple, $statistical_functions) {
 		return array('name' => $field_name, 'title' => $field_title,
-		'type' => $field_type, 'multiple' => $multiple);
+		'type' => $field_type, 'multiple' => $multiple, 'statistics' => $statistical_functions);
 	}
 
 	/**
@@ -736,7 +757,7 @@ class Reporting extends CI_Controller
 	 * Field type
 	 * Field is multiple
 	 */
-	private function python_classification_model_factory($table_fields) {
+	private function python_classification_model_factory($table_fields, $statistical_functions) {
 		foreach($table_fields as $field_name => &$field_value) {
 			$type = $this->python_evaluate_field_type_condition($field_value);
 
@@ -746,9 +767,11 @@ class Reporting extends CI_Controller
 				continue;
 			}
 
+			$field_statistical_functions = $this->python_evaluate_field_statistical_functions($type,
+			 $statistical_functions);
 			$multiple = $this->python_evaluate_multiple($field_value['number_of_values']);
 			$table_fields[$field_name] = $this->python_classification_field_factory($field_name,
-			$field_value['field_title'], $type, $multiple);
+			$field_value['field_title'], $type, $multiple, $field_statistical_functions);
 		}
 		return $table_fields;
 	}
@@ -783,20 +806,11 @@ class Reporting extends CI_Controller
 
 		$results = $this->python_fields_cleaning($table_fields,
 		$export_config['CLASSIFICATION_METADATA_FIELDS']);
-		$cm = $this->python_classification_model_factory($results);
+		$cm = $this->python_classification_model_factory($results,
+		 $export_config['STATISTICAL_FUNCTIONS']);
 
 		return $this->python_add_static_classification_fields($cm,
 		$export_config['CLASSIFICATION_STATIC_FIELDS']);
-	}
-
-	private function python_statistical_function_factory($name, $type, $return_type, $variable_type)
-	{
-		return array(
-			'name' => $name,
-			'type' => $type,
-			'return_type' => $return_type,
-			'variable_type' => $variable_type 
-		);
 	}
 
 	private function python_create_export_config($statistical_functions)
