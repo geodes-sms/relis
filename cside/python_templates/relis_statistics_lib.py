@@ -7,25 +7,18 @@ import matplotlib.pyplot as plt
 from enum import Enum
 from typing import Type
 from matplotlib import ticker
-#from FisherExact import fisher_exact
+from FisherExact import fisher_exact
 from statsmodels.robust.scale import mad
 from scipy.stats import kurtosis, skew, shapiro, spearmanr, pearsonr 
-
-{% for key1, item in cm %}
-    {% for key2, variable in item %}
-        {{ key1 }} 
-        {{ key2 }}: {{ variable.name }}
-    {% endfor %}
-{% endfor %}
 
 ### Config
 
 plt.rcParams['figure.max_open_warning'] = 0
 
 class Multivalue(Enum):
-    SEPARATOR = {{attribute(export_config,'MULTIVALUE_SEPARATOR')}}
+    SEPARATOR = '{{attribute(export_config,'MULTIVALUE_SEPARATOR')}}'
 class Policies(Enum):
-    DROPNA = {{attribute(export_config,'DROP_NA')}}
+    DROPNA = {{attribute(export_config,'DROP_NA') ? 'True' : 'False' }}
 
 ### Types
 
@@ -40,20 +33,21 @@ class Variable:
         self.type = type
         self.multiple = multiple
 
+{#Producing the Nominal variables of our configuration model #}
 class NominalVariables(Enum):
-    venue = Variable("venue", "Venue", FieldClassificationType.NOMINAL, False)
-    search_type = Variable("search_type", "Search Type", FieldClassificationType.NOMINAL, False)
-    domain = Variable("domain", "Domain", FieldClassificationType.NOMINAL, False)
-    transformation_language = Variable("transformation_language", "Transformation Language", FieldClassificationType.NOMINAL, True)
-    source_language = Variable("source_language", "Source language", FieldClassificationType.NOMINAL, False)
-    target_language = Variable("target_language", "Target language", FieldClassificationType.NOMINAL, False)
-    scope = Variable("scope", "Scope", FieldClassificationType.NOMINAL, True)
-    industrial = Variable("industrial", "Industrial", FieldClassificationType.NOMINAL, False)
-    bidirectional = Variable("bidirectional", "Bidirectional", FieldClassificationType.NOMINAL, False)
+{% for key1, item in cm %}
+{% if item.type == 'Nominal'%}
+    {{ item.name }} = Variable("{{item.name}}", "{{item.title}}", FieldClassificationType.NOMINAL, {{attribute(item,'multiple') ? 'True' : 'False' }})
+{% endif %}
+{% endfor %}
 
+{#Producing the Continuous variables of our configuration model #}
 class ContinuousVariables(Enum):
-    publication_year = Variable("publication_year", "Publication year", FieldClassificationType.CONTINUOUS, False)
-    targeted_year = Variable("targeted_year", "Targeted year", FieldClassificationType.CONTINUOUS, False)
+{% for key1, item in cm %}
+{% if item.type == 'Continuous'%}
+    {{ item.name }} = Variable("{{item.name}}", "{{item.title}}", FieldClassificationType.CONTINUOUS, {{attribute(item,'multiple') ? 'True' : 'False' }})
+{% endif %}
+{% endfor %}
 
 class DataFrame:
     def __init__(self, data: pd.DataFrame, variable_type: Type[NominalVariables] | Type[ContinuousVariables]):

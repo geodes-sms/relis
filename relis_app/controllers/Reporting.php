@@ -827,7 +827,7 @@ class Reporting extends CI_Controller
 			)
 		);
 		$MULTIVALUE_SEPARATOR = '|';
-		$DROP_NA = 'false';
+		$DROP_NA = false;
 
 		return array('PROJECT_NAME' => $PROJECT_NAME,
 		'CLASSIFICATION_METADATA_FIELDS' => $CLASSIFICATION_METADATA_FIELDS,
@@ -889,24 +889,24 @@ class Reporting extends CI_Controller
 			}*/
 
 			// It works for now, but it prints it on the html page of the download. I want to be able to write a new file with the output instead of the echo
-			echo $twig->render('relis_statistics_lib.py', array(
+			$python_lib = $twig->render('relis_statistics_lib.py', array(
 				'cm' => $cm,
 				'export_config' => $export_config,
 			));
 			
 
-			$twig->render('relis_statistics_playground.py', array(
+			$python_play = $twig->render('relis_statistics_playground.py', array(
 				
 				
 			));
 
 			// Writing files in the export
-			//$myfile1 = fopen("cside/export_python/relis_statistics_lib.py", "w") or die("Unable to open library!");
-			//fwrite($myfile1, $python_lib);
-			//$myfile2 = fopen("cside/export_python/relis_statistics_playground.py", "w") or die("Unable to open playground!");
-			//fwrite($myfile2, $python_play);
-			//fclose($myfile1);
-			//fclose($myfile2);
+			$myfile1 = fopen("cside/export_python/relis_statistics_lib.py", "w") or die("Unable to open library!");
+			fwrite($myfile1, $python_lib);
+			$myfile2 = fopen("cside/export_python/relis_statistics_playground.py", "w") or die("Unable to open playground!");
+			fwrite($myfile2, $python_play);
+			fclose($myfile1);
+			fclose($myfile2);
 
 		}catch (Exception $e) {
 			set_top_msg($e);
