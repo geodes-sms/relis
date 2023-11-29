@@ -679,13 +679,16 @@ class Reporting extends CI_Controller
 		);
 	}
 
-	private function python_statistical_function_factory($name, $type, $return_type, $field_type)
+	/**
+	 * Abstract the creation of statistics for the classfication data
+	*/
+	private function python_statistical_function_factory($name, $type, $return_type, $data_type)
 	{
 		return array(
 			'name' => $name,
 			'type' => $type,
+			'data_type' => $data_type,
 			'return_data_type' => $return_type,
-			'field_type' => $field_type 
 		);
 	}
 
@@ -713,7 +716,7 @@ class Reporting extends CI_Controller
 	}
 	
 	/**
-	 * Evaluate the type of a field
+	 * Evaluates the type of a field
 	 * Null value is returned if the type
 	 * isn't euqal to Nominal or Continuous
 	 */
@@ -735,16 +738,23 @@ class Reporting extends CI_Controller
 		}
 	}
 
+	/**
+	 * Returns the set of statistical functions associated to a given field in terms
+	 * of it's type (data_type) 
+	 */
 	private function python_evaluate_field_statistical_functions($field_type, $STATISTICAL_FUNCTIONS)
 	{
 		$statistical_functions = array_filter($STATISTICAL_FUNCTIONS, function($statistical_function) use ($field_type) {
-			return $statistical_function['field_type'] == $field_type;
+			return $statistical_function['data_type'] == $field_type;
 		});
 
 		// Reset the indexes
 		return array_values($statistical_functions);
 	}
 
+	/**
+	 * Abstract the creation of statistical classification fields 
+	 */
 	private function python_classification_field_factory($field_name, $field_title, $field_type,
 	 $multiple, $statistical_functions) {
 		return array('name' => $field_name, 'title' => $field_title,
@@ -813,6 +823,10 @@ class Reporting extends CI_Controller
 		$export_config['CLASSIFICATION_STATIC_FIELDS']);
 	}
 
+	/**
+	 * Encapsulate static and dynaminc configuration parameters related
+	 * to the relis statistical classification (RSC) service
+	 */
 	private function python_create_export_config($statistical_functions)
 	{
 		$PROJECT_NAME = project_db();
@@ -838,7 +852,7 @@ class Reporting extends CI_Controller
 	}
 	
 	/**
-	 * Main function for the python statistical classfication scripts generator
+	 * Orchestrator for the python statistical classfication scripts generator
 	 */
 	public function python_export()
 	{
