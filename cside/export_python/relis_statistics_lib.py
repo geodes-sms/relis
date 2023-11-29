@@ -7,10 +7,9 @@ import matplotlib.pyplot as plt
 from enum import Enum
 from typing import Type
 from matplotlib import ticker
-#from FisherExact import fisher_exact
+from FisherExact import fisher_exact
 from statsmodels.robust.scale import mad
 from scipy.stats import kurtosis, skew, shapiro, spearmanr, pearsonr 
-
 
 ### Config
 
@@ -28,10 +27,10 @@ class FieldClassificationType(Enum):
     CONTINUOUS = 'Continuous'
 
 class Variable:
-    def __init__(self, name: str, title: str, type: FieldClassificationType, multiple: bool):
+    def __init__(self, name: str, title: str, data_type: FieldClassificationType, multiple: bool):
         self.name = name
         self.title = title
-        self.type = type
+        self.data_type = data_type
         self.multiple = multiple
 
 class NominalVariables(Enum):
@@ -43,7 +42,7 @@ class NominalVariables(Enum):
     variety = Variable("variety", "Variety", FieldClassificationType.NOMINAL, True)
     bev_qualities = Variable("bev_qualities", "Bevrage qualities", FieldClassificationType.NOMINAL, True)
 
-class ContinuousVariables(Enum):
+class ContinuousVariables(Enum):    
     temperature = Variable("temperature", "Temperature", FieldClassificationType.CONTINUOUS, False)
     year = Variable("year", "Year", FieldClassificationType.CONTINUOUS, False)
     citation = Variable("citation", "Number of citations", FieldClassificationType.CONTINUOUS, False)
