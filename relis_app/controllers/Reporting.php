@@ -758,7 +758,7 @@ class Reporting extends CI_Controller
 	private function python_classification_field_factory($field_name, $field_title, $field_type,
 	 $multiple, $statistical_functions) {
 		return array('name' => $field_name, 'title' => $field_title,
-		'type' => $field_type, 'multiple' => $multiple, 'statistics' => $statistical_functions);
+		'data_type' => $field_type, 'multiple' => $multiple, 'statistics' => $statistical_functions);
 	}
 
 	/**
@@ -836,7 +836,7 @@ class Reporting extends CI_Controller
 			array(
 				'name' => 'publication_year',
 				'title' => 'Publication year',
-				'type' => 'Continuous',
+				'data_type' => 'Continuous',
 				'multiple' => false
 			)
 		);
@@ -889,7 +889,8 @@ class Reporting extends CI_Controller
 
 			$loader = new \Twig\Loader\FilesystemLoader('cside/python_templates');
 			$twig = new \Twig\Environment($loader, [
-				'cache' => 'cside/cache',
+				// 'cache' => 'cside/cache',
+				'cache' => false
 			]);
 
 			// Test to see how the arrays work

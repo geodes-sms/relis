@@ -27,24 +27,24 @@ class FieldClassificationType(Enum):
     CONTINUOUS = 'Continuous'
 
 class Variable:
-    def __init__(self, name: str, title: str, type: FieldClassificationType, multiple: bool):
+    def __init__(self, name: str, title: str, data_type: FieldClassificationType, multiple: bool):
         self.name = name
         self.title = title
-        self.type = type
+        self.data_type = data_type
         self.multiple = multiple
 
 {#Producing the Nominal variables of our configuration model #}
 class NominalVariables(Enum):
 {% for key1, item in cm %}
-{% if item.type == 'Nominal'%}
+{% if item.data_type == 'Nominal'%}
     {{ item.name }} = Variable("{{item.name}}", "{{item.title}}", FieldClassificationType.NOMINAL, {{attribute(item,'multiple') ? 'True' : 'False' }})
 {% endif %}
 {% endfor %}
 
 {#Producing the Continuous variables of our configuration model #}
-class ContinuousVariables(Enum):
+class ContinuousVariables(Enum):    
 {% for key1, item in cm %}
-{% if item.type == 'Continuous'%}
+{% if item.data_type == 'Continuous'%}
     {{ item.name }} = Variable("{{item.name}}", "{{item.title}}", FieldClassificationType.CONTINUOUS, {{attribute(item,'multiple') ? 'True' : 'False' }})
 {% endif %}
 {% endfor %}
