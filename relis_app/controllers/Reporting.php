@@ -950,6 +950,12 @@ class Reporting extends CI_Controller
 			$this->python_compress_executable_artifacts($library_artifact_name, $playground_artifact_name,
 			$python_lib, $python_playground, $project_name, $target_directory, $classification_file_name);
 
+			$this->python_compress_executable_artifacts($library_artifact_name, $playground_artifact_name,
+			$project_name, $target_directory);
+
+			$this->python_delete_file($target_directory . 'relis_statistics_lib.py');
+			$this->python_delete_file($target_directory . 'relis_statistics_playground.py');
+
 		}catch (Exception $e) {
 			set_top_msg($e);
 		}
