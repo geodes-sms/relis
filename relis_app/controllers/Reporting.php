@@ -842,13 +842,48 @@ class Reporting extends CI_Controller
 		);
 		$MULTIVALUE_SEPARATOR = '|';
 		$DROP_NA = false;
+		$TARGET_DIRECTORY = 'cside/export_python/';
 
 		return array('PROJECT_NAME' => $PROJECT_NAME,
 		'CLASSIFICATION_METADATA_FIELDS' => $CLASSIFICATION_METADATA_FIELDS,
 		'CLASSIFICATION_STATIC_FIELDS' => $CLASSIFICATION_STATIC_FIELDS,
 		'MULTIVALUE_SEPARATOR' => $MULTIVALUE_SEPARATOR,
 		'DROP_NA' => $DROP_NA,
-		'STATISTICAL_FUNCTIONS' => $statistical_functions);
+		'STATISTICAL_FUNCTIONS' => $statistical_functions,
+		'TARGET_DIRECTORY' => $TARGET_DIRECTORY);
+	}
+
+	private function python_compress_executable_artifacts($library_artifact_name,
+	 $playground_artifact_name, $project_name, $target_directory)
+	{
+		$zip = new ZipArchive();
+
+		$python_env_name = 'python_env_' . $project_name ;
+		$zipFileName = $target_directory . $python_env_name . '.zip';
+		$root_directory = $python_env_name . '/';
+
+		if ($zip->open($zipFileName, ZipArchive::CREATE)!==TRUE) {
+			set_top_msg('Cannot open <$filename>\n');
+			return;
+		}
+
+		$zip->addFile($target_directory . $library_artifact_name, $root_directory . $library_artifact_name);
+		$zip->addFile($target_directory . $playground_artifact_name, $root_directory . $playground_artifact_name);
+
+		$zip->close();
+	}
+
+	private function python_delete_file($file_path)
+	{
+		if (!file_exists($file_path)) {
+			set_top_msg('File does not exist');
+			return;
+		}
+
+		if (!unlink($file_path)) {
+			set_top_msg('Error deleting the file: ' . $file_path);
+			return;
+		}
 	}
 	
 	/**
@@ -867,6 +902,8 @@ class Reporting extends CI_Controller
 			# TWIG business logic should be invoked here
 			$this->twig_generate($cm, $export_config);
 
+			redirect('reporting/result_export');
+
 		} catch (Exception $e) {
 			set_top_msg($e);
 		}
@@ -882,7 +919,7 @@ class Reporting extends CI_Controller
 	* Function that uses TWIG to generate the 2 python files, relis_statistics_playground.py and relis_statistics_lib.py
 	* 
 	*/
-	public function twig_generate($cm, $export_config){
+	private function twig_generate($cm, $export_config){
 		try{
 			// Initial setup for TWIG 
 			require_once 'vendor/autoload.php';
@@ -893,9 +930,14 @@ class Reporting extends CI_Controller
 				'cache' => false
 			]);
 
+			$library_artifact_name = 'relis_statistics_lib.py';
+			$playground_artifact_name = 'relis_statistics_playground.py';
+			$target_directory = $export_config['TARGET_DIRECTORY'];
+			$project_name = $export_config['PROJECT_NAME'];
+
 			// Test to see how the arrays work
-			var_dump($cm);
-			var_dump($export_config);
+			// var_dump($cm);
+			// var_dump($export_config);
 			
 			/*foreach($results as $result) {
 				foreach($result as $key_field => $value) {
@@ -914,19 +956,34 @@ class Reporting extends CI_Controller
 				
 				
 			));
-
 			// Writing files in the export
-			$myfile1 = fopen("cside/export_python/relis_statistics_lib.py", "w") or die("Unable to open library!");
+			$myfile1 = fopen($target_directory . 'relis_statistics_lib.py', "w") or die("Unable to open library!");
 			fwrite($myfile1, $python_lib);
-			$myfile2 = fopen("cside/export_python/relis_statistics_playground.py", "w") or die("Unable to open playground!");
+			$myfile2 = fopen($target_directory . 'relis_statistics_playground.py', "w") or die("Unable to open playground!");
 			fwrite($myfile2, $python_play);
 			fclose($myfile1);
 			fclose($myfile2);
+
+			$this->python_compress_executable_artifacts($library_artifact_name, $playground_artifact_name,
+			$project_name, $target_directory);
+
+			$this->python_delete_file($target_directory . 'relis_statistics_lib.py');
+			$this->python_delete_file($target_directory . 'relis_statistics_playground.py');
 
 		}catch (Exception $e) {
 			set_top_msg($e);
 		}
 
+	}
+
+	//enable the user to download the specified file
+	public function python_download($file_name)
+	{
+		$url = "cside/export_python/" . $file_name;
+		header("Content-Type: application/zip");
+		header("Content-Transfer-Encoding: Binary");
+		header("Content-disposition: attachment; filename=\"" . $file_name . "\"");
+		readfile($url);
 	}
 
 	public function r_export_configurations($data = "", $operation = "new", $display_type = "normal")

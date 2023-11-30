@@ -11,7 +11,9 @@ RUN apt-get autoclean && apt-get update && apt-get install -y \
     ksh \
     unzip \
     zip \
-    git
+    git \
+    libzip-dev \
+    docker-php-ext-install
 
 RUN apt-get install -y libicu-dev
 RUN docker-php-ext-install intl mysqli pdo pdo_mysql
