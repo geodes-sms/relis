@@ -121,7 +121,7 @@ class Reporting extends CI_Controller
 	}
 
 	//retrieves the classification data, prepares the necessary information for export, creates a CSV file, and writes the data to the file
-	public function result_export_classification()
+	private function generate_result_export_classification()
 	{
 		//get classification
 		$table_ref = "classification";
@@ -250,23 +250,35 @@ class Reporting extends CI_Controller
 		if (!empty($data['list'])) {
 			array_unshift($list_to_display, $field_list_header);
 		}
-        try {
-            $f_new = fopen("cside/export_r/relis_classification_" . project_db() . ".csv", 'w');
-            if (!$f_new) {
-                throw new Exception('Could not open file relis_classification_'. project_db() . ".csv");
-            }
-            // Iterate over the data, writting each line to the text stream
-            foreach ($list_to_display as $val) {
-                fputcsv($f_new, $val, get_appconfig_element('csv_field_separator_export'));
-            }
-            fclose($f_new);
-            set_top_msg(lng_min('File generated'));
-        }
-        catch (Exception $e) {
-            set_top_msg(lng_min("Error (File: ".$e->getFile().", line ".$e->getLine()."): ".$e->getMessage()), 'error');
-        }
-		redirect('reporting/result_export');
+      
+		$f_new = fopen("cside/export_r/relis_classification_" . project_db() . ".csv", 'w');
+		if (!$f_new) {
+			throw new Exception('Could not open file relis_classification_'. project_db() . ".csv");
+		}
+		// Iterate over the data, writting each line to the text stream
+		foreach ($list_to_display as $val) {
+			fputcsv($f_new, $val, get_appconfig_element('csv_field_separator_export'));
+		}
+		fclose($f_new);
 	}
+
+	/**
+	 * Wrapper function on top of generate_result_export_classification
+	 * to handle errors and redirection.
+	 * 
+	 * This allows the generate_result_export_classification to be invoked
+	 * in other parts of the application.
+	 */
+	public function result_export_classification()
+	{
+		try {
+			$this->generate_result_export_classification();
+			set_top_msg(lng_min('File generated'));
+		} catch (Exception $e) {
+			set_top_msg(lng_min("Error (File: ".$e->getFile().", line ".$e->getLine()."): ".$e->getMessage()), 'error');
+		}
+		redirect('reporting/result_export');
+	}	
 
 	//export classification data from the "classification" table to a CSV file, which can then be downloaded or used for further analysis
 	public function result_export_classification2()
@@ -581,7 +593,7 @@ class Reporting extends CI_Controller
 
 	/**
 	 * Functions which are used to perform the statistical
-	 * classification analysis of a given project 
+	 * classification analysis of a given project
 	 */
 	private function python_statistical_functions()
 	{
@@ -716,12 +728,13 @@ class Reporting extends CI_Controller
 	}
 	
 	/**
-	 * Evaluates the type of a field
-	 * Null value is returned if the type
-	 * isn't euqal to Nominal or Continuous
+	 * Taken from the r_export_configurations view
+	 * 
+	 * Evaluates the data type of a field.
+	 * No value is returned if the type
+	 * isn't equal to Nominal or Continuous
 	 */
 	private function python_evaluate_field_type_condition($value) {
-		// Taken from the r_export_configurations view
 		if (
 			($value['field_type'] === 'text' && $value['category_type'] != 'FreeCategory') ||
 			($value['field_type'] === 'int' && $value['category_type'] != 'FreeCategory') ||
@@ -740,7 +753,7 @@ class Reporting extends CI_Controller
 
 	/**
 	 * Returns the set of statistical functions associated to a given field in terms
-	 * of it's type (data_type) 
+	 * of it's type (data_type)
 	 */
 	private function python_evaluate_field_statistical_functions($field_type, $STATISTICAL_FUNCTIONS)
 	{
@@ -843,6 +856,7 @@ class Reporting extends CI_Controller
 		$MULTIVALUE_SEPARATOR = '|';
 		$DROP_NA = false;
 		$TARGET_DIRECTORY = 'cside/export_python/';
+		$CLASSIFICATION_FILE_NAME = 'relis_classification_' . $PROJECT_NAME . '.csv';
 
 		return array('PROJECT_NAME' => $PROJECT_NAME,
 		'CLASSIFICATION_METADATA_FIELDS' => $CLASSIFICATION_METADATA_FIELDS,
@@ -850,11 +864,18 @@ class Reporting extends CI_Controller
 		'MULTIVALUE_SEPARATOR' => $MULTIVALUE_SEPARATOR,
 		'DROP_NA' => $DROP_NA,
 		'STATISTICAL_FUNCTIONS' => $statistical_functions,
-		'TARGET_DIRECTORY' => $TARGET_DIRECTORY);
+		'TARGET_DIRECTORY' => $TARGET_DIRECTORY,
+		'CLASSIFICATION_FILE_NAME' => $CLASSIFICATION_FILE_NAME);
 	}
 
-	private function python_compress_executable_artifacts($library_artifact_name,
-	 $playground_artifact_name, $project_name, $target_directory)
+	private function python_compress_executable_artifacts(
+		$library_artifact_name,
+		$playground_artifact_name,
+		$python_lib,
+		$python_playground,
+		$project_name,
+		$target_directory,
+		$classification_file_name)
 	{
 		$zip = new ZipArchive();
 
@@ -863,44 +884,35 @@ class Reporting extends CI_Controller
 		$root_directory = $python_env_name . '/';
 
 		if ($zip->open($zipFileName, ZipArchive::CREATE)!==TRUE) {
-			set_top_msg('Cannot open <$filename>\n');
-			return;
+			throw new Exception('Cannot open ' . $zipFileName);
 		}
-
-		$zip->addFile($target_directory . $library_artifact_name, $root_directory . $library_artifact_name);
-		$zip->addFile($target_directory . $playground_artifact_name, $root_directory . $playground_artifact_name);
+		
+		$zip->addFromString($root_directory . $library_artifact_name, $python_lib);
+		$zip->addFromString($root_directory . $playground_artifact_name, $python_playground);
+		$zip->addFile('cside/export_r/' . $classification_file_name, $root_directory . $classification_file_name);
 
 		$zip->close();
 	}
-
-	private function python_delete_file($file_path)
-	{
-		if (!file_exists($file_path)) {
-			set_top_msg('File does not exist');
-			return;
-		}
-
-		if (!unlink($file_path)) {
-			set_top_msg('Error deleting the file: ' . $file_path);
-			return;
-		}
-	}
 	
 	/**
-	 * Orchestrator for the python statistical classfication scripts generator
+	 * Orchestrator for the python statistical classfication environment
+	 * generation
 	 */
-	public function python_export()
+	public function python_environment_export()
 	{
 		try {
+			# Project statistical classification modelization
 			$statistical_functions = $this->python_statistical_functions();
 			$export_config = $this->python_create_export_config($statistical_functions);
 			$cm = $this->python_create_classification_model($export_config);
 
-			$js_code = 'console.log(' . json_encode($cm) . ')';
-			echo "<script>$js_code</script>";
+			# Generate/update project classification data
+			$this->generate_result_export_classification();
 
-			# TWIG business logic should be invoked here
-			$this->twig_generate($cm, $export_config);
+			# Python environment code generation
+			$this->python_twig_generate($cm, $export_config);
+
+			set_top_msg(lng_min('Python environment generated'));
 
 			redirect('reporting/result_export');
 
@@ -916,10 +928,11 @@ class Reporting extends CI_Controller
  	* TWIG SETUP
  	* --------------------------------------------------------------------
 	*
-	* Function that uses TWIG to generate the 2 python files, relis_statistics_playground.py and relis_statistics_lib.py
+	* Function that uses TWIG to generate the 2 python files,
+	* relis_statistics_playground.py and relis_statistics_lib.py
 	* 
 	*/
-	private function twig_generate($cm, $export_config){
+	private function python_twig_generate($cm, $export_config){
 		try{
 			// Initial setup for TWIG 
 			require_once 'vendor/autoload.php';
@@ -934,6 +947,7 @@ class Reporting extends CI_Controller
 			$playground_artifact_name = 'relis_statistics_playground.py';
 			$target_directory = $export_config['TARGET_DIRECTORY'];
 			$project_name = $export_config['PROJECT_NAME'];
+			$classification_file_name = $export_config['CLASSIFICATION_FILE_NAME'];
 
 			// Test to see how the arrays work
 			// var_dump($cm);
@@ -952,23 +966,13 @@ class Reporting extends CI_Controller
 			));
 			
 
-			$python_play = $twig->render('relis_statistics_playground.py', array(
+			$python_playground = $twig->render('relis_statistics_playground.py', array(
 				
 				
 			));
-			// Writing files in the export
-			$myfile1 = fopen($target_directory . 'relis_statistics_lib.py', "w") or die("Unable to open library!");
-			fwrite($myfile1, $python_lib);
-			$myfile2 = fopen($target_directory . 'relis_statistics_playground.py', "w") or die("Unable to open playground!");
-			fwrite($myfile2, $python_play);
-			fclose($myfile1);
-			fclose($myfile2);
 
 			$this->python_compress_executable_artifacts($library_artifact_name, $playground_artifact_name,
-			$project_name, $target_directory);
-
-			$this->python_delete_file($target_directory . 'relis_statistics_lib.py');
-			$this->python_delete_file($target_directory . 'relis_statistics_playground.py');
+			$python_lib, $python_playground, $project_name, $target_directory, $classification_file_name);
 
 		}catch (Exception $e) {
 			set_top_msg($e);
@@ -976,7 +980,11 @@ class Reporting extends CI_Controller
 
 	}
 
-	//enable the user to download the specified file
+	/**
+	 * Extended from the download file function
+	 * Both functions could be generalized into
+	 * a single one 
+	 */
 	public function python_download($file_name)
 	{
 		$url = "cside/export_python/" . $file_name;

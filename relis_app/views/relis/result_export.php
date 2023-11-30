@@ -52,6 +52,7 @@
            $class_exluded_filename=FCPATH."cside/export_r/relis_paper_excluded_class_".project_db().".csv";
            $r_config_filename=FCPATH."cside/export_r/relis_r_config_".project_db().".R";
            $r_lib_filename=FCPATH."cside/export_r/relis_r_lib_".project_db().".R";
+           $python_environment_filename=FCPATH."cside/export_python/python_env_".project_db().".zip";
            
            if(file_exists($paper_filename)){
            	$paper_size = (filesize($paper_filename)> 1000 ? round(filesize($paper_filename)/1000): round(filesize($paper_filename)/1000,1)).' Kb  Last update:';
@@ -153,6 +154,19 @@
              
             $r_lib_dsc="";
            }
+
+           if(file_exists($python_environment_filename)){
+            $paper_size = (filesize($python_environment_filename)>1000 ? round(filesize($python_environment_filename)/1000): round(filesize($python_environment_filename)/1000,1)).' Kb  Last update:';
+            $paper_date = date("Y-m-d h:i:s", filemtime($python_environment_filename));
+             
+            $python_environment_dsc="<i class='fa fa-download'></i> Download Python (".$paper_size.$paper_date.")";
+             
+           }else{
+            
+            $python_environment_dsc="";
+           }
+
+          //  python_environment_filename
       
            echo box_header("Result","",12,12,12);
            ?>
@@ -197,7 +211,8 @@
 
            
            <tr>
-          <td>Python environment</td><td><a href="<?php echo base_url();?>reporting/python_download/python_env_<?php echo project_db();?>.zip"><i class='fa fa-download'></i> Download Python</a></td><td></td>
+           <td>Python environment</td><td><a href="<?php echo base_url();?>reporting/python_download/python_env_<?php echo project_db();?>.zip"><?php echo $python_environment_dsc?></a></td><td><a href="<?php echo base_url();?>reporting/python_environment_export"><i class="fa fa-refresh"></i><?php echo lng('Update file')?></a></td>
+          <!-- <td>Python environment</td><td><a href="<?php echo base_url();?>reporting/python_download/python_env_<?php echo project_db();?>.zip"><i class='fa fa-download'></i> Download Python</a></td><td></td> -->
            </tr>
 
 
