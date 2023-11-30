@@ -1,5 +1,4 @@
 import re
-import json
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -7,18 +6,23 @@ import matplotlib.pyplot as plt
 from enum import Enum
 from typing import Type
 from matplotlib import ticker
-from FisherExact import fisher_exact
+from matplotlib.text import Text
 from statsmodels.robust.scale import mad
-from scipy.stats import kurtosis, skew, shapiro, spearmanr, pearsonr 
+from scipy.stats import kurtosis, skew, shapiro, spearmanr, pearsonr, chi2_contingency
 
 ### Config
 
 plt.rcParams['figure.max_open_warning'] = 0
 
+custom = {'axes.edgecolor': 'black', 'grid.linestyle': 'dashed', 'grid.color': 'grey'}
+
+sns.set_style('darkgrid', rc = custom)
+
 class Multivalue(Enum):
     SEPARATOR = '{{attribute(export_config,'MULTIVALUE_SEPARATOR')}}'
+
 class Policies(Enum):
-    DROPNA = {{attribute(export_config,'DROP_NA') ? 'True' : 'False' }}
+    DROP_NA = {{attribute(export_config,'DROP_NA') ? 'True' : 'False' }}
 
 ### Types
 
@@ -64,8 +68,8 @@ class ContinuousDataFrame(DataFrame):
 
 ### Shared
 
-def removeEmptyStrings(df: pd.DataFrame):
-    df.replace('', np.nan, inplace=True)
+def substituteNan(df: pd.DataFrame) -> None:
+    df.replace(np.nan, '', inplace=True)
 
 def get_variable(field_name: str, variables) -> Variable:
     return variables[field_name].value
@@ -73,6 +77,7 @@ def get_variable(field_name: str, variables) -> Variable:
 def split_multiple_values(value):
     if not pd.isna(value):
         return [item.strip() for item in re.split(rf'\{Multivalue.SEPARATOR.value}', value)] 
+    
     return [value]
 
 def process_multiple_values(values: pd.Series, multiple: bool):
@@ -81,35 +86,73 @@ def process_multiple_values(values: pd.Series, multiple: bool):
 
     return values.apply(lambda x: [x])
 
+def dataFrameGetTitle(statistic_type: str, statistic_name: str,
+                          field_name: str, dependency_field_name = None):
+    
+    base_str =  f"{statistic_type} | {statistic_name} : {field_name}"
+    if dependency_field_name: base_str += f"->{dependency_field_name}"
+
+    return {'title': base_str}
+
+def configureSeabornLegend(title: str, ax, plt):
+    handles, labels = ax.get_legend_handles_labels()
+
+    if handles:
+        plt.legend(bbox_to_anchor=(1, 1), loc='upper left', title=title)
+        plt.gca().get_legend().get_frame().set_edgecolor('black')
+
+def dataFrameUpdateTitle(dataFrame: pd.DataFrame, object: dict):
+    dataFrame.attrs.update(object)
+
+def create_empty_dataframe(title: dict[str, str], dataFrameUpdateTitle):
+    empty_df = pd.DataFrame()
+    dataFrameUpdateTitle(empty_df, title)
+
+    return empty_df
+
+def no_data_message():
+    return 'No data... Nothing to show'
+
 def display_data(dataFrame: pd.DataFrame, bool: bool):
-    if bool: print(dataFrame)
+    if not bool:
+        return
+    
+    if dataFrame.attrs.get('title'): print(dataFrame.attrs.get('title'))
+
+    if dataFrame.size != 0:
+        print(dataFrame.to_markdown())
+    else:
+        print(no_data_message())
+    print('\n')
 
 def display_figure(plt, bool: bool):
-    if bool: plt.show()
+    if isinstance(plt, Text):
+        print(plt.get_text())
+        print(no_data_message())
+        print('\n')
+        return
+    elif bool: plt.show()
 
 ### Data
 
-## Parsing (only for demonstration purposes)
+## Parsing
 
-with open('../data/relis_classification_rsc_CV.json', 'r', encoding='utf8') as f:
-   classification_data: list[dict[str, str]] =  json.loads(f.read())
+project_classification_data = pd.read_csv('./{{attribute(export_config,'PROJECT_NAME')}}.csv', encoding='utf8')
+
+nominal_variables = {nominal_variable.value.title: nominal_variable.name for nominal_variable in NominalVariables}
+continuous_variables = {continuous_variable.value.title: continuous_variable.name for continuous_variable in ContinuousVariables}
 
 ## Preprocessing
 
-# Split config file based on data type
-def filter_row_by_field_type(paper, field_type):
-    pd_row = {key: value["value"] for key, value in paper.items() if value['type'] == field_type}
-    return pd_row
+nominal_data = project_classification_data[nominal_variables.keys()].rename(columns=nominal_variables)
+continuous_data = project_classification_data[continuous_variables.keys()].rename(columns=continuous_variables)
 
-nominal_data = pd.DataFrame([filter_row_by_field_type(paper, FieldClassificationType.NOMINAL.value) for paper in classification_data])
-continuous_data = pd.DataFrame([filter_row_by_field_type(paper, FieldClassificationType.CONTINUOUS.value) for paper in classification_data])
+if (not Policies.DROP_NA.value):
+    substituteNan(nominal_data)
+    substituteNan(continuous_data)
 
 nominal = NominalDataFrame(nominal_data, NominalVariables)
 continuous = ContinuousDataFrame(continuous_data, ContinuousVariables)
-
-if (Policies.DROPNA.value):
-    removeEmptyStrings(nominal.data)
-    removeEmptyStrings(continuous.data)
 
 ### DESCRIPTIVE STATS
 
@@ -119,7 +162,7 @@ def beautify_data_desc(field_name: str, data: pd.DataFrame):
     # Get metadata
     variable = get_variable(field_name, NominalVariables)
 
-    # Split the values by the "|" character and flatten the result
+    # Split the values by the multivalue character and flatten the result
     split_values = process_multiple_values(data[field_name], variable.multiple)
     flattened_values = np.concatenate(split_values)
 
@@ -134,73 +177,92 @@ def beautify_data_desc(field_name: str, data: pd.DataFrame):
 
 ## Frequency tables
 
-desc_distr_vector = {NominalVariables[field_name]: beautify_data_desc(field_name, nominal.data)
+def generate_desc_frequency_table(field_name: str, data: pd.DataFrame):
+    subset_data = beautify_data_desc(field_name, data)
+
+    dataFrameUpdateTitle(subset_data, dataFrameGetTitle('Descriptive', 'Frequency tables', field_name))
+
+    return subset_data
+
+desc_frequency_tables = {NominalVariables[field_name]:  generate_desc_frequency_table(field_name, nominal.data)
                       for field_name in nominal.data.columns}
 
 ## Bar plots
 
-def generate_bar_plot(field_name: str, data: pd.DataFrame):
+def generate_desc_bar_plot(field_name: str, data: pd.DataFrame):
     df = beautify_data_desc(field_name, data)
-    
-    if (len(df) == 0): return
-
-    # Set the theme
-    sns.set_theme(style="whitegrid")
-
-    # Create the plot
-    fig, ax = plt.subplots(figsize=(10, 6))
-    sns.barplot(data=df, x="value", y="percentage", hue="n")
 
     # Get metadata
     variable = get_variable(field_name, NominalVariables)
 
     # Set labels and title
     title = f"{variable.title} ~ Bar plot"
+    
+    if df.empty: return plt.title(title)
+
+    # Create the plot
+    fig, ax = plt.subplots(figsize=(10, 6))
+    hue = 'n'
+    sns.barplot(data=df, x='value', y='percentage', hue=hue, dodge=False) # type: ignore
+
     plt.title(title)
     plt.xlabel(variable.title)
-    plt.ylabel("Percentage")
+    plt.ylabel('Percentage')
+    configureSeabornLegend(hue, ax, plt)
 
     return fig
 
-bar_plot_vector = {NominalVariables[field_name]: generate_bar_plot(field_name, nominal.data)
+desc_bar_plots = {NominalVariables[field_name]: generate_desc_bar_plot(field_name, nominal.data)
                     for field_name in nominal.data.columns}
 
 ## Statistics
 
-def generate_statistics(field_name: str, data: pd.DataFrame):
+def generate_desc_statistics(field_name: str, data: pd.DataFrame):
     series =  data[field_name]
     
     series.replace('', np.nan, inplace=True)
+
+    df_title = dataFrameGetTitle('Descriptive', 'Statistics', field_name)
     
-    if (len(data) == 0): return
+    if data.empty: return create_empty_dataframe(df_title, dataFrameUpdateTitle)
 
-    nan_policy = 'omit' if Policies.DROPNA.value else 'propagate'
+    nan_policy = 'omit' if Policies.DROP_NA.value else 'propagate'
     results = {
-    "vars": 1,
-    "n": series.count(),
-    "mean": series.mean(),
-    "sd": series.std(),
-    "median": series.median(),
-    "trimmed": series[series.between(series.quantile(0.25), series.quantile(0.75))].mean(),
-    "mad": mad(series),
-    "min": series.min(),
-    "max": series.max(),
-    "range": series.max() - series.min(),
-    "skew": skew(series, nan_policy=nan_policy),
-    "kurtosis": kurtosis(series, nan_policy=nan_policy, fisher=True),
-    "se": series.std() / np.sqrt(series.count())  
+    'vars': 1,
+    'n': series.count(),
+    'mean': series.mean(),
+    'sd': series.std(),
+    'median': series.median(),
+    'trimmed': series[series.between(series.quantile(0.25), series.quantile(0.75))].mean(),
+    'mad': mad(series),
+    'min': series.min(),
+    'max': series.max(),
+    'range': series.max() - series.min(),
+    'skew': skew(series, nan_policy=nan_policy),
+    'kurtosis': kurtosis(series, nan_policy=nan_policy, fisher=True),
+    'se': series.std() / np.sqrt(series.count())  
     }
-    return results
 
-statistics_vector = {ContinuousVariables[field_name]: generate_statistics(field_name, continuous.data)
+    subset_data = pd.DataFrame(results, index=[0])
+
+    dataFrameUpdateTitle(subset_data, df_title)
+
+    return subset_data
+
+desc_statistics = {ContinuousVariables[field_name]: generate_desc_statistics(field_name, continuous.data)
                       for field_name in continuous.data.columns}
 
 ## Box Plots
 
-def generate_box_plot(field_name: str, data: pd.DataFrame):
+def generate_desc_box_plot(field_name: str, data: pd.DataFrame):
     series = data[field_name]
 
     variable = get_variable(field_name, ContinuousVariables)
+
+    # Set the title and labels
+    title = f"{variable.title} ~ Box plot"
+
+    if series.empty: return plt.title(title)
 
     # Create the box plot
     fig, ax = plt.subplots(figsize=(10, 6))
@@ -210,37 +272,38 @@ def generate_box_plot(field_name: str, data: pd.DataFrame):
     mean_value = series.mean()
     plt.scatter(x=0, y=mean_value, color='red', s=50, zorder=3)  # s is the size of the point
 
-    # Set the title and labels
-    title = f"{variable.title} ~ Box plot"
     plt.title(title)
     plt.ylabel(variable.title)
     plt.xlabel('')
-
     plt.gca().yaxis.set_major_formatter(ticker.FormatStrFormatter('%0.0f'))
 
     return fig
 
-box_plot_vector = {ContinuousVariables[field_name]: generate_box_plot(field_name, continuous.data)
+desc_box_plots = {ContinuousVariables[field_name]: generate_desc_box_plot(field_name, continuous.data)
                     for field_name in continuous.data.columns}
 
 ## Violin Plots
 
-def generate_violin_plot(field_name: str, data: pd.DataFrame):
+def generate_desc_violin_plot(field_name: str, data: pd.DataFrame):
     series = data[field_name]
     
     variable = get_variable(field_name, ContinuousVariables)
 
-    fig, ax = plt.subplots(figsize=(10, 6))
-    sns.violinplot(data=series, color="lightgray")
+    title = f"{variable.title} ~ Violin plot"
 
-    plt.title(f"{variable.title} ~ Violin plot")
+    if series.empty: return plt.title(title)
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+    sns.violinplot(data=series, color='lightgray')
+
+    plt.title(title)
     plt.ylabel(variable.title)
-    plt.xlabel("Density")
+    plt.xlabel('Density')
     plt.xticks([])
 
     return fig
 
-violin_plot_vector = {ContinuousVariables[field_name]: generate_violin_plot(field_name, continuous.data)
+desc_violin_plots = {ContinuousVariables[field_name]: generate_desc_violin_plot(field_name, continuous.data)
                        for field_name in continuous.data.columns}
 
 ### EVOLUTIVE STATS
@@ -267,7 +330,7 @@ def beautify_data_evo(field_name: str, publication_year: pd.Series, variable: Va
 
 ## Frequency tables
 
-def expand_data(field_name: str, publication_year: pd.Series, data: pd.DataFrame):
+def generate_evo_frequency_table(field_name: str, publication_year: pd.Series, data: pd.DataFrame):
     variable = get_variable(field_name, NominalVariables)
 
     subset_data = beautify_data_evo(field_name, publication_year, variable, data)
@@ -278,9 +341,11 @@ def expand_data(field_name: str, publication_year: pd.Series, data: pd.DataFrame
     subset_data.columns.name = None
     subset_data.reset_index(inplace=True)
 
+    dataFrameUpdateTitle(subset_data, dataFrameGetTitle('Evolutive', 'Frequency tables', field_name))
+
     return subset_data 
 
-evo_distr_vector = {NominalVariables[field_name]: expand_data(field_name, continuous.data["publication_year"], nominal.data)
+evo_frequency_tables = {NominalVariables[field_name]: generate_evo_frequency_table(field_name, continuous.data["publication_year"], nominal.data)
                        for field_name in nominal.data.columns}
 
 ## Evolution Plots
@@ -290,18 +355,25 @@ def generate_evo_plot(field_name: str, publication_year: pd.Series, data: pd.Dat
     
     subset_data = beautify_data_evo(field_name, publication_year, variable, data)
 
+    title = f"{variable.title} ~ Evolution plot"
+
+    if subset_data.empty: return plt.title(title)
+
     # Create a plot
     fig, ax = plt.subplots(figsize=(10, 6))
-    sns.lineplot(data=subset_data, x='Year', y='Frequency', hue='Value', style='Value', markers=True)
+    hue = 'Value'
+    sns.lineplot(data=subset_data, x='Year', y='Frequency', hue=hue, style='Value', markers=True)
 
     # Setting title, labels, and theme
-    plt.title(f"{variable.title} ~ Evolution plot")
+    plt.title(title)
     plt.xlabel('Year')
     plt.ylabel('Frequency')
     plt.grid(True)
+    configureSeabornLegend(hue, ax, plt)
+
     return fig
 
-evolution_plot_vector = {NominalVariables[field_name]: generate_evo_plot(field_name, continuous.data["publication_year"], nominal.data)
+evo_plots = {NominalVariables[field_name]: generate_evo_plot(field_name, continuous.data["publication_year"], nominal.data)
                           for field_name in nominal.data.columns}
 
 ### COMPARATIVE STATS
@@ -316,7 +388,7 @@ def beautify_data_comp(field_name: str, dependency_field_name: str,
     })
     
     # Filtering out rows where any of the variables is empty
-    subset_data = subset_data[(subset_data[field_name] != "") & (subset_data[dependency_field_name] != "")]
+    subset_data = subset_data[(subset_data[field_name] != '') & (subset_data[dependency_field_name] != '')]
 
     # Splitting the strings and expanding into separate rows
     subset_data[field_name] = process_multiple_values(subset_data[field_name], variable.multiple)
@@ -345,26 +417,32 @@ def evaluate_comparative_dependency_field(field_name: str, dataFrame: DataFrame,
 
 ## Frequency Tables
 
-def generate_comparative_violin_plot(field_name: str, dependency_field_name: str, data: pd.DataFrame):
+def generate_comp_frequency_table(field_name: str, dependency_field_name: str, data: pd.DataFrame):
     variable = get_variable(field_name, NominalVariables)
     dependency_variable = get_variable(dependency_field_name, NominalVariables)
 
-    return beautify_data_comp(field_name, dependency_field_name,
+    subset_data = beautify_data_comp(field_name, dependency_field_name,
                                       variable, dependency_variable, data)
+    
+    dataFrameUpdateTitle(subset_data, dataFrameGetTitle('Comparative', 'Frequency tables', field_name, dependency_variable.title))
 
-comp_distr_vector = {NominalVariables[field_name]: evaluate_comparative_dependency_field(field_name, nominal, generate_comparative_violin_plot)
+    return subset_data
+
+comp_frequency_tables = {NominalVariables[field_name]: evaluate_comparative_dependency_field(field_name, nominal, generate_comp_frequency_table)
                        for field_name in nominal.data.columns}
 
-## Bar Plots
+## Stacked Bar Plots
 
-def generate_stacked_bar_plot(field_name: str, dependency_field_name: str, data: pd.DataFrame):
+def generate_comp_stacked_bar_plot(field_name: str, dependency_field_name: str, data: pd.DataFrame):
     variable = get_variable(field_name, NominalVariables)
     dependency_variable = get_variable(dependency_field_name, NominalVariables)
 
     subset_data = beautify_data_comp(field_name, dependency_field_name,
                                       variable, dependency_variable, data)
 
-    if subset_data.empty: return
+    title = f"{variable.title} and {dependency_variable.title} ~ Stacked bar plot"
+
+    if subset_data.empty: return plt.title(title)
 
     # Pivot the data to get a matrix form
     pivoted_data = subset_data.pivot(index=field_name, columns=dependency_field_name, values='Frequency')
@@ -381,132 +459,175 @@ def generate_stacked_bar_plot(field_name: str, dependency_field_name: str, data:
         plt.bar(pivoted_data.index, pivoted_data[col], bottom=bottom_value, label=col)
         bottom_value += pivoted_data[col]
 
-    plt.title(f"{variable.title} and {dependency_variable.title} ~ Stacked bar plot")
+    plt.title(title)
     plt.xlabel(variable.title)
     plt.ylabel('Frequency')
-    plt.legend(title=dependency_field_name)
+    configureSeabornLegend(dependency_variable.title, ax, plt)
 
     return fig
 
-stacked_bar_plot_vector = {NominalVariables[field_name]: evaluate_comparative_dependency_field(field_name, nominal, generate_stacked_bar_plot)
+comp_stacked_bar_plots = {NominalVariables[field_name]: evaluate_comparative_dependency_field(field_name, nominal, generate_comp_stacked_bar_plot)
                        for field_name in nominal.data.columns}
 
 ## Grouped Bar Plots
 
-def generate_grouped_bar_plot(field_name: str, dependency_field_name: str, data: pd.DataFrame):
+def generate_comp_grouped_bar_plot(field_name: str, dependency_field_name: str, data: pd.DataFrame):
     variable = get_variable(field_name, NominalVariables)
     dependency_variable = get_variable(dependency_field_name, NominalVariables)
 
     subset_data = beautify_data_comp(field_name, dependency_field_name,
                                       variable, dependency_variable, data)
+    
+    title = f"{variable.title} and {dependency_variable.title} ~ Grouped bar plot"
 
-    if subset_data.empty: return
+    if subset_data.empty: return plt.title(title)
 
     fig, ax = plt.subplots(figsize=(10, 6))
-    sns.barplot(x=field_name, y='Frequency', hue=dependency_field_name, data=subset_data, dodge=True)
+    sns.barplot(x=field_name, y='Frequency', hue=dependency_field_name, data=subset_data, dodge=False) # type: ignore
 
-    plt.title(f"{variable.title} and {dependency_variable.title} ~ Grouped bar plot")
+    plt.title(title)
     plt.gca().set_xlabel('')
     plt.ylabel('Frequency')
+    configureSeabornLegend(dependency_variable.title, ax, plt)
 
     return fig
 
-grouped_bar_plot_vector = {NominalVariables[field_name]: evaluate_comparative_dependency_field(field_name, nominal, generate_grouped_bar_plot)
+comp_grouped_bar_plots = {NominalVariables[field_name]: evaluate_comparative_dependency_field(field_name, nominal, generate_comp_grouped_bar_plot)
                        for field_name in nominal.data.columns}
 
 ## Bubble Charts
 
-def generate_bubble_chart(field_name: str, dependency_field_name: str, data: pd.DataFrame):
+def generate_comp_bubble_chart(field_name: str, dependency_field_name: str, data: pd.DataFrame):
     variable = get_variable(field_name, NominalVariables)
     dependency_variable = get_variable(dependency_field_name, NominalVariables)
 
     subset_data = beautify_data_comp(field_name, dependency_field_name,
                                       variable, dependency_variable, data)
 
-    if subset_data.empty: return
+    title = f"{variable.title} and {dependency_variable.title} ~ Bubble Chart"
+
+    if subset_data.empty: return plt.title(title)
 
     # Creating the bubble chart
     fig, ax = plt.subplots(figsize=(10, 6))
-    sns.scatterplot(data=subset_data, x=field_name, y=dependency_field_name, size='Frequency', color='black')
+    size = 'Frequency'
+    sns.scatterplot(data=subset_data, x=field_name, y=dependency_field_name, size=size, color='black')
 
     # Adding labels and title
-    plt.title(f"{variable.title} and {dependency_variable.title} ~ Bubble Chart")
+    plt.title(title)
     plt.gca().set_xlabel('')
     plt.gca().set_ylabel('')
+    configureSeabornLegend(size, ax, plt)
 
     return fig
 
-bubble_chart_vector = {NominalVariables[field_name]: evaluate_comparative_dependency_field(field_name, nominal, generate_bubble_chart)
+comp_bubble_charts = {NominalVariables[field_name]: evaluate_comparative_dependency_field(field_name, nominal, generate_comp_bubble_chart)
                        for field_name in nominal.data.columns}
 
-## Fisher's Exact Test
+## Chi-squared test
 
-def fisher_exact_test(field_name: str, dependency_field_name: str, data: pd.DataFrame):
+def generate_comp_chi_squared_test(field_name: str, dependency_field_name: str, data: pd.DataFrame):
     variable = get_variable(field_name, NominalVariables)
     dependency_variable = get_variable(dependency_field_name, NominalVariables)
 
     subset_data = beautify_data_comp(field_name, dependency_field_name,
                                       variable, dependency_variable, data)
+    
+    df_title = dataFrameGetTitle('Comparative', 'Chi-squared test', field_name)
 
-    if subset_data.empty: return
+    empty_df = create_empty_dataframe(df_title, dataFrameUpdateTitle)
 
-    # Check for the condition where there's only one row and both variables are NaN
+    if subset_data.empty: return empty_df
+
+    # Check for the condition where both variables are NaN
     if len(subset_data) == 1 and pd.isna(subset_data[field_name]).all() and pd.isna(subset_data[dependency_field_name]).all():
-        return
+        return empty_df
 
     # Create contingency table
     contingency_table = pd.crosstab(subset_data[field_name], subset_data[dependency_field_name],
                                      values=subset_data['Frequency'], aggfunc='sum', dropna=False).fillna(0)
+   
+    # Calculating the Chi-squared statistic
+    chi2_result = chi2_contingency(contingency_table)
 
-    # Perform Fisher's Exact Test
-    fisher_result = fisher_exact(contingency_table, simulate_pval=True)
+    subset_data = pd.DataFrame({
+        'p-value': chi2_result.pvalue # type: ignore
+    }, index=[0])
 
-    # return fisher_result
-    return fisher_result
+    dataFrameUpdateTitle(subset_data, df_title)
 
-fisher_exact_test_vector = {NominalVariables[field_name]: evaluate_comparative_dependency_field(field_name, nominal, fisher_exact_test)
+    return subset_data
+
+comp_chi_squared_tests = {NominalVariables[field_name]: evaluate_comparative_dependency_field(field_name, nominal, generate_comp_chi_squared_test)
                        for field_name in nominal.data.columns}
 
 ## Shapiro Wilk's Correlation Test
 
-def shapiro_wilk_test(field_name: str, continuous_df: pd.DataFrame):
+def generate_comp_shapiro_wilk_test(field_name: str, continuous_df: pd.DataFrame):
     subset_data = continuous_df[field_name].fillna(0)
 
     shapiro_result = shapiro(subset_data)
 
-    return shapiro_result
+    statistics, pvalue =  shapiro_result
 
-shapiro_wilk_test_vector = {ContinuousVariables[field_name]: shapiro_wilk_test(field_name, continuous.data)
+    subset_data = pd.DataFrame({
+        'statistics': statistics,
+        'p-value': pvalue
+    }, index=[0])
+
+    dataFrameUpdateTitle(subset_data, dataFrameGetTitle('Comparative', "Shapiro Wilk's Correlation Test", field_name))
+
+    return subset_data
+
+comp_shapiro_wilk_tests = {ContinuousVariables[field_name]: generate_comp_shapiro_wilk_test(field_name, continuous.data)
                           for field_name in continuous.data.columns}
 
 ## Pearson's Correlation Test
 
-def pearson_cor_test(field_name: str, dependency_field_name: str, data: pd.DataFrame):
-    _, pvalue = shapiro_wilk_test_vector[ContinuousVariables[field_name]]
-    _, dpvalue = shapiro_wilk_test_vector[ContinuousVariables[dependency_field_name]]
+def generate_comp_pearson_cor_test(field_name: str, dependency_field_name: str, data: pd.DataFrame):
+    p_value = comp_shapiro_wilk_tests[ContinuousVariables[field_name]]['p-value'][0]
+    dp_value = comp_shapiro_wilk_tests[ContinuousVariables[dependency_field_name]]['p-value'][0]
 
-    if not (pvalue > 0.05 and dpvalue > 0.05): return
+    df_title = dataFrameGetTitle('Comparative', "Pearson's Correlation Test", field_name)
+
+    if not (p_value > 0.05 and dp_value > 0.05): return create_empty_dataframe(df_title, dataFrameUpdateTitle)
     
     # Perform Pearson's correlation test
     pearson_coefficient, p_value = pearsonr(data[field_name].fillna(0), data[dependency_field_name].fillna(0))
 
-    return pearson_coefficient, p_value
+    subset_data = pd.DataFrame({
+        'pearson coefficient': pearson_coefficient,
+        'p-value': p_value
+    }, index=[0])
 
-pearson_cor_test_vector = {ContinuousVariables[field_name]: evaluate_comparative_dependency_field(field_name, continuous, pearson_cor_test)
+    dataFrameUpdateTitle(subset_data, df_title)
+
+    return subset_data
+
+comp_pearson_cor_tests = {ContinuousVariables[field_name]: evaluate_comparative_dependency_field(field_name, continuous, generate_comp_pearson_cor_test)
                        for field_name in continuous.data.columns}
 
 ## Spearman's Correlation Test
 
-def spearman_cor_test(field_name: str, dependency_field_name: str, data: pd.DataFrame):
-    _, pvalue = shapiro_wilk_test_vector[ContinuousVariables[field_name]]
-    _, dpvalue = shapiro_wilk_test_vector[ContinuousVariables[dependency_field_name]]
+def generate_comp_spearman_cor_test(field_name: str, dependency_field_name: str, data: pd.DataFrame):
+    p_value = comp_shapiro_wilk_tests[ContinuousVariables[field_name]]['p-value'][0]
+    dp_value = comp_shapiro_wilk_tests[ContinuousVariables[dependency_field_name]]['p-value'][0]
 
-    if  pvalue > 0.05 and dpvalue > 0.05: return
-  
+    df_title = dataFrameGetTitle('Comparative', "Spearman's Correlation Test", field_name)
+    
+    if  p_value > 0.05 and dp_value > 0.05: return create_empty_dataframe(df_title, dataFrameUpdateTitle)
+
     # Perform Spearman's correlation test
     spearman_result = spearmanr(data[field_name].fillna(0), data[dependency_field_name].fillna(0))
 
-    return spearman_result
+    subset_data = pd.DataFrame({
+        'statistic': spearman_result.statistic, # type: ignore
+        'p-value': spearman_result.pvalue # type: ignore
+    }, index=[0])
 
-spearman_cor_test_vector = {ContinuousVariables[field_name]: evaluate_comparative_dependency_field(field_name, continuous, spearman_cor_test)
+    dataFrameUpdateTitle(subset_data, df_title)
+   
+    return subset_data
+
+comp_spearman_cor_tests = {ContinuousVariables[field_name]: evaluate_comparative_dependency_field(field_name, continuous, generate_comp_spearman_cor_test)
                        for field_name in continuous.data.columns}
