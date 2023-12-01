@@ -665,7 +665,7 @@ class Reporting extends CI_Controller
 				'Nominal'
 			),
 			$this->python_statistical_function_factory(
-				'generate_comp_fisher_exact_test',
+				'generate_comp_chi_squared_test',
 				'comparative',
 				'Dataframe',
 				'Nominal'
@@ -802,14 +802,14 @@ class Reporting extends CI_Controller
 	/**
 	 * Add mandatory fields which are shared between projects to the final data structure 
 	 */
-	private function python_add_static_classification_fields($cm, $CLASSIFICATION_STATIC_FIELDS)
+	private function python_add_static_classification_fields($results, $CLASSIFICATION_STATIC_FIELDS)
 	{
 		foreach($CLASSIFICATION_STATIC_FIELDS as $field_name => &$field_value) {
-			if (!array_key_exists($field_name, $cm)) {
-				$cm[$field_value['name']] = $field_value;
+			if (!array_key_exists($field_name, $results)) {
+				$results[$field_name] = $field_value;
 			}
 		}
-		return $cm;
+		return $results;
 	}
 
 	/**
@@ -829,11 +829,12 @@ class Reporting extends CI_Controller
 
 		$results = $this->python_fields_cleaning($table_fields,
 		$export_config['CLASSIFICATION_METADATA_FIELDS']);
+		$results = $this->python_add_static_classification_fields($results,
+		$export_config['CLASSIFICATION_STATIC_FIELDS']);
 		$cm = $this->python_classification_model_factory($results,
 		 $export_config['STATISTICAL_FUNCTIONS']);
 
-		return $this->python_add_static_classification_fields($cm,
-		$export_config['CLASSIFICATION_STATIC_FIELDS']);
+		return $cm;
 	}
 
 	/**
@@ -846,11 +847,12 @@ class Reporting extends CI_Controller
 		$CLASSIFICATION_METADATA_FIELDS = array('class_active', 'class_id',
 		'class_paper_id', 'classification_time', 'user_id', 'A_id');
 		$CLASSIFICATION_STATIC_FIELDS = array(
-			array(
-				'name' => 'publication_year',
-				'title' => 'Publication year',
-				'data_type' => 'Continuous',
-				'multiple' => false
+			'publication_year' => array(
+				'field_title' => 'Publication year',
+				'field_type' => 'int',
+				'number_of_values' => '1',
+				'category_type' => 'FreeCategory',
+				'input_type' => 'text'
 			)
 		);
 		$MULTIVALUE_SEPARATOR = '|';
