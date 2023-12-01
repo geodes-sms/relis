@@ -126,19 +126,22 @@ def display_data(dataFrame: pd.DataFrame, bool: bool):
     print('\n')
 
 def display_figure(plt, bool: bool):
+    if not bool:
+        return
+    
     if isinstance(plt, Text):
         print(plt.get_text())
         print(no_data_message())
         print('\n')
         return
-    elif bool: plt.show()
+    else: plt.show()
 
 ### Data
 
 ## Parsing
 
 {# The data should be at the root of the project, with the name of the project as the name of the .csv #}
-project_classification_data = pd.read_csv('./{{attribute(export_config,'PROJECT_NAME')}}.csv', encoding='utf8')
+project_classification_data = pd.read_csv('./{{attribute(export_config,'CLASSIFICATION_FILE_NAME')}}', encoding='utf8')
 
 nominal_variables = {nominal_variable.value.title: nominal_variable.name for nominal_variable in NominalVariables}
 continuous_variables = {continuous_variable.value.title: continuous_variable.name for continuous_variable in ContinuousVariables}

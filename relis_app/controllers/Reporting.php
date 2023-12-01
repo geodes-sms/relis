@@ -672,7 +672,7 @@ class Reporting extends CI_Controller
 			),
 			$this->python_statistical_function_factory(
 				'generate_comp_shapiro_wilk_test',
-				'comparative',
+				'descriptive',
 				'Continuous',
 				'Dataframe'
 			),
@@ -898,60 +898,32 @@ class Reporting extends CI_Controller
 	}
 
 	/**
- 	*
-	* 
- 	* --------------------------------------------------------------------
- 	* TWIG SETUP
- 	* --------------------------------------------------------------------
-	*
-	* Function that uses TWIG to generate the 2 python files,
-	* relis_statistics_playground.py and relis_statistics_lib.py
-	* 
+	 * TWIG static configuration parameters
+	 */
+	private function python_create_twig_config()
+	{
+		return array('LIBRARY_ARTIFACT_NAME' => 'relis_statistics_lib.py',
+		'PLAYGROUND_ARTIFACT_NAME' => 'relis_statistics_playground.py');
+	}
+
+	/**
+	* Function that uses the TWIG framework to generate the python
+	* executable artifacts part of the RSC environment
 	*/
-	private function python_twig_generate($cm, $export_config){
+	private function python_twig_generate($cm, $artifact_name, $export_config){
 		try{
 			// Initial setup for TWIG 
 			require_once 'vendor/autoload.php';
 
 			$loader = new \Twig\Loader\FilesystemLoader('cside/python_templates');
 			$twig = new \Twig\Environment($loader, [
-				//'cache' => 'cside/cache'
 				'cache' => false
 			]);
-
-			$library_artifact_name = 'relis_statistics_lib.py';
-			$playground_artifact_name = 'relis_statistics_playground.py';
-			$target_directory = $export_config['TARGET_DIRECTORY'];
-			$project_name = $export_config['PROJECT_NAME'];
-			$classification_file_name = $export_config['CLASSIFICATION_FILE_NAME'];
-
-			// Test to see how the arrays work
-			// var_dump($cm);
-			// var_dump($export_config);
 			
-			/*foreach($results as $result) {
-				foreach($result as $key_field => $value) {
-					echo $result[$key_field];
-				}
-			}*/
-
-			// Save the input in a variable, so we can write it on disk
-			$python_lib = $twig->render('relis_statistics_lib.py', array(
+			return $twig->render($artifact_name, array(
 				'cm' => $cm,
 				'export_config' => $export_config
 			));
-			
-
-			$python_play = $twig->render('relis_statistics_playground.py', array(
-				'cm' => $cm,
-				'export_config' => $export_config
-			));
-
-			$this->python_compress_executable_artifacts($library_artifact_name, $playground_artifact_name,
-			$python_lib, $python_playground, $project_name, $target_directory, $classification_file_name);
-
-			$this->python_compress_executable_artifacts($library_artifact_name, $playground_artifact_name,
-			$python_lib, $python_playground, $project_name, $target_directory, $classification_file_name);
 
 		}catch (Exception $e) {
 			set_top_msg($e);
@@ -974,8 +946,22 @@ class Reporting extends CI_Controller
 			# Generate/update project classification data
 			$this->generate_result_export_classification();
 
-			# Python environment code generation
-			$this->python_twig_generate($cm, $export_config);
+			# Environment code generation
+			$twig_config = $this->python_create_twig_config();
+
+			$python_lib_artifact = $this->python_twig_generate($cm, $twig_config['LIBRARY_ARTIFACT_NAME'],
+			 $export_config);
+
+			$python_playground_artifact = $this->python_twig_generate($cm, $twig_config['PLAYGROUND_ARTIFACT_NAME'],
+			 $export_config);
+
+			$twig_config = $this->python_create_twig_config();
+
+			# Environment packaging
+			$this->python_compress_executable_artifacts($twig_config['LIBRARY_ARTIFACT_NAME'],
+			$twig_config['PLAYGROUND_ARTIFACT_NAME'], $python_lib_artifact, $python_playground_artifact,
+			$export_config['PROJECT_NAME'], $export_config['TARGET_DIRECTORY'],
+			$export_config['CLASSIFICATION_FILE_NAME']);
 
 			set_top_msg(lng_min('Python environment generated'));
 
