@@ -881,15 +881,14 @@ class Reporting extends CI_Controller
 
 		$python_env_name = 'python_env_' . $project_name ;
 		$zipFileName = $target_directory . $python_env_name . '.zip';
-		$root_directory = $python_env_name . '/';
 
 		if ($zip->open($zipFileName, ZipArchive::CREATE)!==TRUE) {
 			throw new Exception('Cannot open ' . $zipFileName);
 		}
 		
-		$zip->addFromString($root_directory . $library_artifact_name, $python_lib);
-		$zip->addFromString($root_directory . $playground_artifact_name, $python_playground);
-		$zip->addFile('cside/export_r/' . $classification_file_name, $root_directory . $classification_file_name);
+		$zip->addFromString($library_artifact_name, $python_lib);
+		$zip->addFromString($playground_artifact_name, $python_playground);
+		$zip->addFile('cside/export_r/' . $classification_file_name, $classification_file_name);
 
 		$zip->close();
 	}
