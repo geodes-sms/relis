@@ -137,6 +137,7 @@ def display_figure(plt, bool: bool):
 
 ## Parsing
 
+{# The data should be at the root of the project, with the name of the project as the name of the .csv #}
 project_classification_data = pd.read_csv('./{{attribute(export_config,'PROJECT_NAME')}}.csv', encoding='utf8')
 
 nominal_variables = {nominal_variable.value.title: nominal_variable.name for nominal_variable in NominalVariables}
@@ -224,7 +225,7 @@ desc_bar_plots = {NominalVariables[field_name]: generate_desc_bar_plot(field_nam
 
 ## Statistics
 
-def generate_desc_statistics(field_name: str, data: pd.DataFrame):
+def generate_desc_statistic(field_name: str, data: pd.DataFrame):
     series =  data[field_name]
 
     df_title = dataFrameGetTitle('Descriptive', 'Statistics', field_name)
@@ -256,7 +257,7 @@ def generate_desc_statistics(field_name: str, data: pd.DataFrame):
 
     return subset_data
 
-desc_statistics = {ContinuousVariables[field_name]: generate_desc_statistics(field_name, continuous.data)
+desc_statistics = {ContinuousVariables[field_name]: generate_desc_statistic(field_name, continuous.data)
                       for field_name in continuous.data.columns}
 
 ## Box Plots

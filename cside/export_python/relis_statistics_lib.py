@@ -177,9 +177,14 @@ def beautify_data_desc(field_name: str, data: pd.DataFrame):
 ## Frequency tables
 
 def generate_desc_frequency_table(field_name: str, data: pd.DataFrame):
+    
+    df_title = dataFrameGetTitle('Descriptive', 'Frequency tables', field_name)
+    
+    if data.empty: return create_empty_dataframe(df_title, dataFrameUpdateTitle)
+
     subset_data = beautify_data_desc(field_name, data)
 
-    dataFrameUpdateTitle(subset_data, dataFrameGetTitle('Descriptive', 'Frequency tables', field_name))
+    dataFrameUpdateTitle(subset_data, df_title)
 
     return subset_data
 
@@ -189,15 +194,17 @@ desc_frequency_tables = {NominalVariables[field_name]:  generate_desc_frequency_
 ## Bar plots
 
 def generate_desc_bar_plot(field_name: str, data: pd.DataFrame):
-    df = beautify_data_desc(field_name, data)
-
     # Get metadata
     variable = get_variable(field_name, NominalVariables)
 
     # Set labels and title
     title = f"{variable.title} ~ Bar plot"
     
-    if df.empty: return plt.title(title)
+    if data.empty: return plt.title(title)
+
+    df = beautify_data_desc(field_name, data)
+
+    if df.empty: return plt.title(title) 
 
     # Create the plot
     fig, ax = plt.subplots(figsize=(10, 6))
@@ -216,14 +223,14 @@ desc_bar_plots = {NominalVariables[field_name]: generate_desc_bar_plot(field_nam
 
 ## Statistics
 
-def generate_desc_statistics(field_name: str, data: pd.DataFrame):
+def generate_desc_statistic(field_name: str, data: pd.DataFrame):
     series =  data[field_name]
-    
-    series.replace('', np.nan, inplace=True)
 
     df_title = dataFrameGetTitle('Descriptive', 'Statistics', field_name)
     
-    if data.empty: return create_empty_dataframe(df_title, dataFrameUpdateTitle)
+    if series.empty: return create_empty_dataframe(df_title, dataFrameUpdateTitle)
+    
+    series.replace('', np.nan, inplace=True)
 
     nan_policy = 'omit' if Policies.DROP_NA.value else 'propagate'
     results = {
@@ -248,7 +255,7 @@ def generate_desc_statistics(field_name: str, data: pd.DataFrame):
 
     return subset_data
 
-desc_statistics = {ContinuousVariables[field_name]: generate_desc_statistics(field_name, continuous.data)
+desc_statistics = {ContinuousVariables[field_name]: generate_desc_statistic(field_name, continuous.data)
                       for field_name in continuous.data.columns}
 
 ## Box Plots
@@ -565,6 +572,13 @@ comp_chi_squared_tests = {NominalVariables[field_name]: evaluate_comparative_dep
 def generate_comp_shapiro_wilk_test(field_name: str, continuous_df: pd.DataFrame):
     subset_data = continuous_df[field_name].fillna(0)
 
+    df_title = dataFrameGetTitle('Comparative', "Shapiro Wilk's Correlation Test", field_name)
+
+    empty_df = create_empty_dataframe(df_title, dataFrameUpdateTitle)
+
+    # Test requires at least 3 samples
+    if len(subset_data) <= 2: return empty_df
+
     shapiro_result = shapiro(subset_data)
 
     statistics, pvalue =  shapiro_result
@@ -574,7 +588,7 @@ def generate_comp_shapiro_wilk_test(field_name: str, continuous_df: pd.DataFrame
         'p-value': pvalue
     }, index=[0])
 
-    dataFrameUpdateTitle(subset_data, dataFrameGetTitle('Comparative', "Shapiro Wilk's Correlation Test", field_name))
+    dataFrameUpdateTitle(subset_data, df_title)
 
     return subset_data
 
@@ -584,12 +598,17 @@ comp_shapiro_wilk_tests = {ContinuousVariables[field_name]: generate_comp_shapir
 ## Pearson's Correlation Test
 
 def generate_comp_pearson_cor_test(field_name: str, dependency_field_name: str, data: pd.DataFrame):
+    df_title = dataFrameGetTitle('Comparative', "Pearson's Correlation Test", field_name)
+
+    empty_df = create_empty_dataframe(df_title, dataFrameUpdateTitle)
+    
+    if comp_shapiro_wilk_tests[ContinuousVariables[field_name]].empty or \
+    comp_shapiro_wilk_tests[ContinuousVariables[dependency_field_name]].empty : return empty_df
+
     p_value = comp_shapiro_wilk_tests[ContinuousVariables[field_name]]['p-value'][0]
     dp_value = comp_shapiro_wilk_tests[ContinuousVariables[dependency_field_name]]['p-value'][0]
 
-    df_title = dataFrameGetTitle('Comparative', "Pearson's Correlation Test", field_name)
-
-    if not (p_value > 0.05 and dp_value > 0.05): return create_empty_dataframe(df_title, dataFrameUpdateTitle)
+    if not (p_value > 0.05 and dp_value > 0.05): return empty_df
     
     # Perform Pearson's correlation test
     pearson_coefficient, p_value = pearsonr(data[field_name].fillna(0), data[dependency_field_name].fillna(0))
@@ -609,12 +628,17 @@ comp_pearson_cor_tests = {ContinuousVariables[field_name]: evaluate_comparative_
 ## Spearman's Correlation Test
 
 def generate_comp_spearman_cor_test(field_name: str, dependency_field_name: str, data: pd.DataFrame):
+    df_title = dataFrameGetTitle('Comparative', "Spearman's Correlation Test", field_name)
+
+    empty_df = create_empty_dataframe(df_title, dataFrameUpdateTitle)
+
+    if comp_shapiro_wilk_tests[ContinuousVariables[field_name]].empty or \
+    comp_shapiro_wilk_tests[ContinuousVariables[dependency_field_name]].empty : return empty_df
+
     p_value = comp_shapiro_wilk_tests[ContinuousVariables[field_name]]['p-value'][0]
     dp_value = comp_shapiro_wilk_tests[ContinuousVariables[dependency_field_name]]['p-value'][0]
-
-    df_title = dataFrameGetTitle('Comparative', "Spearman's Correlation Test", field_name)
     
-    if  p_value > 0.05 and dp_value > 0.05: return create_empty_dataframe(df_title, dataFrameUpdateTitle)
+    if  p_value > 0.05 and dp_value > 0.05: return empty_df
 
     # Perform Spearman's correlation test
     spearman_result = spearmanr(data[field_name].fillna(0), data[dependency_field_name].fillna(0))

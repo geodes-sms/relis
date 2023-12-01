@@ -611,7 +611,7 @@ class Reporting extends CI_Controller
 				'Nominal'
 			),
 			$this->python_statistical_function_factory(
-				'generate_desc_statistics',
+				'generate_desc_statistic',
 				'descriptive',
 				'Dataframe',
 				'Continuous'
@@ -913,7 +913,7 @@ class Reporting extends CI_Controller
 
 			$loader = new \Twig\Loader\FilesystemLoader('cside/python_templates');
 			$twig = new \Twig\Environment($loader, [
-				// 'cache' => 'cside/cache',
+				//'cache' => 'cside/cache'
 				'cache' => false
 			]);
 
@@ -933,16 +933,16 @@ class Reporting extends CI_Controller
 				}
 			}*/
 
-			// It works for now, but it prints it on the html page of the download. I want to be able to write a new file with the output instead of the echo
+			// Save the input in a variable, so we can write it on disk
 			$python_lib = $twig->render('relis_statistics_lib.py', array(
 				'cm' => $cm,
-				'export_config' => $export_config,
+				'export_config' => $export_config
 			));
 			
 
-			$python_playground = $twig->render('relis_statistics_playground.py', array(
-				
-				
+			$python_play = $twig->render('relis_statistics_playground.py', array(
+				'cm' => $cm,
+				'export_config' => $export_config
 			));
 
 			$this->python_compress_executable_artifacts($library_artifact_name, $playground_artifact_name,
