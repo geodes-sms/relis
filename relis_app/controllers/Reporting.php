@@ -601,92 +601,92 @@ class Reporting extends CI_Controller
 			$this->python_statistical_function_factory(
 				'generate_desc_frequency_table',
 				'descriptive',
-				'Dataframe',
-				'Nominal'
+				'Nominal',
+				'Dataframe'
 			),
 			$this->python_statistical_function_factory(
 				'generate_desc_bar_plot',
 				'descriptive',
-				'Figure',
-				'Nominal'
+				'Nominal',
+				'Figure'
 			),
 			$this->python_statistical_function_factory(
 				'generate_desc_statistic',
 				'descriptive',
-				'Dataframe',
-				'Continuous'
+				'Continuous',
+				'Dataframe'
 			),
 			$this->python_statistical_function_factory(
 				'generate_desc_box_plot',
 				'descriptive',
-				'Figure',
-				'Continuous'
+				'Continuous',
+				'Figure'
 			),
 			$this->python_statistical_function_factory(
 				'generate_desc_violin_plot',
 				'descriptive',
-				'Figure',
-				'Continuous'
+				'Continuous',
+				'Figure'
 			),
 			$this->python_statistical_function_factory(
 				'generate_evo_frequency_table',
 				'evolutive',
-				'Dataframe',
-				'Nominal'
+				'Nominal',
+				'Dataframe'
 			),
 			$this->python_statistical_function_factory(
 				'generate_evo_plot',
 				'evolutive',
-				'Figure',
-				'Nominal'
+				'Nominal',
+				'Figure'
 			),
 			$this->python_statistical_function_factory(
 				'generate_comp_frequency_table',
 				'comparative',
-				'Dataframe',
-				'Nominal'
+				'Nominal',
+				'Dataframe'
 			),
 			$this->python_statistical_function_factory(
 				'generate_comp_stacked_bar_plot',
 				'comparative',
-				'Figure',
-				'Nominal'
+				'Nominal',
+				'Figure'
 			),
 			$this->python_statistical_function_factory(
 				'generate_comp_grouped_bar_plot',
 				'comparative',
-				'Figure',
-				'Nominal'
+				'Nominal',
+				'Figure'
 			),
 			$this->python_statistical_function_factory(
 				'generate_comp_bubble_chart',
 				'comparative',
-				'Figure',
-				'Nominal'
+				'Nominal',
+				'Figure'
 			),
 			$this->python_statistical_function_factory(
 				'generate_comp_chi_squared_test',
 				'comparative',
-				'Dataframe',
-				'Nominal'
+				'Nominal',
+				'Dataframe'
 			),
 			$this->python_statistical_function_factory(
 				'generate_comp_shapiro_wilk_test',
 				'comparative',
-				'Dataframe',
-				'Continuous'
+				'Continuous',
+				'Dataframe'
 			),
 			$this->python_statistical_function_factory(
 				'generate_comp_pearson_cor_test',
 				'comparative',
-				'Dataframe',
-				'Continuous'
+				'Continuous',
+				'Dataframe'
 			),
 			$this->python_statistical_function_factory(
 				'generate_comp_spearman_cor_test',
 				'comparative',
-				'Dataframe',
-				'Continuous'
+				'Continuous',
+				'Dataframe'
 			)
 		);
 	}
@@ -694,7 +694,7 @@ class Reporting extends CI_Controller
 	/**
 	 * Abstract the creation of statistics for the classfication data
 	*/
-	private function python_statistical_function_factory($name, $type, $return_type, $data_type)
+	private function python_statistical_function_factory($name, $type, $data_type, $return_type)
 	{
 		return array(
 			'name' => $name,
