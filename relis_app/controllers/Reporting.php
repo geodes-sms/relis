@@ -880,44 +880,19 @@ class Reporting extends CI_Controller
 		$zip = new ZipArchive();
 
 		$python_env_name = 'python_env_' . $project_name ;
-		$zipFileName = $target_directory . $python_env_name . '.zip';
+		$zip_file_name = $target_directory . $python_env_name . '.zip';
+		$requirements_file_name = 'requirements.txt';
 
-		if ($zip->open($zipFileName, ZipArchive::CREATE)!==TRUE) {
-			throw new Exception('Cannot open ' . $zipFileName);
+		if ($zip->open($zip_file_name, ZipArchive::CREATE)!==TRUE) {
+			throw new Exception('Cannot open ' . $zip_file_name);
 		}
 		
 		$zip->addFromString($library_artifact_name, $python_lib);
 		$zip->addFromString($playground_artifact_name, $python_playground);
 		$zip->addFile('cside/export_r/' . $classification_file_name, $classification_file_name);
+		$zip->addFile('cside/python_templates/' . $requirements_file_name, $requirements_file_name);
 
 		$zip->close();
-	}
-	
-	/**
-	 * Orchestrator for the python statistical classfication environment
-	 * generation
-	 */
-	public function python_environment_export()
-	{
-		try {
-			# Project statistical classification modelization
-			$statistical_functions = $this->python_statistical_functions();
-			$export_config = $this->python_create_export_config($statistical_functions);
-			$cm = $this->python_create_classification_model($export_config);
-
-			# Generate/update project classification data
-			$this->generate_result_export_classification();
-
-			# Python environment code generation
-			$this->python_twig_generate($cm, $export_config);
-
-			set_top_msg(lng_min('Python environment generated'));
-
-			redirect('reporting/result_export');
-
-		} catch (Exception $e) {
-			set_top_msg($e);
-		}
 	}
 
 	/**
@@ -977,6 +952,33 @@ class Reporting extends CI_Controller
 			set_top_msg($e);
 		}
 
+	}
+
+	/**
+	 * Orchestrator for the python statistical classfication environment
+	 * generation
+	 */
+	public function python_environment_export()
+	{
+		try {
+			# Project statistical classification modelization
+			$statistical_functions = $this->python_statistical_functions();
+			$export_config = $this->python_create_export_config($statistical_functions);
+			$cm = $this->python_create_classification_model($export_config);
+
+			# Generate/update project classification data
+			$this->generate_result_export_classification();
+
+			# Python environment code generation
+			$this->python_twig_generate($cm, $export_config);
+
+			set_top_msg(lng_min('Python environment generated'));
+
+			redirect('reporting/result_export');
+
+		} catch (Exception $e) {
+			set_top_msg($e);
+		}
 	}
 
 	/**
