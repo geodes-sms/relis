@@ -43,7 +43,7 @@ display_figure(comp_bubble_charts[NominalVariables.has_choco][NominalVariables.c
 display_figure(comp_bubble_charts[NominalVariables.has_choco][NominalVariables.types], False)
 display_figure(comp_bubble_charts[NominalVariables.has_choco][NominalVariables.variety], False)
 display_figure(comp_bubble_charts[NominalVariables.has_choco][NominalVariables.bev_qualities], False)
-# Type of test: [comparative] Name of test: []
+# Type of test: [comparative] Name of test: [Chi-squared test]
 display_data(comp_chi_squared_tests[NominalVariables.has_choco][NominalVariables.brand], False)
 display_data(comp_chi_squared_tests[NominalVariables.has_choco][NominalVariables.cocoa_origin], False)
 display_data(comp_chi_squared_tests[NominalVariables.has_choco][NominalVariables.cocoa_level], False)
@@ -58,13 +58,13 @@ display_data(desc_statistics[ContinuousVariables.temperature], False)
 display_figure(desc_box_plots[ContinuousVariables.temperature], False)
 # Type of test: [descriptive] Name of test: [Violin plots]
 display_figure(desc_violin_plots[ContinuousVariables.temperature], False)
-# Type of test: [] Name of test: [descriptive]
+# Type of test: [descriptive] Name of test: [Shapiro Wilk's correlation test]
 display_data(comp_shapiro_wilk_tests[ContinuousVariables.temperature], False)
-# Type of test: [comparative] Name of test: []
+# Type of test: [comparative] Name of test: [Pearson's correlation test]
 display_data(comp_pearson_cor_tests[ContinuousVariables.temperature][ContinuousVariables.year], False)
 display_data(comp_pearson_cor_tests[ContinuousVariables.temperature][ContinuousVariables.citation], False)
 display_data(comp_pearson_cor_tests[ContinuousVariables.temperature][ContinuousVariables.publication_year], False)
-# Type of test: [comparative] Name of test: []
+# Type of test: [comparative] Name of test: [Spearman's correlation test]
 display_data(comp_spearman_cor_tests[ContinuousVariables.temperature][ContinuousVariables.year], False)
 display_data(comp_spearman_cor_tests[ContinuousVariables.temperature][ContinuousVariables.citation], False)
 display_data(comp_spearman_cor_tests[ContinuousVariables.temperature][ContinuousVariables.publication_year], False)
@@ -106,7 +106,7 @@ display_figure(comp_bubble_charts[NominalVariables.brand][NominalVariables.cocoa
 display_figure(comp_bubble_charts[NominalVariables.brand][NominalVariables.types], False)
 display_figure(comp_bubble_charts[NominalVariables.brand][NominalVariables.variety], False)
 display_figure(comp_bubble_charts[NominalVariables.brand][NominalVariables.bev_qualities], False)
-# Type of test: [comparative] Name of test: []
+# Type of test: [comparative] Name of test: [Chi-squared test]
 display_data(comp_chi_squared_tests[NominalVariables.brand][NominalVariables.has_choco], False)
 display_data(comp_chi_squared_tests[NominalVariables.brand][NominalVariables.cocoa_origin], False)
 display_data(comp_chi_squared_tests[NominalVariables.brand][NominalVariables.cocoa_level], False)
@@ -151,7 +151,7 @@ display_figure(comp_bubble_charts[NominalVariables.cocoa_origin][NominalVariable
 display_figure(comp_bubble_charts[NominalVariables.cocoa_origin][NominalVariables.types], False)
 display_figure(comp_bubble_charts[NominalVariables.cocoa_origin][NominalVariables.variety], False)
 display_figure(comp_bubble_charts[NominalVariables.cocoa_origin][NominalVariables.bev_qualities], False)
-# Type of test: [comparative] Name of test: []
+# Type of test: [comparative] Name of test: [Chi-squared test]
 display_data(comp_chi_squared_tests[NominalVariables.cocoa_origin][NominalVariables.has_choco], False)
 display_data(comp_chi_squared_tests[NominalVariables.cocoa_origin][NominalVariables.brand], False)
 display_data(comp_chi_squared_tests[NominalVariables.cocoa_origin][NominalVariables.cocoa_level], False)
@@ -196,7 +196,7 @@ display_figure(comp_bubble_charts[NominalVariables.cocoa_level][NominalVariables
 display_figure(comp_bubble_charts[NominalVariables.cocoa_level][NominalVariables.types], False)
 display_figure(comp_bubble_charts[NominalVariables.cocoa_level][NominalVariables.variety], False)
 display_figure(comp_bubble_charts[NominalVariables.cocoa_level][NominalVariables.bev_qualities], False)
-# Type of test: [comparative] Name of test: []
+# Type of test: [comparative] Name of test: [Chi-squared test]
 display_data(comp_chi_squared_tests[NominalVariables.cocoa_level][NominalVariables.has_choco], False)
 display_data(comp_chi_squared_tests[NominalVariables.cocoa_level][NominalVariables.brand], False)
 display_data(comp_chi_squared_tests[NominalVariables.cocoa_level][NominalVariables.cocoa_origin], False)
@@ -241,7 +241,7 @@ display_figure(comp_bubble_charts[NominalVariables.types][NominalVariables.cocoa
 display_figure(comp_bubble_charts[NominalVariables.types][NominalVariables.cocoa_level], False)
 display_figure(comp_bubble_charts[NominalVariables.types][NominalVariables.variety], False)
 display_figure(comp_bubble_charts[NominalVariables.types][NominalVariables.bev_qualities], False)
-# Type of test: [comparative] Name of test: []
+# Type of test: [comparative] Name of test: [Chi-squared test]
 display_data(comp_chi_squared_tests[NominalVariables.types][NominalVariables.has_choco], False)
 display_data(comp_chi_squared_tests[NominalVariables.types][NominalVariables.brand], False)
 display_data(comp_chi_squared_tests[NominalVariables.types][NominalVariables.cocoa_origin], False)
@@ -286,7 +286,7 @@ display_figure(comp_bubble_charts[NominalVariables.variety][NominalVariables.coc
 display_figure(comp_bubble_charts[NominalVariables.variety][NominalVariables.cocoa_level], False)
 display_figure(comp_bubble_charts[NominalVariables.variety][NominalVariables.types], False)
 display_figure(comp_bubble_charts[NominalVariables.variety][NominalVariables.bev_qualities], False)
-# Type of test: [comparative] Name of test: []
+# Type of test: [comparative] Name of test: [Chi-squared test]
 display_data(comp_chi_squared_tests[NominalVariables.variety][NominalVariables.has_choco], False)
 display_data(comp_chi_squared_tests[NominalVariables.variety][NominalVariables.brand], False)
 display_data(comp_chi_squared_tests[NominalVariables.variety][NominalVariables.cocoa_origin], False)
@@ -331,7 +331,7 @@ display_figure(comp_bubble_charts[NominalVariables.bev_qualities][NominalVariabl
 display_figure(comp_bubble_charts[NominalVariables.bev_qualities][NominalVariables.cocoa_level], False)
 display_figure(comp_bubble_charts[NominalVariables.bev_qualities][NominalVariables.types], False)
 display_figure(comp_bubble_charts[NominalVariables.bev_qualities][NominalVariables.variety], False)
-# Type of test: [comparative] Name of test: []
+# Type of test: [comparative] Name of test: [Chi-squared test]
 display_data(comp_chi_squared_tests[NominalVariables.bev_qualities][NominalVariables.has_choco], False)
 display_data(comp_chi_squared_tests[NominalVariables.bev_qualities][NominalVariables.brand], False)
 display_data(comp_chi_squared_tests[NominalVariables.bev_qualities][NominalVariables.cocoa_origin], False)
@@ -346,13 +346,13 @@ display_data(desc_statistics[ContinuousVariables.year], False)
 display_figure(desc_box_plots[ContinuousVariables.year], False)
 # Type of test: [descriptive] Name of test: [Violin plots]
 display_figure(desc_violin_plots[ContinuousVariables.year], False)
-# Type of test: [] Name of test: [descriptive]
+# Type of test: [descriptive] Name of test: [Shapiro Wilk's correlation test]
 display_data(comp_shapiro_wilk_tests[ContinuousVariables.year], False)
-# Type of test: [comparative] Name of test: []
+# Type of test: [comparative] Name of test: [Pearson's correlation test]
 display_data(comp_pearson_cor_tests[ContinuousVariables.year][ContinuousVariables.temperature], False)
 display_data(comp_pearson_cor_tests[ContinuousVariables.year][ContinuousVariables.citation], False)
 display_data(comp_pearson_cor_tests[ContinuousVariables.year][ContinuousVariables.publication_year], False)
-# Type of test: [comparative] Name of test: []
+# Type of test: [comparative] Name of test: [Spearman's correlation test]
 display_data(comp_spearman_cor_tests[ContinuousVariables.year][ContinuousVariables.temperature], False)
 display_data(comp_spearman_cor_tests[ContinuousVariables.year][ContinuousVariables.citation], False)
 display_data(comp_spearman_cor_tests[ContinuousVariables.year][ContinuousVariables.publication_year], False)
@@ -364,13 +364,13 @@ display_data(desc_statistics[ContinuousVariables.citation], False)
 display_figure(desc_box_plots[ContinuousVariables.citation], False)
 # Type of test: [descriptive] Name of test: [Violin plots]
 display_figure(desc_violin_plots[ContinuousVariables.citation], False)
-# Type of test: [] Name of test: [descriptive]
+# Type of test: [descriptive] Name of test: [Shapiro Wilk's correlation test]
 display_data(comp_shapiro_wilk_tests[ContinuousVariables.citation], False)
-# Type of test: [comparative] Name of test: []
+# Type of test: [comparative] Name of test: [Pearson's correlation test]
 display_data(comp_pearson_cor_tests[ContinuousVariables.citation][ContinuousVariables.temperature], False)
 display_data(comp_pearson_cor_tests[ContinuousVariables.citation][ContinuousVariables.year], False)
 display_data(comp_pearson_cor_tests[ContinuousVariables.citation][ContinuousVariables.publication_year], False)
-# Type of test: [comparative] Name of test: []
+# Type of test: [comparative] Name of test: [Spearman's correlation test]
 display_data(comp_spearman_cor_tests[ContinuousVariables.citation][ContinuousVariables.temperature], False)
 display_data(comp_spearman_cor_tests[ContinuousVariables.citation][ContinuousVariables.year], False)
 display_data(comp_spearman_cor_tests[ContinuousVariables.citation][ContinuousVariables.publication_year], False)
@@ -382,13 +382,13 @@ display_data(desc_statistics[ContinuousVariables.publication_year], False)
 display_figure(desc_box_plots[ContinuousVariables.publication_year], False)
 # Type of test: [descriptive] Name of test: [Violin plots]
 display_figure(desc_violin_plots[ContinuousVariables.publication_year], False)
-# Type of test: [] Name of test: [descriptive]
+# Type of test: [descriptive] Name of test: [Shapiro Wilk's correlation test]
 display_data(comp_shapiro_wilk_tests[ContinuousVariables.publication_year], False)
-# Type of test: [comparative] Name of test: []
+# Type of test: [comparative] Name of test: [Pearson's correlation test]
 display_data(comp_pearson_cor_tests[ContinuousVariables.publication_year][ContinuousVariables.temperature], False)
 display_data(comp_pearson_cor_tests[ContinuousVariables.publication_year][ContinuousVariables.year], False)
 display_data(comp_pearson_cor_tests[ContinuousVariables.publication_year][ContinuousVariables.citation], False)
-# Type of test: [comparative] Name of test: []
+# Type of test: [comparative] Name of test: [Spearman's correlation test]
 display_data(comp_spearman_cor_tests[ContinuousVariables.publication_year][ContinuousVariables.temperature], False)
 display_data(comp_spearman_cor_tests[ContinuousVariables.publication_year][ContinuousVariables.year], False)
 display_data(comp_spearman_cor_tests[ContinuousVariables.publication_year][ContinuousVariables.citation], False)

@@ -677,27 +677,28 @@ class Reporting extends CI_Controller
 			),
 			$this->python_statistical_function_factory(
 				'generate_comp_chi_squared_test',
-				`Chi-squared test`,
+				'Chi-squared test',
 				'comparative',
 				'Nominal',
 				'Dataframe'
 			),
 			$this->python_statistical_function_factory(
 				'generate_comp_shapiro_wilk_test',
+				'Shapiro Wilk\'s correlation test',
 				'descriptive',
 				'Continuous',
 				'Dataframe'
 			),
 			$this->python_statistical_function_factory(
 				'generate_comp_pearson_cor_test',
-				`Pearson's correlation test`,
+				'Pearson\'s correlation test',
 				'comparative',
 				'Continuous',
 				'Dataframe'
 			),
 			$this->python_statistical_function_factory(
 				'generate_comp_spearman_cor_test',
-				`Spearman's correlation test`,
+				'Spearman\'s correlation test',
 				'comparative',
 				'Continuous',
 				'Dataframe'
