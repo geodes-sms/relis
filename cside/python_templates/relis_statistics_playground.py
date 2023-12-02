@@ -14,12 +14,12 @@ from relis_statistics_lib import (
 {% for statistic in item.statistics %}
 {% if loop.index == 1 %}
 
-#--{{ statistic.type }}--#
+#--{{ statistic.type|capitalize }}--#
 {% endif %}
 {# Check if it's not the first iteration and if the current statistic is different from the previous one #}
 {% if loop.index > 1 and statistic.type != previousStatistic.type %}
 
-#--{{ statistic.type }}--#
+#--{{ statistic.type|capitalize }}--#
 {% endif %}
 {% set previousStatistic = statistic %}
 # Name of test: [{{ statistic.title|raw }}]

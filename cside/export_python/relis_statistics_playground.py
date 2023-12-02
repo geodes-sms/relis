@@ -9,19 +9,19 @@ from relis_statistics_lib import (
 
 # Statistical tests for variable: 'has_choco'
 
-#--descriptive--#
+#--Descriptive--#
 # Name of test: [Frequency tables]
 display_data(desc_frequency_tables[NominalVariables.has_choco], False)
 # Name of test: [Bar plots]
 display_figure(desc_bar_plots[NominalVariables.has_choco], False)
 
-#--evolutive--#
+#--Evolutive--#
 # Name of test: [Frequency tables]
 display_data(evo_frequency_tables[NominalVariables.has_choco], False)
 # Name of test: [Evolution plots]
 display_figure(evo_plots[NominalVariables.has_choco], False)
 
-#--comparative--#
+#--Comparative--#
 # Name of test: [Frequency tables]
 display_data(comp_frequency_tables[NominalVariables.has_choco][NominalVariables.brand], False)
 display_data(comp_frequency_tables[NominalVariables.has_choco][NominalVariables.cocoa_origin], False)
@@ -60,7 +60,7 @@ display_data(comp_chi_squared_tests[NominalVariables.has_choco][NominalVariables
 
 # Statistical tests for variable: 'temperature'
 
-#--descriptive--#
+#--Descriptive--#
 # Name of test: [Statistics]
 display_data(desc_statistics[ContinuousVariables.temperature], False)
 # Name of test: [Box plots]
@@ -70,7 +70,7 @@ display_figure(desc_violin_plots[ContinuousVariables.temperature], False)
 # Name of test: [Shapiro Wilk's correlation test]
 display_data(comp_shapiro_wilk_tests[ContinuousVariables.temperature], False)
 
-#--comparative--#
+#--Comparative--#
 # Name of test: [Pearson's correlation test]
 display_data(comp_pearson_cor_tests[ContinuousVariables.temperature][ContinuousVariables.year], False)
 display_data(comp_pearson_cor_tests[ContinuousVariables.temperature][ContinuousVariables.citation], False)
@@ -82,19 +82,19 @@ display_data(comp_spearman_cor_tests[ContinuousVariables.temperature][Continuous
 
 # Statistical tests for variable: 'brand'
 
-#--descriptive--#
+#--Descriptive--#
 # Name of test: [Frequency tables]
 display_data(desc_frequency_tables[NominalVariables.brand], False)
 # Name of test: [Bar plots]
 display_figure(desc_bar_plots[NominalVariables.brand], False)
 
-#--evolutive--#
+#--Evolutive--#
 # Name of test: [Frequency tables]
 display_data(evo_frequency_tables[NominalVariables.brand], False)
 # Name of test: [Evolution plots]
 display_figure(evo_plots[NominalVariables.brand], False)
 
-#--comparative--#
+#--Comparative--#
 # Name of test: [Frequency tables]
 display_data(comp_frequency_tables[NominalVariables.brand][NominalVariables.has_choco], False)
 display_data(comp_frequency_tables[NominalVariables.brand][NominalVariables.cocoa_origin], False)
@@ -133,19 +133,19 @@ display_data(comp_chi_squared_tests[NominalVariables.brand][NominalVariables.bev
 
 # Statistical tests for variable: 'cocoa_origin'
 
-#--descriptive--#
+#--Descriptive--#
 # Name of test: [Frequency tables]
 display_data(desc_frequency_tables[NominalVariables.cocoa_origin], False)
 # Name of test: [Bar plots]
 display_figure(desc_bar_plots[NominalVariables.cocoa_origin], False)
 
-#--evolutive--#
+#--Evolutive--#
 # Name of test: [Frequency tables]
 display_data(evo_frequency_tables[NominalVariables.cocoa_origin], False)
 # Name of test: [Evolution plots]
 display_figure(evo_plots[NominalVariables.cocoa_origin], False)
 
-#--comparative--#
+#--Comparative--#
 # Name of test: [Frequency tables]
 display_data(comp_frequency_tables[NominalVariables.cocoa_origin][NominalVariables.has_choco], False)
 display_data(comp_frequency_tables[NominalVariables.cocoa_origin][NominalVariables.brand], False)
@@ -184,19 +184,19 @@ display_data(comp_chi_squared_tests[NominalVariables.cocoa_origin][NominalVariab
 
 # Statistical tests for variable: 'cocoa_level'
 
-#--descriptive--#
+#--Descriptive--#
 # Name of test: [Frequency tables]
 display_data(desc_frequency_tables[NominalVariables.cocoa_level], False)
 # Name of test: [Bar plots]
 display_figure(desc_bar_plots[NominalVariables.cocoa_level], False)
 
-#--evolutive--#
+#--Evolutive--#
 # Name of test: [Frequency tables]
 display_data(evo_frequency_tables[NominalVariables.cocoa_level], False)
 # Name of test: [Evolution plots]
 display_figure(evo_plots[NominalVariables.cocoa_level], False)
 
-#--comparative--#
+#--Comparative--#
 # Name of test: [Frequency tables]
 display_data(comp_frequency_tables[NominalVariables.cocoa_level][NominalVariables.has_choco], False)
 display_data(comp_frequency_tables[NominalVariables.cocoa_level][NominalVariables.brand], False)
@@ -235,19 +235,19 @@ display_data(comp_chi_squared_tests[NominalVariables.cocoa_level][NominalVariabl
 
 # Statistical tests for variable: 'types'
 
-#--descriptive--#
+#--Descriptive--#
 # Name of test: [Frequency tables]
 display_data(desc_frequency_tables[NominalVariables.types], False)
 # Name of test: [Bar plots]
 display_figure(desc_bar_plots[NominalVariables.types], False)
 
-#--evolutive--#
+#--Evolutive--#
 # Name of test: [Frequency tables]
 display_data(evo_frequency_tables[NominalVariables.types], False)
 # Name of test: [Evolution plots]
 display_figure(evo_plots[NominalVariables.types], False)
 
-#--comparative--#
+#--Comparative--#
 # Name of test: [Frequency tables]
 display_data(comp_frequency_tables[NominalVariables.types][NominalVariables.has_choco], False)
 display_data(comp_frequency_tables[NominalVariables.types][NominalVariables.brand], False)
@@ -286,19 +286,19 @@ display_data(comp_chi_squared_tests[NominalVariables.types][NominalVariables.bev
 
 # Statistical tests for variable: 'variety'
 
-#--descriptive--#
+#--Descriptive--#
 # Name of test: [Frequency tables]
 display_data(desc_frequency_tables[NominalVariables.variety], False)
 # Name of test: [Bar plots]
 display_figure(desc_bar_plots[NominalVariables.variety], False)
 
-#--evolutive--#
+#--Evolutive--#
 # Name of test: [Frequency tables]
 display_data(evo_frequency_tables[NominalVariables.variety], False)
 # Name of test: [Evolution plots]
 display_figure(evo_plots[NominalVariables.variety], False)
 
-#--comparative--#
+#--Comparative--#
 # Name of test: [Frequency tables]
 display_data(comp_frequency_tables[NominalVariables.variety][NominalVariables.has_choco], False)
 display_data(comp_frequency_tables[NominalVariables.variety][NominalVariables.brand], False)
@@ -337,19 +337,19 @@ display_data(comp_chi_squared_tests[NominalVariables.variety][NominalVariables.b
 
 # Statistical tests for variable: 'bev_qualities'
 
-#--descriptive--#
+#--Descriptive--#
 # Name of test: [Frequency tables]
 display_data(desc_frequency_tables[NominalVariables.bev_qualities], False)
 # Name of test: [Bar plots]
 display_figure(desc_bar_plots[NominalVariables.bev_qualities], False)
 
-#--evolutive--#
+#--Evolutive--#
 # Name of test: [Frequency tables]
 display_data(evo_frequency_tables[NominalVariables.bev_qualities], False)
 # Name of test: [Evolution plots]
 display_figure(evo_plots[NominalVariables.bev_qualities], False)
 
-#--comparative--#
+#--Comparative--#
 # Name of test: [Frequency tables]
 display_data(comp_frequency_tables[NominalVariables.bev_qualities][NominalVariables.has_choco], False)
 display_data(comp_frequency_tables[NominalVariables.bev_qualities][NominalVariables.brand], False)
@@ -388,7 +388,7 @@ display_data(comp_chi_squared_tests[NominalVariables.bev_qualities][NominalVaria
 
 # Statistical tests for variable: 'year'
 
-#--descriptive--#
+#--Descriptive--#
 # Name of test: [Statistics]
 display_data(desc_statistics[ContinuousVariables.year], False)
 # Name of test: [Box plots]
@@ -398,7 +398,7 @@ display_figure(desc_violin_plots[ContinuousVariables.year], False)
 # Name of test: [Shapiro Wilk's correlation test]
 display_data(comp_shapiro_wilk_tests[ContinuousVariables.year], False)
 
-#--comparative--#
+#--Comparative--#
 # Name of test: [Pearson's correlation test]
 display_data(comp_pearson_cor_tests[ContinuousVariables.year][ContinuousVariables.temperature], False)
 display_data(comp_pearson_cor_tests[ContinuousVariables.year][ContinuousVariables.citation], False)
@@ -410,7 +410,7 @@ display_data(comp_spearman_cor_tests[ContinuousVariables.year][ContinuousVariabl
 
 # Statistical tests for variable: 'citation'
 
-#--descriptive--#
+#--Descriptive--#
 # Name of test: [Statistics]
 display_data(desc_statistics[ContinuousVariables.citation], False)
 # Name of test: [Box plots]
@@ -420,7 +420,7 @@ display_figure(desc_violin_plots[ContinuousVariables.citation], False)
 # Name of test: [Shapiro Wilk's correlation test]
 display_data(comp_shapiro_wilk_tests[ContinuousVariables.citation], False)
 
-#--comparative--#
+#--Comparative--#
 # Name of test: [Pearson's correlation test]
 display_data(comp_pearson_cor_tests[ContinuousVariables.citation][ContinuousVariables.temperature], False)
 display_data(comp_pearson_cor_tests[ContinuousVariables.citation][ContinuousVariables.year], False)
@@ -432,7 +432,7 @@ display_data(comp_spearman_cor_tests[ContinuousVariables.citation][ContinuousVar
 
 # Statistical tests for variable: 'publication_year'
 
-#--descriptive--#
+#--Descriptive--#
 # Name of test: [Statistics]
 display_data(desc_statistics[ContinuousVariables.publication_year], False)
 # Name of test: [Box plots]
@@ -442,7 +442,7 @@ display_figure(desc_violin_plots[ContinuousVariables.publication_year], False)
 # Name of test: [Shapiro Wilk's correlation test]
 display_data(comp_shapiro_wilk_tests[ContinuousVariables.publication_year], False)
 
-#--comparative--#
+#--Comparative--#
 # Name of test: [Pearson's correlation test]
 display_data(comp_pearson_cor_tests[ContinuousVariables.publication_year][ContinuousVariables.temperature], False)
 display_data(comp_pearson_cor_tests[ContinuousVariables.publication_year][ContinuousVariables.year], False)
