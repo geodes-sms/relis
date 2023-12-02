@@ -600,72 +600,84 @@ class Reporting extends CI_Controller
 		return array(
 			$this->python_statistical_function_factory(
 				'generate_desc_frequency_table',
+				'Frequency tables',
 				'descriptive',
 				'Nominal',
 				'Dataframe'
 			),
 			$this->python_statistical_function_factory(
 				'generate_desc_bar_plot',
+				'Bar plots',
 				'descriptive',
 				'Nominal',
 				'Figure'
 			),
 			$this->python_statistical_function_factory(
 				'generate_desc_statistic',
+				'Statistics',
 				'descriptive',
 				'Continuous',
 				'Dataframe'
 			),
 			$this->python_statistical_function_factory(
 				'generate_desc_box_plot',
+				'Box plots',
 				'descriptive',
 				'Continuous',
 				'Figure'
 			),
 			$this->python_statistical_function_factory(
 				'generate_desc_violin_plot',
+				'Violin plots',
 				'descriptive',
 				'Continuous',
 				'Figure'
 			),
 			$this->python_statistical_function_factory(
 				'generate_evo_frequency_table',
+				'Frequency tables',
 				'evolutive',
 				'Nominal',
 				'Dataframe'
 			),
 			$this->python_statistical_function_factory(
 				'generate_evo_plot',
+				'Evolution plots',
 				'evolutive',
 				'Nominal',
 				'Figure'
 			),
 			$this->python_statistical_function_factory(
 				'generate_comp_frequency_table',
+				'Frequency tables',
 				'comparative',
 				'Nominal',
 				'Dataframe'
 			),
 			$this->python_statistical_function_factory(
 				'generate_comp_stacked_bar_plot',
+				'Stacked bar plots',
 				'comparative',
 				'Nominal',
 				'Figure'
 			),
 			$this->python_statistical_function_factory(
 				'generate_comp_grouped_bar_plot',
+				'Grouped bar plots',
 				'comparative',
 				'Nominal',
 				'Figure'
 			),
 			$this->python_statistical_function_factory(
 				'generate_comp_bubble_chart',
+				'Bubble charts',
 				'comparative',
 				'Nominal',
 				'Figure'
 			),
 			$this->python_statistical_function_factory(
 				'generate_comp_chi_squared_test',
+				`Chi-squared test`,
 				'comparative',
 				'Nominal',
 				'Dataframe'
@@ -678,12 +690,14 @@ class Reporting extends CI_Controller
 			),
 			$this->python_statistical_function_factory(
 				'generate_comp_pearson_cor_test',
+				`Pearson's correlation test`,
 				'comparative',
 				'Continuous',
 				'Dataframe'
 			),
 			$this->python_statistical_function_factory(
 				'generate_comp_spearman_cor_test',
+				`Spearman's correlation test`,
 				'comparative',
 				'Continuous',
 				'Dataframe'
@@ -692,12 +706,14 @@ class Reporting extends CI_Controller
 	}
 
 	/**
-	 * Abstract the creation of statistics for the classfication data
+	 * Abstract the creation of statistics for the analysis of classfication data
 	*/
-	private function python_statistical_function_factory($name, $type, $data_type, $return_type)
+	private function python_statistical_function_factory($name, $title, $type,
+	$data_type, $return_type)
 	{
 		return array(
 			'name' => $name,
+			'title' => $title,
 			'type' => $type,
 			'data_type' => $data_type,
 			'return_data_type' => $return_type,
