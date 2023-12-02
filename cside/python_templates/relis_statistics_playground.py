@@ -10,6 +10,7 @@ from relis_statistics_lib import (
 
 # Statistical tests for variable: '{{ item.name }}'
 {% for statistic in item.statistics %}
+
 # Type of test: [{{ statistic.type }}] Name of test: [{{ statistic.title|raw }}]
 {% set foo = statistic.name[9:]~'s'%}
 {% if statistic.type != 'comparative'%}
