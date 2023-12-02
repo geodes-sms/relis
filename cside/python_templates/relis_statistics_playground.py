@@ -1,4 +1,4 @@
-from relis_statistics_lib import (
+from relis_statistics_kernel import (
     display_data, display_figure, NominalVariables, ContinuousVariables,
     desc_frequency_tables, desc_statistics, desc_bar_plots, desc_box_plots, desc_violin_plots, 
     evo_plots, evo_frequency_tables, comp_stacked_bar_plots, comp_grouped_bar_plots,

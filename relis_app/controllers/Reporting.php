@@ -919,7 +919,7 @@ class Reporting extends CI_Controller
 	 */
 	private function python_create_twig_config()
 	{
-		return array('LIBRARY_ARTIFACT_NAME' => 'relis_statistics_lib.py',
+		return array('LIBRARY_ARTIFACT_NAME' => 'relis_statistics_kernel.py',
 		'PLAYGROUND_ARTIFACT_NAME' => 'relis_statistics_playground.py');
 	}
 
