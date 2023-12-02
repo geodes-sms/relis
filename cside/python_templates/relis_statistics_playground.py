@@ -8,8 +8,9 @@ from relis_statistics_lib import (
 {# Generating statistical tests for every variable #}
 {% for key1, item in cm %}
 
-# Statistical tests for variable: {{ item.name }}
+# Statistical tests for variable: '{{ item.name }}'
 {% for statistic in item.statistics %}
+# Type of test: [{{ statistic.type }}] Name of test: [{{ statistic.title }}]
 {% set foo = statistic.name[9:]~'s'%}
 {% if statistic.type != 'comparative'%}
 {% if statistic.return_data_type == 'Dataframe'%}
