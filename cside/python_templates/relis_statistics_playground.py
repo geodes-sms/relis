@@ -5,13 +5,24 @@ from relis_statistics_lib import (
     comp_chi_squared_tests, comp_spearman_cor_tests, comp_frequency_tables, comp_bubble_charts,
     comp_shapiro_wilk_tests, comp_pearson_cor_tests
 )
+{% set previousStatistic = null %}
+
 {# Generating statistical tests for every variable #}
 {% for key1, item in cm %}
 
 # Statistical tests for variable: '{{ item.name }}'
 {% for statistic in item.statistics %}
+{% if loop.index == 1 %}
 
-# Type of test: [{{ statistic.type }}] Name of test: [{{ statistic.title|raw }}]
+#--{{ statistic.type }}--#
+{% endif %}
+{# Check if it's not the first iteration and if the current statistic is different from the previous one #}
+{% if loop.index > 1 and statistic.type != previousStatistic.type %}
+
+#--{{ statistic.type }}--#
+{% endif %}
+{% set previousStatistic = statistic %}
+# Name of test: [{{ statistic.title|raw }}]
 {% set foo = statistic.name[9:]~'s'%}
 {% if statistic.type != 'comparative'%}
 {% if statistic.return_data_type == 'Dataframe'%}
