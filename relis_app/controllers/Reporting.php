@@ -984,8 +984,6 @@ class Reporting extends CI_Controller
 
 			redirect('reporting/result_export');
 
-			redirect('reporting/result_export');
-
 		} catch (Exception $e) {
 			set_top_msg($e);
 		}
