@@ -724,8 +724,8 @@ class Reporting extends CI_Controller
 	/**
 	 * Deletes obsolete fields from the classification data
 	 */
-	private function python_fields_cleaning($table_fields, $CLASSIFICATION_METADATA_FIELDS) {
-		foreach($CLASSIFICATION_METADATA_FIELDS as $field_key) {
+	private function python_fields_cleaning($table_fields, $classification_metadata_fields) {
+		foreach($classification_metadata_fields as $field_key) {
 			if (array_key_exists($field_key, $table_fields)) {
 				unset($table_fields[$field_key]);
 			}
@@ -785,8 +785,13 @@ class Reporting extends CI_Controller
 	/**
 	 * Abstract the creation of statistical classification fields 
 	 */
-	private function python_classification_field_factory($field_name, $field_title, $field_type,
-	 $multiple, $statistical_functions) {
+	private function python_classification_field_factory(
+		$field_name,
+		$field_title,
+		$field_type,
+		$multiple,
+		$statistical_functions)
+	{
 		return array('name' => $field_name, 'title' => $field_title,
 		'data_type' => $field_type, 'multiple' => $multiple, 'statistics' => $statistical_functions);
 	}
@@ -819,9 +824,9 @@ class Reporting extends CI_Controller
 	/**
 	 * Add mandatory fields which are shared between projects to the final data structure 
 	 */
-	private function python_add_static_classification_fields($results, $CLASSIFICATION_STATIC_FIELDS)
+	private function python_add_static_classification_fields($results, $classification_static_fields)
 	{
-		foreach($CLASSIFICATION_STATIC_FIELDS as $field_name => &$field_value) {
+		foreach($classification_static_fields as $field_name => &$field_value) {
 			if (!array_key_exists($field_name, $results)) {
 				$results[$field_name] = $field_value;
 			}

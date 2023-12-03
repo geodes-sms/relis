@@ -165,8 +165,6 @@
             
             $python_environment_dsc="";
            }
-
-          //  python_environment_filename
       
            echo box_header("Result","",12,12,12);
            ?>
@@ -212,7 +210,6 @@
            
            <tr>
            <td>Python environment</td><td><a href="<?php echo base_url();?>reporting/python_download/python_env_<?php echo project_db();?>.zip"><?php echo $python_environment_dsc?></a></td><td><a href="<?php echo base_url();?>reporting/python_environment_export"><i class="fa fa-refresh"></i><?php echo lng('Update file')?></a></td>
-          <!-- <td>Python environment</td><td><a href="<?php echo base_url();?>reporting/python_download/python_env_<?php echo project_db();?>.zip"><i class='fa fa-download'></i> Download Python</a></td><td></td> -->
            </tr>
 
 
