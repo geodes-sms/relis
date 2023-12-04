@@ -494,7 +494,7 @@ def generate_comp_grouped_bar_plot(field_name: str, dependency_field_name: str, 
     if subset_data.empty: return plt.title(title)
 
     fig, ax = plt.subplots(figsize=(10, 6))
-    sns.barplot(x=field_name, y='Frequency', hue=dependency_field_name, data=subset_data, dodge=False) # type: ignore
+    sns.barplot(x=field_name, y='Frequency', hue=dependency_field_name, data=subset_data)
 
     plt.title(title)
     plt.gca().set_xlabel('')
