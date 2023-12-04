@@ -17,7 +17,7 @@
  *
  * --------------------------------------------------------------------------
  *
- *  :Author: Brice Michel Bigendako
+ *  :Authors: Brice Michel Bigendako, Louis Lalonde and Hanz Schepens
  * --------------------------------------------------------------------------
  *
  * This controller contain all the pages user can access before connection to the application
@@ -593,7 +593,7 @@ class Reporting extends CI_Controller
 
 	/**
 	 * Functions which are used to perform the statistical
-	 * classification analysis of a given project
+	 * analysis of a given project
 	 */
 	private function python_statistical_functions()
 	{
@@ -770,22 +770,22 @@ class Reporting extends CI_Controller
 
 	/**
 	 * Returns the set of statistical functions associated to a given field in terms
-	 * of it's type (data_type)
+	 * of it's data_type
 	 */
-	private function python_evaluate_field_statistical_functions($field_type, $STATISTICAL_FUNCTIONS)
+	private function python_evaluate_field_statistical_functions($field_type, $statistical_functions)
 	{
-		$statistical_functions = array_filter($STATISTICAL_FUNCTIONS, function($statistical_function) use ($field_type) {
+		$field_statistical_functions = array_filter($statistical_functions, function($statistical_function) use ($field_type) {
 			return $statistical_function['data_type'] == $field_type;
 		});
 
 		// Reset the indexes
-		return array_values($statistical_functions);
+		return array_values($field_statistical_functions);
 	}
 
 	/**
 	 * Abstract the creation of statistical classification fields 
 	 */
-	private function python_classification_field_factory(
+	private function python_statistical_classification_field_factory(
 		$field_name,
 		$field_title,
 		$field_type,
@@ -802,7 +802,7 @@ class Reporting extends CI_Controller
 	 * Field type
 	 * Field is multiple
 	 */
-	private function python_classification_model_factory($table_fields, $statistical_functions) {
+	private function python_statistical_analysis_model_factory($table_fields, $statistical_functions) {
 		foreach($table_fields as $field_name => &$field_value) {
 			$type = $this->python_evaluate_field_type_condition($field_value);
 
@@ -815,7 +815,7 @@ class Reporting extends CI_Controller
 			$field_statistical_functions = $this->python_evaluate_field_statistical_functions($type,
 			 $statistical_functions);
 			$multiple = $this->python_evaluate_multiple($field_value['number_of_values']);
-			$table_fields[$field_name] = $this->python_classification_field_factory($field_name,
+			$table_fields[$field_name] = $this->python_statistical_classification_field_factory($field_name,
 			$field_value['field_title'], $type, $multiple, $field_statistical_functions);
 		}
 		return $table_fields;
@@ -835,10 +835,10 @@ class Reporting extends CI_Controller
 	}
 
 	/**
-	 * Creates the project classification fields model which conforms
-	 * to the relis-statistical-classification metamodel
+	 * Creates the project statistical analysis model which conforms
+	 * to the relis-statistical-analysis-dsl metamodel
 	 */
-	private function python_create_classification_model($export_config)
+	private function python_create_statistical_analysis_model($export_config)
 	{
 		$table_ref = "classification";
 
@@ -853,15 +853,15 @@ class Reporting extends CI_Controller
 		$export_config['CLASSIFICATION_METADATA_FIELDS']);
 		$results = $this->python_add_static_classification_fields($results,
 		$export_config['CLASSIFICATION_STATIC_FIELDS']);
-		$cm = $this->python_classification_model_factory($results,
+		$sam = $this->python_statistical_analysis_model_factory($results,
 		 $export_config['STATISTICAL_FUNCTIONS']);
 
-		return $cm;
+		return $sam;
 	}
 
 	/**
 	 * Encapsulate static and dynaminc configuration parameters related
-	 * to the relis statistical classification (RSC) service
+	 * to the relis-statistical-analysis-environment
 	 */
 	private function python_create_export_config($statistical_functions)
 	{
@@ -892,10 +892,13 @@ class Reporting extends CI_Controller
 		'CLASSIFICATION_FILE_NAME' => $CLASSIFICATION_FILE_NAME);
 	}
 
+	/**
+	 * Package the environment into a zip file
+	 */
 	private function python_compress_executable_artifacts(
 		$library_artifact_name,
 		$playground_artifact_name,
-		$python_lib,
+		$python_kernel,
 		$python_playground,
 		$project_name,
 		$target_directory,
@@ -911,7 +914,7 @@ class Reporting extends CI_Controller
 			throw new Exception('Cannot open ' . $zip_file_name);
 		}
 		
-		$zip->addFromString($library_artifact_name, $python_lib);
+		$zip->addFromString($library_artifact_name, $python_kernel);
 		$zip->addFromString($playground_artifact_name, $python_playground);
 		$zip->addFile('cside/export_r/' . $classification_file_name, $classification_file_name);
 		$zip->addFile('cside/python_templates/' . $requirements_file_name, $requirements_file_name);
@@ -929,10 +932,10 @@ class Reporting extends CI_Controller
 	}
 
 	/**
-	* Function that uses the TWIG framework to generate the python
-	* executable artifacts part of the RSC environment
+	* Function that uses the TWIG templates engine to generate the python
+	* artifacts part of the relis-statistical-analysis-environment
 	*/
-	private function python_twig_generate($cm, $artifact_name, $export_config){
+	private function python_twig_generate($sam, $artifact_name, $export_config){
 		try{
 			// Initial setup for TWIG 
 			require_once 'vendor/autoload.php';
@@ -943,7 +946,7 @@ class Reporting extends CI_Controller
 			]);
 			
 			return $twig->render($artifact_name, array(
-				'cm' => $cm,
+				'sam' => $sam,
 				'export_config' => $export_config
 			));
 
@@ -954,16 +957,16 @@ class Reporting extends CI_Controller
 	}
 
 	/**
-	 * Orchestrator for the python statistical classfication environment
+	 * Orchestrator for the python statistical analysis environment
 	 * generation
 	 */
 	public function python_environment_export()
 	{
 		try {
-			# Project statistical classification modelization
+			# Project statistical analysis modelization
 			$statistical_functions = $this->python_statistical_functions();
 			$export_config = $this->python_create_export_config($statistical_functions);
-			$cm = $this->python_create_classification_model($export_config);
+			$sam = $this->python_create_statistical_analysis_model($export_config);
 
 			# Generate/update project classification data
 			$this->generate_result_export_classification();
@@ -971,17 +974,17 @@ class Reporting extends CI_Controller
 			# Environment code generation
 			$twig_config = $this->python_create_twig_config();
 
-			$python_lib_artifact = $this->python_twig_generate($cm, $twig_config['LIBRARY_ARTIFACT_NAME'],
+			$python_kernel_artifact = $this->python_twig_generate($sam, $twig_config['LIBRARY_ARTIFACT_NAME'],
 			 $export_config);
 
-			$python_playground_artifact = $this->python_twig_generate($cm, $twig_config['PLAYGROUND_ARTIFACT_NAME'],
+			$python_playground_artifact = $this->python_twig_generate($sam, $twig_config['PLAYGROUND_ARTIFACT_NAME'],
 			 $export_config);
 
 			$twig_config = $this->python_create_twig_config();
 
 			# Environment packaging
 			$this->python_compress_executable_artifacts($twig_config['LIBRARY_ARTIFACT_NAME'],
-			$twig_config['PLAYGROUND_ARTIFACT_NAME'], $python_lib_artifact, $python_playground_artifact,
+			$twig_config['PLAYGROUND_ARTIFACT_NAME'], $python_kernel_artifact, $python_playground_artifact,
 			$export_config['PROJECT_NAME'], $export_config['TARGET_DIRECTORY'],
 			$export_config['CLASSIFICATION_FILE_NAME']);
 

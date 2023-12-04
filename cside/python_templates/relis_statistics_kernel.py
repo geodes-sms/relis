@@ -26,12 +26,12 @@ class Policies(Enum):
 
 ### Types
 
-class FieldClassificationType(Enum):
+class VariableClassificationType(Enum):
     NOMINAL = 'Nominal'
     CONTINUOUS = 'Continuous'
 
 class Variable:
-    def __init__(self, name: str, title: str, data_type: FieldClassificationType, multiple: bool):
+    def __init__(self, name: str, title: str, data_type: VariableClassificationType, multiple: bool):
         self.name = name
         self.title = title
         self.data_type = data_type
@@ -39,17 +39,17 @@ class Variable:
 
 {#Producing the Nominal variables of our configuration model #}
 class NominalVariables(Enum):
-{% for key1, item in cm %}
+{% for key1, item in sam %}
 {% if item.data_type == 'Nominal'%}
-    {{ item.name }} = Variable("{{item.name}}", "{{item.title}}", FieldClassificationType.NOMINAL, {{attribute(item,'multiple') ? 'True' : 'False' }})
+    {{ item.name }} = Variable("{{item.name}}", "{{item.title}}", VariableClassificationType.NOMINAL, {{attribute(item,'multiple') ? 'True' : 'False' }})
 {% endif %}
 {% endfor %}
 
 {#Producing the Continuous variables of our configuration model #}
 class ContinuousVariables(Enum):    
-{% for key1, item in cm %}
+{% for key1, item in sam %}
 {% if item.data_type == 'Continuous'%}
-    {{ item.name }} = Variable("{{item.name}}", "{{item.title}}", FieldClassificationType.CONTINUOUS, {{attribute(item,'multiple') ? 'True' : 'False' }})
+    {{ item.name }} = Variable("{{item.name}}", "{{item.title}}", VariableClassificationType.CONTINUOUS, {{attribute(item,'multiple') ? 'True' : 'False' }})
 {% endif %}
 {% endfor %}
 

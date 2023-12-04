@@ -8,7 +8,7 @@ from relis_statistics_kernel import (
 {% set previousStatistic = null %}
 
 {# Generating statistical tests for every variable #}
-{% for key1, item in cm %}
+{% for key1, item in sam %}
 
 # Statistical tests for variable: '{{ item.name }}'
 {% for statistic in item.statistics %}
@@ -33,7 +33,7 @@ display_figure({{foo}}[{{item.data_type}}Variables.{{item.name}}], False)
 {% endif %}
 {% endif %}
 {% if statistic.type == 'comparative'%}{# Every variable that has a comparative test will be compared with every other variable that shares the same return_data_type (DataFrame/Figure)#}
-{% for key2, item_compa in cm %}{# If/else hell, but in short, we compare the statistic we have with all the other variable's statistics.#}
+{% for key2, item_compa in sam %}{# If/else hell, but in short, we compare the statistic we have with all the other variable's statistics.#}
 {% if item_compa.name != item.name %}{# We do not compare the variable with itself#}
 {% for statistic_compa in item_compa.statistics %}{# Iterate over the list again #}
 {% if statistic_compa.type == 'comparative' %}{# Check the type and make sure its comparative#}
