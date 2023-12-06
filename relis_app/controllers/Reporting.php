@@ -833,23 +833,27 @@ class Reporting extends CI_Controller
 		}
 		return $results;
 	}
+	
+	/**
+	 * Extract the classification configuration of a given project
+	 */
+	private function python_extract_classification_configuration()
+	{
+		$table_ref = "classification";
+
+		$this->db2 = $this->load->database(project_db(), TRUE);
+		$ref_table_config = get_table_config($table_ref);
+		return $ref_table_config['fields'];
+	}
 
 	/**
 	 * Creates the project statistical analysis model which conforms
 	 * to the relis-statistical-analysis-dsl metamodel
 	 */
-	private function python_create_statistical_analysis_model($export_config)
+	private function python_create_statistical_analysis_model($classification_configuration,
+	 $export_config)
 	{
-		$table_ref = "classification";
-
-		$this->db2 = $this->load->database(project_db(), TRUE);
-		$data = $this->db2->query("CALL get_list_" . $table_ref . "(0,0,'') ");
-		$ref_table_config = get_table_config($table_ref);
-		$table_fields = $ref_table_config['fields'];
-		$results = $data->result_array();	
-		$table_id = $ref_table_config['table_id'];
-
-		$results = $this->python_fields_cleaning($table_fields,
+		$results = $this->python_fields_cleaning($classification_configuration,
 		$export_config['CLASSIFICATION_METADATA_FIELDS']);
 		$results = $this->python_add_static_classification_fields($results,
 		$export_config['CLASSIFICATION_STATIC_FIELDS']);
@@ -922,6 +926,19 @@ class Reporting extends CI_Controller
 		$zip->close();
 	}
 
+	private function python_create_twig_setup()
+	{
+		// Initial setup for TWIG 
+		require_once 'vendor/autoload.php';
+
+		$loader = new \Twig\Loader\FilesystemLoader('cside/python_templates');
+		$twig = new \Twig\Environment($loader, [
+			'cache' => false
+		]);
+
+		return $twig;
+	}
+
 	/**
 	 * TWIG static configuration parameters
 	 */
@@ -935,17 +952,10 @@ class Reporting extends CI_Controller
 	* Function that uses the TWIG templates engine to generate the python
 	* artifacts part of the relis-statistical-analysis-environment
 	*/
-	private function python_twig_generate($sam, $artifact_name, $export_config){
-		try{
-			// Initial setup for TWIG 
-			require_once 'vendor/autoload.php';
-
-			$loader = new \Twig\Loader\FilesystemLoader('cside/python_templates');
-			$twig = new \Twig\Environment($loader, [
-				'cache' => false
-			]);
-			
-			return $twig->render($artifact_name, array(
+	private function python_twig_generate($sam, $artifact_name,
+	 $export_config, $twig_setup){
+		try{		
+			return $twig_setup->render($artifact_name, array(
 				'sam' => $sam,
 				'export_config' => $export_config
 			));
@@ -963,22 +973,27 @@ class Reporting extends CI_Controller
 	public function python_environment_export()
 	{
 		try {
+			# Project classification configuration extraction
+			$classification_configuration = $this->python_extract_classification_configuration();
+
 			# Project statistical analysis modelization
 			$statistical_functions = $this->python_statistical_functions();
 			$export_config = $this->python_create_export_config($statistical_functions);
-			$sam = $this->python_create_statistical_analysis_model($export_config);
+			$sam = $this->python_create_statistical_analysis_model($classification_configuration,
+			 $export_config);
 
 			# Generate/update project classification data
 			$this->generate_result_export_classification();
 
 			# Environment code generation
+			$twig_setup = $this->python_create_twig_setup();
 			$twig_config = $this->python_create_twig_config();
 
 			$python_kernel_artifact = $this->python_twig_generate($sam, $twig_config['LIBRARY_ARTIFACT_NAME'],
-			 $export_config);
+			 $export_config, $twig_setup);
 
 			$python_playground_artifact = $this->python_twig_generate($sam, $twig_config['PLAYGROUND_ARTIFACT_NAME'],
-			 $export_config);
+			 $export_config, $twig_setup);
 
 			$twig_config = $this->python_create_twig_config();
 
