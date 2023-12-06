@@ -148,22 +148,33 @@ def __display_figure(plt):
 ## Parsing
 
 {# The data should be at the root of the project, with the name of the project as the name of the .csv #}
-project_classification_data = pd.read_csv('./{{attribute(export_config,'CLASSIFICATION_FILE_NAME')}}', encoding='utf8')
+def __read_project_classification_data(path = './{{attribute(export_config,'CLASSIFICATION_FILE_NAME')}}'):
+    return pd.read_csv(path, encoding='utf8')
 
-nominal_variables = {nominal_variable.value.title: nominal_variable.name for nominal_variable in NominalVariables}
-continuous_variables = {continuous_variable.value.title: continuous_variable.name for continuous_variable in ContinuousVariables}
+def __aggregate_variables_by_data_type(variables: type[NominalVariables] | type[ContinuousVariables]):
+    return {variable.value.title: variable.name for variable in variables}
+
+def __transform_classification_data(project_classification_data: pd.DataFrame, aggregated_variables: dict[str, str]):
+    data = project_classification_data[aggregated_variables.keys()].rename(columns=aggregated_variables)
+
+    if (not Policies.DROP_NA.value):
+        __substitute_nan(data)
+
+    return data
 
 ## Preprocessing
 
-nominal_data = project_classification_data[nominal_variables.keys()].rename(columns=nominal_variables)
-continuous_data = project_classification_data[continuous_variables.keys()].rename(columns=continuous_variables)
+def __nominal_dataframe():
+    project_classification_data = __read_project_classification_data()
+    aggregated_variables = __aggregate_variables_by_data_type(NominalVariables)
+    nominal_data = __transform_classification_data(project_classification_data, aggregated_variables)
+    return NominalDataFrame(nominal_data, NominalVariables)
 
-if (not Policies.DROP_NA.value):
-    __substitute_nan(nominal_data)
-    __substitute_nan(continuous_data)
-
-nominal_dataframe = NominalDataFrame(nominal_data, NominalVariables)
-continuous_dataframe = ContinuousDataFrame(continuous_data, ContinuousVariables)
+def __continuous_dataframe():
+    project_classification_data = __read_project_classification_data()
+    aggregated_variables = __aggregate_variables_by_data_type(ContinuousVariables)
+    continuous_data = __transform_classification_data(project_classification_data, aggregated_variables)
+    return ContinuousDataFrame(continuous_data, ContinuousVariables)
 
 ### DESCRIPTIVE STATS
 
@@ -189,7 +200,7 @@ def __beautify_data_desc(field_name: str, data: pd.DataFrame):
 ## Frequency tables
 
 def __desc_frequency_table(classification_variable: NominalVariables):
-    df = nominal_dataframe.data
+    df = __nominal_dataframe().data
 
     variable = classification_variable.value
     
@@ -212,7 +223,7 @@ def desc_frequency_table(classification_variable: NominalVariables, show: bool):
 ## Bar plots
 
 def __desc_bar_plot(classification_variable: NominalVariables):
-    df = nominal_dataframe.data
+    df = __nominal_dataframe().data
 
     variable = classification_variable.value
 
@@ -246,7 +257,7 @@ def desc_bar_plot(classification_variable: NominalVariables, show: bool):
 ## Statistics
 
 def __desc_statistics(classification_variable: ContinuousVariables):
-    df = continuous_dataframe.data
+    df = __continuous_dataframe().data
 
     variable = classification_variable.value
 
@@ -290,7 +301,7 @@ def desc_statistics(classification_variable: ContinuousVariables, show: bool):
 ## Box Plots
 
 def __desc_box_plot(classification_variable: ContinuousVariables):
-    df = continuous_dataframe.data
+    df = __continuous_dataframe().data
 
     variable = classification_variable.value
 
@@ -325,7 +336,7 @@ def desc_box_plot(classification_variable: ContinuousVariables, show: bool):
 ## Violin Plots
 
 def __desc_violin_plot(classification_variable: ContinuousVariables):
-    df = continuous_dataframe.data
+    df = __continuous_dataframe().data
 
     variable = classification_variable.value
 
@@ -376,9 +387,9 @@ def __beautify_data_evo(field_name: str, publication_year: pd.Series, variable: 
 ## Frequency tables
 
 def __evo_frequency_table(classification_variable: NominalVariables):
-    df = nominal_dataframe.data
+    df = __nominal_dataframe().data
 
-    publication_year = continuous_dataframe.data["publication_year"]
+    publication_year = __continuous_dataframe().data["publication_year"]
 
     variable = classification_variable.value
 
@@ -403,9 +414,9 @@ def evo_frequency_table(classification_variable: NominalVariables, show: bool):
 ## Evolution Plots
 
 def __evo_plot(classification_variable: NominalVariables):
-    df = nominal_dataframe.data
+    df = __nominal_dataframe().data
 
-    publication_year = continuous_dataframe.data["publication_year"]
+    publication_year = __continuous_dataframe().data["publication_year"]
 
     variable = classification_variable.value
     
@@ -466,7 +477,7 @@ def __beautify_data_comp(field_name: str, comparison_variable_name: str,
 
 def __comp_frequency_table(classification_variable: NominalVariables,
                               comparison_classification_variable: NominalVariables):
-    data = nominal_dataframe.data
+    data = __nominal_dataframe().data
 
     variable = classification_variable.value
     comparison_variable = comparison_classification_variable.value
@@ -490,7 +501,7 @@ def comp_frequency_table(classification_variable: NominalVariables,
 
 def __comp_stacked_bar_plot(classification_variable: NominalVariables,
                               comparison_classification_variable: NominalVariables):
-    data = nominal_dataframe.data
+    data = __nominal_dataframe().data
 
     variable = classification_variable.value
     comparison_variable = comparison_classification_variable.value
@@ -535,7 +546,7 @@ def comp_stacked_bar_plot(classification_variable: NominalVariables,
 
 def __comp_grouped_bar_plot(classification_variable: NominalVariables,
                               comparison_classification_variable: NominalVariables):
-    data = nominal_dataframe.data
+    data = __nominal_dataframe().data
 
     variable = classification_variable.value
     comparison_variable = comparison_classification_variable.value
@@ -568,7 +579,7 @@ def comp_grouped_bar_plot(classification_variable: NominalVariables,
 
 def __comp_bubble_chart(classification_variable: NominalVariables,
                               comparison_classification_variable: NominalVariables):
-    data = nominal_dataframe.data
+    data = __nominal_dataframe().data
 
     variable = classification_variable.value
     comparison_variable = comparison_classification_variable.value
@@ -604,7 +615,7 @@ def comp_bubble_chart(classification_variable: NominalVariables,
 
 def __comp_chi_squared_test(classification_variable: NominalVariables,
                               comparison_classification_variable: NominalVariables):
-    data = nominal_dataframe.data
+    data = __nominal_dataframe().data
 
     variable = classification_variable.value
     comparison_variable = comparison_classification_variable.value
@@ -649,7 +660,7 @@ def comp_chi_squared_test(classification_variable: NominalVariables,
 ## Shapiro Wilk's Correlation Test
 
 def __comp_shapiro_wilk_test(classification_variable: ContinuousVariables):
-    df = continuous_dataframe.data
+    df = __continuous_dataframe().data
 
     variable = classification_variable.value
 
@@ -686,7 +697,7 @@ def comp_shapiro_wilk_test(classification_variable: ContinuousVariables, show: b
 
 def __comp_pearson_cor_test(classification_variable: ContinuousVariables,
                               comparison_classification_variable: ContinuousVariables):
-    data = continuous_dataframe.data
+    data = __continuous_dataframe().data
 
     variable = classification_variable.value
     comparison_variable = comparison_classification_variable.value
@@ -732,7 +743,7 @@ def comp_pearson_cor_test(classification_variable: ContinuousVariables,
 
 def __comp_spearman_cor_test(classification_variable: ContinuousVariables,
                               comparison_classification_variable: ContinuousVariables):
-    data = continuous_dataframe.data
+    data = __continuous_dataframe().data
 
     variable = classification_variable.value
     comparison_variable = comparison_classification_variable.value
