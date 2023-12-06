@@ -599,105 +599,105 @@ class Reporting extends CI_Controller
 	{
 		return array(
 			$this->python_statistical_function_factory(
-				'generate_desc_frequency_table',
+				'desc_frequency_table',
 				'Frequency tables',
 				'descriptive',
 				'Nominal',
 				'Dataframe'
 			),
 			$this->python_statistical_function_factory(
-				'generate_desc_bar_plot',
+				'desc_bar_plot',
 				'Bar plots',
 				'descriptive',
 				'Nominal',
 				'Figure'
 			),
 			$this->python_statistical_function_factory(
-				'generate_desc_statistic',
+				'desc_statistics',
 				'Statistics',
 				'descriptive',
 				'Continuous',
 				'Dataframe'
 			),
 			$this->python_statistical_function_factory(
-				'generate_desc_box_plot',
+				'desc_box_plot',
 				'Box plots',
 				'descriptive',
 				'Continuous',
 				'Figure'
 			),
 			$this->python_statistical_function_factory(
-				'generate_desc_violin_plot',
+				'desc_violin_plot',
 				'Violin plots',
 				'descriptive',
 				'Continuous',
 				'Figure'
 			),
 			$this->python_statistical_function_factory(
-				'generate_evo_frequency_table',
+				'evo_frequency_table',
 				'Frequency tables',
 				'evolutive',
 				'Nominal',
 				'Dataframe'
 			),
 			$this->python_statistical_function_factory(
-				'generate_evo_plot',
+				'evo_plot',
 				'Evolution plots',
 				'evolutive',
 				'Nominal',
 				'Figure'
 			),
 			$this->python_statistical_function_factory(
-				'generate_comp_frequency_table',
+				'comp_frequency_table',
 				'Frequency tables',
 				'comparative',
 				'Nominal',
 				'Dataframe'
 			),
 			$this->python_statistical_function_factory(
-				'generate_comp_stacked_bar_plot',
+				'comp_stacked_bar_plot',
 				'Stacked bar plots',
 				'comparative',
 				'Nominal',
 				'Figure'
 			),
 			$this->python_statistical_function_factory(
-				'generate_comp_grouped_bar_plot',
+				'comp_grouped_bar_plot',
 				'Grouped bar plots',
 				'comparative',
 				'Nominal',
 				'Figure'
 			),
 			$this->python_statistical_function_factory(
-				'generate_comp_bubble_chart',
+				'comp_bubble_chart',
 				'Bubble charts',
 				'comparative',
 				'Nominal',
 				'Figure'
 			),
 			$this->python_statistical_function_factory(
-				'generate_comp_chi_squared_test',
+				'comp_chi_squared_test',
 				'Chi-squared test',
 				'comparative',
 				'Nominal',
 				'Dataframe'
 			),
 			$this->python_statistical_function_factory(
-				'generate_comp_shapiro_wilk_test',
+				'comp_shapiro_wilk_test',
 				'Shapiro Wilk\'s correlation test',
 				'descriptive',
 				'Continuous',
 				'Dataframe'
 			),
 			$this->python_statistical_function_factory(
-				'generate_comp_pearson_cor_test',
+				'comp_pearson_cor_test',
 				'Pearson\'s correlation test',
 				'comparative',
 				'Continuous',
 				'Dataframe'
 			),
 			$this->python_statistical_function_factory(
-				'generate_comp_spearman_cor_test',
+				'comp_spearman_cor_test',
 				'Spearman\'s correlation test',
 				'comparative',
 				'Continuous',
