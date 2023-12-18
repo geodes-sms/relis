@@ -602,106 +602,91 @@ class Reporting extends CI_Controller
 				'desc_frequency_table',
 				'Frequency tables',
 				'descriptive',
-				'Nominal',
-				'Dataframe'
+				'Nominal'
 			),
 			$this->python_statistical_function_factory(
 				'desc_bar_plot',
 				'Bar plots',
 				'descriptive',
-				'Nominal',
-				'Figure'
+				'Nominal'
 			),
 			$this->python_statistical_function_factory(
 				'desc_statistics',
 				'Statistics',
 				'descriptive',
-				'Continuous',
-				'Dataframe'
+				'Continuous'
 			),
 			$this->python_statistical_function_factory(
 				'desc_box_plot',
 				'Box plots',
 				'descriptive',
-				'Continuous',
-				'Figure'
+				'Continuous'
 			),
 			$this->python_statistical_function_factory(
 				'desc_violin_plot',
 				'Violin plots',
 				'descriptive',
-				'Continuous',
-				'Figure'
+				'Continuous'
 			),
 			$this->python_statistical_function_factory(
 				'evo_frequency_table',
 				'Frequency tables',
 				'evolutive',
-				'Nominal',
-				'Dataframe'
+				'Nominal'
 			),
 			$this->python_statistical_function_factory(
 				'evo_plot',
 				'Evolution plots',
 				'evolutive',
-				'Nominal',
-				'Figure'
+				'Nominal'
 			),
 			$this->python_statistical_function_factory(
 				'comp_frequency_table',
 				'Frequency tables',
 				'comparative',
-				'Nominal',
-				'Dataframe'
+				'Nominal'
 			),
 			$this->python_statistical_function_factory(
 				'comp_stacked_bar_plot',
 				'Stacked bar plots',
 				'comparative',
-				'Nominal',
-				'Figure'
+				'Nominal'
 			),
 			$this->python_statistical_function_factory(
 				'comp_grouped_bar_plot',
 				'Grouped bar plots',
 				'comparative',
-				'Nominal',
-				'Figure'
+				'Nominal'
 			),
 			$this->python_statistical_function_factory(
 				'comp_bubble_chart',
 				'Bubble charts',
 				'comparative',
-				'Nominal',
-				'Figure'
+				'Nominal'
 			),
 			$this->python_statistical_function_factory(
 				'comp_chi_squared_test',
 				'Chi-squared test',
 				'comparative',
-				'Nominal',
-				'Dataframe'
+				'Nominal'
 			),
 			$this->python_statistical_function_factory(
 				'comp_shapiro_wilk_test',
 				'Shapiro Wilk\'s correlation test',
 				'descriptive',
-				'Continuous',
-				'Dataframe'
+				'Continuous'
 			),
 			$this->python_statistical_function_factory(
 				'comp_pearson_cor_test',
 				'Pearson\'s correlation test',
 				'comparative',
-				'Continuous',
-				'Dataframe'
+				'Continuous'
 			),
 			$this->python_statistical_function_factory(
 				'comp_spearman_cor_test',
 				'Spearman\'s correlation test',
 				'comparative',
-				'Continuous',
-				'Dataframe'
+				'Continuous'
 			)
 		);
 	}
@@ -710,14 +695,13 @@ class Reporting extends CI_Controller
 	 * Abstract the creation of statistics for the analysis of classfication data
 	*/
 	private function python_statistical_function_factory($name, $title, $type,
-	$data_type, $return_type)
+	$data_type)
 	{
 		return array(
 			'name' => $name,
 			'title' => $title,
 			'type' => $type,
-			'data_type' => $data_type,
-			'return_data_type' => $return_type,
+			'data_type' => $data_type
 		);
 	}
 
