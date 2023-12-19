@@ -847,6 +847,10 @@ class Reporting extends CI_Controller
 		return $sam;
 	}
 
+	private function get_current_formatted_datetime($format) {
+		return date($format);
+	}
+
 	/**
 	 * Encapsulate static and dynaminc configuration parameters related
 	 * to the relis-statistical-analysis-environment
@@ -854,6 +858,8 @@ class Reporting extends CI_Controller
 	private function python_create_export_config($statistical_functions)
 	{
 		$PROJECT_NAME = project_db();
+		$ENVIRONMENT_VERSION = '1.0.0';
+		$DATE_TIME_GENERATED = $this->get_current_formatted_datetime('Y-m-d h:i:s');
 		$CLASSIFICATION_METADATA_FIELDS = array('class_active', 'class_id',
 		'class_paper_id', 'classification_time', 'user_id', 'A_id');
 		$CLASSIFICATION_STATIC_FIELDS = array(
@@ -871,6 +877,8 @@ class Reporting extends CI_Controller
 		$CLASSIFICATION_FILE_NAME = 'relis_classification_' . $PROJECT_NAME . '.csv';
 
 		return array('PROJECT_NAME' => $PROJECT_NAME,
+		'ENVIRONMENT_VERSION' => $ENVIRONMENT_VERSION,
+		'DATE_TIME_GENERATED' => $DATE_TIME_GENERATED,
 		'CLASSIFICATION_METADATA_FIELDS' => $CLASSIFICATION_METADATA_FIELDS,
 		'CLASSIFICATION_STATIC_FIELDS' => $CLASSIFICATION_STATIC_FIELDS,
 		'MULTIVALUE_SEPARATOR' => $MULTIVALUE_SEPARATOR,

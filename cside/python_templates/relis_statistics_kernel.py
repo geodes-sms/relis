@@ -10,6 +10,9 @@ from matplotlib.text import Text
 from statsmodels.robust.scale import mad
 from scipy.stats import kurtosis, skew, shapiro, spearmanr, pearsonr, chi2_contingency
 
+#-- Environment version : {{attribute(export_config,'ENVIRONMENT_VERSION')}}
+#-- Generated timestamp: {{attribute(export_config,'DATE_TIME_GENERATED')}}
+
 ### Config
 
 plt.rcParams['figure.max_open_warning'] = 0

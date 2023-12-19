@@ -5,6 +5,9 @@ from relis_statistics_kernel import (
     comp_chi_squared_test, comp_spearman_cor_test, comp_frequency_table, comp_bubble_chart,
     comp_shapiro_wilk_test, comp_pearson_cor_test
 )
+
+#-- Environment version : {{attribute(export_config,'ENVIRONMENT_VERSION')}}
+#-- Generated timestamp: {{attribute(export_config,'DATE_TIME_GENERATED')}}
 {% set previousStatistic = null %}
 
 {# Generating statistical tests for every variable #}
