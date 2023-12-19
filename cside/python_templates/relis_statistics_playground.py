@@ -9,7 +9,6 @@ from relis_statistics_kernel import (
 #-- Environment version : {{attribute(export_config,'ENVIRONMENT_VERSION')}}
 #-- Generated timestamp: {{attribute(export_config,'DATE_TIME_GENERATED')}}
 {% set previousStatistic = null %}
-
 {# Generating statistical tests for every variable #}
 {% for key1, item in sam %}
 
