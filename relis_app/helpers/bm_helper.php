@@ -1391,9 +1391,8 @@ function get_paper_screen_status($paper_id)
 	$ci = get_instance();
 	$ci->db2 = $ci->load->database(project_db(), TRUE);
 
-
-	$sql = "select A.*,S.screening_id,S.decision,S.exclusion_criteria,S.inclusion_criteria,S.note,S.screening_time from assignment_screen A 	LEFT JOIN screening S ON (A.assignment_id = S.assignment_id AND S.	screening_active=1)  where A.paper_id = $paper_id AND 	A.assignment_active  ";
-
+    $sql = "SELECT * FROM screening_paper WHERE screening_active = 1 AND paper_id = $paper_id";
+	
 	$res_assignment = $ci->db2->query($sql)->result_array();
 
 	//print_test($res_assignment);
@@ -1408,10 +1407,9 @@ function get_paper_screen_status($paper_id)
 		if (empty($value['screening_id'])) {
 			$pending++;
 		} else {
-			if ($value['decision'] == 'accepted') {
+			if ($value['screening_decision'] == 'accepted') {
 				$accepted++;
 			} else {
-
 				$excluded++;
 				$exclude_crit[$value['exclusion_criteria']] = isset($exclude_crit[$value['exclusion_criteria']]) ? ($exclude_crit[$value['exclusion_criteria']] + 1) : 1;
 

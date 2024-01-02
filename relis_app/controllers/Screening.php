@@ -1093,10 +1093,10 @@ class Screening extends CI_Controller
     public function remove_screening($screen_id)
     {
         $this->db2 = $this->load->database(project_db(), TRUE);
-        $config = "screening";
+        $config = "screen"; 
         $screen_detail = $this->DBConnection_mdl->get_row_details($config, $screen_id);
-        $this->db2->update('screening', array('screening_active' => 0), array('	screening_id' => $screen_id));
-        $this->db2->update('assignment_screen', array('screening_done' => 0), array('assignment_id' => $screen_detail['assignment_id']));
+        $this->db2->update('screening_paper', array('screening_active' => 0), array('screening_id' => $screen_id));
+        $this->db2->update('screening_paper', array('screening_status' => 'Pending'), array('screening_id' => $screen_id));
         update_paper_status_status($screen_detail['paper_id']);
         redirect('screening/list_screen/mine_screen');
     }
@@ -1105,10 +1105,10 @@ class Screening extends CI_Controller
     public function remove_screening_validation($screen_id)
     {
         $this->db2 = $this->load->database(project_db(), TRUE);
-        $config = "screening_validate";
+        $config = "screen";
         $screen_detail = $this->DBConnection_mdl->get_row_details($config, $screen_id);
-        $this->db2->update('screening_validate', array('screening_active' => 0), array('	screening_id' => $screen_id));
-        $this->db2->update('assignment_screen_validate', array('screening_done' => 0), array('assignment_id' => $screen_detail['assignment_id']));
+        $this->db2->update('screening_paper', array('screening_active' => 0), array('screening_id' => $screen_id));
+        $this->db2->update('screening_paper', array('screening_status' => 'Pending'), array('screening_id' => $screen_id));
         redirect('screening/list_screen/screen_validation');
     }
 

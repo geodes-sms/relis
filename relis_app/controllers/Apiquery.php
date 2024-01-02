@@ -41,6 +41,8 @@ class Apiquery extends CI_Controller
      */
     public function run($sql = "", $targetDb = 'default')
     {
+        $sql = $this->input->get('sql');
+        
         $sql = $sql ?: "select * from users";
         $pre_select_sql = " select* from ( ";
         $post_select_sql = " ) as T ";
@@ -54,4 +56,5 @@ class Apiquery extends CI_Controller
             print_r($result);
         }
     }
+
 }

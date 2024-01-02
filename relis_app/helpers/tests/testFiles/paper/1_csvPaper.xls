@@ -1,0 +1,2 @@
+global_key,paper_key,conf_key,link,title,pages,citations
+aaai,conf/aaai/0001JT16,conf/aaai/2016np,http://www.aaai.org/ocs/index.php/WS/AAAIW16/paper/view/12603,"Solving QBF Instances with Nested SAT Solvers.",NULL,NULL

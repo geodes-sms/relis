@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CodeIgniter
  *
@@ -35,7 +36,7 @@
  * @since	Version 1.3.1
  * @filesource
  */
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
 /**
  * Unit Testing Class
@@ -48,7 +49,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @author		EllisLab Dev Team
  * @link		https://codeigniter.com/user_guide/libraries/unit_testing.html
  */
-class CI_Unit_test {
+class CI_Unit_test
+{
 
 	/**
 	 * Active flag
@@ -92,11 +94,17 @@ class CI_Unit_test {
 	 *
 	 * @var	array
 	 */
-	protected $_test_items_visible	= array(
+	protected $_test_items_visible = array(
+		'test_controller',
+		'test_action',
 		'test_name',
+		'test_aspect',
 		'test_datatype',
+		'test_value',
 		'res_datatype',
+		'res_value',
 		'result',
+		'http_response_code',
 		'file',
 		'line',
 		'notes'
@@ -126,8 +134,7 @@ class CI_Unit_test {
 	 */
 	public function set_test_items($items)
 	{
-		if ( ! empty($items) && is_array($items))
-		{
+		if (!empty($items) && is_array($items)) {
 			$this->_test_items_visible = $items;
 		}
 	}
@@ -145,34 +152,36 @@ class CI_Unit_test {
 	 * @param	string	$notes
 	 * @return	string
 	 */
-	public function run($test, $expected = TRUE, $test_name = 'undefined', $notes = '')
+	public function run($test, $expected = TRUE, $test_name = 'undefined', $test_aspect = 'undefined', $test_controller = 'undefined', $test_action = 'undefined', $http_response_code = 'undefined', $notes = '')
 	{
-		if ($this->active === FALSE)
-		{
+		if ($this->active === FALSE) {
 			return FALSE;
 		}
 
-		if (in_array($expected, array('is_object', 'is_string', 'is_bool', 'is_true', 'is_false', 'is_int', 'is_numeric', 'is_float', 'is_double', 'is_array', 'is_null', 'is_resource'), TRUE))
-		{
+		if (in_array($expected, array('is_object', 'is_string', 'is_bool', 'is_true', 'is_false', 'is_int', 'is_numeric', 'is_float', 'is_double', 'is_array', 'is_null', 'is_resource'), TRUE)) {
 			$result = $expected($test);
 			$extype = str_replace(array('true', 'false'), 'bool', str_replace('is_', '', $expected));
-		}
-		else
-		{
+		} else {
 			$result = ($this->strict === TRUE) ? ($test === $expected) : ($test == $expected);
 			$extype = gettype($expected);
 		}
 
 		$back = $this->_backtrace();
 
-		$report = array (
-			'test_name'     => $test_name,
+		$report = array(
+			'test_controller' => $test_controller,
+			'test_action' => $test_action,
+			'test_name' => $test_name,
+			'test_aspect' => $test_aspect,
+			'res_datatype' => $extype,
+			'res_value' => $expected,
 			'test_datatype' => gettype($test),
-			'res_datatype'  => $extype,
-			'result'        => ($result === TRUE) ? 'passed' : 'failed',
-			'file'          => $back['file'],
-			'line'          => $back['line'],
-			'notes'         => $notes
+			'test_value' => $test,
+			'result' => ($result === TRUE) ? 'passed' : 'failed',
+			'http_response_code' => $http_response_code,
+			'file' => $back['file'],
+			'line' => $back['line'],
+			'notes' => $notes
 		);
 
 		$this->results[] = $report;
@@ -190,11 +199,22 @@ class CI_Unit_test {
 	 * @param	array	 $result
 	 * @return	string
 	 */
-	public function report($result = array())
+	public function report($result = array(), $executionTime = "")
 	{
-		if (count($result) === 0)
-		{
+		$tests_passed = 0; 
+		$tests_failed = 0; 
+
+		if (count($result) === 0) {
 			$result = $this->result();
+		}
+
+		foreach ($result as $res) {
+			if ($res['Status'] == 'Passed') {
+				$tests_passed += 1;
+			}
+			if ($res['Status'] == 'Failed') {
+				$tests_failed += 1;
+			}
 		}
 
 		$CI =& get_instance();
@@ -202,22 +222,30 @@ class CI_Unit_test {
 
 		$this->_parse_template();
 
-		$r = '';
-		foreach ($result as $res)
-		{
+		$r = '<table style="background-color:#f0f5f5; font-size:small; text-align:center; margin:0 auto; border-collapse:collapse; border:1px solid #CCC;">
+        		<tr>
+            		<th style="padding: 2px; border-collapse:collapse; border:1px solid #CCC;">Nbr of tests</th>
+            		<th style="padding: 2px; border-collapse:collapse; border:1px solid #CCC;">Tests passed</th>
+            		<th style="padding: 2px; border-collapse:collapse; border:1px solid #CCC;">Tests failed</th>
+					<th style="padding: 2px; border-collapse:collapse; border:1px solid #CCC;">Exec time</th>
+        		</tr>
+        		<tr>
+            		<td style="padding: 2px; border-collapse:collapse; border:1px solid #CCC;">' . count($result) . '</td>
+            		<td style="padding: 2px; border-collapse:collapse; border:1px solid #CCC; color: #0C0;">' . $tests_passed . '</td>
+            		<td style="padding: 2px; border-collapse:collapse; border:1px solid #CCC; color: #C00;">' . $tests_failed . '</td>
+					<td style="padding: 2px; border-collapse:collapse; border:1px solid #CCC;">' . $executionTime . '</td>
+        		</tr>
+    		</table>';
+
+		foreach ($result as $res) {
 			$table = '';
 
-			foreach ($res as $key => $val)
-			{
-				if ($key === $CI->lang->line('ut_result'))
-				{
-					if ($val === $CI->lang->line('ut_passed'))
-					{
-						$val = '<span style="color: #0C0;">'.$val.'</span>';
-					}
-					elseif ($val === $CI->lang->line('ut_failed'))
-					{
-						$val = '<span style="color: #C00;">'.$val.'</span>';
+			foreach ($res as $key => $val) {
+				if ($key === $CI->lang->line('ut_result')) {
+					if ($val === $CI->lang->line('ut_passed')) {
+						$val = '<span style="color: #0C0;">' . $val . '</span>';
+					} elseif ($val === $CI->lang->line('ut_failed')) {
+						$val = '<span style="color: #C00;">' . $val . '</span>';
 					}
 				}
 
@@ -275,36 +303,60 @@ class CI_Unit_test {
 		$CI =& get_instance();
 		$CI->load->language('unit_test');
 
-		if (count($results) === 0)
-		{
+		if (count($results) === 0) {
 			$results = $this->results;
 		}
 
 		$retval = array();
-		foreach ($results as $result)
-		{
+		foreach ($results as $result) {
 			$temp = array();
-			foreach ($result as $key => $val)
-			{
-				if ( ! in_array($key, $this->_test_items_visible))
-				{
+			foreach ($result as $key => $val) {
+				if (!in_array($key, $this->_test_items_visible)) {
 					continue;
-				}
-				elseif (in_array($key, array('test_name', 'test_datatype', 'res_datatype', 'result'), TRUE))
-				{
-					if (FALSE !== ($line = $CI->lang->line(strtolower('ut_'.$val), FALSE)))
-					{
+				} elseif (in_array($key, array('test_controller', 'test_action', 'test_name', 'test_aspect', 'test_datatype', 'test_value', 'res_datatype', 'res_value', 'result', 'http_response_code'), TRUE)) { 
+					if (FALSE !== ($line = $CI->lang->line(strtolower('ut_' . $val), FALSE))) {
 						$val = $line;
 					}
 				}
 
-				$temp[$CI->lang->line('ut_'.$key, FALSE)] = $val;
+				$temp[$CI->lang->line('ut_' . $key, FALSE)] = $val;
 			}
 
 			$retval[] = $temp;
 		}
 
 		return $retval;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 *
+	 *
+	 * @param	array	$results
+	 * @return	string
+	 */
+	public function last_result($results = array())
+	{
+		$is_success = true;
+		$CI =& get_instance();
+		$CI->load->language('unit_test');
+
+		if (count($results) === 0) {
+			$results = $this->results;
+		}
+
+		foreach ($results as $result) {
+			if ($result['result'] == 'failed') {
+				$is_success = false;
+			}
+		}
+
+		if ($is_success == true) {
+			return "successful";
+		}
+
+		return "failed";
 	}
 
 	// --------------------------------------------------------------------
@@ -349,10 +401,10 @@ class CI_Unit_test {
 	 */
 	protected function _default_template()
 	{
-		$this->_template = "\n".'<table style="width:100%; font-size:small; margin:10px 0; border-collapse:collapse; border:1px solid #CCC;">{rows}'."\n</table>";
+		$this->_template = "\n" . '<table style="width:100%; background-color:#f0f5f5; font-size:small; margin:10px 0; border-collapse:collapse; border:1px solid #CCC;">{rows}' . "\n</table>"; 
 
-		$this->_template_rows = "\n\t<tr>\n\t\t".'<th style="text-align: left; border-bottom:1px solid #CCC;">{item}</th>'
-					."\n\t\t".'<td style="border-bottom:1px solid #CCC;">{result}</td>'."\n\t</tr>";
+		$this->_template_rows = "\n\t<tr>\n\t\t" . '<th style="width:150px; text-align: left; border-bottom:1px solid #CCC; white-space: nowrap;">{item}</th>'
+			. "\n\t\t" . '<td style="border-bottom:1px solid #CCC;">{result}</td>' . "\n\t</tr>";
 	}
 
 	// --------------------------------------------------------------------
@@ -366,13 +418,11 @@ class CI_Unit_test {
 	 */
 	protected function _parse_template()
 	{
-		if ($this->_template_rows !== NULL)
-		{
+		if ($this->_template_rows !== NULL) {
 			return;
 		}
 
-		if ($this->_template === NULL OR ! preg_match('/\{rows\}(.*?)\{\/rows\}/si', $this->_template, $match))
-		{
+		if ($this->_template === NULL or !preg_match('/\{rows\}(.*?)\{\/rows\}/si', $this->_template, $match)) {
 			$this->_default_template();
 			return;
 		}

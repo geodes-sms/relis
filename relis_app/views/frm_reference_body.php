@@ -50,11 +50,13 @@
                     	if($value[$var_check]!='not_set'){
 						$value['field_title']=lng($value['field_title']);
                     		
-                    		if($value['field_value']=='active_user'){	
-                    			$user_id= $this->session->userdata('user_id');
-                    		echo form_hidden(array( $key => $user_id));
+                    		// if($value['field_value']=='active_user'){	
+                    		// 	$user_id= $this->session->userdata('user_id');
+                    		// echo form_hidden(array( $key => $user_id));
                     		
-                    		}elseif($value[$var_check]=='hidden'){	
+                    		// }else
+							
+							if($value[$var_check]=='hidden'){	
                     		echo form_hidden(array( $key => isset($content_item[$key])?$content_item[$key]:''));
                     		
                     		}else {
@@ -140,11 +142,11 @@
                     			
                     		}elseif($input_type=='select'){
                     			
-                    			if($value['field_value']=='0_1' ){
+                    			// if($value['field_value']=='0_1' ){
                     				
-                    			echo checkbox_form_bm($value['field_title'],$key,$key,$value['input_select_values'],isset($content_item[$key])?$content_item[$key]:'',$extra_class.$mandatory,$readonly);
+                    			// echo checkbox_form_bm($value['field_title'],$key,$key,$value['input_select_values'],isset($content_item[$key])?$content_item[$key]:'',$extra_class.$mandatory,$readonly);
                     				 
-                    			}else{
+                    			// }else{
                     			
                     			if(isset($value['multi-select']) AND $value['multi-select']=='Yes'){
                     				echo dropdown_multi_form_bm($value['field_title'],$key,$key,$value['input_select_values'],isset($content_item[$key])?$content_item[$key]:'',$extra_class.$mandatory,$readonly,$number_of_values);
@@ -155,7 +157,7 @@
                     			}
 
                     				
-                    			}
+                    			// }
                     		}else{
                     			echo input_form_bm($value['field_title'],$key,$key,isset($content_item[$key])?$content_item[$key]:$initial_value,$size, $extra_class.$mandatory ,$readonly,$place_holder,$pattern,$pattern_info);
                     			 

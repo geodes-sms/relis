@@ -124,7 +124,7 @@
     <script src="<?php echo site_url();?>cside/vendors/datatables.net-buttons/js/buttons.print.min.js"></script>
     <script src="<?php echo site_url();?>cside/vendors/datatables.net-buttons/js/buttons.html5.min.js"></script>
     <script src="<?php echo site_url();?>cside/vendors/datatables.net-buttons/js/buttons.flash.min.js"></script>
-    <script src="<?php echo site_url();?>cside/vendors/datatables.net-buttons/js/buttons.colVis"></script>
+    <script src="<?php echo site_url();?>cside/vendors/datatables.net-buttons/js/buttons.colVis.js"></script>
     <!-- /PNotify -->
     <script>
 function get_screen_info(){

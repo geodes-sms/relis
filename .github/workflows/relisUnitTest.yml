@@ -1,0 +1,60 @@
+name: Relis unit test
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  relis_unit_testing:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Check if Docker is installed
+        run: |
+          if docker --version; then
+            echo "Docker is installed in your repository."
+          else
+            echo "Docker is not installed, please install Docker in your Github Repository."
+          fi
+
+      - name: Build Docker Image
+        run: docker-compose build
+        working-directory: relis_deployment
+
+      - name: Run Docker Containers
+        run: docker-compose up -d
+        working-directory: relis_deployment
+
+      - name: Wait for Application to Start
+        run: sleep 10
+
+      - name: Set relis-app Container permission
+        run: |
+          docker exec relis-app chmod -R 777 /u/relis/public_html/relis_app/ 
+          docker exec relis-app chmod -R 777 /u/relis/public_html/cside/export_r
+
+      - name: Run Unit test
+        run: |
+
+          response=$(php -r 'echo file_get_contents("http://localhost:8083/test/unit_test/relis_unit_test/last_result", false, stream_context_create(["http" => ["timeout" => 500]]));')
+
+          if [ "$response" == "successful" ]; then
+            echo "The unit test passed. Proceeding with the workflow."
+
+          elif [ "$response" == "failed" ]; then
+            echo "The unit test failed"
+            echo "Browse to http://localhost:8083/test/unit_test/relis_unit_test in you local browser for more details"
+            exit 1
+
+          else
+            echo "The unit test has an error :"
+            echo $response
+            exit 1
+          fi
+
+      - name: Stop all running Docker Containers
+        run: docker stop $(docker ps -q)

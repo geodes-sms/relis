@@ -587,7 +587,7 @@ class Home extends CI_Controller
 		$data['top_buttons'] = get_top_button('back', 'Back', 'home');
 		$data['left_menu_perspective'] = 'z_left_menu_screening';
 		$data['project_perspective'] = 'screening';
-		$data['page'] = 'export';
+		$data['page'] = 'relis/result_export';
 		/*
 		 * Chargement de la vue avec les données préparés dans le controleur suivant le type d'affichage : (popup modal ou pas)
 		 */

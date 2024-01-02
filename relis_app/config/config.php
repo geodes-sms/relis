@@ -278,8 +278,7 @@ $config['proxy_ips'] = '';
 // My configurations
 
 $config['rec_per_page'] = '50';
-$config['free_controllers'] = ['auth', 'api', 'apiquery', 'user'];
-
+$config['free_controllers'] = ['auth', 'api', 'apiquery', 'user', 'unit_test'];
 
 //For image upload
 $config['image_upload_path'] = 'cside/media/images/';

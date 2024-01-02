@@ -1,6 +1,6 @@
 <?php
 /* ReLiS - A Tool for conducting systematic literature reviews and mapping studies.
- * Copyright (C) 2018  Eugene Syriani
+ * Copyright (C) 2018  Eugene Syriani 
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -181,7 +181,7 @@ class Install extends CI_Controller
 			if (!empty($res_install_config['reference_tables'])) {
 				foreach ($res_install_config['reference_tables'] as $key => $value) {
 					array_push($ref_tables, $key);
-					$sql_ref .= $this->create_reference_table($key, $value);
+					$sql_ref .= create_reference_table($key, $value);
 					$sql_ref .= "<br/><br/>";
 				}
 			}
@@ -193,8 +193,8 @@ class Install extends CI_Controller
 					array_push($generated_tables, $key_config);
 					//$sql_table.=$this->create_table_config($config_values);
 					//$sql_table.="<br/><br/>";
-					$this->populate_common_tables('current', $key_config);
-					$foreign_key = $this->get_froreign_keys_constraint($key_config, $config_values);
+					populate_common_tables('current', $key_config);
+					$foreign_key = get_froreign_keys_constraint($key_config, $config_values);
 					if (!empty($foreign_key)) {
 						array_push($foreign_key_constraints, $foreign_key);
 					}
@@ -213,13 +213,13 @@ class Install extends CI_Controller
 			// stored procedures
 			if (!empty($res_install_config['config'])) {
 				foreach ($res_install_config['config'] as $key_config => $config_values) {
-					//$this->update_stored_procedure($key_config);
-					$this->update_stored_procedure($key_config, FALSE, 'current', TRUE);
+					//update_stored_procedure($key_config);
+					update_stored_procedure($key_config, FALSE, 'current', TRUE);
 				}
 			}
 			if (!empty($res_install_config['reference_tables'])) {
 				foreach ($res_install_config['reference_tables'] as $key => $value) {
-					$this->update_stored_procedure($key);
+					update_stored_procedure($key);
 				}
 			}
 			if ($verbose)
@@ -242,7 +242,7 @@ class Install extends CI_Controller
 		}
 		//add screening_values if available
 		if (!empty($res_install_config['screening']) and !(!empty($res_install_config['screen_action']) and $res_install_config['screen_action'] != 'override')) {
-			$this->update_screening_values($res_install_config['screening'], $project_short_name);
+			update_screening_values($res_install_config['screening'], $project_short_name);
 			array_push($success_array, 'Screening configuration set');
 		} else {
 			if (empty($res_install_config['screening'])) {
@@ -252,7 +252,7 @@ class Install extends CI_Controller
 		//adding Qality assessment values
 		//	print_test($res_install_config);
 		if (!empty($res_install_config['qa']) and !empty($res_install_config['qa_action'] and $res_install_config['qa_action'] == 'override')) {
-			$this->update_qa_values($res_install_config['qa'], $project_short_name);
+			update_qa_values($res_install_config['qa'], $project_short_name);
 			array_push($success_array, 'Quality assessment configuration set');
 		} else {
 			if (empty($res_install_config['qa'])) {
@@ -260,7 +260,7 @@ class Install extends CI_Controller
 			}
 			array_push($success_array, 'Retained Quality assessment configuration set');
 		}
-		$this->project_install_result($error_array, $success_array, 'update_project');
+		project_install_result($error_array, $success_array, 'update_project');
 		//echo "<h2>Installation done</h3>";
 		//echo anchor('home','<h2> Start the Application </h3>');
 	}
@@ -312,7 +312,7 @@ class Install extends CI_Controller
 		}
 		if (!empty($error_array)) {
 			//print_r($error_array);
-			$this->project_install_result($error_array, $success_array, 'update_project');
+			project_install_result($error_array, $success_array, 'update_project');
 		}
 	}
 
@@ -364,7 +364,7 @@ class Install extends CI_Controller
 		}
 		if (!empty($error_array)) {
 			//print_r($error_array);
-			$this->project_install_result($error_array, $success_array, 'update_project_editor');
+			project_install_result($error_array, $success_array, 'update_project_editor');
 		}
 	}
 
