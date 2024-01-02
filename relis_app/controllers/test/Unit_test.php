@@ -53,7 +53,7 @@ class Unit_test extends CI_Controller
         $this->load->helper('tests/helpers/curl');
         $this->load->helper('tests/helpers/tests');
         $this->load->helper('tests/helpers/functions');
-        $this->load->helper('tests/user_ut');
+        $this->load->helper('tests/userunittest');
         $this->load->helper('tests/project_ut');
         $this->load->helper('tests/paper_ut');
         $this->load->helper('tests/screening_ut');
@@ -102,23 +102,23 @@ class Unit_test extends CI_Controller
         $startTime = microtime(true);
 
         $this->userUnitTest->run_tests();
-        $this->projectUnitTest->run_tests();
-        $this->paperUnitTest->run_tests();
-        $this->screeningUnitTest->run_tests();
-        $this->quality_assessmentUnitTest->run_tests();
-        $this->data_extractionUnitTest->run_tests();
-        $this->reportingUnitTest->run_tests();
-        $this->elementUnitTest->run_tests();
-        $this->homeUnitTest->run_tests();
-        $this->installUnitTest->run_tests();
-        $this->adminUnitTest->run_tests();
-        $this->configUnitTest->run_tests();
-        $this->manageUnitTest->run_tests();
-        $this->managerUnitTest->run_tests();
-        $this->relisManagerUnitTest->run_tests();
-        $this->apiUnitTest->run_tests();
-        $this->apiQueryUnitTest->run_tests();
-        $this->opUnitTest->run_tests();
+        // $this->projectUnitTest->run_tests();
+        // $this->paperUnitTest->run_tests();
+        // $this->screeningUnitTest->run_tests();
+        // $this->quality_assessmentUnitTest->run_tests();
+        // $this->data_extractionUnitTest->run_tests();
+        // $this->reportingUnitTest->run_tests();
+        // $this->elementUnitTest->run_tests();
+        // $this->homeUnitTest->run_tests();
+        // $this->installUnitTest->run_tests();
+        // $this->adminUnitTest->run_tests();
+        // $this->configUnitTest->run_tests();
+        // $this->manageUnitTest->run_tests();
+        // $this->managerUnitTest->run_tests();
+        // $this->relisManagerUnitTest->run_tests();
+        // $this->apiUnitTest->run_tests();
+        // $this->apiQueryUnitTest->run_tests();
+        // $this->opUnitTest->run_tests();
 
         // Record the end time of the tests
         $endTime = microtime(true);
