@@ -14,7 +14,7 @@
 
 This unit test for ReLiS project aims to provide robust quality assurance by quickly identifying and addressing potential regressions, ensuring a smooth and reliable user experience. The introduction of automated unit tests aligns with a proactive approach to anticipate the impacts on the code during future developments of the application.
 
-The choice of framework for conducting unit tests in ReLiS leaned towards the "Unit Testing" library. This selection was driven by the fact that this library serves as the integrated testing framework within the CodeIgniter 3 framework, making it seamlessly compatible with both PHP 7.1 and CodeIgniter 3, the technologies employed in ReLiS.
+The choice of framework for conducting unit tests in ReLiS leaned towards the **Unit Testing** library. This selection was driven by the fact that this library serves as the integrated testing framework within the CodeIgniter 3 framework, making it seamlessly compatible with both PHP 7.1 and CodeIgniter 3, the technologies employed in ReLiS.
 
 This README file offers a comprehensive overview of the unit testing implementation for the ReLiS application. The following points are outlined to provide insight into the implementation and maintenance of unit tests:
 
@@ -33,12 +33,12 @@ In ReLiS, the Unit Testing class is initialized in the file [Unit_test.php](../.
 
 ## Implementation
 
-As mentioned earlier, unit tests have been implemented using the CodeIgniter 3 **Unit Testing** library. Additionally, the **cURL** library initialized in [xxx.php](../tests/helpers/hhhhdh_helper.php), was utilized for making HTTP calls to all functions within the tested controllers. Each tested controller has its dedicated file in the [tests](../tests/) directory, where all tests for the controller's functions are implemented. For instance, all tests for the **Reporting** controller can be found in the file `reporting_xxx` [xxx.php](../tests/reportingUnitTest_helper.php).
+As mentioned earlier, unit tests have been implemented using the CodeIgniter 3 **Unit Testing** library. Additionally, the **cURL** library initialized in [curl_helper.php](../tests/helpers/curl_helper.php), was utilized for making HTTP calls to all functions within the tested controllers. Each tested controller has its dedicated file in the [tests](../tests/) directory, where all tests for the controller's functions are implemented. For instance, all tests for the **Reporting** controller can be found in the file [reporting_ut_helper.php](../tests/reporting_ut_helper.php).
 
 All the test files for controllers are initialized in the [Unit_test.php](../../controllers/test/Unit_test.php) file, where all the tests are executed using the following code:
 
 * `$this->unit->report()`: Prints out a formatted report in the browser. This report includes details such as the tests passed and failed, the number of tests run, the number of tests passed and failed, along with additional information on the time taken for the tests.
-* `$this->unit->last_result()`: This function returns either **pass** or **failed** to indicate whether the tests have passed or failed. It is used in the GitHub unit testing action to determine the outcome of the tests, providing a clear indication of whether the tests were successful or not.
+* `$this->unit->last_result()`: This function returns either **successful** or **failed** to indicate whether the tests have passed or failed. It is used in the GitHub unit testing action to determine the outcome of the tests, providing a clear indication of whether the tests were successful or not.
 
 ## Running the Tests
 
@@ -54,19 +54,21 @@ Then from your web browser go to the following URL: `http://localhost:8083/test/
 
 ### Running the tests from Github action
 
-The creation of a configuration file in the ".yml" format, as described in the [GitHub Deployment](#github-deployment) section, enables automatic test execution on GitHub with each push using the `git push` command on the **develop** branch.
+The creation of a configuration file in the **.yml** format, as described in the [GitHub Deployment](#github-deployment) section, enables automatic test execution on GitHub with each push using the `git push` command on the **develop** branch.
 
 ### Enable and disable tests
 
-The controllers' tests are enabled or disabled individually by uncommenting or commenting the line of code that runs the corresponding controller test in [Unit_test.php](../../controllers/test/Unit_test.php). For example, to enable the test for the screening controller, simply uncomment the line of code responsible for running the screening controller tests, like so: `$this->screeningxxxxxxUnitTest->run_tests();`.
+The controllers' tests are enabled or disabled individually by uncommenting or commenting the line of code that runs the corresponding controller test in [Unit_test.php](../../controllers/test/Unit_test.php). For example, to enable the test for the screening controller, simply uncomment the line of code responsible for running the screening controller tests, like so: `$this->screeningUnitTest->run_tests();`.
 
 ## Disable, delete and add test functions
 
 ### Disable/delete test functions
 
-To disable a test function, simply comment the call to that function. For example, to disable the **logout()** test function, you can comment the call to that test function in [UserxxxxUnit_test.php](../../helpers/tests/uuss_helper.php). Alternatively, you can delete the test function for permanent removal. 
+To disable a test function, simply comment the call to that function. For example, to disable the **logout()** test function, you can comment the call to that test function in [user_ut_helper.php](../../helpers/tests/user_ut_helper.php). Alternatively, you can delete the test function for permanent removal. 
 
-As some test functions depend on others, ensure that disabling or removing a function does not break the execution of other test functions.
+```diff
+- As some test functions depend on others, ensure that disabling or removing a function does not break the execution of other test functions.
+```
 
 ### Adding test functions
 
@@ -85,7 +87,7 @@ As some test functions depend on others, ensure that disabling or removing a fun
 2. In case of new test class helper in [tests](../tests/): 
 
     * `Remane your test class helper file`: Renaming your test helper file can be a tricky task due to potential issues in the GitHub Action workflow. It has been observed that certain file names, such as renaming the **user** test helper to **userUnitTest_helper.php**, may result in an error during the GitHub Action workflow. Unfortunately, the exact cause of this error is currently unknown. The naming error is manifested in the GitHub Action as depicted below:
-      ![Namming error](../../../cside/images/nameError.png)
+      ![Naming error](../../../cside/images/nameError.png)
 
     * `Name suggestion`: As a recommended naming convention, consider using the following pattern for your class helper file: `[controller name]_ut_helper`. For example, if you have a **user** controller, the appropriate name for the test class helper would be `user_ut_helper`, where **ut** signifies **unit test**. Adhering to this naming convention may help avoid issues in the GitHub Action workflow.
 
@@ -95,7 +97,9 @@ As some test functions depend on others, ensure that disabling or removing a fun
       - `$this->newclassUnitTest = new NewclassUnitTest();`: In the constructor
       - `$this->newclassUnitTest->run_tests();`: In the **relis_unit_test()** function
 
-It is advisable to add a new test function at the end of the test class to avoid disrupting the execution flow of other tests, especially since some tests are dependent on others. This precaution is recommended unless you are familiar with the dependencies and potential impacts on the test suite.
+```diff
+- It is advisable to add a new test function at the end of the test class to avoid disrupting the execution flow of other tests, especially since some tests are dependent on others. This precaution is recommended unless you are familiar with the dependencies and potential impacts on the test suite.
+```
 
 ## GitHub Deployment
 
@@ -128,12 +132,12 @@ The implementation of the **main** branch protection system is achieved as follo
 * Click on `Create`
 
 * if the latest code push to the **develop** branch fails the unit test, the **Merge pull request** button will be disabled, preventing the initiation of the merge.
-  ![Merge 1](../../../cside/images/merge%20pull%20request1.png)
+  ![Merge pull request 1](../../../cside/images/merge%20pull%20request1.png)
 
 * When a new push is made, the status check is restarted on the latest action workflow run
-  ![Merge 2](../../../cside/images/merge%20pull%20request2.png)
+  ![Merge pull request 2](../../../cside/images/merge%20pull%20request2.png)
 
 * When the status check pass, the “merge pull request” button is activated to allow the merging.
-  ![Merge 3](../../../cside/images/merge%20pull%20request3.png)
+  ![Merge pull request 3](../../../cside/images/merge%20pull%20request3.png)
 
 Changes made to the local repository will always be pushed to the **develop** branch, regardless of the success or failure of unit tests. However, the **main** branch will only permit code merging if the latest code push to the **develop** branch successfully passes the unit tests.
