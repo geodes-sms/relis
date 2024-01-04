@@ -54,7 +54,18 @@ Then from your web browser go to the following URL: `http://localhost:8083/test/
 
 ### Running the tests from Github action
 
-The creation of a configuration file in the **.yml** format, as described in the [GitHub Deployment](#github-deployment) section, enables automatic test execution on GitHub with each push using the `git push` command on the **develop** branch.
+The creation of a configuration file in the **.yml** format, as described in the [GitHub Deployment](#github-deployment) section, enables automatic test execution on GitHub with each push using the `git push` command on the **develop** branch. The precise steps involve in the execution are outlined in the [GitHub Deployment](#github-deployment) section. Three possible results can be returned from the test:
+
+* `successful`: This result is returned when the unit test is successful.
+* `failed`: This result is returned when the unit test encounters a failure. To identify the specific test that failed, you can run the test in a web browser following the instructions provided in the [Running the tests from a web browser](#Running-the-tests-from-a-web-browser) section.
+* `error`: This result is returned when an error occurs during the test execution. To determine the nature of the error, follow the steps outlined below:
+
+    - Comment out the permission lines in the action workflow configuration file [relisUnitTest.yml](../../../.github/workflows/relisUnitTest.yml), as illustrated in the image below:
+      ![Comment permissions](../../../cside/images/comment%20permissions.png)
+    - Push the changes to the GitHub remote repository.
+    - In the `Run Unit test` section of the workflow, a block of HTML code will be generated, describing the error as depicted in the following image:
+      ![test error](../../../cside/images/test%20error.png)
+    - Copy the HTML code to an HTML file and open the file with a web browser to view the actual error details.
 
 ### Enable and disable tests
 
@@ -66,9 +77,7 @@ The controllers' tests are enabled or disabled individually by uncommenting or c
 
 To disable a test function, simply comment the call to that function. For example, to disable the **logout()** test function, you can comment the call to that test function in [user_ut_helper.php](../../helpers/tests/user_ut_helper.php). Alternatively, you can delete the test function for permanent removal. 
 
-```diff
-- As some test functions depend on others, ensure that disabling or removing a function does not break the execution of other test functions.
-```
+As some test functions depend on others, ensure that disabling or removing a function does not break the execution of other test functions.
 
 ### Adding test functions
 
@@ -97,9 +106,7 @@ To disable a test function, simply comment the call to that function. For exampl
       - `$this->newclassUnitTest = new NewclassUnitTest();`: In the constructor
       - `$this->newclassUnitTest->run_tests();`: In the **relis_unit_test()** function
 
-```diff
-- It is advisable to add a new test function at the end of the test class to avoid disrupting the execution flow of other tests, especially since some tests are dependent on others. This precaution is recommended unless you are familiar with the dependencies and potential impacts on the test suite.
-```
+It is advisable to add a new test function at the end of the test class to avoid disrupting the execution flow of other tests, especially since some tests are dependent on others. This precaution is recommended unless you are familiar with the dependencies and potential impacts on the test suite.
 
 ## GitHub Deployment
 
@@ -110,7 +117,7 @@ The [relisUnitTest.yml](../../../.github/workflows/relisUnitTest.yml) configurat
 * `Step 3. Docker Image Build`: Uses the command **docker-compose build** to construct the Docker image in the remote GitHub repository.
 * `Step 4. Docker Containers Execution`: Uses the command **docker-compose up -d** to start the Docker containers.
 * `Step 5. Application Startup Wait`: Waits for 10 seconds to allow the containers to start.
-* `Step 6. Permissions Assignment to the "relis-app" Container`: Modifies the permissions of the **relis-app** container to ensure access.
+* `Step 6. Permissions Assignment to the "relis-app" Container and cside/export_r directory`: Modifies the permissions of the **relis-app** container and **cside/export_r** directory to ensure access.
 * `Step 7. Unit Tests Execution`: Executes the unit tests.
 * `Step 8. Stop All Docker Containers`: Stops all Docker containers after the tests have been executed.
 
