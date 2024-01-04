@@ -32,10 +32,10 @@ jobs:
       - name: Wait for Application to Start
         run: sleep 10
 
-      # - name: Set relis-app Container permission
-      #   run: |
-      #     docker exec relis-app chmod -R 777 /u/relis/public_html/relis_app/ 
-      #     docker exec relis-app chmod -R 777 /u/relis/public_html/cside/export_r
+      - name: Set relis-app Container permission
+        run: |
+          docker exec relis-app chmod -R 777 /u/relis/public_html/relis_app/ 
+          docker exec relis-app chmod -R 777 /u/relis/public_html/cside/export_r
 
       - name: Run Unit test
         run: |
