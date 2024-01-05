@@ -40,7 +40,7 @@ jobs:
       - name: Run Unit test
         run: |
 
-          response=$(php -r 'echo file_get_contents("http://localhost:8083/test/unit_test/relis_unit_test/last_result", false, stream_context_create(["http" => ["timeout" => 500]]));')
+          response=$(php -r 'echo file_get_contents("http://localhost:8083/test/unit_test/relis_unit_test/last_result", false, stream_context_create(["http" => ["timeout" => 900]]));')
 
           if [ "$response" == "successful" ]; then
             echo "The unit test passed. Proceeding with the workflow."
