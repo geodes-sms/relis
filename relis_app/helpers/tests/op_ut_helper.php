@@ -91,9 +91,7 @@ class OpUnitTest
         }
 
         run_test($this->controller, $action, $test_name, $test_aspect, $expected_value, $actual_value);
-    }
-
-   
+    }   
 }
 
 
