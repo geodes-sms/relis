@@ -21,7 +21,6 @@ class ScreeningUnitTest
         $this->screeningSelect_2ScreeningPhases_classification();
         $this->screeningSelect_classification();
         $this->selectScreenPhase();
-        $this->screening();
         $this->openScreenPhase();
         $this->closeScreenPhase();
         $this->assignmentScreen();
@@ -61,6 +60,8 @@ class ScreeningUnitTest
         $this->screenValidationResult();
         $this->removeScreening();
         $this->removeScreeningValidation();
+        $this->screening_4papersScreened();
+        $this->screening_0paperScreened();
     }
 
     private function TestInitialize()
@@ -212,29 +213,6 @@ class ScreeningUnitTest
 
     /*
      * Test 5
-     * Action : screening
-     * Description : Display screening home page with (Assign papers, screen, progress, statistics) button.
-     * Expected HTTP Response Code : 200 OK (indicating a successful response from the server).
-     */
-    private function screening()
-    {
-        $action = "screening";
-        $test_name = "Display screening home page with (Assign papers, screen, progress, statistics) button.";
-        $test_aspect = "Http response code";
-        $expected_value = http_code()[200];
-        $response = $this->http_client->response($this->controller, $action);
-
-        if ($response['status_code'] >= 400) {
-            $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
-        } else {
-            $actual_value = http_code()[$response['status_code']];
-        }
-
-        run_test($this->controller, $action, $test_name, $test_aspect, $expected_value, $actual_value);
-    }
-
-    /*
-     * Test 6
      * Action : screening_phase_manage
      * Description : Open a specific screening phase.
      * Expected phase state in DB: Open
@@ -258,7 +236,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 7
+     * Test 6
      * Action : screening_phase_manage
      * Description : close a specific screening phase.
      * Expected phase state in DB: Closed
@@ -282,7 +260,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 8
+     * Test 7
      * Action : assignment_screen
      * Description : loads the form for assigning papers for screening
      * Expected nbr of users (Number of users added to the project available for assignation) : 2
@@ -352,7 +330,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 9
+     * Test 8
      * Action : save_assignment_screen
      * Description : Handle the saving of paper assignments for screening without number_of_users field.
      * Expected Paper assignements : 
@@ -400,7 +378,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 10
+     * Test 9
      * Action : save_assignment_screen
      * Description : Handle the saving of paper assignments for screening without reviews_per_paper field.
      * Expected Paper assignements : 
@@ -448,7 +426,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 11
+     * Test 10
      * Action : save_assignment_screen
      * Description : Handle the saving of paper assignments for screening when number_of_users < reviews_per_paper.
      * Expected Paper assignements : 
@@ -496,7 +474,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 12
+     * Test 11
      * Action : save_assignment_screen
      * Description : Handle the saving of paper assignments for screening with empty users.
      * Expected Paper assignements : 
@@ -540,7 +518,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 13
+     * Test 12
      * Action : save_assignment_screen
      * Description : Test the number of assignment per reviewer with 5 papers to assign to 1 reviewer.
      * Expected Paper assignements : 
@@ -587,7 +565,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 14
+     * Test 13
      * Action : save_assignment_screen
      * Description : Test the number of assignment per reviewer with 6 papers to assign to 3 reviewers.
      * Expected Paper assignements : 
@@ -648,7 +626,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 15
+     * Test 14
      * Action : save_assignment_screen
      * Description : Test the number of assignment per reviewer with 5 papers to assign to 3 reviewers.
      * Expected Paper assignements : 
@@ -712,7 +690,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 16
+     * Test 15
      * Action : save_assignment_screen
      * Description : Test the number of assignment per reviewer with 5 papers to assign to 2 reviewers.
      * Expected Paper assignements : 
@@ -768,7 +746,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 17
+     * Test 16
      * Action : save_screening
      * Description : Save the screening inclusion decision made for a paper with inclusion criteria field.
      * Expected screening details: check the screening decision of the screened paper
@@ -794,7 +772,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 18
+     * Test 17
      * Action : save_assignment_screen
      * Description : Test the number of assignment per reviewer with 5 papers to assign to 2 reviewers with 2 reviews per paper.
      * Expected Paper assignements : 
@@ -851,7 +829,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 19
+     * Test 18
      * Action : screen_paper
      * Description : Handle the display of papers for screening.
      * Expected result: check if correct info is displayed.
@@ -886,7 +864,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 20
+     * Test 19
      * Action : edit_screen
      * Description : Handle the display of a paper for editing when screening hasn’t been done yet.
      * Expected HTTP Response Code : 200 OK (indicating a successful response from the server).
@@ -912,7 +890,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 21
+     * Test 20
      * Action : save_screening
      * Description : Save the screening exclusion decision made for a paper with no exclusion criteria field.
      * Expected screening details: No screening done
@@ -939,7 +917,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 22
+     * Test 21
      * Action : screen_result
      * Description : Display screening statistics and results while no paper is screened yet.
      * Expected result: check if the results values are corrects
@@ -987,7 +965,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 23
+     * Test 22
      * Action : screen_result
      * Description : Display screening statistics and results while 3 out of 5 papers are screened.
      * Expected result: check if the results values are corrects
@@ -1037,7 +1015,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 24
+     * Test 23
      * Action : save_screening
      * Description : Save the screening decision made for all papers.
      * Expected screening details
@@ -1117,7 +1095,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 25
+     * Test 24
      * Action : edit_screen
      * Description : Handle the display of a paper for editing a screening done.
      * Expected HTTP Response Code : 200 OK (indicating a successful response from the server).
@@ -1143,7 +1121,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 26
+     * Test 25
      * Action : screen_completion
      * Description : calculate and display the completion progress of screening for users.
      * Expected correct completion progress calculation
@@ -1176,7 +1154,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 27
+     * Test 26
      * Action : screen_result
      * Description : Display screening statistics and results with 1 paper Included, 2 excluded and 1 conflict.
      * Expected result: check if the results values are corrects
@@ -1224,7 +1202,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 28
+     * Test 27
      * Action : save_phase_screen
      * Description : Handle the process of saving a screening phase without Title field.
      * Expected screening phase saved in DB: No phase should be inserted (Number of phases should be same before and after the request)
@@ -1273,7 +1251,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 29
+     * Test 28
      * Action : save_phase_screen
      * Description : Handle the process of saving a screening phase without displayed_fields_vals field.
      * Expected screening phase saved in DB: No phase should be inserted (Number of phases should be same before and after the request)
@@ -1321,7 +1299,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 30
+     * Test 29
      * Action : save_phase_screen
      * Description : Handle the process of saving a final screening phase while an final phase already exist.
      * Expected screening phase saved in DB: No phase should be inserted (Number of phases should be same before and after the request)
@@ -1369,7 +1347,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 31
+     * Test 30
      * Action : save_phase_screen
      * Description : Handle the process of saving a screening phase.
      * Expected screening phase saved in DB.
@@ -1428,7 +1406,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 32
+     * Test 31
      * Action : display_paper_screen
      * Description : Display the details of a paper in the screening process.
      * Expected HTTP Response Code : 200 OK (indicating a successful response from the server).
@@ -1452,7 +1430,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 33
+     * Test 32
      * Action : list_screen
      * Description : display a list of screening done.
      * Expected HTTP Response Code : 200 OK (indicating a successful response from the server).
@@ -1475,7 +1453,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 34
+     * Test 33
      * Action : validate_screen_set
      * Description : Display page for assigning papers for validation in the screening process.
      * Expected nbr of users (Number of users added to the project available for assignation) : 2
@@ -1546,7 +1524,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 35
+     * Test 34
      * Action : save_assign_screen_validation
      * Description : Handle the saving of paper assignments for screening validation with empty percentage in POST request.
      * Expected Paper assignements : 
@@ -1591,7 +1569,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 36
+     * Test 35
      * Action : save_assign_screen_validation
      * Description : Handle the saving of paper assignments for screening validation with invalid percentage (>100) in POST request.
      * Expected Paper assignements : 
@@ -1636,7 +1614,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 37
+     * Test 36
      * Action : save_assign_screen_validation
      * Description : Handle the saving of paper assignments for screening validation with empty users in POST request.
      * Expected Paper assignements : 
@@ -1680,7 +1658,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 38
+     * Test 37
      * Action : save_assign_screen_validation
      * Description : save the assignments of papers for screening validation with 50% of paper assignement.
      * Expected Paper assignements : 
@@ -1731,7 +1709,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 39
+     * Test 38
      * Action : save_assign_screen_validation
      * Description : save the assignments of papers for screening validation with 100% of paper assignement.
      * Expected Paper assignements : 
@@ -1791,7 +1769,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 40
+     * Test 39
      * Action : screen_paper_validation
      * Description : handle the display of a paper for screening validation
      * Expected HTTP Response Code : 200 OK (indicating a successful response from the server).
@@ -1814,7 +1792,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 41
+     * Test 40
      * Action : screen_completion
      * Description : calculate and display the completion progress of screening validation for users.
      * Expected HTTP Response Code : 200 OK (indicating a successful response from the server).
@@ -1837,7 +1815,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 42
+     * Test 41
      * Action : screen_validation_result
      * Description : Display screening validation statistics and results.
      * Expected HTTP Response Code : 200 OK (indicating a successful response from the server).
@@ -1860,7 +1838,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 43
+     * Test 42
      * Action : remove_screening
      * Description : Remove a screening entry from the database.
      * Expected update in DB
@@ -1890,7 +1868,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 44
+     * Test 43
      * Action : remove_screening_validation
      * Description : Handle the removal of screening validation entries from the database.
      * Expected update in DB
@@ -1917,5 +1895,76 @@ class ScreeningUnitTest
         }
 
         run_test($this->controller, $action, $test_name, $test_aspect_screening_update, $expected_screening_update, $actual_screening_update);
+    }
+
+    /*
+     * Test 44
+     * Action : screening
+     * Description : Display screening home page with 4 papers screened.
+     * Expected result: check if displayed data is correct
+     */
+    private function screening_4papersScreened()
+    {
+        $action = "screening";
+        $test_name = "Display screening home page with 4 papers screened";
+        $test_aspect = "is data correct";
+        $expected_value = "Correct";
+        $actual_value = "Not Correct";
+        $response = $this->http_client->response($this->controller, $action);
+
+        if ($response['status_code'] >= 400) {
+            $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
+        } else {
+            if (
+                strstr(str_replace(' ', '', $response['content']), '<divclass="count"style="color:black;">4</div>') != false &&
+                strstr(str_replace(' ', '', $response['content']), '<divclass="countgreen">4</div>') != false &&
+                strstr(str_replace(' ', '', $response['content']), '<divclass="count">0</div>') != false &&
+                strstr(str_replace(' ', '', $response['content']), '<divclass="countred">0</div>') != false
+            ) {
+                $actual_value = "Correct";
+            }
+        }
+
+        run_test($this->controller, $action, $test_name, $test_aspect, $expected_value, $actual_value);
+    }
+
+    /*
+     * Test 45
+     * Action : screening
+     * Description : Display screening home page with 0 paper screened.
+     * Expected result: check if displayed data is correct
+     */
+    private function screening_0paperScreened()
+    {
+        $action = "screening";
+        $test_name = "Display screening home page with 0 paper screened";
+        $test_aspect = "is data correct";
+        $expected_value = "Correct";
+        $actual_value = "Not Correct";
+        
+        //initialise the Database
+        $this->TestInitialize();
+        //add 5 papers to test Project
+        addBibtextPapersToProject("relis_app/helpers/tests/testFiles/paper/5_bibPapers.bib");
+        //select screening phase as active phase
+        $this->http_client->response("screening", "select_screen_phase" . "/" . getScreeningPhaseId("Title"));
+        //screening papers by including 3 papers and excluding 2 papers
+        assignPapers_and_performScreening([getAdminUserId()], "Title", $done = 0);
+        $response = $this->http_client->response($this->controller, $action);
+
+        if ($response['status_code'] >= 400) {
+            $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
+        } else {
+            if (
+                strstr(str_replace(' ', '', $response['content']), '<divclass="count"style="color:black;">5</div>') != false &&
+                strstr(str_replace(' ', '', $response['content']), '<divclass="countgreen">0</div>') != false &&
+                strstr(str_replace(' ', '', $response['content']), '<divclass="count">5</div>') != false &&
+                strstr(str_replace(' ', '', $response['content']), '<divclass="countred">0</div>') != false
+            ) {
+                $actual_value = "Correct";
+            }
+        }
+
+        run_test($this->controller, $action, $test_name, $test_aspect, $expected_value, $actual_value);
     }
 }

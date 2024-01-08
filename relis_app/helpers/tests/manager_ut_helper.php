@@ -34,6 +34,7 @@ class ManagerUnitTest
         $this->add_ref_brand();
         $this->add_ref_variety();
         $this->add_research_question();
+        $this->add_screen_phase();
         $this->add_user();
         $this->add_user_current_project();
         $this->add_venue();
@@ -96,7 +97,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 4
+     * Test 1
      * Action : display_element
      * Description : display string management entry
      * Expected value: check if the correct element is displayed
@@ -133,7 +134,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 8
+     * Test 2
      * Action : edit_element
      * Description : display form for editing info
      */
@@ -161,7 +162,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 12
+     * Test 3
      * Action : display_element
      * Description : display project configuration
      * Expected value: check if the correct element is displayed
@@ -191,7 +192,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 17
+     * Test 4
      * Action : display_element
      * Description : display user-project detail
      * Expected value: check if the correct element is displayed
@@ -229,7 +230,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 53
+     * Test 5
      * Action : add_element
      * Description : display form for adding author affiliation
      */
@@ -257,7 +258,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 54
+     * Test 6
      * Action : add_element
      * Description : display form for adding author
      */
@@ -285,7 +286,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 55
+     * Test 7
      * Action : add_element
      * Description : display form for adding exclusion criteria
      */
@@ -313,7 +314,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 56
+     * Test 8
      * Action : add_element
      * Description : display form for adding inclusion criteria
      */
@@ -341,7 +342,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 57
+     * Test 9
      * Action : add_element
      * Description : display form for adding info
      */
@@ -369,7 +370,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 58
+     * Test 10
      * Action : add_element
      * Description : display form for adding paper
      */
@@ -397,7 +398,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 59
+     * Test 11
      * Action : add_element
      * Description : display form for adding qa question
      */
@@ -425,7 +426,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 60
+     * Test 12
      * Action : add_element
      * Description : display form for adding qa response
      */
@@ -453,7 +454,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 61
+     * Test 13
      * Action : add_element
      * Description : display form for adding ref brand
      */
@@ -481,7 +482,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 62
+     * Test 14
      * Action : add_element
      * Description : display form for adding ref variety
      */
@@ -509,7 +510,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 63
+     * Test 15
      * Action : add_element
      * Description : display form for adding research question
      */
@@ -537,7 +538,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 64
+     * Test 16
      * Action : add_element
      * Description : display form for adding screen phase
      */
@@ -565,7 +566,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 65
+     * Test 17
      * Action : add_element
      * Description : display form for adding user
      */
@@ -593,7 +594,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 66
+     * Test 18
      * Action : add_element
      * Description : display form for adding user to project
      */
@@ -621,7 +622,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 67
+     * Test 19
      * Action : add_element
      * Description : display form for adding venue
      */
@@ -649,7 +650,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 70
+     * Test 20
      * Action : edit_element
      * Description : display form for editing author
      */
@@ -677,7 +678,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 71
+     * Test 21
      * Action : edit_element
      * Description : display form for editing exclusion criteria
      */
@@ -705,7 +706,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 72
+     * Test 22
      * Action : edit_element
      * Description : display form for editing paper
      */
@@ -733,7 +734,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 73
+     * Test 23
      * Action : edit_element
      * Description : display form for editing qa question
      */
@@ -761,7 +762,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 74
+     * Test 24
      * Action : edit_element
      * Description : display form for editing qa response
      */
@@ -789,7 +790,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 75
+     * Test 25
      * Action : edit_element
      * Description : display form for editing ref brand
      */
@@ -817,7 +818,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 76
+     * Test 26
      * Action : edit_element
      * Description : display form for editing ref variety
      */
@@ -845,7 +846,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 77
+     * Test 27
      * Action : edit_element
      * Description : display form for editing screen phase
      */
@@ -873,7 +874,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 78
+     * Test 28
      * Action : edit_element
      * Description : display form for editing user
      */
@@ -901,7 +902,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 79
+     * Test 29
      * Action : edit_element
      * Description : display form for editing venue
      */
@@ -929,7 +930,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 80
+     * Test 30
      * Action : edit_element
      * Description : display form for editing classification assignation to a paper
      */
@@ -957,7 +958,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 81
+     * Test 31
      * Action : edit_element
      * Description : display form for editing screening config
      */
@@ -985,7 +986,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 82
+     * Test 32
      * Action : edit_element
      * Description : display form for editing QA config
      */
@@ -1013,7 +1014,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 83
+     * Test 33
      * Action : edit_element
      * Description : display form for editing classification config
      */
@@ -1041,7 +1042,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 84
+     * Test 34
      * Action : edit_element
      * Description : display form for editing papers config
      */
@@ -1069,7 +1070,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 85
+     * Test 35
      * Action : edit_element
      * Description : display form for editing project
      */
@@ -1097,7 +1098,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 98
+     * Test 36
      * Action : save_element
      * Description : update screening config 
      * Expected result: check if the element is updated in the DB
@@ -1151,7 +1152,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 99
+     * Test 37
      * Action : save_element
      * Description : update qa config 
      * Expected result: check if the element is updated in the DB
@@ -1199,7 +1200,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 100
+     * Test 38
      * Action : save_element
      * Description : update classification config 
      * Expected result: check if the element is updated in the DB
@@ -1245,7 +1246,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 6
+     * Test 39
      * Action : cancel_operation
      * Description : cancel operation and update the operation state in the database
      * Expected operation state in DB: Cancelled
@@ -1269,7 +1270,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 6
+     * Test 40
      * Action : undo_cancel_operation
      * Description : undo cancel operation and update the operation state in the database
      * Expected operation state in DB: Active
@@ -1293,7 +1294,7 @@ class ManagerUnitTest
     }
 
     /*
-     * Test 6
+     * Test 41
      * Action : clear_logs
      * Description : clear log entries
      * Expected log states in DB: 0
