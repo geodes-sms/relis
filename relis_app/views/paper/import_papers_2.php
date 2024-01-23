@@ -61,6 +61,11 @@
                        		
                        		echo dropdown_form_bm('Papers source','papers_sources','papers_sources',$source_papers);
                        }
+
+                       if(!empty($phases))
+                       {
+                        echo dropdown_form_bm_for_phases('Select screening phase','select_screening_phase','select_screening_phase',$phases);
+                       }
                        
                         
                        if(!empty($search_strategy)){

@@ -39,10 +39,10 @@
                  
                   <?php
                  
-                  echo "<table class='table table-striped'>";
+                  echo "<table class='table table-striped'> ";
                   foreach($item_data as $k=>$v){
                   	
-	                  	echo "<tr>";
+	                  	echo "<tr> h1";
 	                  	echo "<th style='width:20%'>".$v['title']."</th>";
 	                    if(empty($v['val2']) OR count($v['val2'])==0){
 	                    	  echo "<td></td>";

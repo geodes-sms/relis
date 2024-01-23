@@ -262,6 +262,7 @@ function get_config_screen_phase()
 			'source_paper_status' => array('mandatory' => 'mandatory', 'field_state' => 'hidden', 'field_value' => 'Included'),
 
 			'phase_title' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
+			'next_phase_id' =>array('mandatory'=>'mandatory', 'field_state'=>'enabled'),
 			'description' => array('mandatory' => '', 'field_state' => 'enabled'),
 			'displayed_fields_vals' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
 			'screen_phase_final' => array('mandatory' => '', 'field_state' => 'enabled')
@@ -344,13 +345,14 @@ function get_config_screen_phase()
 		'generate_stored_procedure' => False,
 
 		'fields' => array(
-			'screen_phase_id' => array('mandatory' => '', 'field_state' => 'hidden'),
+			'screen_phase_id' => array('mandatory' => 'mandatory', 'field_state' => 'hidden'),
 			'added_by' => array('mandatory' => '', 'field_state' => 'hidden'),
 			'displayed_fields' => array('mandatory' => '', 'field_state' => 'hidden'),
 			'phase_type' => array('mandatory' => '', 'field_state' => 'hidden'),
 			'source_paper' => array('mandatory' => 'mandatory', 'field_state' => 'hidden'),
 			'source_paper_status' => array('mandatory' => 'mandatory', 'field_state' => 'hidden'),
 
+			'next_phase_id' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
 			'phase_title' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
 			'description' => array('mandatory' => '', 'field_state' => 'enabled'),
 			'displayed_fields_vals' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
@@ -384,11 +386,21 @@ function get_config_screen_phase()
 		'generate_stored_procedure' => True,
 
 		'fields' => array(
+
 			'screen_phase_id' => array(),
+
 			'phase_title' => array(
 				'link' => array(
 					'url' => 'element/display_element/detail_screen_phase/',
 					'id_field' => 'screen_phase_id',
+					'trim' => '0'
+				)
+			 ),
+
+			'next_phase_id' =>array(
+				'link' => array(
+					'url' => 'element/display_element/detail_screen_phase/',
+					'id_field' => 'next_phase_id',
 					'trim' => '0'
 				)
 			),
@@ -397,7 +409,8 @@ function get_config_screen_phase()
 			//'source_paper'=>array(),
 			//'source_paper_status'=>array(),
 			'screen_phase_state' => array(),
-			'screen_phase_order' => array(),
+			// 'screen_phase_order' => array(),
+			
 			//'phase_type'=>array(),
 			'screen_phase_final' => array()
 
@@ -464,6 +477,7 @@ function get_config_screen_phase()
 			//'screen_phase_id'=>array(),
 			'phase_title' => array(),
 			'description' => array(),
+			'next_phase_id' => array(),
 			'displayed_fields' => array(),
 			//'phase_state'=>array(),
 			//'source_paper'=>array(),

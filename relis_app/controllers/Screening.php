@@ -30,6 +30,7 @@ class Screening extends CI_Controller
     function __construct()
     {
         parent::__construct();
+        
     }
 
     //handle the logic and data preparation for the screening page, including progress tracking, action button generation, and project configuration retrieval.
@@ -200,9 +201,62 @@ class Screening extends CI_Controller
     {
         $project_published = project_published();
         //debug_comment_diaplay();
-        $screening_phases = $this->db_current->order_by('screen_phase_order', 'ASC')
+        // $screening_phases = $this->db_current->order_by('screen_phase_order', 'ASC')
+        //     ->get_where('screen_phase', array('screen_phase_active' => 1))
+        //     ->result_array();
+        $screening_phases = $this->db_current
+            ->select('*')
+            ->order_by('screen_phase_order', 'ASC')
             ->get_where('screen_phase', array('screen_phase_active' => 1))
             ->result_array();
+
+        $this->db_current->query('CREATE TEMPORARY TABLE temp_graph (screen_phase_id INT, next_phase_id INT)');
+        foreach ($screening_phases as $phase) {
+            $this->db_current->query('INSERT INTO temp_graph (screen_phase_id, next_phase_id) VALUES (?, ?)', array($phase['screen_phase_id'], $phase['next_phase_id']));
+        }
+        // Retrieve the topological order using a recursive query
+        $query = $this->db_current->query('
+        WITH RECURSIVE TopologicalOrder AS (
+            SELECT screen_phase_id, next_phase_id, 1 AS Level
+            FROM temp_graph
+            WHERE screen_phase_id NOT IN (SELECT DISTINCT next_phase_id FROM temp_graph WHERE next_phase_id IS NOT NULL)
+            AND next_phase_id IS NOT NULL
+            
+            UNION ALL
+            
+            SELECT g.screen_phase_id, g.next_phase_id, t.Level + 1
+            FROM temp_graph g
+            JOIN TopologicalOrder t ON g.screen_phase_id = t.next_phase_id
+        )
+        SELECT screen_phase_id, MAX(Level) AS TopologicalOrder
+        FROM TopologicalOrder
+        GROUP BY screen_phase_id
+        ORDER BY TopologicalOrder;
+        ');
+
+        // // Get the result as an array
+        $screening_phases_topological = $query->result_array();
+        $this->db_current->query('DROP TEMPORARY TABLE IF EXISTS temp_graph');
+
+        // Update the original $screening_phases array with the topological order
+        foreach ($screening_phases as &$phase) {
+            foreach ($screening_phases_topological as $topological) {
+                if ($phase['screen_phase_id'] == $topological['screen_phase_id']) {
+                    $phase['TopologicalOrder'] = $topological['TopologicalOrder'];
+                    break;
+                }
+            }
+        }
+
+        // Sort the $screening_phases array based on 'TopologicalOrder'
+        // usort($screening_phases, function ($a, $b) {
+        //     return $a['TopologicalOrder'] - $b['TopologicalOrder'];
+        // });
+
+        usort($screening_phases, function ($a, $b) {
+            return $a['TopologicalOrder'] <=> $b['TopologicalOrder'];
+        });
+
         $this->session->set_userdata('working_perspective', 'screen');
         $phases_list = array();
         $yes_no = array('0' => '', '1' => 'Yes');
@@ -622,109 +676,109 @@ class Screening extends CI_Controller
     /**
      * The purpose of this function is to prepare and load data for displaying a form or view related to assigning papers for screening.
      */
+
     public function assignment_screen($data = array())
     {
         if (!active_screening_phase()) {
             redirect('home');
             exit;
         }
-        /*$error=FALSE;
-               if(empty($data))
-               {
-                  if($this->input->post ()){
-                  $post_arr = $this->input->post();
-                  //print_test($post_arr);
-                  if(empty( $post_arr['screening_phase'] )){
-                  $data['err_msg'] = lng(' Please provide  "The screening phase" concerned !');
-                  $this->pre_assignment_screen($data);
-                  $error=True;
-                  }else{
-                  $data['screening_phase']=$post_arr['screening_phase'];
-                  $data['papers_sources']=empty($post_arr['papers_sources'])?'all':$post_arr['papers_sources'];
-                  }
-                  }else{
-                  $data['err_msg'] = lng(' Please fill the form !');
-                  $this->pre_assignment_screen($data);
-                  $error=True;
-                  }
-                  $post_arr = $this->input->post ();
-                  //print_test($post_arr);
-                  }else{
-                  if(empty($data['screening_phase']) OR empty($data['papers_sources']) ){
-                  $data['err_msg'] = lng(' Please fill the form !');
-                  $this->pre_assignment_screen($data);
-                  $error=True;
-                  }
-                  }
-                  //
-                  */
+        
+
         $screening_phase_info = active_screening_phase_info();
         $creening_phase_id = active_screening_phase();
-        $data['screening_phase'] = $creening_phase_id;
-        //$screening phases
-        $screening_phases = $this->db_current->order_by('screen_phase_order', 'ASC')
-            ->get_where('screen_phase', array('screen_phase_active' => 1))
-            ->result_array();
-        //$creening_phase_id=8;
-        $previous_phase = 0;
-        $previous_phase_title = "";
-        foreach ($screening_phases as $k => $phase) {
-            if ($phase['screen_phase_id'] == $creening_phase_id) {
-                break;
-            } elseif ($phase['phase_type'] != 'Validation') {
-                $previous_phase = $phase['screen_phase_id'];
-                $previous_phase_title = $phase['phase_title'];
+        $results_of_match = $this->Screening_dataAccess->match_initial_phase_id($creening_phase_id);
+
+        if (!empty($results_of_match)) {
+
+            // The result is not null, it contains a value 
+            // that means the current phase is a initial phase
+            // so we have to write a different logic over here
+            $initial_phase_id =  $results_of_match;
+            $data['screening_phase'] = $initial_phase_id;
+            $papers = $this->Screening_dataAccess->get_papers_by_initial_phase($initial_phase_id);
+            $paper_list[0] = array('Key', 'Title');
+            foreach ($papers as $key => $value) { //replace $key to index
+                $paper_list[$key + 1] = array($value['bibtexKey'], $value['title']);
             }
-        }
-        if ($previous_phase == 0) {
-            $paper_source = 'all';
-            $paper_source_status = 'all';
-            $previous_phase_title = " ";
-        } else {
-            $paper_source = $previous_phase;
-            $paper_source_status = $screening_phase_info['source_paper_status'];
-            $previous_phase_title = " from $previous_phase_title";
-        }
-        $append_title = "( $paper_source_status papers  $previous_phase_title )";
-        //print_test($previous_phase);
-        //print_test($screening_phase_info);
-        //print_test($screening_phases);
-        $data['papers_sources'] = $paper_source;
-        $data['paper_source_status'] = $paper_source_status;
-        $data['screening_phase'] = $creening_phase_id;
-        $papers = $this->get_papers_to_screen($paper_source, $paper_source_status, '', 'Screening');
-        $data['paper_source'] = $paper_source;
-        $paper_list[0] = array('Key', 'Title');
-        foreach ($papers['to_assign'] as $key => $value) {
-            $paper_list[$key + 1] = array($value['bibtexKey'], $value['title']);
-        }
-        $data['paper_list'] = $paper_list;
-        $user_table_config = get_table_configuration('users');
-        $users = $this->DBConnection_mdl->get_list($user_table_config, '_', 0, -1);
-        $_assign_user = array();
+            $data['page_title'] = lng('Assign papers for screening ');
+            $data['paper_list'] = $paper_list;
+            $data['top_buttons'] = get_top_button('back', 'Back', 'manage');
+            $data['number_papers'] = count($paper_list)-1;
+            $data['page'] = 'screening/assign_papers_screen_auto';
 
-        foreach ($users['list'] as $key => $value) {
-
-
-            if ((user_project($this->session->userdata('project_id'), $value['user_id'])) and !has_user_role('Guest', $value['user_id'])) {
-                $_assign_user[$value['user_id']] = $value['user_name'];
+            $user_table_config = get_table_configuration('users');
+            $users = $this->DBConnection_mdl->get_list($user_table_config, '_', 0, -1);
+            $_assign_user = array();
+            foreach ($users['list'] as $key => $value) {
+                if ((user_project($this->session->userdata('project_id'), $value['user_id'])) and !has_user_role('Guest', $value['user_id'])) {
+                    $_assign_user[$value['user_id']] = $value['user_name'];
+                }
             }
+            $assigned = $this->Screening_dataAccess->already_assigned_papers($creening_phase_id);
+            $data['number_papers_assigned'] = count($assigned);
+            $data['users'] = $_assign_user;
+            $data['paper_source'] = 'all'; 
+            $data['papers_sources']='all';
+            $data['paper_source_status']='all';
+            $data['reviews_per_paper'] = get_appconfig_element('screening_reviewer_number');
+            $data['status']="I am from IF";
+            $this->load->view('shared/body', $data);
         }
 
-        $data['users'] = $_assign_user;
-        $data['number_papers'] = count($papers['to_assign']);
-        $data['number_papers_assigned'] = count($papers['assigned']);
-        $data['reviews_per_paper'] = get_appconfig_element('screening_reviewer_number');
-        $data['page_title'] = lng('Assign papers for screening ' . $append_title);
-        $data['top_buttons'] = get_top_button('back', 'Back', 'manage');
-        //$data['left_menu_perspective']='z_left_menu_screening';
-        //$data['project_perspective']='screening';
-        $data['page'] = 'screening/assign_papers_screen_auto';
-        //	print_test($data);
-        /*
-         * Chargement de la vue avec les données préparés dans le controleur suivant le type d'affichage : (popup modal ou pas)
-         */
-        $this->load->view('shared/body', $data);
+        else 
+        {
+            $data['screening_phase'] = $creening_phase_id; 
+            $previous_phases = $this->Screening_dataAccess->find_prev_phases($creening_phase_id);
+            $paper_IDs = array();
+            foreach ($previous_phases as $phaseID) 
+            {
+                $paper_IDs = array_merge($paper_IDs, $this->Screening_dataAccess->get_paperid_from_prev_phases_to_assign($phaseID));
+            }
+
+            $papers = $this->Screening_dataAccess->get_papers($paper_IDs);
+            $data['papers_sources'] = $previous_phases; //WHAT IS THIS?
+            $data['paper_source_status'] = $screening_phase_info['source_paper_status'];
+            $data['screening_phase'] = $creening_phase_id;
+
+            //take titles of all previous phase and show that on the UI that we are importing the paper to screen from
+            // these phases( prev phases)
+            
+            $data['paper_source'] = $previous_phases;  // WHAT IS THIS?
+            $paper_list[0] = array('Key', 'Title');
+            foreach ($papers as $key => $value) {
+                $paper_list[$key + 1] = array($value['bibtexKey'], $value['title']);
+            }
+            $data['paper_list'] = $paper_list;
+            $user_table_config = get_table_configuration('users');
+            $users = $this->DBConnection_mdl->get_list($user_table_config, '_', 0, -1);
+            $_assign_user = array();
+
+            foreach ($users['list'] as $key => $value) {
+
+
+                if ((user_project($this->session->userdata('project_id'), $value['user_id'])) and !has_user_role('Guest', $value['user_id'])) {
+                    $_assign_user[$value['user_id']] = $value['user_name'];
+                }
+            }
+
+            $assigned = $this->Screening_dataAccess->already_assigned_papers($creening_phase_id);
+
+
+            $data['users'] = $_assign_user;
+            $data['number_papers'] = count($papers);
+            $data['number_papers_assigned'] = count($assigned); //EDIT LATER
+            $data['reviews_per_paper'] = get_appconfig_element('screening_reviewer_number');
+            $data['page_title'] = lng('Assign papers for screening ' );
+            $data['top_buttons'] = get_top_button('back', 'Back', 'manage');
+            $data['page'] = 'screening/assign_papers_screen_auto';
+            $data['status'] = "I am from ELSE";
+            //	print_test($data);
+            /*
+            * Chargement de la vue avec les données préparés dans le controleur suivant le type d'affichage : (popup modal ou pas)
+            */
+            $this->load->view('shared/body', $data);         
+       } 
     }
 
     /**
@@ -739,14 +793,14 @@ class Screening extends CI_Controller
             $current_phase = active_screening_phase();
         }
 
-        $all_papers = $this->Screening_dataAccess->select_screening_all_papers($source, $source_status);
-
+        $all_papers = $this->Screening_dataAccess->select_screening_all_papers($source, $source_status, $current_phase);
+        
         $result['all_papers'] = $all_papers;
         // get papers already assigned in current phase
         $condition = "";
         if (!empty($assignment_role)) {
             $condition = " AND assignment_role = '$assignment_role'";
-        }
+       }
 
         $paper_assigned = $this->Screening_dataAccess->select_screening_paper($current_phase, $condition);
 
@@ -804,11 +858,14 @@ class Screening extends CI_Controller
                 $this->assignment_screen($data);
             } else {
                 $currect_screening_phase = $post_arr['screening_phase'];
-                $papers_sources = $post_arr['papers_sources'];
-                $paper_source_status = $post_arr['paper_source_status'];
+                $papers_sources = $post_arr['papers_sources']; //I want to know what is this
+                $paper_source_status = $post_arr['paper_source_status']; // I want to know what is this
                 $reviews_per_paper = $post_arr['reviews_per_paper'];
                 //Get all papers
                 //	$papers=$this->get_papers_to_screen($papers_sources);
+
+            //TILL HERE THE CODE WORKS FINE
+
                 $papers = $this->get_papers_to_screen($papers_sources, $paper_source_status);
                 //	print_test($papers); exit;
                 $assign_papers = array();
@@ -2291,6 +2348,13 @@ class Screening extends CI_Controller
         //	print_test($kappa);
     }
 
+    
+
+    
+    
+    //END OF NEW FUNCTIONS
+
+
     /**
      * handle the process of saving a screening phase, including form validation, error handling, and database operations for insertion or update
      */
@@ -2320,7 +2384,7 @@ class Screening extends CI_Controller
             //modifying $existing_phases_titles so that we get only phase_title column
             $existing_phase_titles = array_column($existing_phase_titles,'phase_title');
         }
-        $phase_title_exists;
+        $phase_title_exists=false;
         foreach ($existing_phase_titles as $title) {
             if ($post_arr['phase_title'] === $title) {
                 // If a match is found, set the variable to true and break the loop
@@ -2366,12 +2430,67 @@ class Screening extends CI_Controller
             $other_check = false;
             $data['err_msg'] .= lng('There is already a final phase ! ') . ' <br/>';
         }
+
+        //MY EDITS
+
+        $dfs_data = array();
+        $dfs_data = $this->Screening_dataAccess->getData_forDFS();
+       
+        // echo "<pre>";
+        // var_dump($dfs_data);
+        // echo "</pre>";
+        
+        $graph = array();
+
+        if (isset($dfs_data[0]) && is_array($dfs_data[0]))
+        {
+            foreach($dfs_data[0] as $dfs )
+            { 
+                $this->Screening_dataAccess->addEdge($graph,$dfs['screen_phase_id'], $dfs['next_phase_id']);
+            }
+        }
+
+        if ($table_config['operations'][$current_operation]['operation_type'] == 'Edit')
+        {
+            //array_push($graph[$post_arr['screen_phase_id']],$post_arr['next_phase_id']);
+            $graph[$post_arr['screen_phase_id']][0] = $post_arr['next_phase_id'];
+        }
+        
+        if($table_config['operations'][$current_operation]['operation_type'] == 'New')
+        {
+            $next_auto_index = $this->Screening_dataAccess->get_next_screen_phase_id();
+            $this->Screening_dataAccess->addEdge($graph,$next_auto_index, $post_arr['next_phase_id']);
+        }
+
+        // echo "<pre>";
+        // var_dump($graph);
+        // echo "</pre>";
+
+        // $this->Screening_dataAccess->addEdge($graph, 1, 2);
+        // $this->Screening_dataAccess->addEdge($graph, 2, 3);
+        // $this->Screening_dataAccess->addEdge($graph, 3, 1);
+        // $this->Screening_dataAccess->addEdge($graph, 4, NULL);
+        
+        $cycle_exist = $this->Screening_dataAccess->isCyclic($graph);
+
+        if($cycle_exist)
+        {
+            $other_check=false;
+            $data['err_msg'].=lng('Adding/Editing the phase would create a cycle. Cannot add/Edit.').'<br/>';
+        }
+
+
+        //I need to check for loops within the system now.
+        // For this I need to have the table of id and next_phase_id from table "screen_phase"
+        // I will use this data as a graph & apply DFS on it.
+        
         //print_test($data);
         //exit;
         if ($this->form_validation->run() == FALSE or !$other_check) {
             /*
             * Si la validation du formulaire n'est pas concluante , retour au formulaire de saisie
             */
+
             $data['content_item'] = $post_arr;
             if ($this->session->userdata('submit_mode') and $this->session->userdata('submit_mode') == 'modal') {
                 $submit_mode = 'modal';
@@ -2384,11 +2503,13 @@ class Screening extends CI_Controller
                 $this->add_element($current_operation, $data, $post_arr['operation_type'], $submit_mode, 'Edit');
             }
         } else {
+
             //Correct go for save
             $fields = implode("|", $post_arr['displayed_fields_vals']);
             $order = !empty($post_arr['screen_phase_order']) ? $post_arr['screen_phase_order'] : $last_order + 10;
             $to_save = array(
                 'phase_title' => $post_arr['phase_title'],
+                'next_phase_id' => $post_arr['next_phase_id'],
                 'description' => $post_arr['description'],
                 'source_paper' => $post_arr['source_paper'],
                 'source_paper_status' => $post_arr['source_paper_status'],
@@ -2399,6 +2520,7 @@ class Screening extends CI_Controller
                 'added_by' => $post_arr['added_by'],
             );
             //	print_test($to_save); exit;
+
             if ($post_arr['operation_type'] == 'new') {
                 $res = $this->db2->insert('screen_phase', $to_save);
             } else {
@@ -2410,12 +2532,15 @@ class Screening extends CI_Controller
                     )
                 );
             }
+
             //	print_test($to_save);
             redirect($post_arr['redirect_after_save']);
         }
 
-        
+
     }
+
+    
 
     //handles the process of displaying a form for adding or editing an element based on the operation type and the table configuration
     public function add_element($operation_name, $data = [], $operation = 'new', $display_type = "normal", $op_type = "Add")
@@ -2425,6 +2550,46 @@ class Screening extends CI_Controller
         $ref_table = $op['tab_ref'];
         $ref_table_operation = $op['operation_id'];
         $table_config = get_table_configuration($ref_table);
+
+        $dfs_data = array();
+        $dfs_data = $this->Screening_dataAccess->getData_forDFS();
+       
+        // echo "<pre>";
+        // var_dump($dfs_data);
+        // echo "</pre>";
+        
+        // $graph = array();
+
+        // if (isset($dfs_data[0]) && is_array($dfs_data[0]))
+        // {
+        //     foreach($dfs_data[0] as $dfs )
+        //     { 
+        //         $this->Screening_dataAccess->addEdge($graph,$dfs['screen_phase_id'], $dfs['next_phase_id']);
+        //     }
+        // }
+
+        // $next_auto_index = $this->Screening_dataAccess->get_next_screen_phase_id();
+        
+        // $this->Screening_dataAccess->addEdge($graph,$next_auto_index, $post_arr['next_phase_id']);
+
+        // echo "<pre>";
+        // var_dump($graph);
+        // echo "</pre>";
+
+        // $this->Screening_dataAccess->addEdge($graph, 1, 2);
+        // $this->Screening_dataAccess->addEdge($graph, 2, 3);
+        // $this->Screening_dataAccess->addEdge($graph, 3, 1);
+        // $this->Screening_dataAccess->addEdge($graph, 4, NULL);
+        
+        // $cycle_exist = $this->Screening_dataAccess->isCyclic($graph);
+
+        // if($cycle_exist)
+        // {
+        //     $other_check=false;
+        //     $data['err_msg'].=lng('Adding the new phase would create a cycle. Cannot add.').'<br/>';
+        // }
+
+
         if (!$is_guest) {
             if ($ref_table == 'papers') { //Use bibler for papers management
                 //redirect("paper/bibler_add_paper");

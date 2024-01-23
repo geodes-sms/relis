@@ -42,6 +42,9 @@
                 <br /><i> Number of papers already assigned :
                   <?php echo $number_papers_assigned ?>
                 </i><br />
+                <br/> <i> Status of page:
+                  <?php echo $status ?> 
+                </i>  <br/>
               </p>
               <p class="lead">Select reviewers </p>
               <?php
