@@ -609,7 +609,7 @@ class CI_Email {
 		{
 			$this->_cc_array = $cc;
 		}
-
+ 
 		return $this;
 	}
 

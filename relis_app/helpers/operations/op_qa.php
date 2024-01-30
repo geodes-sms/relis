@@ -1,4 +1,5 @@
 <?php
+//The get_operations_qa() function generates operations for the 'qa_questions', 'qa_responses', 'qa_result', 'qa_assignment', and 'qa_validation_assignment' tables.
 function get_operations_qa() {
 	
 	//qa questions

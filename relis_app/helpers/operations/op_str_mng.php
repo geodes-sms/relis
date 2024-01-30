@@ -1,4 +1,5 @@
 <?php
+//The get_operations_str_mng() function generates operations for strategic management tasks.
 function get_operations_str_mng() {
 	
 

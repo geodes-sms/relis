@@ -1,4 +1,5 @@
 <?php
+//The get_operations_logs() function generates operations for the 'logs' table
 function get_operations_logs() {
 	
 

@@ -19,6 +19,17 @@
  *
  *  :Author: Brice Michel Bigendako
  */
+
+ /*
+	This function returns a configuration array for managing operations in a system. 
+	The function creates a configuration array with various settings for managing operations in a system. Here are the key components of the configuration:
+		- table_name: The name of the table associated with operations.
+		- table_id: The primary key field for the operations table.
+		- table_active_field: The field used to determine whether a record is active or deleted.
+		- order_by: The sorting order for the operations in the list view.
+		- The configuration includes a fields array, which defines the fields of the table.
+		- etc.
+*/
 function get_operation() {
 	
 		$config['config_id']='operations';
@@ -131,6 +142,10 @@ function get_operation() {
 		
 	   	$config['fields']=$fields;
 	   	
+		/*
+			The $operations array defines different operations or actions that can be performed on the class assignment. 
+			Each operation has a type, title, description, page title, save function, page template, and other settings.
+		*/
 		$operations['list_operations']=array(
 			'operation_type'=>'List',
 			'operation_title'=>'List operations',

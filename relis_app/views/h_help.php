@@ -5,7 +5,7 @@
           
            if(!empty($home_help)){
 
-           	box_header("Help","",12,12,12);
+           	box_header("Getting Started","",12,12,12);
           ?>
           
             <div class="row">
@@ -21,7 +21,7 @@
                         <div class="block" >
                           <div class="block_content">
                             <h2 class="title">
-                             <a href="<?php echo base_url()?>auth/help_det/<?php echo $feature['info_id']?>"><?php echo !empty($feature['info_title'])?$feature['info_title']:""?></a>
+                             <a href="<?php echo base_url()?>user/help_det/<?php echo $feature['info_id']?>"><?php echo !empty($feature['info_title'])?$feature['info_title']:""?></a>
                             </h2>
                             <div class="byline"></div>
                             <p class="excerpt">
