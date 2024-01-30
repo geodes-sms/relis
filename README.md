@@ -152,5 +152,11 @@ To compile the source code, you need the following dependencies:
 The source code is licensed under a [GNU GENERAL PUBLIC LICENSE 3](https://www.gnu.org/copyleft/gpl.html) ![GNU GPL v3](https://img.shields.io/badge/license-GPLv3-blue.svg)
 
 # Change log
-### Version 1.0
+### Version 1.2
+Bug fixes prior to docker version
 
+### Version 1.1
+Some preliminary bug fixes
+
+### Version 1.0
+Initial version of ReLiS with CodeIgnitier
