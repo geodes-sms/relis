@@ -1,0 +1,54 @@
+PROJECT demo_relis "Demo ReLiS"
+
+SCREENING
+
+Reviews 2
+Conflict on Criteria resolved_by Unanimity
+Criteria =   ["EC1: Too short ","EC2: Not abour chocolate" ]
+Sources = ["Google Scholar","Chocolate DB"]
+Strategies =["Manual search","Snowballing"]
+Validation 10%  Normal
+Phases "Title" "Screen by title" Fields(Title),
+	    "Full-Text" "Screen by full-text" Fields(Title,Abstract,Link,Preview)
+
+/************************/
+QA
+
+Questions =["Is the paper about chocolate?","Is the chocolate brand available?","Is there a validation of the methodology?"]
+Response=["Yes":3,"Bearly":1.5,"No":0]
+Min_score 5
+
+/************************/
+CLASSIFICATION
+
+Simple has_choco "Has chocolate" * :bool
+Simple temperature "Temperature" * :real
+Simple start "Start date" * :date
+Simple code "Code" :string(10) style("[A-Z]+[0-9]*") = ["AB9"]
+DynamicList brand "Brand"  [1] "Brand" =["Ferrero","Ghirardelli","Godiva","Hersheys","Leonidas","Lindt","Nestle"]
+List cocoa_origin "Cocoa origin" [0] =["Cote dIvoire","Indonesia","Ghana","Nigeria","Cameroon","Brazil","Ecuador","Mexico","Dominican Republic","Peru"]
+List cocoa_level "Cocoa level" * [1] = ["35%","40%","45%","50%","55%","60%","65%","70%","75%","80%","90%","95%","100%"]
+List types "Types" [0] = ["Raw","Dark","Milk","White","Baking","Modeling","Organic","Compound","Couverture","Ruby"]
+DynamicList variety "Variety" [2] = ["Bitter","Bittersweet","Semi-sweet","Sweet"] {
+  DynamicList level1 "Level 1" depends_on cocoa_level
+  DynamicList level2 "Level 2" depends_on cocoa_level
+}
+Simple venue "Venue" * :string(100)
+Simple year "Year" * :int(4)
+Simple citation "Number of citations" [1] : int
+Simple note "Note" [1] :text(500)
+
+/************************/
+REPORT
+
+Simple year "Papers per year" on year charts(line)
+Compare year_venue "Venue per year" on venue with year charts(bar)
+Compare year_citation "Citations per year" on citation with year charts(bar)
+
+Simple has_choco "Has chocolate" on has_choco charts(pie)
+Simple temperature "Temperature" on temperature charts(pie)
+
+Compare year_brand "Brand per year" on brand with year charts(line)
+
+Compare level_origin "Cocoa level per origin" on cocoa_level with cocoa_origin charts(bar)
+Compare level_types "Cocoa types per level" on types with cocoa_origin charts(bar)

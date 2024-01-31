@@ -1,4 +1,5 @@
 <?php
+//The get_operations_info() function generates operations for the 'info' table
 function get_operations_info() {
 	
 
