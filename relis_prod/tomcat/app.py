@@ -3,7 +3,7 @@ import os
 from fastapi.responses import JSONResponse, FileResponse
 import uvicorn
 
-app = FastAPI(docs_url='/apis/tomcat/docs')
+app = FastAPI(docs_url="/apis/tomcat/docs")
 
 
 @app.get("/apis/tomcat/list_projects")
@@ -41,4 +41,4 @@ def get_project_configuration(project_name: str, file_name: str):
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, port=8181, log_level="info")
+    uvicorn.run(app, port=8181, host="0.0.0.0", log_level="info")
