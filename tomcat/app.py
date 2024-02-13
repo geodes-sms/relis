@@ -12,6 +12,7 @@ def list_projects():
     try:
         response = {}
         projects = os.listdir("/u/relis/public_html/workspace/dslforge_workspace")
+        projects = [i for i in projects if not i.startswith(".")]  # Remove hidden files
         for project in projects:
             response[project.strip()] = {
                 "files": [
@@ -32,7 +33,7 @@ def get_project_configuration(project_name: str, file_name: str):
     # Your code to get project configuration goes here
     try:
         return FileResponse(
-            path=f"/u/relis/public_html/workspace/dslforge_workspace/{project_name}/{file_name}",
+            path=f"/u/relis/public_html/workspace/dslforge_workspace/{project_name}/src-gen/{file_name}",
             media_type="text/plain",
             filename=file_name,
         )

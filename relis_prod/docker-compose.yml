@@ -46,7 +46,7 @@ services:
       - db
     image: relis/tomcat-relis:latest
     build:
-      context: ./tomcat/
+      context: ../tomcat/
     volumes:
       - ../data/tomcat_data:/u/relis/public_html/workspace #TODO: Document if we need to change host path or not
     networks:
