@@ -11,4 +11,6 @@ COPY ./relis.war /usr/local/tomcat/webapps/relis.war
 COPY ./entrypoint.sh /usr/local/bin
 RUN sed 's/\r$//g' /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
+EXPOSE 8080 
+EXPOSE 8181
 ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]

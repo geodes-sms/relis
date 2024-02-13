@@ -39,16 +39,16 @@ services:
 
     volumes:
       - ./docker/db/initial_db.sql:/docker-entrypoint-initdb.d/initial_db.sql
-      - ./data/db:/var/lib/mysql
+      - ../data/db:/var/lib/mysql
 
   tomcat:
     depends_on:
       - db
-    image: relis/tomcat-relis
+    image: relis/tomcat-relis:latest
     build:
       context: ./tomcat/
     volumes:
-      - ./tomcat_data:/u/relis/public_html/workspace
+      - ../data/tomcat_data:/u/relis/public_html/workspace #TODO: Document if we need to change host path or not
     networks:
       default:
         aliases:
