@@ -21,40 +21,40 @@
  * --------------------------------------------------------------------------
  * Functions used to access review data via API in JSON
  */
+
 if (!defined('BASEPATH'))
-	exit('No direct script access allowed');
+    exit('No direct script access allowed');
+
 class Apiquery extends CI_Controller
 {
-	function __construct()
-	{
-		parent::__construct();
-
-	}
-    public function index($sql = "", $targetDb='default')
+    function __construct()
     {
-
+        parent::__construct();
     }
-	
-	public function run($sql = "", $targetDb='default')
+
+    public function index($sql = "", $targetDb = 'default')
     {
+    }
+
+    /**
+     * provide a convenient way to run custom SQL queries and retrieve the results, while handling any errors that may occur during the execution process.
+     */
+    public function run($sql = "", $targetDb = 'default')
+    {
+        $sql = $this->input->get('sql');
+        
         $sql = $sql ?: "select * from users";
-
-        $pre_select_sql=" select* from ( ";
-        $post_select_sql=" ) as T ";
-        $sql =$pre_select_sql . $sql . $post_select_sql;
-
+        $pre_select_sql = " select* from ( ";
+        $post_select_sql = " ) as T ";
+        $sql = $pre_select_sql . $sql . $post_select_sql;
         $res = $this->manage_mdl->run_query($sql, true);
-
-        if($res['code']==0){
+        if ($res['code'] == 0) {
             $result = json_encode($res['message']);
             print_r($result);
-        }else{
-            $result ="Error: ".$res['message'] ;
+        } else {
+            $result = "Error: " . $res['message'];
             print_r($result);
         }
-
-
-	}
-
+    }
 
 }

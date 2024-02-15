@@ -3,19 +3,6 @@ FROM php:7.1-apache-buster
 ARG DIRECTORY_INDEX
 ARG DOCUMENT_ROOT
 
-# Fixing user file permissions 
-ARG USER_ID
-ARG GROUP_ID
-
-# Define environment variables
-ENV USER_ID=$USER_ID
-ENV GROUP_ID=$GROUP_ID
-ENV USER_ID=${USER_ID:-1001}
-ENV GROUP_ID=${GROUP_ID:-1001}
-
-# Add group and user based on build arguments
-RUN addgroup --gid ${GROUP_ID} relis
-RUN adduser --disabled-password --gecos '' --uid ${USER_ID} --gid ${GROUP_ID} relis
 
 RUN apt-get autoclean && apt-get update && apt-get install -y \
     curl \
@@ -37,12 +24,6 @@ RUN composer --version
 ## Make a lsb-release file so the installer knows the os (necessary for debian)
 RUN cp /etc/os-release /etc/lsb-release
 
-## Create and switch user for a non-root installation
-RUN useradd -ms /bin/bash docker
-USER docker
-
-USER root
-
 #Set php.ini configuration
 
 COPY ./php/conf/apache/php.ini "$PHP_INI_DIR/conf.d/apache/php.ini"
@@ -61,5 +42,5 @@ RUN a2enmod rewrite
 COPY ./entrypoint.sh /usr/local/bin
 RUN sed 's/\r$//g' /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
-RUN chown -R relis:relis ${DOCUMENT_ROOT}
+
 WORKDIR ${DOCUMENT_ROOT}

@@ -92,9 +92,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
 $active_group = 'default';
 $query_builder = TRUE;
 
+
 $db['default'] = array(
     'dsn'    => '',
-    'hostname' => 'db',
+    'hostname' => 'relis_db',
     'username' => 'root',
     'password' => '',
     'database' => 'relis_db',
@@ -115,3 +116,4 @@ $db['default'] = array(
 );
 
 // Added configuration
+

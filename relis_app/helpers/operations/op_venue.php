@@ -1,4 +1,5 @@
 <?php
+//The get_operations_venue() function generates operations for managing venues.
 function get_operations_venue() {
 	//venue
 
@@ -34,7 +35,4 @@ function get_operations_venue() {
 	
 	
 	return $operations;
-	
-	
-	
 }

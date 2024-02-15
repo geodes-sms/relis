@@ -1,4 +1,5 @@
 <?php
+//The get_operations_reference() function generates operations for various reference tables.
 function get_operations_reference() {
 	//exclusion criteria
 

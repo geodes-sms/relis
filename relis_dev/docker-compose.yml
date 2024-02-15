@@ -27,16 +27,23 @@ services:
   tomcat:
     depends_on:
       - db
-    image: tomcat:8.5.51-jdk8-openjdk-slim
+    image: relis/tomcat-relis:latest
+    build:
+      context: ../tomcat/
     volumes:
-      - ./docker/tomcat/relis.war:/usr/local/tomcat/webapps/relis.war
-      - ../:/u/relis/public_html
+      - ../data/tomcat_data:/u/relis/public_html/workspace
     environment:
       MYSQL_DATABASE: db
       CATALINA_OPTS: '-Xms512M -Xmx1024M -server -XX:+UseParallelGC'
       JAVA_OPTS: '-Djava.security.egd=file:///dev/urandom'
     ports:
       - 8088:8080
+      - 8089:8181
+
+  bibler:
+    container_name: bibler
+    image: relis/bibler
+    restart: always
 
   relis-application:
     depends_on:

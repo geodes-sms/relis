@@ -33,7 +33,7 @@
                  	
                  	$project_class=(project_published($value['project_id']) )?'publishedProject':'';
                  ?>
-                 <a href="<?php echo base_url().'manager/set_project/'.$value['project_id']?>">
+                 <a href="<?php echo base_url().'project/set_project/'.$value['project_id']?>">
                  <div class="col-md-3 col-sm-3 col-xs-12 col-md-offset-1">
                         <div class="thumbnail <?php echo $project_class ?>">
                           <div class="image view view-first">
@@ -42,11 +42,11 @@
                               <p><?php echo $value['project_description']?></p>
                               <div class="tools tools-bottom">
                               <?php 
-                              echo anchor('manager/set_project/'.$value['project_id'],' &nbsp &nbsp <i class="fa fa-paper-plane"></i> ','title="'.lng_min('Go to the project').'"');
+                              echo anchor('project/set_project/'.$value['project_id'],' &nbsp &nbsp <i class="fa fa-paper-plane"></i> ','title="'.lng_min('Go to the project').'"');
                               if(is_project_creator($value['project_label']) or has_usergroup(1)){
-                              echo anchor('op/display_element/detail_project/'.$value['project_id'],'  &nbsp &nbsp <i class="fa fa-folder"></i>','title="'.lng_min('View').'"');
-                              echo anchor('op/edit_element/edit_project/'.$value['project_id'],' &nbsp &nbsp <i class="fa fa-pencil"></i>','title="'.lng_min('Edit').'"');
-                              echo anchor('install/remove_project_validation/'.$value['project_id'],' &nbsp &nbsp <i class="fa fa-trash-o"></i>','title="'.lng_min('Uninstall').'"');
+                              echo anchor('element/display_element/detail_project/'.$value['project_id'],'  &nbsp &nbsp <i class="fa fa-folder"></i>','title="'.lng_min('View').'"');
+                              echo anchor('element/edit_element/edit_project/'.$value['project_id'],' &nbsp &nbsp <i class="fa fa-pencil"></i>','title="'.lng_min('Edit').'"');
+                              echo anchor('project/remove_project_validation/'.$value['project_id'],' &nbsp &nbsp <i class="fa fa-trash-o"></i>','title="'.lng_min('Uninstall').'"');
                               }
                               ?>
                               </div>

@@ -1,4 +1,5 @@
 <?php
+//The get_operations_screening() function generates operations for screening-related tasks.
 function get_operations_screening() {
 	//Screening phases
 

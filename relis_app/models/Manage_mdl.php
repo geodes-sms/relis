@@ -95,7 +95,7 @@ class Manage_mdl extends CI_Model
 		/*
 		function count_papers($paper_cat="all"){
 			
-			$result=$this->DBConnection_mdl->count_papers($paper_cat);
+			$result=$this->paper_dataAccess->count_papers($paper_cat);
 				
 				
 			return $result;
@@ -210,13 +210,6 @@ class Manage_mdl extends CI_Model
 			
 		}
 		
-		function get_classifications($paper_id){
-			$result=$this->DBConnection_mdl->get_classifications($paper_id);
-				
-			return $result;
-			
-		}
-		
 		function get_exclusion($paper_id){
 			$result=$this->DBConnection_mdl->get_exclusion($paper_id);
 			
@@ -230,9 +223,6 @@ class Manage_mdl extends CI_Model
             return $result;
 
         }
-		
-		
-		
 		
 		function get_assignations($paper_id){
 			
@@ -262,7 +252,6 @@ class Manage_mdl extends CI_Model
 				
 				return "";
 			}
-			
 		}
 		
 		/*
@@ -277,53 +266,7 @@ class Manage_mdl extends CI_Model
 			
 			return $res;
 				
-		}*/
-		
-		function get_classification_paper($classification_id){
-			$result=$this->DBConnection_mdl->get_classification_paper($classification_id);
-				
-			return $result;
-			
-			/*
-			$sql="Select class_paper_id from classification WHERE class_id='$classification_id' ";
-		
-			$res=$this->db->query ( $sql )->row_array ();
-			
-			if(!empty($res))
-				return $res['class_paper_id'];
-			else 
-				return 0;
-			*/
-		
-		}
-		
-		
-		function get_result_classification($field){
-			
-			$this->db3 = $this->load->database(project_db(), TRUE);
-		
-			$data=$this->db3->query ( "CALL get_result_count('".$field."') " );
-			
-			mysqli_next_result( $this->db3->conn_id );
-			$result=$data->result_array();	
-			//print_test($result);
-			return $result;
-		}
-		
-		function get_classification_intents($classification_id){
-			$this->db3 = $this->load->database(project_db(), TRUE);
-			$data=$this->db3->query ( "CALL getMTIntents(".$classification_id.") " );
-				
-			mysqli_next_result( $this->db3->conn_id );
-			$result=$data->result_array();
-			
-			
-				
-			
-			return $result;
-		}
-		
-		
+		}*/		
 		
 		function run_query($sql,$result_table=False,$target_db='current'){
 	
@@ -358,30 +301,6 @@ class Manage_mdl extends CI_Model
 			}
 			
 			
-		}
-		
-		function get_classification_scheme(){
-			
-			$result=$this->DBConnection_mdl->get_classification_scheme();
-			
-			return $result;
-
-			/*
-			$sql="SELECT *  from  classification_scheme WHERE  	scheme_active=1 ORDER BY field_order ASC ";
-		
-			$result=$this->db->query ( $sql )->result_array ();
-		
-			return $result;
-			*/
-		}
-		
-		function get_project_config($project_label){
-			
-			$sql="SELECT *  from  projects WHERE  	project_active=1 AND project_label LIKE '$project_label' ";
-			
-			$result=$this->db->query ( $sql )->row_array ();
-			
-			return $result;
 		}
 		
 		function add_operation($content){

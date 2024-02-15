@@ -42,7 +42,7 @@
                  
                  $attributes = array('class' => 'form-horizontal form_content');
                   //echo form_open('manage/save_ref',$attributes);
-                 $fct_save=isset($save_function)?$save_function:'op/save_element';
+                 $fct_save=isset($save_function)?$save_function:'element/save_element';
                  
                 // echo  old_version('test save image');
                  //$fct_save='manager/save_element_picture';
