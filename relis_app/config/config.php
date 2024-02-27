@@ -327,7 +327,7 @@ $config['project_specific_config_folder'] = "relis_app/libraries/table_config/pr
 // The prefix that will have the new databases for projects  installed
 $config['project_db_prefix'] = "relis_dev_correct_";
 $config['server_OS'] = "WINDOWS";
-$config['support_contact'] = "info@relis.iro.umontreal.ca";
+$config['support_contact'] = "relis@relis.iro.umontreal.ca";
 
 //Mail config
 $config['mail_protocol']    = "smtp";
