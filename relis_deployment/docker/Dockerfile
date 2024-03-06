@@ -12,11 +12,10 @@ RUN apt-get autoclean && apt-get update && apt-get install -y \
     unzip \
     zip \
     git \
-    libzip-dev \
-    docker-php-ext-install
+    libzip-dev
 
 RUN apt-get install -y libicu-dev
-RUN docker-php-ext-install intl mysqli pdo pdo_mysql
+RUN docker-php-ext-install intl mysqli pdo pdo_mysql zip
 
 RUN pecl install xdebug-2.8.0 \
     && docker-php-ext-enable xdebug
