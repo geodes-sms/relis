@@ -1255,64 +1255,68 @@ class Paper extends CI_Controller
     }
 
     /*
-     * perform a search in the database to check if a paper with the given BibTeX key and title already exists
+     * perform a search in the database to check if a paper with the given DOI or title/authors already exists
      */
     private function paper_exist($paper_array)
     {
-        $bibtexKey = $paper_array['bibtexKey'];
+        $title = $paper_array['title'];
+        $doi = $paper_array['doi'];
         $exist = False;
-        $stopsearch = False;
-        $i = 1;
-        while (!$stopsearch) {
-            $res = $this->Paper_dataAccess->select_from_paper($bibtexKey);
+        $verify_title = True;
 
-            if (empty($res)) {
-                $stopsearch = True;
-                $exist = False;
-            } else {
-                if ($res['title'] == $paper_array['title']) {
-                    $stopsearch = True;
+        if (!empty($doi)) {
+            $res = $this->Paper_dataAccess->select_from_doi($doi);
+            if (!empty($res)) {
+                $exist = True;
+                $verify_title = False;
+            }
+        } 
+        if ($verify_title) {
+            foreach ($this->Paper_dataAccess->select_all_from_title($title) as $res) {
+                if (!empty($doi) && !empty($res['doi'])) {
+                    $exist = False;
+                    break;
+                }
+
+                $paperauthors = $this->Paper_dataAccess->select_from_paper_id_all_authors_ids($res['id']);
+                $authors = array();
+                foreach ($paperauthors as $paperauthor) {
+                    $r = $this->Paper_dataAccess->select_from_author_id($paperauthor['authorId']);
+                    if (!empty($r))
+                        array_push($authors, $r['author_name']);
+                }
+
+                $equal_authors = 0;
+                foreach ($paper_array['authors'] as $key => $author) {
+                    foreach ($authors as $author_added) {
+                        $author_added_names = explode(" ", $author_added);
+                        $author_last_names = explode(" ", $author['last_name']);
+                        if (strcoll(end($author_last_names), end($author_added_names)) == 0) {
+                            $equal_authors++;
+                            break 1;
+                        }
+                    }
+                }
+                if ($equal_authors == count($paper_array['authors']) and $equal_authors == count($authors)) {
                     $exist = True;
-                } else {
-                    $bibtexKey = $paper_array['bibtexKey'] . '_' . $i;
                 }
             }
-            $i++;
         }
+
         return $exist;
     }
 
     /**
-     * checks if a paper already exists based on the BibTeX key and title, 
+     * checks if a paper already exists based on the DOI or title/authors, 
      * and then inserts the paper into the database with the appropriate values and relationships with authors
      */
     private function insert_paper_bibtext($paper_array)
     {
-        //check papers_exist
-        //print_test($paper_array);
         $authors = $paper_array['authors'];
-        unset($paper_array['authors']);
         $bibtexKey = $paper_array['bibtexKey'];
-        $exist = False;
-        $stopsearch = False;
-        $i = 1;
-        while (!$stopsearch) {
-            $res = $this->Paper_dataAccess->select_from_paper($bibtexKey);
 
-            if (empty($res)) {
-                $stopsearch = True;
-                $exist = False;
-            } else {
-                if ($res['title'] == $paper_array['title']) {
-                    $stopsearch = True;
-                    $exist = True;
-                } else {
-                    $bibtexKey = $paper_array['bibtexKey'] . '_' . $i;
-                }
-            }
-            $i++;
-        }
-        if (!$exist) {
+        if (!$this->paper_exist($paper_array)) {
+            unset($paper_array['authors']);
             //add venue
             if (!empty($paper_array['venue'])) {
                 $venue_id = $this->add_venue($paper_array['venue'], $paper_array['year']);
