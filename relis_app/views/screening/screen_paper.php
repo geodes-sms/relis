@@ -203,22 +203,15 @@
                     <script>
 
                         function validate_screen() {
-
-                            if ($('.exclusion_crit').css('display') != 'none') {
-                                var crit = $('#criteria_ex').val();
-
-                                if (crit == '0' || crit == '') {
+                            if ($('#decision').val() == 'excluded' && $('#criteria_ex').val() == '') {
                                     alert("You must select an exclusion criteria");
                                     return false;
-                                } else {
-                                    return true;
+                                } else if ($('#decision').val()=='accepted' && $('#criteria_in').val() == '') {                                    
+                                    alert("You must select an inclusion criteria");
+                                    return false;
                                 }
-                            } else {
                                 return true;
                             }
-
-
-                        }
 
                         function include_paper() {
 
