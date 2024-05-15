@@ -297,9 +297,14 @@ $config['image_max_size'] = '0';
 $config['csv_field_separator'] = ';';
 $config['csv_field_separator_export'] = ',';
 $config['csv_string_dellimitter'] = '"';
-$config['sess_save_path'] = "C:/xampp/htdocs/relis/relis_dev/cside/sessions";
-$config['editor_generated_path'] = "/u/relis/public_html/workspace/dslforge_workspace";
 
+
+$config['base_url'] = "http://localhost/relis/relis_dev";
+
+$config['sess_save_path'] = "C:/xampp/htdocs/relis/relis_dev/cside/sessions";
+$config['editor_generated_path'] = "D:\www\dslforge\workspace";
+$config['editor_generated_path'] = "C:/dslforge_workspace";
+$config['editor_url'] = "http://127.0.0.1:8080/relis/texteditor";
 
 $config['metrics_save_path'] = "C:/xampp/htdocs/relis/relis_dev/cside/metrics";
 $config['root_path'] = "C:/xampp/htdocs/relis/relis_dev";
