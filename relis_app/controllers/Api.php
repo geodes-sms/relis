@@ -42,7 +42,7 @@ class Api extends CI_Controller
 	 * providing information about the project's schema and data. 
 	 * The report can be returned in either JSON format or as an array, depending on the value of the $type parameter.
 	 */
-	public function report($project_label = 'mt_all', $type = "json")
+	public function report($project_label = 'mt_all', $type = "json") //not used
 	{
 		$project = $this->get_project($project_label);
 		if (empty($project)) {
@@ -100,7 +100,7 @@ class Api extends CI_Controller
 		}
 		$json_protocol = json_encode($protocol);
 		if ($type == 'array') {
-			print_test($protocol);
+			print_r($protocol);
 		} else {
 			echo $json_protocol;
 		}
@@ -109,7 +109,7 @@ class Api extends CI_Controller
 	/**
 	 * this function fetches project information from the database based on the project label and returns it as an associative array.
 	 */
-	private function get_project($project)
+	private function get_project($project) //not used
 	{
 		$res = $this->db->get_where('projects', array('project_active' => 1, 'project_label' => $project))
 			->row_array();
@@ -119,19 +119,19 @@ class Api extends CI_Controller
 	/**
 	 * retrieves user information for a given project ID from the database and returns it as an associative array.
 	 */
-	private function get_users($project_id)
+	private function get_users($project_id) //not used
 	{
 		$sql = "SELECT U.user_id,U.user_name,P.user_role 
 				FROM users U,userproject P
 				WHERE U.user_id=P.user_id AND  P.project_id=$project_id  
 						AND   P.userproject_active=1  AND U.user_active=1";
-		echo $sql;
+		// echo $sql;
 		$users = $this->db->query($sql)->row_array();
 		return $users;
 	}
 
 	//retrieves paper search information for a given project ID
-	private function get_papers_search($project_id = NULL)
+	private function get_papers_search($project_id = NULL) //not used
 	{
 		$paper_serch = array();
 		$this->db_project->select('ref_value as value');
@@ -146,7 +146,7 @@ class Api extends CI_Controller
 	}
 
 	//retrieves the schema (field structure) for a given project ID
-	private function get_scheme($project_id)
+	private function get_scheme($project_id) //not used
 	{
 		$scheme = array();
 		$res_install_config = $this->entity_configuration_lib->get_install_config($project_id);
@@ -155,7 +155,7 @@ class Api extends CI_Controller
 	}
 	
 	//retrieves the field schema (structure) for a given entity configuration.
-	private function get_field_schema($res_install_config, $config = 'classification')
+	private function get_field_schema($res_install_config, $config = 'classification') //not used
 	{
 		$scheme = array();
 		if (!empty($res_install_config['config'][$config]['fields'])) {
@@ -202,7 +202,7 @@ class Api extends CI_Controller
 								$type = 'ListDependant';
 								//print_test($conf);
 								$ref_table = $conf[0];
-								$fields = $conf[1];
+								// $fields = $conf[1];
 								$scheme[$key]['values'] = $ref_table;
 							}
 						}
@@ -226,7 +226,7 @@ class Api extends CI_Controller
 						$conf = explode(";", $source_values);
 						//print_test($conf);
 						$ref_table = $conf[0];
-						$fields = $conf[1];
+						// $fields = $conf[1];
 						$scheme[$key]['category'] = 'Subcategory';
 						$scheme[$key]['sub_categories'] = $this->get_field_schema($res_install_config, $ref_table);
 					}
@@ -237,7 +237,7 @@ class Api extends CI_Controller
 	}
 
 	//retrieves QA (Quality Assurance) related information for a project.
-	private function get_qa($project = NULL)
+	private function get_qa($project = NULL) //not used
 	{
 		$this->db_project->select('question ');
 		$qa['questions'] = $this->db_project->order_by('question_id', 'ASC')
@@ -255,7 +255,7 @@ class Api extends CI_Controller
 	}
 
 	//retrieves reference values from a reference table based on the provided reference configuration.
-	private function get_reference_values($reference)
+	private function get_reference_values($reference) //not used
 	{
 		//print_test($reference);
 		$conf = explode(";", $reference);
@@ -275,7 +275,7 @@ class Api extends CI_Controller
 	}
 
 	//retrieves classification information for a specific project label.
-	private function get_classification($project_label)
+	private function get_classification($project_label) //not used
 	{
 		$classification = array();
 		$stored_proc_count = " CALL count_papers_class('','0')";
@@ -293,7 +293,7 @@ class Api extends CI_Controller
 	}
 
 	//retrieves screening information for a specific project ID
-	private function get_screening($project_id)
+	private function get_screening($project_id) //not used
 	{
 		//$this->initialise_user($project_id);
 		$screening = array();
@@ -348,7 +348,7 @@ class Api extends CI_Controller
 	}
 
 	//retrieves a specific configuration element for a given project ID
-	private function get_config_element($project_id, $element = "all")
+	private function get_config_element($project_id, $element = "all") //not used
 	{
 		$config = $this->db_project->get_where('config', array('config_active' => 1))
 			->row_array();
@@ -364,7 +364,7 @@ class Api extends CI_Controller
 	}
 
 	//retrieves data from a database table based on a specified project and operation.
-	private function get_data($project = 'mt_all')
+	private function get_data($project = 'mt_all') //not used
 	{
 		$this->initialise_user($project);
 		$operation_name = 'list_classification';
@@ -493,12 +493,12 @@ class Api extends CI_Controller
 	}
 
 	//initializes the user session with the necessary user data. 
-	private function initialise_user($project)
+	private function initialise_user($project) //not used
 	{
 		/*
 		 * Vérification si login et password sont correct
 		 */
-		$user_id = 6;
+		$user_id = 1;
 		$user = $this->DBConnection_mdl->get_row_details(
 			'get_user_detail'
 			,
@@ -530,7 +530,7 @@ class Api extends CI_Controller
 	}
 
 	//performs user session cleanup and logout.
-	private function discon()
+	private function discon() //not used
 	{
 		$this->session->sess_destroy();
 		$this->session->set_userdata('user_id', 0);

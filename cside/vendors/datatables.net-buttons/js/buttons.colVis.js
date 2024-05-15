@@ -43,7 +43,7 @@ $.extend( DataTable.ext.buttons, {
 		return {
 			extend: 'collection',
 			text: function ( dt ) {
-				return dt.i18n( 'buttons.colvis', 'Column visibility' );
+				return dt.i18n( 'buttons.colvis.js', 'Column visibility' );
 			},
 			className: 'buttons-colvis',
 			buttons: [ {

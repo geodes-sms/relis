@@ -45,25 +45,17 @@ class Data_extraction extends CI_Controller
 	}
 
 	//remove a classification feature for a project
-	public function remove_classification($id, $paper_id)
-	{
-		$res = $this->DBConnection_mdl->remove_element($id, 'classification');
-		set_top_msg(lng_min('Classification removed'));
-		redirect('data_extraction/display_paper/' . $paper_id);
-	}
-
-	//remove a classification record from the database
-	public function remove_classification2($id, $paper_id)
-	{
-		//$res=$this->manage_mdl->remove_element($id,'classification','class_id','class_active');
-		$res = $this->DBConnection_mdl->remove_element($id, 'classification');
-		redirect('paper/view_paper/' . $paper_id);
-	}
+    public function remove_classification($id, $paper_id, $redirectUrl)//tested
+    {
+        $res = $this->DBConnection_mdl->remove_element($id, 'classification');
+        set_top_msg(lng_min('Classification removed'));
+        redirect($redirectUrl . '/' . $paper_id);
+    }
 
 	/*
 	 * spécialisation de la fonction add_classification lorsque le formulaire s'affiche en pop up
 	 */
-	public function new_classification_modal($parent_id, $data = "", $operation = "new")
+	public function new_classification_modal($parent_id, $data = [], $operation = "new")
 	{
 		$this->new_classification($parent_id, $data, $operation, 'modal');
 	}
@@ -76,7 +68,7 @@ class Data_extraction extends CI_Controller
 	 * 			$operation: type de l'opération ajout (new) ou modification(edit)
 	 * 			$display_type: indique comment le formulaire va être afficher normal ou modal(pop- up)
 	 */
-	public function new_classification($parent_id, $data = "", $operation = "new", $display_type = "normal")
+	public function new_classification($parent_id, $data = [], $operation = "new", $display_type = "normal")
 	{
 		$ref_table_child = 'classification';
 		$child_field = 'class_paper_id';
@@ -762,241 +754,7 @@ class Data_extraction extends CI_Controller
 	 */
 	public function list_classification_dt($list_type = 'normal', $val = "_", $page = 0)
 	{
-		$ref_table = 'classification';
-		/*
-		 * Vérification si il y a une condition de recherche
-		 */
-		$val = urldecode(urldecode($val));
-		$filter = array();
-		if (isset($_POST['search_all'])) {
-			$filter = $this->input->post();
-			// print_test($filter);exit;
-			unset($filter['search_all']);
-			$val = "_";
-			if (isset($filter['valeur']) and !empty($filter['valeur'])) {
-				$val = $filter['valeur'];
-				$val = urlencode(urlencode($val));
-			}
-			/*
-			 * mis à jours de l'url en ajoutant la valeur recherché dans le lien puis rechargement de l'url
-			 */
-			$url = "manage/liste_ref/" . $ref_table . "/" . $val . "/0/";
-			redirect($url);
-		}
-		/*
-		 * Récupération de la configuration(structure) de la table à afficher
-		 */
-		$ref_table_config = $this->ref_table_config($ref_table);
-		$table_id = $ref_table_config['table_id'];
-		/*
-		 * Vérification des critères de  recherche supplementaire 
-		 */
-		$condition = array();
-		$extra_condition = "";
-		$sup_title = "";
-		if ($list_type == 'search_cat') {
-			if ($this->session->userdata('classification_search_field') and $this->session->userdata('classification_search_value')) {
-				$field = $this->session->userdata('classification_search_field');
-				$value = $this->session->userdata('classification_search_value');
-				$extra_condition = " AND ( " . $field . "='" . $value . "') ";
-				$value_desc = $value;
-				if (!empty($ref_table_config['fields'][$field]['input_type']) and $ref_table_config['fields'][$field]['input_type'] == 'select') {
-					if ($ref_table_config['fields'][$field]['input_select_source'] == 'table') {
-						$values = $this->get_reference_select_values($ref_table_config['fields'][$field]['input_select_values']);
-					} elseif ($ref_table_config['fields'][$field]['input_select_source'] == 'yes_no') {
-						$values = array("No", 'Yes');
-					}
-					$value_desc = $value;
-					if (!empty($values[$value]))
-						$value_desc = $values[$value];
-					$sup_title = " for \"" . $ref_table_config['fields'][$field]['field_title'] . "\" :  $value_desc";
-				}
-			}
-		}
-		/*
-		 * Appel du model pour récuperer la liste à afficher dans la Base de données
-		 */
-		if (!empty($extra_condition)) {
-			$data = $this->manage_mdl->get_list($ref_table_config, $val, $page, -1, $extra_condition);
-		} else {
-			$data = $this->DBConnection_mdl->get_list($ref_table_config, $val, $page, -1, $extra_condition);
-		}
-		//print_test($data);
-		/*
-		 * récupération des correspondances des clès externes pour l'affichage  suivant la structure de la table
-		 */
-		$dropoboxes = array();
-		foreach ($ref_table_config['fields'] as $k => $v) {
-			if (!empty($v['input_type']) and $v['input_type'] == 'select' and $v['on_list'] == 'show') {
-				if ($v['input_select_source'] == 'array') {
-					$dropoboxes[$k] = $v['input_select_values'];
-				} elseif ($v['input_select_source'] == 'table') {
-					$dropoboxes[$k] = $this->get_reference_select_values($v['input_select_values']);
-				} elseif ($v['input_select_source'] == 'yes_no') {
-					$dropoboxes[$k] = array(
-						'0' => "No",
-						'1' => "Yes"
-					);
-				}
-			}
-			;
-		}
-		/*
-		 * Vérification des liens (links) a afficher sur la liste
-		 */
-		$add_child_link = False;
-		$edit_link = False;
-		$view_link = False;
-		$delete_link = False;
-		//view link
-		if (!empty($ref_table_config['links']['view']) and !empty($ref_table_config['links']['view']['on_list']) and ($ref_table_config['links']['view']['on_list'] == True)) {
-			if (!empty($ref_table_config['links']['view']['url'])) {
-				$view_link_url = $ref_table_config['links']['view']['url'];
-			} else {
-				$view_link_url = 'manage/view_ref/' . $ref_table;
-			}
-			$view_link_label = $ref_table_config['links']['view']['label'];
-			$view_link_title = $ref_table_config['links']['view']['title'];
-			$view_link = True;
-		}
-		//edit link
-		if (!empty($ref_table_config['links']['edit']) and !empty($ref_table_config['links']['edit']['on_list']) and ($ref_table_config['links']['edit']['on_list'] == True)) {
-			//$edit_link_url=$ref_table_config['links']['edit']['url'];
-			$edit_link_label = $ref_table_config['links']['edit']['label'];
-			$edit_link_title = $ref_table_config['links']['edit']['title'];
-			$edit_link = True;
-		}
-		//addchild link
-		if (!empty($ref_table_config['links']['add_child']['url']) and !empty($ref_table_config['links']['add_child']['on_list']) and ($ref_table_config['links']['add_child']['on_list'] == True)) {
-			$child_link_url = 'manage/add_ref_child/' . $ref_table_config['links']['add_child']['url'] . "/" . $ref_table;
-			$child_link_label = $ref_table_config['links']['add_child']['label'];
-			$child_link_title = $ref_table_config['links']['add_child']['title'];
-			$add_child_link = True;
-		}
-		//delete link
-		if (!empty($ref_table_config['links']['delete']) and !empty($ref_table_config['links']['delete']['on_list']) and ($ref_table_config['links']['delete']['on_list'] == True)) {
-			$delete_link_label = $ref_table_config['links']['delete']['label'];
-			$delete_link_title = $ref_table_config['links']['delete']['title'];
-			$delete_link = True;
-		}
-		$i = 1;
-		/*
-		 * Préparation de la liste à afficher sur base du contenu et  stucture de la table
-		 */
-		foreach ($data['list'] as $key => $value) {
-			/*
-			 * Ajout des liens(links) sur la liste
-			 */
-			$add_child_button = "";
-			$edit_button = "";
-			$view_button = "";
-			$action_button = "";
-			$arr_buttons = array();
-			if ($view_link) {
-				array_push(
-					$arr_buttons,
-					array(
-						'url' => $view_link_url . '/' . $value[$table_id],
-						'label' => '<i class="fa fa-folder"></i> ' . $view_link_label,
-						'title' => $view_link_title
-					)
-				);
-			}
-			if ($edit_link) {
-				array_push(
-					$arr_buttons,
-					array(
-						'url' => 'manage/edit_ref/' . $ref_table . '/' . $value[$table_id],
-						'label' => '<i class="fa fa-pencil"></i> ' . $edit_link_label,
-						'title' => $edit_link_title
-					)
-				);
-			}
-			if ($add_child_link) {
-				array_push(
-					$arr_buttons,
-					array(
-						'url' => $child_link_url . '/' . $value[$table_id],
-						'label' => '<i class="fa fa-plus"></i> ' . $child_link_label,
-						'title' => $child_link_title
-					)
-				);
-			}
-			if ($delete_link) {
-				array_push(
-					$arr_buttons,
-					array(
-						'url' => 'manage/delete_ref/' . $ref_table . '/' . $value[$table_id],
-						'label' => '<i class="fa fa-trash"></i> ' . $delete_link_label,
-						'title' => $delete_link_title
-					)
-				);
-			}
-			$action_button = create_button_link_dropdown($arr_buttons);
-			//$extra_values=$this->get_extra_fields($data ['list'] [$key] [$table_id]);
-			//$data ['list'] [$key]['class_scope']=$extra_values['class_scope'];
-			//$data ['list'] [$key]['class_intent']=$extra_values['class_intent'];
-			//$data ['list'] [$key]['class_intent_relation']=$extra_values['class_intent_relation'];
-			$data['list'][$key]['edit'] = $action_button;
-			$data['list'][$key][$table_id] = $i + $page;
-			unset($data['list'][$key][$table_id]);
-			/*
-			 * Remplacement des clés externes par leurs correspondances
-			 */
-			foreach ($dropoboxes as $k => $v) {
-				if ($data['list'][$key][$k]) {
-					if (isset($v[$data['list'][$key][$k]])) {
-						if ($k == 'class_paper_id') {
-							//Pour le nom du papier affichage des 15 premiers caractères
-							$the_title = $v[$data['list'][$key][$k]];
-							$display = substr($the_title, 0, 15) . "...";
-							$data['list'][$key][$k] = anchor('paper/view_paper/' . $data['list'][$key][$k], "<u><b>" . $display . "</b></u>", "title='" . $the_title . "'");
-						} else {
-							$data['list'][$key][$k] = $v[$data['list'][$key][$k]];
-						}
-					}
-				} else {
-					if ($ref_table_config['fields'][$k]['field_value'] == "0_1") {
-						$data['list'][$key][$k] = "No";
-					} else {
-						$data['list'][$key][$k] = "";
-					}
-				}
-			}
-			$i++;
-		}
-		/*
-		 * Ajout de l'entête de la liste
-		 */
-		if (!empty($data['list'])) {
-			$array_header = $ref_table_config['header_list_fields'];
-			unset($array_header[0]);
-			//array_push($array_header,lng('Scope'));
-			//array_push($array_header,lng('Intent'));
-			//array_push($array_header,lng('Intent relation'));
-			if (trim($data['list'][$key]['edit']) != "") {
-				array_push($array_header, '');
-			}
-			$data['list_header'] = $array_header;
-			//array_unshift($data['list'],$array_header);
-		}
-		/*
-		 * Création des boutons qui vont s'afficher en haut de la page (top_buttons)
-		 */
-		$data['top_buttons'] = "";
-		$data['top_buttons'] .= get_top_button('close', 'Close', 'home');
-		/*
-		 * Titre de la page
-		 */
-		$data['page_title'] = $ref_table_config['reference_title'] . $sup_title;
-		/*
-		 * La vue qui va s'afficher
-		 */
-		$data['page'] = 'liste_dt';
-		/*
-		 * Chargement de la vue avec les données préparés dans le controleur
-		 */
-		$this->load->view('shared/body', $data);
+		$this->list_classification($list_type, $val, $page, 1);
 	}
 
 	//calculate and display the completion progress for user classification tasks
@@ -1096,7 +854,7 @@ class Data_extraction extends CI_Controller
 		$_assign_user = array();
 
 		foreach ($users['list'] as $key => $value) {
-			if ((user_project($this->session->userdata('project_id'), $value['user_id'])) and can_review_project($value['user_id']) and !has_user_role('Guest',$value['user_id'])) {
+			if ((user_project($this->session->userdata('project_id'), $value['user_id'])) and can_review_project($value['user_id']) and !has_user_role('Guest', $value['user_id'])) {
 				$_assign_user[$value['user_id']] = $value['user_name'];
 			}
 		}
@@ -1181,10 +939,10 @@ class Data_extraction extends CI_Controller
 	}
 
 	/*
-					handles the form submission to assign papers for classification.
-					retrieves the form data, validates the selected users, determines 
-					the number of papers to assign, assigns papers to users
-				*/
+						  handles the form submission to assign papers for classification.
+						  retrieves the form data, validates the selected users, determines 
+						  the number of papers to assign, assigns papers to users
+					  */
 	function class_assignment_save()
 	{
 		$post_arr = $this->input->post();
@@ -1205,7 +963,7 @@ class Data_extraction extends CI_Controller
 		//Verify if selected users is > of required reviews per paper
 		if (count($users) < 1) {
 			$data['err_msg'] = lng('Please select at least one user  ');
-			$this->qa_assignment_set($data);
+			$this->class_assignment_set($data);
 		} else {
 			$reviews_per_paper = 1;
 			$papers_all = $this->get_papers_for_classification();
@@ -1261,10 +1019,10 @@ class Data_extraction extends CI_Controller
 	}
 
 	/*
-					handles the form submission to assign papers for classification validation. 
-					It retrieves the form data, validates the selected users and percentage, 
-					determines the number of papers to assign, assigns papers to users
-				*/
+						  handles the form submission to assign papers for classification validation. 
+						  It retrieves the form data, validates the selected users and percentage, 
+						  determines the number of papers to assign, assigns papers to users
+					  */
 	function class_validation_assignment_save()
 	{
 		$post_arr = $this->input->post();
@@ -1345,9 +1103,9 @@ class Data_extraction extends CI_Controller
 	}
 
 	/*
-					updating the validation status of a paper in the database. 
-					It marks the paper as correct if $op is equal to 1
-				*/
+						  updating the validation status of a paper in the database. 
+						  It marks the paper as correct if $op is equal to 1
+					  */
 	function class_validate($paper_id, $op = 1)
 	{
 		if ($op == 1) {
@@ -1360,7 +1118,7 @@ class Data_extraction extends CI_Controller
 			)
 				->row_array();
 			//print_test($assignment); exit;
-			//$this->db_current->update('assigned',array('validation'=>'Not Correct','validation_time'=>bm_current_time()),array('assigned_paper_id'=>$paper_id));
+			$this->db_current->update('assigned', array('validation' => 'Not Correct', 'validation_time' => bm_current_time()), array('assigned_paper_id' => $paper_id));
 			if (!empty($assignment['assigned_id'])) {
 				redirect('element/edit_element/class_not_valid/' . $assignment['assigned_id']);
 			}
@@ -1514,8 +1272,7 @@ class Data_extraction extends CI_Controller
 			$classification_data = $this->manager_lib->get_detail($table_classification, $classification[0]['class_id'], FALSE, True);
 			//print_test(get_table_config('classification'));
 			$data['classification_data'] = $classification_data;
-			$delete_button = get_top_button('delete', 'Remove the classification', 'data_extraction/remove_classification/' . $classification[0]['class_id'] . "/" . $ref_id, 'Remove the classification') . " ";
-			$edit_button = get_top_button('edit', 'Edit the classification', 'data_extraction/edit_classification/' . $classification[0]['class_id'], 'Edit the classification') . " ";
+            $delete_button = get_top_button('delete', 'Remove the classification', 'data_extraction/remove_classification/' . $classification[0]['class_id'] . "/" . $ref_id . "/data_extraction/display_paper", 'Remove the classification') . " ";			$edit_button = get_top_button('edit', 'Edit the classification', 'data_extraction/edit_classification/' . $classification[0]['class_id'], 'Edit the classification') . " ";
 			$edit_button = get_top_button('edit', 'Edit the classification', 'element/edit_drilldown/update_classification/' . $classification[0]['class_id'] . '/' . $ref_id, 'Edit the classification') . " ";
 			$data['classification_button'] = $edit_button . " " . $delete_button;
 		} else {

@@ -705,6 +705,7 @@ class Quality_assessment extends CI_Controller
 			)
 				->row_array();
 			if (!empty($assignment['qa_validation_assignment_id'])) {
+				$this->db_current->update('qa_validation_assignment', array('validation' => 'Not Correct', 'validation_note' => '', 'validation_time' => bm_current_time()), array('paper_id' => $paper_id));
 				redirect('element/edit_element/qa_not_valid/' . $assignment['qa_validation_assignment_id']);
 			}
 			//$this->db_current->update('qa_validation_assignment',array('validation'=>'Not Correct'),array('paper_id'=>$paper_id));

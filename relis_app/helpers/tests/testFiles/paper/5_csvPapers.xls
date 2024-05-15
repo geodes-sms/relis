@@ -1,0 +1,6 @@
+global_key,paper_key,conf_key,link,title,pages,citations
+aaai,conf/aaai/0001JT16,conf/aaai/2016np,http://www.aaai.org/ocs/index.php/WS/AAAIW16/paper/view/12603,"Solving QBF Instances with Nested SAT Solvers.",NULL,NULL
+aaai,conf/aaai/0001M13,conf/aaai/2013,http://www.aaai.org/ocs/index.php/AAAI/AAAI13/paper/view/6372,"Multiscale Manifold Learning.",NULL,NULL
+aaai,conf/aaai/0001STS15,conf/aaai/2015w3phi,http://aaai.org/ocs/index.php/WS/AAAIW15/paper/view/10102,"Online Transfer Learning for Differential Diagnosis Determination.",NULL,NULL
+aaai,conf/aaai/0001T15,conf/aaai/2015,http://www.aaai.org/ocs/index.php/AAAI/AAAI15/paper/view/9827,"Logic Programming in Assumption-Based Argumentation Revisited - Semantics and Graphical Representation.",1569-1575,NULL
+aaai,conf/aaai/0001TZLL14,conf/aaai/2014,http://www.aaai.org/ocs/index.php/AAAI/AAAI14/paper/view/8391,"Role-Aware Conformity Modeling and Analysis in Social Networks.",958-965,NULL
