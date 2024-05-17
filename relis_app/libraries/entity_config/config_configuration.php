@@ -120,10 +120,22 @@ function get_configuration()
 
 	);
 
+	$fields['screening_inclusion_mode'] = array(
+		'field_title' => 'Inclusion mode',
+		'field_type' => 'text',
+		'field_value' => 'hehe',
+		'field_size' => 50,
+		'mandatory' => ' mandatory ',
+		'input_type' => 'select',
+		'input_select_source' => 'array',
+		'input_select_values' => array('None' => 'None (No inclusion criteria needs to be selected)',
+									   'Any' => 'Any (At least one inclusion criteria needs to be selected)',
+									   'All' => 'All (All inclusion criterias must be selected)'),
+	);
+
 	$fields['screening_conflict_type'] = array(
 		'field_title' => 'Conflict criteria',
 		'field_type' => 'text',
-		'field_value' => 'IncludeExclude',
 		'field_value' => 'IncludeExclude',
 		'field_size' => 50,
 		'mandatory' => ' mandatory ',
@@ -435,6 +447,7 @@ function get_configuration()
 			'screening_result_on' => array('group' => 'screen'),
 			'assign_papers_on' => array('group' => 'screen'),
 			'screening_reviewer_number' => array('group' => 'screen'),
+			'screening_inclusion_mode' => array('group' => 'screen'),
 			'screening_conflict_type' => array('group' => 'screen'),
 			'screening_screening_conflict_resolution' => array('group' => 'screen'),
 			'use_kappa' => array('group' => 'screen'),
@@ -659,8 +672,6 @@ function get_configuration()
 			'use_kappa' => array(),
 			'validation_default_percentage' => array(),
 			'screening_validator_assignment_type' => array(),
-
-
 		),
 
 
@@ -795,13 +806,13 @@ function get_configuration()
 			'screening_result_on' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
 			'assign_papers_on' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
 			'screening_reviewer_number' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
+			'screening_inclusion_mode' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
 			'screening_conflict_type' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
 			'screening_screening_conflict_resolution' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
 			'use_kappa' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
 			'screening_validation_on' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
 			'screening_validator_assignment_type' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
 			'validation_default_percentage' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
-
 		),
 
 		'top_links' => array(
