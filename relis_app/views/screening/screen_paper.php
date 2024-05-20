@@ -226,8 +226,6 @@
 
                                         case "Any" :
                                             var selected_criteria_number = $('#criteria_in').val().length;
-                                            alert(selected_criteria_number);
-                                            alert(typeof selected_criteria_number);
                                             if (selected_criteria_number == 0) {
                                                 alert("At least one inclusion criterion must be met");
                                                 return false;
@@ -238,10 +236,12 @@
                                             var selected_criteria_number = $('#criteria_in').val().length;
                                             var total_criteria_number = <? echo count($exclusion_criteria) ?>;
                                             if (selected_criteria_number < total_criteria_number) {
-                                                alert("All inclusion criteria must be met")
+                                                alert("All inclusion criteria must be met");
+                                                return false;
                                             };
                                             break;
                                     }
+                                    return true;
                                 }
                         }
 

@@ -718,7 +718,7 @@ class Element extends CI_Controller
         //print_test($table_config); exit;
         if (!empty($post_arr[$table_config['table_id']])) {
             $data['current_element'] = $post_arr[$table_config['table_id']];
-            //print_test($data);
+            //print_test($data); exit;
         }
         if ($post_arr['operation_type'] == 'new') {
             $var_check = "on_add";
