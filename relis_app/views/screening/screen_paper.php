@@ -134,7 +134,7 @@
                                     echo '<div class="exclusion_crit" >' . dropdown_form_bm('Excluded criteria', 'criteria_ex', 'criteria_ex', $exclusion_criteria, !empty($content_item['exclusion_criteria']) ? $content_item['exclusion_criteria'] : 0) . "</div>";
 
                                     if (!empty($inclusion_criteria)) {
-                                        echo '<div class="inclusion_crit" style="display: none">' . dropdown_form_bm('Included criteria', 'criteria_in', 'criteria_in', $inclusion_criteria, !empty($content_item['inclusion_criteria']) ? $content_item['inclusion_criteria'] : 0) . "</div>";
+                                        echo '<div class="inclusion_crit" style="display: none">' . dropdown_multi_form_bm('Included criteria', 'criteria_in', 'criteria_in', $inclusion_criteria, !empty($content_item['inclusion_criteria']) ? $content_item['inclusion_criteria'] : 0) . "</div>";
                                     }
 
                                     echo input_textarea_bm('Note ', 'note', 'note', !empty($content_item['screening_note']) ? $content_item['screening_note'] : '');
@@ -201,7 +201,7 @@
 
 
                     <script>
-
+                        /*
                         function validate_screen() {
                             if ($('#decision').val() == 'excluded' && $('#criteria_ex').val() == '') {
                                     alert("You must select an exclusion criteria");
@@ -212,9 +212,41 @@
                                 }
                                 return true;
                             }
+                            */
+
+                        function validate_screen() {
+                            var inclusion_mode = '<? echo $inclusion_mode ?>';
+                            if ($('#decision').val() == 'excluded' && $('#criteria_ex').val() == '') {
+                                    alert("You must select an exclusion criteria");
+                                    return false;
+                                }else if ($('#decision').val() == 'accepted') {
+                                    switch(inclusion_mode) {
+                                        case "None" :
+                                            break;
+
+                                        case "Any" :
+                                            var selected_criteria_number = $('#criteria_in').val().length;
+                                            alert(selected_criteria_number);
+                                            alert(typeof selected_criteria_number);
+                                            if (selected_criteria_number == 0) {
+                                                alert("At least one inclusion criterion must be met");
+                                                return false;
+                                            }
+                                            break;
+
+                                        case "All" :
+                                            var selected_criteria_number = $('#criteria_in').val().length;
+                                            var total_criteria_number = <? echo count($exclusion_criteria) ?>;
+                                            if (selected_criteria_number < total_criteria_number) {
+                                                alert("All inclusion criteria must be met")
+                                            };
+                                            break;
+                                    }
+                                }
+                        }
 
                         function include_paper() {
-
+                            var inclusion_mode = '<? echo $inclusion_mode ?>';
                             var content = $('.screen_decision_include').html();
                             $('.screen_decision').html(content);
                             $('.exclusion_crit').hide();

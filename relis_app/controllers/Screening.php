@@ -885,6 +885,7 @@ class Screening extends CI_Controller
         $inclusion_crit = $this->manager_lib->get_reference_select_values('inclusioncriteria;ref_value');
         $data['exclusion_criteria'] = $exclusion_crit;
         $data['inclusion_criteria'] = $inclusion_crit;
+        $data['inclusion_mode'] = get_appconfig_element('screening_inclusion_mode');
         if (!empty($data['content_item'])) {
             //edit screening: used for conflict resolution
             $data['the_paper'] = $data['content_item']['paper_id'];
