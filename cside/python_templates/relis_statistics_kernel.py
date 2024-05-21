@@ -75,7 +75,17 @@ class DataCache:
 
     def load_csv(self, file_path: str, encoding: str):
         if file_path not in self.cache:
-            self.cache[file_path] = pd.read_csv(file_path, encoding=encoding)
+            try:
+                self.cache[file_path] = pd.read_csv(file_path, encoding=encoding)
+            except pd.errors.EmptyDataError:
+                print(f"Error: The file at {file_path} is empty or has no columns to parse.")
+                exit(1)
+            except FileNotFoundError:
+                print(f"Error: The file at {file_path} was not found.")
+                exit(1)
+            except Exception as e:
+                print(f"An unexpected error occurred while reading the file at {file_path}: {e}")
+                exit(1)
         return self.cache[file_path]
 
 ### Shared
