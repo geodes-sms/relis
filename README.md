@@ -121,26 +121,27 @@ You can also check debug setting, Debug port : 9000
 
 ### Branch naming convention:
 - `prod`: is the branch that is used in production
-- `master`: is the main branch used for final testing
-- `develop`: is the branch on which we develop 
+- `prod-testing`: is the branch used for final testing
+- `main`: is the branch on which we develop 
 - `feature-X` _(feature branch)_: X represents the feature we are working on (the number of the ticket if the feature is a task in github or a keyword for the task).
  
 ### Development process:
 1. **Create new task** : For any new task create a feature branch from develop before getting the last version of develop:
-	> git checkout develop
+	> git checkout main
     > 
-	> git pull origin develop
+	> git pull origin main
 	>
     > git checkout -b feature-taskNumber
 2. **Add your code**: Add all changes needed in your feature branch
 3. **Update documentation**: Go to [initial_db.sql](https://github.com/geodes-sms/relis/blob/develop/relis_deployment/docker/db/initial_db.sql) by updating or inserting the text in the `info` table (starting at line 141).
-4. **Create a pull request(PR) to the branch develop**: When the code is ready to be merged, create a pull request to the branch develop. To avoid conficts while merging the code, make sure to pull the last version of develop  in the feature branch before creating an PR.
-5. Repeat steps 1 to 3 for each new task.
+4. **Create a pull request(PR) to the branch main**: When the code is ready to be merged, create a pull request to the main branch. To avoid conficts while merging the code, make sure to pull the last version of develop in the feature branch before creating an PR.
+5. **Quality assurance**: upon a PR on the main branch, a suite of unit tests verify the integrity of the new code. When the tests pass (see Github Actions), you can merge the feature-X branch and delete it.
+6. Repeat steps 1 to 3 for each new task.
 
 ### Deployment process:
-1. Merge develop to master: when the code is ready to be fully tested the code is merged to master
-2. Deploy the branch master on a test server and proceed with testing,
-3. Deploy in production: merge the master branch in prod and pull the changes on the production server.
+1. Deploy to prod-testing: when the code is ready to be fully tested the code from main is moved to prod-testing branch. This branch is deployed on the test server for further testing.
+2. Deploy the prod-testing branch to prod branch on a test server and proceed with testing. This branch is deployed on the production server to be available to the public.
+3. Tag and release: create a tag from prod and create a release by increasing the version number.
 
 
 # Distribution
@@ -152,5 +153,11 @@ To compile the source code, you need the following dependencies:
 The source code is licensed under a [GNU GENERAL PUBLIC LICENSE 3](https://www.gnu.org/copyleft/gpl.html) ![GNU GPL v3](https://img.shields.io/badge/license-GPLv3-blue.svg)
 
 # Change log
-### Version 1.0
+### Version 1.2
+Bug fixes prior to docker version
 
+### Version 1.1
+Some preliminary bug fixes
+
+### Version 1.0
+Initial version of ReLiS with CodeIgnitier

@@ -46,11 +46,11 @@ function get_config_usergroup()
 
 
 	/*
-		The configuration also includes settings for the list view:
-			- order_by: The sorting order for the user_groups in the list view.
-			- search_by: The field to be used for searching user_groups
-			- The configuration includes a fields array, which defines the fields of the usergroup table.
-	*/
+		   The configuration also includes settings for the list view:
+			   - order_by: The sorting order for the user_groups in the list view.
+			   - search_by: The field to be used for searching user_groups
+			   - The configuration includes a fields array, which defines the fields of the usergroup table.
+	   */
 	$config['order_by'] = 'usergroup_name ASC '; //mettre la valeur à mettre dans la requette
 	$config['search_by'] = 'usergroup_name'; // separer les champs par virgule
 
@@ -116,10 +116,17 @@ function get_config_usergroup()
 	);
 	$config['fields'] = $fields;
 
+	$config['links']['view'] = array(
+		'label' => 'View',
+		'title' => 'View',
+		'on_list' => false
+	);
+
+
 	/*
-		The $operations array defines different operations or actions that can be performed on user_groups. 
-		Each operation has a type, title, description, page title, save function, page template, and other settings.
-	*/
+		   The $operations array defines different operations or actions that can be performed on user_groups. 
+		   Each operation has a type, title, description, page title, save function, page template, and other settings.
+	   */
 	$operations['list_usergroups'] = array(
 		'operation_type' => 'List',
 		'operation_title' => 'List of usergroups',

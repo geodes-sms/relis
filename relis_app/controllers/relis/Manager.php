@@ -134,7 +134,7 @@ class Manager extends CI_Controller
 	 * 			$operation: type de l'opération ajout (new) ou modification(edit)
 	 *
 	 */
-	public function new_assignation($paper_id, $data = "", $operation = "new")
+	public function new_assignation($paper_id, $data = [], $operation = "new")
 	{
 		$ref_table_child = 'assignation';
 		$child_field = 'assigned_paper_id';

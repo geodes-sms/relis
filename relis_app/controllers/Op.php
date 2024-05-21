@@ -50,25 +50,6 @@ class Op extends CI_Controller
 		}
 	}
 
-	//delete a child element and update the parent element if required
-	public function delete_drilldown($operation_name, $child_id, $parent_id, $parent_field)
-	{
-		$this->delete_element($table_config_child, $child_id, FALSE);
-		if ($update_parrent == 'yes') {
-			$parent_config = get_table_config($table_config_parent);
-			$array_drill = array(
-				'operation_type' => 'edit',
-				'table_config' => $table_config_parent,
-				'table_name' => $parent_config['table_name'],
-				'table_id' => $parent_config['table_id'],
-				$parent_config['table_id'] => $parent_id,
-				$parent_field => 0
-			);
-			$res_drill = $this->manage_mdl->save_reference($array_drill);
-		}
-		redirect('manager/display_element/' . $table_config_parent . '/' . $parent_id);
-	}
-
 	///----------------------------- to be updated
 	private function zz()
 	{
@@ -139,25 +120,6 @@ class Op extends CI_Controller
 		}
 		//print_test($result);
 		return $result;
-	}
-
-	//delete the specified child element from the child table ($table_config_child) and update the parent element in the parent table ($table_config_parent).
-	public function remove_drilldown($child_id, $table_config_child, $table_config_parent, $parent_id, $parent_field, $update_parrent = 'yes', $modal = 'no')
-	{
-		$this->delete_element($table_config_child, $child_id, FALSE);
-		if ($update_parrent == 'yes') {
-			$parent_config = get_table_config($table_config_parent);
-			$array_drill = array(
-				'operation_type' => 'edit',
-				'table_config' => $table_config_parent,
-				'table_name' => $parent_config['table_name'],
-				'table_id' => $parent_config['table_id'],
-				$parent_config['table_id'] => $parent_id,
-				$parent_field => 0
-			);
-			$res_drill = $this->manage_mdl->save_reference($array_drill);
-		}
-		redirect('manager/display_element/' . $table_config_parent . '/' . $parent_id);
 	}
 
 	//remove a picture associated with a specific element in a table

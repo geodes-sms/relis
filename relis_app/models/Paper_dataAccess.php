@@ -207,6 +207,34 @@ class Paper_dataAccess extends CI_Model
 		return $res;
 	}
 
+	function select_from_doi($doi)
+	{
+		$sql = 'SELECT * FROM paper WHERE BINARY UPPER(doi) = BINARY UPPER(?) and  paper_active=1';
+		$res = $this->db_current->query($sql, array($doi))->row_array();
+		return $res;
+	}
+
+	function select_all_from_title($title)
+	{
+		$sql = 'SELECT * FROM paper WHERE BINARY UPPER(title) = BINARY UPPER(?) and  paper_active=1';
+		$res = $this->db_current->query($sql, array($title))->result_array();
+		return $res;
+	}
+
+	function select_from_paper_id_all_authors_ids($paper_id)
+	{
+		$sql = 'SELECT * FROM paperauthor WHERE BINARY paperId = BINARY ? and  paperauthor_active=1';
+		$res = $this->db_current->query($sql, array($paper_id))->result_array();
+		return $res;
+	}
+
+	function select_from_author_id($author_id)
+	{
+		$sql = 'SELECT * FROM author WHERE BINARY author_id = BINARY ? and  author_active=1';
+		$res = $this->db_current->query($sql, array($author_id))->row_array();
+		return $res;
+	}
+
 	function select_from_author($author_name)
 	{
 		$res = $this->db_current->query('SELECT * FROM author WHERE BINARY author_name = BINARY "' . $author_name . '" and  author_active=1')->row_array();

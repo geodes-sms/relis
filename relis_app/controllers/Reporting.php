@@ -56,6 +56,7 @@ class Reporting extends CI_Controller
 			if (!(!empty($value_conf['compute_result']) and $value_conf['compute_result'] == 'no')) {
 				if (isset($value_conf['number_of_values']) and ($value_conf['number_of_values'] == '1') and ($value_conf['input_type'] == 'select') and ($value_conf['input_select_source'] == 'table' or $value_conf['input_select_source'] == 'array' or $value_conf['input_select_source'] == 'yes_no')) {
 					$ref_field = $key_conf;
+					$ref_config = null;
 					if ($value_conf['input_select_source'] == 'array') {
 						$result = $this->Data_extraction_dataAccess->get_result_classification($key_conf);
 						foreach ($result as $key => $value) {

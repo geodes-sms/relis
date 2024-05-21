@@ -278,8 +278,7 @@ $config['proxy_ips'] = '';
 // My configurations
 
 $config['rec_per_page'] = '50';
-$config['free_controllers'] = ['auth', 'api', 'apiquery', 'user'];
-
+$config['free_controllers'] = ['auth', 'api', 'apiquery', 'user', 'unit_test'];
 
 //For image upload
 $config['image_upload_path'] = 'cside/media/images/';
@@ -328,7 +327,7 @@ $config['project_specific_config_folder'] = "relis_app/libraries/table_config/pr
 // The prefix that will have the new databases for projects  installed
 $config['project_db_prefix'] = "relis_dev_correct_";
 $config['server_OS'] = "WINDOWS";
-$config['support_contact'] = "info@relis.iro.umontreal.ca";
+$config['support_contact'] = "relis@relis.iro.umontreal.ca";
 
 //Mail config
 $config['mail_protocol']    = "smtp";
