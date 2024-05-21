@@ -999,6 +999,10 @@ class Reporting extends CI_Controller
 
 			redirect('reporting/result_export');
 
+			# Need to redirect to this page and collect the (possibly) modified data before generating
+			# Check out r_export_configurations for procedure
+			#redirect('relis/python_export_configurations');
+
 		} catch (Exception $e) {
 			set_top_msg($e);
 		}
