@@ -130,13 +130,31 @@
                                     <br /><br />
 
                                     <?php
-
+                                    if ($inclusion_mode == 'One') {
+                                        echo '<div class="inclusion_crit" style="display: none">' . dropdown_form_bm('Included criteria', 'criteria_in', 'criteria_in', $inclusion_criteria, !empty($content_item['inclusion_criteria']) ? $content_item['inclusion_criteria'] : 0) . "</div>";
+                                    } else if ($inclusion_mode == 'Any') {
+                                        echo '<div class="inclusion_crit" style="display: none">' . dropdown_multi_form_bm('Included criteria', 'criteria_in', 'criteria_in', $inclusion_criteria) . "</div>";
+                                    } else if ($inclusion_mode == 'All') {
+                                        echo '<h4>';
+                                        echo '<div class="inclusion_crit" style="display: none">';
+                                        echo 'Are all criteria met ? <br><br>';
+                                        echo '<ul>';
+                                        foreach ($inclusion_criteria as $inclusion_criterion) {
+                                            if ($inclusion_criterion != 'Select...') echo '<li>' . $inclusion_criterion . '</li>' . '<br>';
+                                        }
+                                        echo '</ul>';
+                                        echo checkbox_form_bm("All criteria are met", "ensure_all", "ensure_all");
+                                        echo '</div>';
+                                        echo '</h4>';
+                                    } else {
+                                        // nothing in case of 'None'
+                                    }
                                     echo '<div class="exclusion_crit" >' . dropdown_form_bm('Excluded criteria', 'criteria_ex', 'criteria_ex', $exclusion_criteria, !empty($content_item['exclusion_criteria']) ? $content_item['exclusion_criteria'] : 0) . "</div>";
-
+                                    /*
                                     if (!empty($inclusion_criteria)) {
                                         echo '<div class="inclusion_crit" style="display: none">' . dropdown_multi_form_bm('Included criteria', 'criteria_in', 'criteria_in', $inclusion_criteria, !empty($content_item['inclusion_criteria']) ? $content_item['inclusion_criteria'] : 0) . "</div>";
                                     }
-
+                                    */
                                     echo input_textarea_bm('Note ', 'note', 'note', !empty($content_item['screening_note']) ? $content_item['screening_note'] : '');
 
                                     //  echo  form_hidden(array( 'decision' => 'exclude'));
@@ -223,30 +241,28 @@
                                     switch(inclusion_mode) {
                                         case "None" :
                                             break;
-
-                                        case "Any" :
-                                            var selected_criteria_number = $('#criteria_in').val().length;
-                                            if (selected_criteria_number == 0) {
-                                                alert("At least one inclusion criterion must be met");
+                                        case "One" :
+                                            if ($('#criteria_in').val() == '') {
+                                                alert("You must select a criterion");
                                                 return false;
                                             }
                                             break;
-
-                                        case "All" :
-                                            var selected_criteria_number = $('#criteria_in').val().length;
-                                            var total_criteria_number = <? echo count($exclusion_criteria) ?>;
-                                            if (selected_criteria_number < total_criteria_number) {
-                                                alert("All inclusion criteria must be met");
+                                        case "Any" :
+                                            if (Array.isArray($('#criteria_in').val())) {
+                                                return true;
+                                            } else {
+                                                alert("At least one inclusion criterion must be met");
                                                 return false;
-                                            };
+                                            }
+                                        case "All" :
+                                                return false;
                                             break;
                                     }
-                                    return true;
+                                    return false;
                                 }
                         }
 
                         function include_paper() {
-                            var inclusion_mode = '<? echo $inclusion_mode ?>';
                             var content = $('.screen_decision_include').html();
                             $('.screen_decision').html(content);
                             $('.exclusion_crit').hide();

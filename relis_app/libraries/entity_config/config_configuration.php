@@ -128,9 +128,10 @@ function get_configuration()
 		'mandatory' => ' mandatory ',
 		'input_type' => 'select',
 		'input_select_source' => 'array',
-		'input_select_values' => array('None' => 'None (No inclusion criteria needs to be selected)',
-									   'Any' => 'Any (At least one inclusion criteria needs to be selected)',
-									   'All' => 'All (All inclusion criterias must be selected)'),
+		'input_select_values' => array('None' => 'None',
+									   'One' => 'One',
+									   'Any' => 'Any',
+									   'All' => 'All'),
 	);
 
 	$fields['screening_conflict_type'] = array(
@@ -441,7 +442,6 @@ function get_configuration()
 			'list_trim_nbr' => array('group' => 'papers'),
 			'source_papers_on' => array('group' => 'papers'),
 			'search_strategy_on' => array('group' => 'papers'),
-
 
 			'screening_on' => array('group' => 'screen'),
 			'screening_result_on' => array('group' => 'screen'),
