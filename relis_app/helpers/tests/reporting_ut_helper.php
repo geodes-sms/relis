@@ -27,8 +27,10 @@ class ReportingUnitTest
         $this->result_export_papers_bib_included();
         $this->result_export_papers_bib_excluded();
         $this->result_export_excluded_screen();
-        $this->r_export_configurations();
-        $this->result_r_config_file();
+        $this->rsae_export_r_configurations();
+        $this->rsae_export_python_configurations();
+        $this->rsae_r_export();
+        $this->rsae_python_export();
     }
 
     private function TestInitialize()
@@ -272,13 +274,13 @@ class ReportingUnitTest
     }
 
     /*
-     * Action : r_export_configurations
-     * Description : Display the form to export r configurations
+     * Action : rsae_export_r_configurations
+     * Description : Display the form to export rsae r artifacts
      * Expected result : check if all categories are presents
      */
-    private function r_export_configurations()
+    private function rsae_export_r_configurations()
     {
-        $action = "r_export_configurations";
+        $action = "rsae_export_r_configurations";
         $test_name = "Display the form to export r configurations";
         $test_aspect = "All categories present?";
         $expected_result = "yes";
@@ -312,16 +314,16 @@ class ReportingUnitTest
     }
 
     /*
-     * Action : result_r_config_file
-     * Description : Export r configuration files
+     * Action : rsae_r_export
+     * Description : Export rsae r package
      * Expected generated reporting files: check if the reproting files are generated
      */
-    private function result_r_config_file()
+    private function rsae_r_export()
     {
-        $action = "result_r_config_file";
-        $test_name = "Export r configuration files";
+        $action = "rsae_r_export";
+        $test_name = "Export rsae r package";
         $test_generated_files = "Generated files";
-        $expected_generated_files = "relis_r_config_demoTestProject.R, relis_r_lib_demoTestProject.R";
+        $expected_generated_files = "r_rsae_demoTestProject.zip";
 
         $postData = [
             'Has chocolate' => 'Nominal',
@@ -343,13 +345,125 @@ class ReportingUnitTest
         if ($response['status_code'] >= 400) {
             $actual_generated_files = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
-            if (
-                file_get_contents('cside/export_r/relis_r_config_demoTestProject.R') == file_get_contents('relis_app/helpers/tests/testFiles/reporting/get_relis_r_config.R') &&
-                file_get_contents('cside/export_r/relis_r_lib_demoTestProject.R') == file_get_contents('relis_app/helpers/tests/testFiles/reporting/get_relis_r_lib.R')
-            ) {
-                $actual_generated_files = "relis_r_config_demoTestProject.R, relis_r_lib_demoTestProject.R";
+            $zip = new ZipArchive();
+            $zip_file = "cside/export_r/r_rsae_demoTestProject.zip";
+
+            if ($zip->open($zip_file) === TRUE) {
+                $config_file_content = $zip->getFromName('relis_r_config_demoTestProject.R');
+                $lib_file_content = $zip->getFromName('relis_r_lib_demoTestProject.R');
+                $zip->close();
+
+                $expected_config_file = file_get_contents('relis_app/helpers/tests/testFiles/reporting/rsae/r/get_relis_r_config.R');
+                $expected_lib_file = file_get_contents('relis_app/helpers/tests/testFiles/reporting/rsae/r/get_relis_r_lib.R');
+
+                if ($config_file_content === $expected_config_file && $lib_file_content === $expected_lib_file) {
+                    $actual_generated_files = "r_rsae_demoTestProject.zip";
+                } else {
+                    $actual_generated_files = "Files content does not match";
+                }
             } else {
-                $actual_generated_files = "Files not generated";
+                $actual_generated_files = "Failed to open zip file";
+            }
+        }
+
+        run_test($this->controller, $action, $test_name, $test_generated_files, $expected_generated_files, $actual_generated_files);
+    }
+
+    /*
+     * Action : rsae_export_python_configurations
+     * Description : Display the form to export rsae python artifacts
+     * Expected result : check if all categories are presents
+     */
+    private function rsae_export_python_configurations()
+    {
+        $action = "rsae_export_python_configurations";
+        $test_name = "Display the form to export rsae python artifacts";
+        $test_aspect = "All categories present?";
+        $expected_result = "yes";
+        $actual_result = "no";
+
+        $response = $this->http_client->response($this->controller, $action);
+
+        if ($response['status_code'] >= 400) {
+            $actual_httpCode = "<span style='color:red'>" . $response['content'] . "</span>";
+        } else {
+            if (
+                strstr($response['content'], "Has chocolate") != false &&
+                strstr($response['content'], "Temperature") != false &&
+                strstr($response['content'], "Start date") != false &&
+                strstr($response['content'], "Code") != false &&
+                strstr($response['content'], "Brand") != false &&
+                strstr($response['content'], "Cocoa origin") != false &&
+                strstr($response['content'], "Cocoa level") != false &&
+                strstr($response['content'], "Types") != false &&
+                strstr($response['content'], "Variety") != false &&
+                strstr($response['content'], "Venue") != false &&
+                strstr($response['content'], "Year") != false &&
+                strstr($response['content'], "Number of citations") != false &&
+                strstr($response['content'], "Note") != false
+            ) {
+                $actual_result = "yes";
+            }
+        }
+
+        run_test($this->controller, $action, $test_name, $test_aspect, $expected_result, $actual_result);
+    }
+
+    /*
+     * Action : rsae_python_export
+     * Description : Export python rsae package
+     * Expected generated reporting files: check if the reproting files are generated
+     */
+    private function rsae_python_export()
+    {
+        $action = "rsae_python_export";
+        $test_name = "Export rsae python package";
+        $test_generated_files = "Generated files";
+        $expected_generated_files = "python_rsae_demoTestProject.zip";
+
+        $postData = [
+            'Has chocolate' => 'Nominal',
+            'Temperature' => 'Continuous',
+            'Start date' => 'Text',
+            'Code' => 'Text',
+            'Brand' => 'Nominal',
+            'Cocoa origin' => 'Nominal',
+            'Cocoa level' => 'Nominal',
+            'Types' => 'Nominal',
+            'Variety' => 'Nominal',
+            'Venue' => 'Text',
+            'Year' => 'Continuous',
+            'Number of citations' => 'Continuous',
+            'Note' => 'Text'
+        ];
+        $response = $this->http_client->response($this->controller, $action, $postData, "POST");
+
+        if ($response['status_code'] >= 400) {
+            $actual_generated_files = "<span style='color:red'>" . $response['content'] . "</span>";
+        } else {
+            $zip = new ZipArchive();
+            $zip_file = "cside/export_python/python_rsae_demoTestProject.zip";
+
+            if ($zip->open($zip_file) === TRUE) {
+                $playground_file_content = $zip->getFromName('relis_statistics_playground.py');
+                $kernel_file_content = $zip->getFromName('relis_statistics_kernel.py');
+                $requirements_file_content = $zip->getFromName('requirements.txt');
+                $zip->close();
+
+                $expected_playground_file = file_get_contents('relis_app/helpers/tests/testFiles/reporting/rsae/python/get_relis_statistics_playground.py');
+                $expected_kernel_file = file_get_contents('relis_app/helpers/tests/testFiles/reporting/rsae/python/get_relis_statistics_kernel.py');
+                $expected_requirements_file = file_get_contents('relis_app/helpers/tests/testFiles/reporting/rsae/python/get_requirements.txt');
+
+                if (
+                    $playground_file_content === $expected_playground_file && $kernel_file_content === $expected_kernel_file &&
+                    $requirements_file_content === $expected_requirements_file
+                ) {
+                    $actual_generated_files = "python_rsae_demoTestProject.zip";
+                } else {
+                    $actual_generated_files = "Files content does not match";
+                }
+            } else {
+                $actual_generated_files = "Failed to open zip file";
             }
         }
 
@@ -406,4 +520,3 @@ class ReportingUnitTest
         run_test($this->controller, $action, $test_name, $test_generated_file, $expected_generated_file, $actual_generated_file);
     }
 }
-

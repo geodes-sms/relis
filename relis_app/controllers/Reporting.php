@@ -863,7 +863,6 @@ class Reporting extends CI_Controller
 	{
 		$PROJECT_NAME = project_db();
 		$ENVIRONMENT_VERSION = '1.0.0';
-		$DATE_TIME_GENERATED = $this->get_current_formatted_datetime('Y-m-d h:i:s');
 		$CLASSIFICATION_METADATA_FIELDS = array(
 			'class_active', 'class_id',
 			'class_paper_id', 'classification_time', 'user_id', 'A_id'
@@ -886,7 +885,6 @@ class Reporting extends CI_Controller
 		return array(
 			'PROJECT_NAME' => $PROJECT_NAME,
 			'ENVIRONMENT_VERSION' => $ENVIRONMENT_VERSION,
-			'DATE_TIME_GENERATED' => $DATE_TIME_GENERATED,
 			'CLASSIFICATION_METADATA_FIELDS' => $CLASSIFICATION_METADATA_FIELDS,
 			'CLASSIFICATION_STATIC_FIELDS' => $CLASSIFICATION_STATIC_FIELDS,
 			'MULTIVALUE_SEPARATOR' => $MULTIVALUE_SEPARATOR,
@@ -946,7 +944,7 @@ class Reporting extends CI_Controller
 	 * Orchestrator for the python statistical analysis environment
 	 * generation
 	 */
-	public function python_environment_export()
+	public function rsae_python_export()
 	{
 		try {
 			$rsae_classification_form = $this->input->post();
@@ -1026,9 +1024,9 @@ class Reporting extends CI_Controller
 	 * Both functions could be generalized into
 	 * a single one 
 	 */
-	public function python_download($file_name)
+	public function rsae_download($rsae_gpl, $file_name)
 	{
-		$url = "cside/export_python/" . $file_name;
+		$url = "cside/export_" . $rsae_gpl . "/" . $file_name;
 		header("Content-Type: application/zip");
 		header("Content-Transfer-Encoding: Binary");
 		header("Content-disposition: attachment; filename=\"" . $file_name . "\"");
@@ -1046,7 +1044,7 @@ class Reporting extends CI_Controller
 	) {
 		$zip = new ZipArchive();
 
-		$gpl_env_name = $rsae_gpl . '_env_' . $project_name;
+		$gpl_env_name = $rsae_gpl . '_rsae_' . $project_name;
 		$zip_file_name = $target_directory . $gpl_env_name . '.zip';
 
 		if ($zip->open($zip_file_name, ZipArchive::CREATE) !== TRUE) {
@@ -1140,7 +1138,7 @@ class Reporting extends CI_Controller
 	 * Orchestrator for the r statistical analysis environment
 	 * generation
 	 */
-	public function r_environment_export()
+	public function rsae_r_export()
 	{
 		try {
 			$export_config = $this->r_create_export_config();

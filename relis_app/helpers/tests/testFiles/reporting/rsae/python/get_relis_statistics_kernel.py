@@ -10,7 +10,7 @@ from matplotlib.text import Text
 from statsmodels.robust.scale import mad
 from scipy.stats import kurtosis, skew, shapiro, spearmanr, pearsonr, chi2_contingency
 
-#-- Environment version : {{attribute(export_config,'ENVIRONMENT_VERSION')}}
+#-- Environment version : 1.0.0
 
 ### Config
 
@@ -21,10 +21,10 @@ custom = {'axes.edgecolor': 'black', 'grid.linestyle': 'dashed', 'grid.color': '
 sns.set_style('darkgrid', rc = custom)
 
 class Multivalue(Enum):
-    SEPARATOR = '{{attribute(export_config,'MULTIVALUE_SEPARATOR')}}'
+    SEPARATOR = '|'
 
 class Policies(Enum):
-    DROP_NA = {{attribute(export_config,'DROP_NA') ? 'True' : 'False' }}
+    DROP_NA = False
 
 ### Types
 
@@ -39,21 +39,20 @@ class Variable:
         self.data_type = data_type
         self.multiple = multiple
 
-{#Producing the Nominal variables of our configuration model #}
 class NominalVariables(Enum):
-{% for key1, item in sam %}
-{% if item.data_type == 'Nominal'%}
-    {{ item.name }} = Variable("{{item.name}}", "{{item.title}}", VariableDataType.NOMINAL, {{attribute(item,'multiple') ? 'True' : 'False' }})
-{% endif %}
-{% endfor %}
+    has_chocolate = Variable("has_chocolate", "Has chocolate", VariableDataType.NOMINAL, False)
+    brand = Variable("brand", "Brand", VariableDataType.NOMINAL, False)
+    cocoa_origin = Variable("cocoa_origin", "Cocoa origin", VariableDataType.NOMINAL, False)
+    cocoa_level = Variable("cocoa_level", "Cocoa level", VariableDataType.NOMINAL, False)
+    types = Variable("types", "Types", VariableDataType.NOMINAL, False)
+    variety = Variable("variety", "Variety", VariableDataType.NOMINAL, True)
+    venue = Variable("venue", "Venue", VariableDataType.NOMINAL, False)
 
-{#Producing the Continuous variables of our configuration model #}
 class ContinuousVariables(Enum):    
-{% for key1, item in sam %}
-{% if item.data_type == 'Continuous'%}
-    {{ item.name }} = Variable("{{item.name}}", "{{item.title}}", VariableDataType.CONTINUOUS, {{attribute(item,'multiple') ? 'True' : 'False' }})
-{% endif %}
-{% endfor %}
+    temperature = Variable("temperature", "Temperature", VariableDataType.CONTINUOUS, False)
+    year = Variable("year", "Year", VariableDataType.CONTINUOUS, False)
+    number_of_citations = Variable("number_of_citations", "Number of citations", VariableDataType.CONTINUOUS, False)
+    publication_year = Variable("publication_year", "Publication year", VariableDataType.CONTINUOUS, False)
 
 class DataFrame:
     def __init__(self, data: pd.DataFrame, variable_type: Type[NominalVariables] | Type[ContinuousVariables]):
@@ -170,8 +169,7 @@ def _display_figure(plt):
 
 data_cache = DataCache()
 
-{# The data should be at the root of the project, with the name of the project as the name of the .csv #}
-def _read_project_classification_data(path = './{{attribute(export_config,'CLASSIFICATION_FILE_NAME')}}'):
+def _read_project_classification_data(path = './relis_classification_demoTestProject.csv'):
     return data_cache.load_csv(path, 'utf8')
 
 def _aggregate_variables_by_data_type(variables: type[NominalVariables] | type[ContinuousVariables]):

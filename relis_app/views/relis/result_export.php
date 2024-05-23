@@ -50,8 +50,8 @@
                 $class_filename = FCPATH . "cside/export_r/relis_classification_" . project_db() . ".csv";
                 $screen_exluded_filename = FCPATH . "cside/export_r/relis_paper_excluded_screen_" . project_db() . ".csv";
                 $class_exluded_filename = FCPATH . "cside/export_r/relis_paper_excluded_class_" . project_db() . ".csv";
-                $r_environment_filename = FCPATH . "cside/export_r/r_env_" . project_db() . ".zip";
-                $python_environment_filename = FCPATH . "cside/export_python/python_env_" . project_db() . ".zip";
+                $r_environment_filename = FCPATH . "cside/export_r/r_rsae_" . project_db() . ".zip";
+                $python_environment_filename = FCPATH . "cside/export_python/python_rsae_" . project_db() . ".zip";
 
                 if (file_exists($paper_filename)) {
                   $paper_size = (filesize($paper_filename) > 1000 ? round(filesize($paper_filename) / 1000) : round(filesize($paper_filename) / 1000, 1)) . ' Kb  Last update:';
@@ -190,14 +190,14 @@
 
 	                <tr>
 	                  <td>R environment</td>
-	                  <td><a href="<?php echo base_url(); ?>reporting/download/r_env_<?php echo project_db(); ?>.zip"><?php echo $r_environment_dsc ?></a></td>
+	                  <td><a href="<?php echo base_url(); ?>reporting/rsae_download/r/r_rsae_<?php echo project_db(); ?>.zip"><?php echo $r_environment_dsc ?></a></td>
 	                  <td><a href="<?php
                                   echo base_url(); ?>reporting/rsae_export_r_configurations"><i class="fa fa-refresh"></i><?php echo lng('Update file') ?></a></td>
 	                </tr>
 
 	                <tr>
 	                  <td>Python environment</td>
-	                  <td><a href="<?php echo base_url(); ?>reporting/python_download/python_env_<?php echo project_db(); ?>.zip"><?php echo $python_environment_dsc ?></a></td>
+	                  <td><a href="<?php echo base_url(); ?>reporting/rsae_download/python/python_rsae_<?php echo project_db(); ?>.zip"><?php echo $python_environment_dsc ?></a></td>
 	                  <td><a href="<?php
                                   echo base_url(); ?>reporting/rsae_export_python_configurations"><i class="fa fa-refresh"></i><?php echo lng('Update file') ?></a></td>
 	                </tr>
