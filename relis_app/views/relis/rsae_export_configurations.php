@@ -39,7 +39,7 @@ if (!isset($rsae_gpl)) {
 
             $attributes = array('class' => 'form-horizontal form_content');
 
-            $fct_save = 'reporting/' . $rsae_gpl . '_environment_export';
+            $fct_save = 'reporting/rsae_' . $rsae_gpl . '_export';
 
             echo form_open_multipart($fct_save, $attributes);
 
