@@ -11,7 +11,7 @@
         </div>
 
         <div class="clearfix"></div>
-
+        
         <div class="row">
 
             <div class="col-md-12 col-sm-12 col-xs-12">
@@ -70,6 +70,7 @@
 
 
                                     <?php
+                                    
                                     if (!empty($paper_abstract)) {
                                         echo " <p><b>Abstract :</b> <br/>";
                                         echo $paper_abstract;
@@ -130,25 +131,31 @@
                                     <br /><br />
 
                                     <?php
-                                    if ($inclusion_mode == 'One') {
-                                        echo '<div class="inclusion_crit" style="display: none">' . dropdown_form_bm('Included criteria', 'criteria_in', 'criteria_in', $inclusion_criteria, !empty($content_item['inclusion_criteria']) ? $content_item['inclusion_criteria'] : 0) . "</div>";
-                                    } else if ($inclusion_mode == 'Any') {
-                                        echo '<div class="inclusion_crit" style="display: none">' . dropdown_multi_form_bm('Included criteria', 'criteria_in', 'criteria_in', $inclusion_criteria) . "</div>";
-                                    } else if ($inclusion_mode == 'All') {
-                                        echo '<h4>';
-                                        echo '<div class="inclusion_crit" style="display: none">';
-                                        echo 'Are all criteria met ? <br><br>';
-                                        echo '<ul>';
-                                        foreach ($inclusion_criteria as $inclusion_criterion) {
-                                            if ($inclusion_criterion != 'Select...') echo '<li>' . $inclusion_criterion . '</li>' . '<br>';
-                                        }
-                                        echo '</ul>';
-                                        echo checkbox_form_bm("All criteria are met", "ensure_all", "ensure_all");
-                                        echo '</div>';
-                                        echo '</h4>';
-                                    } else {
-                                        // nothing in case of 'None'
+                                    switch ($inclusion_mode) {
+                                        case 'One':
+                                            echo '<div class="inclusion_crit" style="display: none">' . dropdown_form_bm('Included criteria', 'criteria_in', 'criteria_in', $inclusion_criteria, !empty($content_item['inclusion_criteria']) ? $content_item['inclusion_criteria'] : 0) . "</div>";
+                                            break;
+                                        case 'Any':
+                                            echo '<div class="inclusion_crit" style="display: none">' . dropdown_multi_form_bm('Included criteria', 'criteria_in', 'criteria_in', $inclusion_criteria) . "</div>";
+                                            break;
+                                        case 'All':
+                                            echo '<h4>';
+                                            echo '<div class="inclusion_crit" style="display: none">';
+                                            echo 'Are all criteria met ? <br><br>';
+                                            echo '<ul>';
+                                            foreach ($inclusion_criteria as $inclusion_criterion) {
+                                                if ($inclusion_criterion != 'Select...') echo '<li>' . $inclusion_criterion . '</li>' . '<br>';
+                                            }
+                                            echo '</ul>';
+                                            echo checkbox_form_bm("All criteria are met", "ensure_all", "ensure_all");
+                                            echo '</div>';
+                                            echo '</h4>';
+                                            break;
+                                        default:
+                                            // nothing in case of 'None'
+                                            break;
                                     }
+                                    
                                     echo '<div class="exclusion_crit" >' . dropdown_form_bm('Excluded criteria', 'criteria_ex', 'criteria_ex', $exclusion_criteria, !empty($content_item['exclusion_criteria']) ? $content_item['exclusion_criteria'] : 0) . "</div>";
                                     /*
                                     if (!empty($inclusion_criteria)) {
@@ -258,7 +265,7 @@
                                                 return false;
                                             break;
                                     }
-                                    return false;
+                                    return true;
                                 }
                         }
 

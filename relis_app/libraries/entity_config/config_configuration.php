@@ -57,7 +57,6 @@ function get_configuration()
 		'default_value' => 'auto_increment'
 	);
 
-
 	$fields['config_type'] = array(
 		'field_title' => 'Configuration type',
 		'field_type' => 'text',
@@ -75,6 +74,7 @@ function get_configuration()
 		'input_type' => 'text',
 		'mandatory' => ' mandatory '
 	);
+
 	$fields['editor_generated_path'] = array(
 		'field_title' => 'Editor workspace location',
 		'field_type' => 'text',
@@ -95,6 +95,7 @@ function get_configuration()
 		'input_select_source' => 'array',
 		'input_select_values' => array(';' => ';', ',' => ',')
 	);
+
 	$fields['csv_field_separator_export'] = array(
 		'field_title' => 'CSV separator for export',
 		'field_type' => 'text',
@@ -144,7 +145,6 @@ function get_configuration()
 		'input_select_source' => 'array',
 		'input_select_values' => array('IncludeExclude' => 'Inclusion - exclusion', 'ExclusionCriteria' => 'Exclusion criteria'),
 		'initial_value' => 'IncludeExclude',
-
 	);
 
 	$fields['import_papers_on'] = array(
@@ -190,6 +190,7 @@ function get_configuration()
 		'input_select_source' => 'yes_no',
 		'input_select_values' => '',
 	);
+
 	$fields['screening_validation_on'] = array(
 		'field_title' => 'Screening validation activated',
 		'field_type' => 'int',
@@ -200,8 +201,6 @@ function get_configuration()
 		'input_select_source' => 'yes_no',
 		'input_select_values' => '',
 	);
-
-
 
 	$fields['classification_on'] = array(
 		'field_title' => 'Classification activated',

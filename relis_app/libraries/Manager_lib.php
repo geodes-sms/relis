@@ -91,7 +91,7 @@ class Manager_lib
 			//Pour les dipendantdynamiccategory ajouter une condition pour les enregistrements relatifs à cet element	
 			if (!empty($filter) and !empty($ref_table_config['fields'][$filter['filter_field']])) {
 				$extra_condition = " AND  " . $filter['filter_field'] . " = '" . $filter['filter_value'] . "'";
-			}
+			}	
 			$res = $this->CI->DBConnection_mdl->get_reference_select_values($ref_table_config, $fields, $extra_condition);
 			//print_test($res);	
 			$result = array();

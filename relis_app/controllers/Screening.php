@@ -1026,13 +1026,32 @@ class Screening extends CI_Controller
             $screening_save = array(
                 'screening_note' => $post_arr['note'],
                 'screening_decision' => $screening_decision,
-                'exclusion_criteria' => $exclusion_criteria,
-                'inclusion_criteria' => $inclusion_criteria,
+                'screening_id' => $post_arr['screening_id'],
+                //'exclusion_criteria' => $exclusion_criteria,
+                //'inclusion_criteria' => $inclusion_criteria,
                 'screening_time' => bm_current_time('Y-m-d H:i:s'),
                 'screening_status' => 'Done',
             );
-            //print_test($screening_save); exit;
+            //print_test($inclusion_criteria); exit;
             $res = $this->db2->update('screening_paper', $screening_save, array('screening_id' => $post_arr['screening_id']));
+            if ($res == 1) {
+                if (is_array($inclusion_criteria)) {
+                    foreach($inclusion_criteria as $criteria) {
+                        $criteria_save = array(
+                            'screening_id' => $post_arr['screening_id'],
+                            'criteria_id' => $criteria,
+                        );
+                        $res = $this->db2->insert('screen_inclusion_mapping', $criteria_save);
+                    }
+                } else if (!empty($inclusion_criteria)){
+                    $criteria_save = array(
+                        'screening_id' => $post_arr['screening_id'],
+                        'criteria_id' => $inclusion_criteria,
+                    );
+                    $res = $this->db2->insert('screen_inclusion_mapping', $criteria_save);
+                }
+                
+            }
             $screen_phase_detail = $this->DBConnection_mdl->get_row_details('get_screen_phase_detail', $screening_phase, TRUE);
             $screening_phase_last_status = $screen_phase_detail['screen_phase_final'];
             $paper_status = get_paper_screen_status_new($post_arr['paper_id'], $screening_phase);

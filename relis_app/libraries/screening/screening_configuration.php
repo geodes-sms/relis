@@ -37,7 +37,6 @@ function get_screening()
 	$config['table_id'] = 'screening_id';
 	$config['table_active_field'] = 'screening_active'; //to detect deleted records
 	$config['main_field'] = 'paper_id';
-
 	$config['entity_label'] = 'Screening';
 	$config['entity_label_plural'] = 'Screening';
 
