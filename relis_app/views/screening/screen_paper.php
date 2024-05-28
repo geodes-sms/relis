@@ -146,9 +146,14 @@
                                             foreach ($inclusion_criteria as $inclusion_criterion) {
                                                 if ($inclusion_criterion != 'Select...') echo '<li>' . $inclusion_criterion . '</li>' . '<br>';
                                             }
-                                            echo '</ul>';
-                                            echo checkbox_form_bm("All criteria are met", "ensure_all", "ensure_all");
-                                            echo '</div>';
+                                            echo '<div class="container mt-5">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="" id="allCriteriaCheck" style="width:1.5em; height:1.5em">
+                                                <label class="form-check-label" for="allCriteriaCheck" style="font-size:1.25em; margin-left:0.25em">
+                                                    Yes
+                                                </label>
+                                            </div>
+                                        </div>';
                                             echo '</h4>';
                                             break;
                                         default:
@@ -184,6 +189,8 @@
                                         value="<?php echo $assignment_id ?>" />
                                     <input type="hidden" name="screen_type" id="screen_type"
                                         value="<?php echo $screen_type ?>" />
+                                        <input type="hidden" name="inclusion_mode" id="inclusion_mode"
+                                        value="<?php echo $inclusion_mode ?>" />
                                     <div class="ln_solid"></div>
                                     <div style='text-align:center'>
 
@@ -226,19 +233,6 @@
 
 
                     <script>
-                        /*
-                        function validate_screen() {
-                            if ($('#decision').val() == 'excluded' && $('#criteria_ex').val() == '') {
-                                    alert("You must select an exclusion criteria");
-                                    return false;
-                                } else if ($('#decision').val()=='accepted' && $('#criteria_in').val() == '') {                                    
-                                    alert("You must select an inclusion criteria");
-                                    return false;
-                                }
-                                return true;
-                            }
-                            */
-
                         function validate_screen() {
                             var inclusion_mode = '<? echo $inclusion_mode ?>';
                             if ($('#decision').val() == 'excluded' && $('#criteria_ex').val() == '') {
@@ -250,19 +244,21 @@
                                             break;
                                         case "One" :
                                             if ($('#criteria_in').val() == '') {
-                                                alert("You must select a criterion");
+                                                alert("You must select a criterion.");
                                                 return false;
                                             }
                                             break;
                                         case "Any" :
-                                            if (Array.isArray($('#criteria_in').val())) {
-                                                return true;
-                                            } else {
-                                                alert("At least one inclusion criterion must be met");
+                                            if (!Array.isArray($('#criteria_in').val())) {
+                                                alert("At least one inclusion criterion must be met.");
                                                 return false;
                                             }
-                                        case "All" :
+                                        case "All":
+                                            var allCriteriaCheck = document.getElementById('allCriteriaCheck').checked;
+                                            if (!allCriteriaCheck) {
+                                                alert("All criteria must be met, otherwise exclude this paper.");
                                                 return false;
+                                            } 
                                             break;
                                     }
                                     return true;

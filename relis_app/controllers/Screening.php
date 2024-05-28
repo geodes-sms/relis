@@ -1033,6 +1033,7 @@ class Screening extends CI_Controller
                 'screening_status' => 'Done',
             );
             //print_test($inclusion_criteria); exit;
+            $this->db2->trans_start();
             $res = $this->db2->update('screening_paper', $screening_save, array('screening_id' => $post_arr['screening_id']));
             if ($res == 1) {
                 if (is_array($inclusion_criteria)) {
@@ -1051,6 +1052,12 @@ class Screening extends CI_Controller
                     $res = $this->db2->insert('screen_inclusion_mapping', $criteria_save);
                 }
                 
+            }
+            $this->db2->trans_complete();
+            if ($this->db2->trans_status() === FALSE) {
+                $this->db2->trans_rollback();
+            } else {
+                $this->db2->trans_commit();
             }
             $screen_phase_detail = $this->DBConnection_mdl->get_row_details('get_screen_phase_detail', $screening_phase, TRUE);
             $screening_phase_last_status = $screen_phase_detail['screen_phase_final'];
