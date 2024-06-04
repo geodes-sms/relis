@@ -1,4 +1,4 @@
-FROM php:7.1-apache-buster
+FROM php:7.3.30-apache-buster
 
 ARG DIRECTORY_INDEX
 ARG DOCUMENT_ROOT
@@ -11,10 +11,11 @@ RUN apt-get autoclean && apt-get update && apt-get install -y \
     ksh \
     unzip \
     zip \
-    git
+    git \
+    libzip-dev
 
 RUN apt-get install -y libicu-dev
-RUN docker-php-ext-install intl mysqli pdo pdo_mysql
+RUN docker-php-ext-install intl mysqli pdo pdo_mysql zip
 
 RUN pecl install xdebug-2.8.0 \
     && docker-php-ext-enable xdebug

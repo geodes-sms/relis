@@ -204,7 +204,6 @@ $db['demo_relis'] = array(
 		'save_queries' => TRUE
 );
 
-
 $db['demoTestProject2'] = array(
 		'dsn'	=> '',
 		'hostname' => 'db',
@@ -226,7 +225,6 @@ $db['demoTestProject2'] = array(
 		'failover' => array(),
 		'save_queries' => TRUE
 );
-
 
 $db['demoTestProject'] = array(
 		'dsn'	=> '',
