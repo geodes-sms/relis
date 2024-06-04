@@ -790,7 +790,8 @@ function get_configuration()
 		'operation_title' => 'Edit screening configurations',
 		'operation_description' => 'Edit screening configurations',
 		'page_title' => 'Edit screening settings ',
-		'save_function' => 'element/save_element',
+		//'save_function' => 'Element/save_element',
+		'save_function' => 'Screening/edit_screening_config',
 		'page_template' => 'general/frm_entity',
 
 		'redirect_after_save' => 'element/display_element/configurations/1',

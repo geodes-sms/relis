@@ -2625,4 +2625,52 @@ class Screening extends CI_Controller
             $interpretation = 'something went wrong...';
         return $interpretation;
     }
+
+    public function edit_screening_config() {
+        $post_arr = $this->input->post();
+        $screening_model = new Screening_dataAccess();
+        $general_screening_completion = $this->get_user_completion(0, active_screening_phase(), 'Screening');
+        $already_screened_papers = $general_screening_completion['papers_done'];
+        $current_inclusion_mode = get_appconfig_element('screening_inclusion_mode');
+        $new_inclusion_mode = $post_arr['screening_inclusion_mode'];
+        
+        if ($new_inclusion_mode != 'None' && $screening_model->count_inclusion_criteria() == 0) {
+            //Criterias must exist for modes other than None
+            set_top_msg('You need to add inclusion criteria before making this change', "error");
+            redirect('element/display_element/configurations/1');
+        }
+        if ($already_screened_papers == 0 || !$this->mode_conflict_exists($current_inclusion_mode, $new_inclusion_mode)) {
+            //Save if no papers already screened or if there is no conflict
+            $screening_model->edit_screening_config($post_arr);
+            $screening_model->update_unique_criteria($post_arr['screening_inclusion_mode']);
+            redirect('element/display_element/configurations/1');
+        } else { 
+            //If screening already started and there is conflict, ask user how to solve it
+            $data['post_arr'] = $post_arr;
+            $data['current_inclusion_mode'] = $current_inclusion_mode;
+            $data['top_buttons'] = get_top_button('back', 'Back', 'manage');
+            $data['left_menu_perspective']='left_menu_screening';
+            $data['project_perspective']='screening';
+            $data['page'] = 'screening/inclusion_mode_conflict';
+            $this->load->view('shared/body', $data);
+        }
+
+    }
+
+    private function mode_conflict_exists($current_mode, $new_mode) {
+        $mode_string = $current_mode . $new_mode;
+        if ($mode_string == 'NoneOne' || $mode_string == 'NoneOne' || $mode_string == 'AnyOne') return true;
+        return false;
+    }
+
+    public function solve_mode_conflict() {
+        $screening_model = new Screening_dataAccess();
+        $post_arr = $this->input->post();
+        $config_array = unserialize($post_arr['config_array']);
+        if (isset($post_arr['reset'])) $screening_model->reset_screening(active_screening_phase());
+        if (isset($post_arr['keep_one'])) $screening_model->keep_one_criterion();
+        $screening_model->update_unique_criteria($post_arr['screening_inclusion_mode']);
+        $screening_model->edit_screening_config($config_array);
+        redirect('element/display_element/configurations/1');
+    }
 }

@@ -163,6 +163,15 @@ function get_config_screen_phase()
 
 	);
 
+	$fields['screen_phase_test'] = array(
+		'field_title' => 'test',
+		'field_type' => 'number',
+		'field_size' => 2,
+		'input_type' => 'text',
+		'mandatory' => ' mandatory '
+
+	);
+
 	$fields['screen_phase_final'] = array(
 		'field_title' => 'Final phase',
 		'field_type' => 'int',

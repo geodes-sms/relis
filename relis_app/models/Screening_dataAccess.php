@@ -104,4 +104,80 @@ class Screening_dataAccess extends CI_Model
         $all_validations = $this->db_current->query($sql)->result_array();
         return $all_validations;
     }
+
+    function edit_screening_config($config) {
+        $this->db2 = $this->load->database(project_db(), TRUE);
+        /*$query = $this->db->query("CALL update_config_screening("
+            . $config['config_id'] . ","
+            . $config['config_id'] . ","
+            . $config['screening_on'] . ","
+            . $config['screening_result_on'] . ","
+            . $config['assign_papers_on'] . ","
+            . $config['screening_reviewer_number'] . ","
+            . $config['screening_inclusion_mode'] . ","
+            . $config['screening_conflict_type'] . ","
+            . $config['screening_screening_conflict_resolution'] . ","
+            . $config['use_kappa'] . ","
+            . $config['screening_validation_on'] . ","
+            . $config['screening_validator_assignment_type'] . ","
+            . $config['validation_default_percentage'] . ","
+        )");*/
+        $config_save = array(
+            'screening_on' => $config['screening_on'],
+            'screening_result_on' => $config['screening_result_on'],
+            'assign_papers_on' => $config['assign_papers_on'],
+            'screening_reviewer_number' => $config['screening_reviewer_number'],
+            'screening_inclusion_mode' => $config['screening_inclusion_mode'],
+            'screening_conflict_type' => $config['screening_conflict_type'],
+            'screening_screening_conflict_resolution' => $config['screening_screening_conflict_resolution'],
+            'use_kappa' => $config['use_kappa'],
+            'screening_validation_on' => $config['screening_validation_on'],
+            'screening_validator_assignment_type' => $config['screening_validator_assignment_type'],
+            'validation_default_percentage' => $config['validation_default_percentage']
+        );
+        return $res = $this->db2->update('config', $config_save, array('config_id' => $config['config_id']));
+    }
+
+    function reset_screening($screening_phase = null) {
+        $sql = 'UPDATE screening_paper SET screening_status = "Reseted"' . ($screening_phase != '' ? ' WHERE screening_phase=' . $screening_phase : '');
+        return $this->db_current->query($sql);
+    }
+
+    function keep_one_criterion() {
+        $sql = '
+        DELETE FROM screen_inclusion_mapping
+        WHERE (screening_id, criteria_id) IN (
+            SELECT screening_id, criteria_id
+            FROM (
+                SELECT 
+                    screening_id, 
+                    criteria_id,
+                    ROW_NUMBER() OVER(PARTITION BY screening_id ORDER BY criteria_id) AS row_num
+                FROM screen_inclusion_mapping
+            ) AS subquery
+            WHERE row_num > 1
+        );
+        ';
+        return $this->db_current->query($sql);
+    }
+
+    function count_inclusion_criteria() {
+        $sql = 'SELECT COUNT(*) AS count FROM ref_inclusioncriteria where ref_active=1';
+        return $this->db_current->query($sql)->row()->count;
+    }
+
+    function update_unique_criteria($inclusion_mode) {
+        $sql = $inclusion_mode == 'One' ? '
+        IF NOT EXISTS (
+            SELECT *
+            FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+            WHERE CONSTRAINT_NAME = "unique_criteria" AND TABLE_NAME = "screen_inclusion_mapping"
+        ) THEN
+            ALTER TABLE screen_inclusion_mapping
+            ADD CONSTRAINT unique_criteria UNIQUE (screening_id);
+        END IF;
+        '
+        : 'ALTER TABLE screen_inclusion_mapping DROP CONSTRAINT IF EXISTS unique_criteria';
+        $this->db_current->query($sql);
+    }
 }
