@@ -339,7 +339,8 @@ $config['mail_from']        = "example@gmail.com";
 $config['mail_reply_to']    = "example@gmail.com";
 
 $config['sess_save_path'] = "/u/relis/public_html/cside/sessions";
-$config['base_url'] = "http://localhost:8083";
+$config['base_url'] = "http://relist.iro.umontreal.ca";
 $config['project_db_user'] = "root";
-$config['project_db_host'] = "db";
+$config['project_db_host'] = "relis_db";
 $config['project_db_pass'] = "";
+$config['editor_url'] = $config['base_url'] ."/relis/texteditor";
