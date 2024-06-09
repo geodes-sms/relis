@@ -1027,7 +1027,7 @@ class Screening extends CI_Controller
                 'screening_note' => $post_arr['note'],
                 'screening_decision' => $screening_decision,
                 'screening_id' => $post_arr['screening_id'],
-                //'exclusion_criteria' => $exclusion_criteria,
+                'exclusion_criteria' => $exclusion_criteria,
                 //'inclusion_criteria' => $inclusion_criteria,
                 'screening_time' => bm_current_time('Y-m-d H:i:s'),
                 'screening_status' => 'Done',
@@ -1636,7 +1636,6 @@ class Screening extends CI_Controller
         $res_screening['all_criteria'] = 0;
         $res_screening['all_criteria_two'] = 0;
         $key = 0;
-        //	print_test($screenings);
         foreach ($screenings['list'] as $key => $value) {
             $res_screening['total']++;
             if (empty($res_screening['users'][$value['user_id']][$value['screening_decision']])) {
@@ -1665,23 +1664,23 @@ class Screening extends CI_Controller
             }
             // inclusion criteria
             if ($value['screening_decision'] == 'Included' and !empty($value['inclusion_criteria'])) {
-                if (empty($res_screening['in_criteria'][$value['inclusion_criteria']])) {
-                    //	echo "<p>bbb</p>";
-                    $res_screening['in_criteria'][$value['inclusion_criteria']] = 1;
-                } else {
-                    //	echo "<p>cccc</p>";
-                    $res_screening['in_criteria'][$value['inclusion_criteria']] = $res_screening['in_criteria'][$value['inclusion_criteria']] + 1;
-                }
-                $res_screening['all_criteria_two']++;
-                //critérias per user
-                if (empty($res_screening['users'][$value['user_id']]['in_criteria'][$value['inclusion_criteria']])) {
-                    //	echo "<p>bbb</p>";
-                    $res_screening['users'][$value['user_id']]['in_criteria'][$value['inclusion_criteria']] = 1;
-                } else {
-                    //	echo "<p>cccc</p>";
-                    $res_screening['users'][$value['user_id']]['in_criteria'][$value['inclusion_criteria']] = $res_screening['users'][$value['user_id']]['in_criteria'][$value['inclusion_criteria']] + 1;
+                $criteria_arr = json_decode($value['inclusion_criteria'], true);
+                foreach ($criteria_arr as $criteria) {
+                    if (empty($res_screening['in_criteria'][$criteria])) {
+                        $res_screening['in_criteria'][$criteria] = 1;
+                    } else {
+                        $res_screening['in_criteria'][$criteria] = $res_screening['in_criteria'][$criteria] + 1;
+                    }
+                    $res_screening['all_criteria_two']++;
+                    // Criteria per user
+                    if (empty($res_screening['users'][$value['user_id']]['in_criteria'][$criteria])) {
+                        $res_screening['users'][$value['user_id']]['in_criteria'][$criteria] = 1;
+                    } else {
+                        $res_screening['users'][$value['user_id']]['in_criteria'][$criteria] = $res_screening['users'][$value['user_id']]['in_criteria'][$criteria] + 1;
+                    }
                 }
             }
+            
         }
         //  list to be displayed for  result per user
         $result_per_user = array();
@@ -2659,7 +2658,7 @@ class Screening extends CI_Controller
 
     private function mode_conflict_exists($current_mode, $new_mode) {
         $mode_string = $current_mode . $new_mode;
-        if ($mode_string == 'NoneOne' || $mode_string == 'NoneOne' || $mode_string == 'AnyOne') return true;
+        if ($mode_string == 'NoneOne' || $mode_string == 'NoneAny' || $mode_string == 'AnyOne') return true;
         return false;
     }
 

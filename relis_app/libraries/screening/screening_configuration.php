@@ -477,7 +477,7 @@ function get_screening()
 
 
 		),
-
+	
 		'order_by' => 'screening_id ASC ',
 		'order_by' => 'screening_time DESC ',
 		//'search_by'=>'project_title',

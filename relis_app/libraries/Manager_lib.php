@@ -34,7 +34,6 @@ class Manager_lib
 	*/
 	function get_reference_select_values($config, $start_with_empty = True, $get_leaf = False, $multiselect = False, $filter = array())
 	{
-
 		$conf = explode(";", $config);
 		//	print_test($conf);
 		$ref_table = $conf[0];
@@ -43,7 +42,6 @@ class Manager_lib
 		//for_array
 
 		if ($get_leaf) {
-
 			while (!empty($ref_table_config['fields'][$fields]['input_type']) and $ref_table_config['fields'][$fields]['input_type'] == 'select' and $ref_table_config['fields'][$fields]['input_select_source'] == 'table') {
 
 				$config = $ref_table_config['fields'][$fields]['input_select_values'];
@@ -60,266 +58,265 @@ class Manager_lib
 		}
 
 		if ($multiselect and isset($ref_table_config['fields'][$fields]['input_select_source']) and $ref_table_config['fields'][$fields]['input_select_source'] == 'array') {
-
 			$result = array();
-
-
-
+			
+			
+			
 			$result = $ref_table_config['fields'][$fields]['input_select_values'];
-
-
+			
+			
 			//print_test($result);
 			//exit;
-		} else {
-
-			if ($multiselect and isset($ref_table_config['fields'][$fields]['input_select_source']) and $ref_table_config['fields'][$fields]['input_select_source'] == 'table') {
-
-				$config = $ref_table_config['fields'][$fields]['input_select_values'];
-
-				$conf = explode(";", $config);
-				//print_test($conf);
-				$ref_table = $conf[0];
-				$fields = $conf[1];
-				$ref_table_config = get_table_configuration($ref_table);
-
-
-
-			}
-
-			$extra_condition = "";
-
-			//Pour les dipendantdynamiccategory ajouter une condition pour les enregistrements relatifs à cet element	
-			if (!empty($filter) and !empty($ref_table_config['fields'][$filter['filter_field']])) {
-				$extra_condition = " AND  " . $filter['filter_field'] . " = '" . $filter['filter_value'] . "'";
-			}	
-			$res = $this->CI->DBConnection_mdl->get_reference_select_values($ref_table_config, $fields, $extra_condition);
-			//print_test($res);	
-			$result = array();
-			if ($res and $start_with_empty)
-				$result[''] = "Select...";
-
-			$_stable_config = $ref_table_config;
-			$_fields = $fields;
-			foreach ($res as $key => $value) {
-
-				$ref_table_config = $_stable_config;
-				$fields = $_fields;
-				//print_test($ref_table_config);
-				$result[$value['refId']] = $value['refDesc'];
-
-
-
-				while (!empty($ref_table_config['fields'][$fields]['input_type']) and $ref_table_config['fields'][$fields]['input_type'] == 'select' and $ref_table_config['fields'][$fields]['input_select_source'] == 'table') {
-					//	echo "<h1>bbbb</h1>";
-					//print_test($result);
-
+			} else {
+				
+				if ($multiselect and isset($ref_table_config['fields'][$fields]['input_select_source']) and $ref_table_config['fields'][$fields]['input_select_source'] == 'table') {
+					
 					$config = $ref_table_config['fields'][$fields]['input_select_values'];
-
+					
 					$conf = explode(";", $config);
-
+					//print_test($conf);
 					$ref_table = $conf[0];
 					$fields = $conf[1];
 					$ref_table_config = get_table_configuration($ref_table);
-
-
-					$res2 = $this->CI->manage_mdl->get_reference_value($ref_table_config['table_name'], $value['refDesc'], $fields, $ref_table_config['table_id']);
-
-					$result[$value['refId']] = $res2;
-
-
-				}
-
-
-				if (isset($ref_table_config['fields'][$fields]['input_select_source'])) {
-					$source = $ref_table_config['fields'][$fields]['input_select_source'];
-
-					if ($source == 'array') {
-						$select_values = $ref_table_config['fields'][$fields]['input_select_values'];
-					} elseif ($source == 'yes_no') {
-						$select_values = array(0 => 'No', 1 => 'Yes');
+					
+					
+					
 					}
-
-					if (!empty($select_values[$result[$value['refId']]]))
-						$result[$value['refId']] = $select_values[$result[$value['refId']]];
-				}
-
-
-
-			}
-
-		}
-		//print_test($result);
-		return $result;
-
-
-	}
-
-	//old version of get_reference_select_values
-	function get_reference_select_values_old($config, $start_with_empty = True, $get_leaf = False, $multiselect = False)
-	{
-
-		$conf = explode(";", $config);
-		//print_test($conf);
-		$ref_table = $conf[0];
-		$fields = $conf[1];
-		$ref_table_config = get_table_config($ref_table);
-		//for_array
-
-		if ($get_leaf) {
-
-			while (!empty($ref_table_config['fields'][$fields]['input_type']) and $ref_table_config['fields'][$fields]['input_type'] == 'select' and $ref_table_config['fields'][$fields]['input_select_source'] == 'table') {
-
-				$config = $ref_table_config['fields'][$fields]['input_select_values'];
-
-				$conf = explode(";", $config);
-				//print_test($conf);
-				$ref_table = $conf[0];
-				$fields = $conf[1];
-				$ref_table_config = get_table_config($ref_table);
-
-
-				//echo "<h1>$fields</h1>";
-			}
-		}
-
-		if ($multiselect and isset($ref_table_config['fields'][$fields]['input_select_source']) and $ref_table_config['fields'][$fields]['input_select_source'] == 'array') {
-
-			$result = array();
-
-
-
-			$result = $ref_table_config['fields'][$fields]['input_select_values'];
-
-
-			//print_test($result);
-			//exit;
-		} else {
-
-			if ($multiselect and isset($ref_table_config['fields'][$fields]['input_select_source']) and $ref_table_config['fields'][$fields]['input_select_source'] == 'table') {
-
-				$config = $ref_table_config['fields'][$fields]['input_select_values'];
-
-				$conf = explode(";", $config);
-				//print_test($conf);
-				$ref_table = $conf[0];
-				$fields = $conf[1];
-				$ref_table_config = get_table_config($ref_table);
-
-
-
-			}
-
-			//	$extra_condition="";
-
-
-
-			$res = $this->CI->DBConnection_mdl->get_reference_select_values($ref_table_config, $fields);
-
-			$result = array();
-			if ($res and $start_with_empty)
-				$result[''] = "Select...";
-
-			$_stable_config = $ref_table_config;
-			$_fields = $fields;
-			foreach ($res as $key => $value) {
-
-				$ref_table_config = $_stable_config;
-				$fields = $_fields;
-				//print_test($ref_table_config);
-				$result[$value['refId']] = $value['refDesc'];
-
-
-
-				while (!empty($ref_table_config['fields'][$fields]['input_type']) and $ref_table_config['fields'][$fields]['input_type'] == 'select' and $ref_table_config['fields'][$fields]['input_select_source'] == 'table') {
-					//	echo "<h1>bbbb</h1>";
-					//print_test($result);
-
-					$config = $ref_table_config['fields'][$fields]['input_select_values'];
-
-					$conf = explode(";", $config);
-
-					$ref_table = $conf[0];
-					$fields = $conf[1];
-					$ref_table_config = get_table_config($ref_table);
-
-
-					$res2 = $this->CI->manage_mdl->get_reference_value($ref_table_config['table_name'], $value['refDesc'], $fields, $ref_table_config['table_id']);
-
-					$result[$value['refId']] = $res2;
-
-
-				}
-
-
-				if (isset($ref_table_config['fields'][$fields]['input_select_source']) and $ref_table_config['fields'][$fields]['input_select_source'] == 'array') {
-
-					$select_values = $ref_table_config['fields'][$fields]['input_select_values'];
-
-					$result[$value['refId']] = $select_values[$result[$value['refId']]];
-
-				}
-
-
-
-			}
-
-		}
-		//print_test($result);
-		return $result;
-
-
-	}
-
-
-	/*
-		facilitates the retrieval of multiple values from a reference table based on a configuration and a specific element
-	*/
-	function get_element_multi_values($config, $key_field, $element_id, $display_field = False)
-	{
-		$Tvalues_source = explode(';', $config);
-
-		$source_table_config = get_table_configuration($Tvalues_source[0]);
-		if ($display_field)
-			$display_field = $Tvalues_source[1];
-		else
-			$display_field = $source_table_config['table_id'];
-
-		$extra_condition = " AND $key_field ='" . $element_id . "'";
-
-		$res_values = $this->CI->DBConnection_mdl->get_reference_select_values($source_table_config, $display_field, $extra_condition);
-
-
-		$results = array();
-
-		foreach ($res_values as $value) {
-			array_push($results, $value['refDesc']);
-		}
-		return $results;
-	}
-
-	/*
-	 * Fonction pour afficher une ligne d'une table avec remplacement des clès externes par leurs correspondances
-	 */
-	function get_element_detail($ref_table, $ref_id, $editable = False, $modal_link = False)
-	{
-		//old_version();
-		//récuperation de la configuration de l'entité
-		$table_config = get_table_config($ref_table);
-
-
-
-
-		$dropoboxes = array();
-
-		// récupération des valeurs pour les champs avec la clé enregistre dans la table (pour pouvoir afficher le label)
-		foreach ($table_config['fields'] as $k => $v) {
-
-			//Rechercher pour les champs qu'on afficher seulement
-
-			if (!empty($v['input_type']) and $v['input_type'] == 'select' and !(isset($v['on_view']) and $v['on_view'] == 'hidden')) {
-				if ($v['input_select_source'] == 'array') {
-					$dropoboxes[$k] = $v['input_select_values'];
-				} elseif ($v['input_select_source'] == 'yes_no') {
+					
+					$extra_condition = "";
+					
+					//Pour les dipendantdynamiccategory ajouter une condition pour les enregistrements relatifs à cet element	
+					if (!empty($filter) and !empty($ref_table_config['fields'][$filter['filter_field']])) {
+						$extra_condition = " AND  " . $filter['filter_field'] . " = '" . $filter['filter_value'] . "'";
+						}	
+						$res = $this->CI->DBConnection_mdl->get_reference_select_values($ref_table_config, $fields, $extra_condition);
+						//print_test($res);	
+						$result = array();
+						if ($res and $start_with_empty)
+						$result[''] = "Select...";
+					
+					$_stable_config = $ref_table_config;
+					$_fields = $fields;
+					
+					foreach ($res as $key => $value) {
+						
+						$ref_table_config = $_stable_config;
+						$fields = $_fields;
+						//print_test($ref_table_config);
+						$result[$value['refId']] = $value['refDesc'];
+						
+						
+						
+						while (!empty($ref_table_config['fields'][$fields]['input_type']) and $ref_table_config['fields'][$fields]['input_type'] == 'select' and $ref_table_config['fields'][$fields]['input_select_source'] == 'table') {
+							//	echo "<h1>bbbb</h1>";
+							//print_test($result);
+							
+							$config = $ref_table_config['fields'][$fields]['input_select_values'];
+							
+							$conf = explode(";", $config);
+							
+							$ref_table = $conf[0];
+							$fields = $conf[1];
+							$ref_table_config = get_table_configuration($ref_table);
+							
+							
+							$res2 = $this->CI->manage_mdl->get_reference_value($ref_table_config['table_name'], $value['refDesc'], $fields, $ref_table_config['table_id']);
+							
+							$result[$value['refId']] = $res2;
+							
+							
+							}
+							
+							
+							if (isset($ref_table_config['fields'][$fields]['input_select_source'])) {
+								$source = $ref_table_config['fields'][$fields]['input_select_source'];
+								
+								if ($source == 'array') {
+									$select_values = $ref_table_config['fields'][$fields]['input_select_values'];
+									} elseif ($source == 'yes_no') {
+										$select_values = array(0 => 'No', 1 => 'Yes');
+										}
+										
+										if (!empty($select_values[$result[$value['refId']]]))
+										$result[$value['refId']] = $select_values[$result[$value['refId']]];
+								}
+								
+								
+								
+								}
+								
+								}
+								return $result;
+								
+								
+								}
+								
+								//old version of get_reference_select_values
+								function get_reference_select_values_old($config, $start_with_empty = True, $get_leaf = False, $multiselect = False)
+								{
+									
+									$conf = explode(";", $config);
+									//print_test($conf);
+									$ref_table = $conf[0];
+									$fields = $conf[1];
+									$ref_table_config = get_table_config($ref_table);
+									//for_array
+									
+									if ($get_leaf) {
+										
+										while (!empty($ref_table_config['fields'][$fields]['input_type']) and $ref_table_config['fields'][$fields]['input_type'] == 'select' and $ref_table_config['fields'][$fields]['input_select_source'] == 'table') {
+											
+											$config = $ref_table_config['fields'][$fields]['input_select_values'];
+											
+											$conf = explode(";", $config);
+											//print_test($conf);
+											$ref_table = $conf[0];
+											$fields = $conf[1];
+											$ref_table_config = get_table_config($ref_table);
+											
+											
+											//echo "<h1>$fields</h1>";
+											}
+											}
+											
+											if ($multiselect and isset($ref_table_config['fields'][$fields]['input_select_source']) and $ref_table_config['fields'][$fields]['input_select_source'] == 'array') {
+												
+												$result = array();
+												
+												
+												
+												$result = $ref_table_config['fields'][$fields]['input_select_values'];
+												
+												
+												//print_test($result);
+												//exit;
+												} else {
+													
+													if ($multiselect and isset($ref_table_config['fields'][$fields]['input_select_source']) and $ref_table_config['fields'][$fields]['input_select_source'] == 'table') {
+														
+														$config = $ref_table_config['fields'][$fields]['input_select_values'];
+														
+														$conf = explode(";", $config);
+														//print_test($conf);
+														$ref_table = $conf[0];
+														$fields = $conf[1];
+														$ref_table_config = get_table_config($ref_table);
+														
+														
+														
+														}
+														
+														//	$extra_condition="";
+														
+														
+														
+														$res = $this->CI->DBConnection_mdl->get_reference_select_values($ref_table_config, $fields);
+														
+														$result = array();
+														if ($res and $start_with_empty)
+														$result[''] = "Select...";
+													
+													$_stable_config = $ref_table_config;
+													$_fields = $fields;
+													foreach ($res as $key => $value) {
+														
+														$ref_table_config = $_stable_config;
+														$fields = $_fields;
+														//print_test($ref_table_config);
+														$result[$value['refId']] = $value['refDesc'];
+														
+														
+														
+														while (!empty($ref_table_config['fields'][$fields]['input_type']) and $ref_table_config['fields'][$fields]['input_type'] == 'select' and $ref_table_config['fields'][$fields]['input_select_source'] == 'table') {
+															//	echo "<h1>bbbb</h1>";
+															//print_test($result);
+															
+															$config = $ref_table_config['fields'][$fields]['input_select_values'];
+															
+															$conf = explode(";", $config);
+															
+															$ref_table = $conf[0];
+															$fields = $conf[1];
+															$ref_table_config = get_table_config($ref_table);
+															
+															
+															$res2 = $this->CI->manage_mdl->get_reference_value($ref_table_config['table_name'], $value['refDesc'], $fields, $ref_table_config['table_id']);
+															
+															$result[$value['refId']] = $res2;
+															
+															
+															}
+															
+															
+															if (isset($ref_table_config['fields'][$fields]['input_select_source']) and $ref_table_config['fields'][$fields]['input_select_source'] == 'array') {
+																
+																$select_values = $ref_table_config['fields'][$fields]['input_select_values'];
+																
+																$result[$value['refId']] = $select_values[$result[$value['refId']]];
+																
+																}
+																
+																
+																
+																}
+																
+																}
+																//print_test($result);
+																return $result;
+																
+																
+																}
+																
+																
+																/*
+																facilitates the retrieval of multiple values from a reference table based on a configuration and a specific element
+																*/
+																function get_element_multi_values($config, $key_field, $element_id, $display_field = False)
+																{
+																	$Tvalues_source = explode(';', $config);
+																	
+																	$source_table_config = get_table_configuration($Tvalues_source[0]);
+																	if ($display_field)
+																	$display_field = $Tvalues_source[1];
+																else
+																$display_field = $source_table_config['table_id'];
+															
+															$extra_condition = " AND $key_field ='" . $element_id . "'";
+															
+															$res_values = $this->CI->DBConnection_mdl->get_reference_select_values($source_table_config, $display_field, $extra_condition);
+															
+															
+															$results = array();
+															
+															foreach ($res_values as $value) {
+																array_push($results, $value['refDesc']);
+																}
+																return $results;
+																}
+																
+																/*
+																* Fonction pour afficher une ligne d'une table avec remplacement des clès externes par leurs correspondances
+																*/
+																function get_element_detail($ref_table, $ref_id, $editable = False, $modal_link = False)
+																{
+																	//old_version();
+																	//récuperation de la configuration de l'entité
+																	$table_config = get_table_config($ref_table);
+																	
+																	
+																	
+																	
+																	$dropoboxes = array();
+																	
+																	// récupération des valeurs pour les champs avec la clé enregistre dans la table (pour pouvoir afficher le label)
+																	foreach ($table_config['fields'] as $k => $v) {
+																		
+																		//Rechercher pour les champs qu'on afficher seulement
+																		
+																		if (!empty($v['input_type']) and $v['input_type'] == 'select' and !(isset($v['on_view']) and $v['on_view'] == 'hidden')) {
+																			if ($v['input_select_source'] == 'array') {
+																				$dropoboxes[$k] = $v['input_select_values'];
+																				} elseif ($v['input_select_source'] == 'yes_no') {
 					$dropoboxes[$k] = array(
 						0 => 'No',
 						1 => 'Yes'

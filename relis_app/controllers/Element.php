@@ -1178,7 +1178,7 @@ class Element extends CI_Controller
         $ref_table_config['current_operation'] = $ref_table_operation;
         //		 Fetching and storing the data from venue table into $data variable
         $data = $this->DBConnection_mdl->get_list_mdl($ref_table_config, $val, $page, $rec_per_page);
-        //	print_test($data);
+        
         /*
          * récupération des correspondances des clés externes pour l'affichage  suivant la structure de la table
          * retrieval of the correspondences of the external keys for display according to the structure of the table
@@ -1288,17 +1288,23 @@ class Element extends CI_Controller
         $i = 1;
         $list_to_display = array();
         foreach ($data['list'] as $key => $value) {
-            //print_test($value);
             $element_array = array();
             $element_array['links'] = '';
             foreach ($field_list as $key_field => $v_field) {
-                //print_test($v_field);
                 if (isset($value[$v_field])) {
+                    if ($v_field == 'inclusion_criteria') {
+                        $criteria_id_arr = json_decode($value[$v_field]);
+                        $criteria_arr = array();
+                        foreach ($criteria_id_arr as $criteria_id) {
+                            array_push($criteria_arr, $dropoboxes[$v_field][$criteria_id]);
+                        }
+                        $element_array[$v_field] = $criteria_arr;
+                    } else 
                     if (isset($dropoboxes[$v_field][$value[$v_field]])) {
                         $element_array[$v_field] = $dropoboxes[$v_field][$value[$v_field]];
-                    } elseif (empty($value[$v_field]) and empty($ref_table_config['fields'][$v_field]['display_null'])) {
-                        $element_array[$v_field] = "";
-                    } else {
+                        } elseif (empty($value[$v_field]) and empty($ref_table_config['fields'][$v_field]['display_null'])) {
+                            $element_array[$v_field] = "";
+                            } else {
                         $element_array[$v_field] = $value[$v_field];
                     }
                 } else {
@@ -1322,11 +1328,11 @@ class Element extends CI_Controller
                     }
                 }
                 if (!empty($link_field_list[$v_field]))
-                    $element_array[$v_field] = string_anchor(
-                        $link_field_list[$v_field]['link']['url'] . $value[$link_field_list[$v_field]['link']['id_field']],
-                        $element_array[$v_field],
-                        $link_field_list[$v_field]['link']['trim']
-                    );
+                $element_array[$v_field] = string_anchor(
+            $link_field_list[$v_field]['link']['url'] . $value[$link_field_list[$v_field]['link']['id_field']],
+            $element_array[$v_field],
+            $link_field_list[$v_field]['link']['trim']
+            );
             }
             //print_test($element_array);
             /*
@@ -1371,6 +1377,7 @@ class Element extends CI_Controller
             array_push($list_to_display, $element_array);
             $i++;
         }
+        
         $data['list'] = $list_to_display;
         /*
          * Ajout de l'entête de la liste

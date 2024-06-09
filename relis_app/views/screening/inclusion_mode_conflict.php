@@ -30,7 +30,7 @@
                   <div style='text-align:center'>
                   <h2>
                     Changing inclusion mode from <b>'<? echo $current_inclusion_mode ?>'</b> to <b>'<? echo $post_arr['screening_inclusion_mode'] ?>'</b>
-                    rises conflict in database. How would you like to proceed ?
+                    raises a conflict in already screened papers. How would you like to proceed ?
                     <br>
                   
                   <?php
@@ -39,21 +39,23 @@
                     $conflict_name = $current_inclusion_mode . $post_arr['screening_inclusion_mode'];
                     switch($conflict_name) {
                       case 'NoneOne' :
-                          echo ' <br> You can choose to either reset the screening for all papers or continue with possible inconsistencies. <br><br>'; 
-                          echo '<button class="btn  btn-lg" type="submit" name="reset">Reset Screening</button>';
-                          echo '<button class="btn  btn-lg" type="submit" name="no_reset">Do not reset screening</button>';
+                          echo ' <br> You may choose to restart the screening from scratch or assign default criteria to the already sreened papers. <br><br>'; 
+                          echo '<button class="btn  btn-success btn-lg" type="submit" name="reset">Restart Screening</button>';
+                          echo '<button class="btn  btn-danger btn-lg" type="submit" name="no_reset">Proceed with default criterion</button>';
                         break;
                       case 'NoneAny' :
-                        echo ' <br> You can choose to either reset the screening for all papers or continue with possible inconsistencies. <br><br>'; 
-                          echo '<button class="btn  btn-lg" type="submit" name="reset">Reset Screening</button>';
-                          echo '<button class="btn  btn-lg" type="submit" name="no_reset">Do not reset screening</button>';
+                        echo ' <br> You may choose to restart the screening from scratch or assign default criteria to the already sreened papers. <br><br>'; 
+                          echo '<button class="btn  btn-success btn-lg" type="submit" name="reset">Restart Screening</button>';
+                          echo '<button class="btn  btn-danger btn-lg" type="submit" name="no_reset">Proceed with default criterion</button>';
                         break;
                       case 'AnyOne' :
-                        echo ' <br> You may choose to reset the screening, or keep the first criterion only. <br><br>'; 
-                          echo '<button class="btn  btn-lg" type="submit" name="reset">Reset Screening</button>';
-                          echo '<button class="btn  btn-lg" type="submit" name="keep_one">Keep first criterion</button>';
+                        echo ' <br> You may choose to restart the screening from scratch or let ReLiS keep one criterion at random for already screened papers. <br><br>'; 
+                          echo '<button class="btn  btn-success btn-lg" type="submit" name="reset">Restart Screening</button>';
+                          echo '<button class="btn  btn-danger btn-lg" type="submit" name="keep_one">Proceed with one criterion</button>';
                         break;
                     }
+                    echo '<br><br>';
+                    echo '<a href="javascript:history.go(-1)" title="Back"><button class="btn">Cancel</button></a>';
                   ?>
                   <input type="hidden" name="config_array" id="config_array" value="<? echo htmlspecialchars(serialize($post_arr)) ?>">
                   </h2>

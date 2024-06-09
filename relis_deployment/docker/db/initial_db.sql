@@ -516,7 +516,7 @@ articles','ReLiS allows you to manually add references or import a list from CSV
                         <li><code>string</code> is a one-line text.</li>\r\n
                         <li><code>text</code> for multi-line text.</li>\r\n
                         <li><code>date</code> for a date displayed as a calendar.</li>\r\n </ul>\r\n </dd>\r\n<dt><code>max</code></dt>\r\n
-                <dd>The maximum number of characters the value can have.</dd>\r\n<dt><code>pattern</code></dt>\r\n
+                <dd>The maximum number of characters the value can have. </dd>\r\n<dt><code>pattern</code></dt>\r\n
                 <dd>A regular expression to limit the possible values allowed. <a href=\ "https://www.w3schools.com/jsref/jsref_obj_regexp.asp\" style=\ "text-decoration: underline;\">Click here for more information</a>. The <code>style(\"pattern\")</code>                    is optional.</dd>\r\n<dt><code>default_value</code></dt>\r\n
                 <dd>A default value that will appear in the initial data extraction form. It must be between square brackets and quotation marks. It must also be in the correct format depending on <code>type</code>, <code>max</code> and <code>pattern</code>.
                     The <code>[\"default_value\"]</code> is optional.</dd>\r\n</dl>\r\n

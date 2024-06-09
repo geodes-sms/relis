@@ -766,10 +766,8 @@ class DBConnection_mdl extends CI_Model
 			$data = $this->db2->query("CALL " . $stored_procedure . "(" . $page . "," . $rec_per_page . ",'" . $search . "' " . $extra_parameters . ") ");
 			mysqli_next_result($this->db2->conn_id);
 		}
-
 		$result['list'] = $data->result_array();
-
-
+		
 		return $result;
 
 	}

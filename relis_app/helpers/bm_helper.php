@@ -1619,7 +1619,6 @@ function get_paper_screen_status_new($paper_id, $screening_phase = "", $return =
 	$criteria2 = $ci->manager_lib->get_reference_select_values('inclusioncriteria;ref_value');
 
 
-
 	///-------
 
 
