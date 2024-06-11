@@ -304,3 +304,16 @@ if ( ! function_exists('repeater'))
 		return ($num > 0) ? str_repeat($data, $num) : '';
 	}
 }
+
+if (! function_exists('endsWith')) {
+	/**
+	 * Check if a string ends with a specific string
+	 *
+	 * @param string $haystack
+	 * @param string $needle
+	 * @return bool
+	 */
+	function endsWith($haystack, $needle) {
+		return substr_compare($haystack, $needle, -strlen($needle)) === 0;
+	}
+}

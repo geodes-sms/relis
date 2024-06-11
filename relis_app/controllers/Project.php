@@ -22,6 +22,8 @@
  * 
  */
 
+use function PHPSTORM_META\type;
+
 if (!defined('BASEPATH'))
     exit('No direct script access allowed');
 
@@ -166,34 +168,63 @@ class Project extends CI_Controller
         $dir = get_adminconfig_element('editor_generated_path');
         $editor_url = get_adminconfig_element('editor_url');
         $Tprojects = array();
-        if (is_dir($dir)) {
-            $files = array_diff(scandir($dir), array('.', '..', ".metadata"));
-            //print_test($files);
-            foreach ($files as $key => $file) {
-                if (is_dir($dir . $path_separator . $file)) {
-                    $project_dir = $dir . $path_separator . $file;
-                    $Tprojects[$file] = array();
-                    $Tprojects[$file]['dir'] = $project_dir;
-                    $Tprojects[$file]['syntax'] = array();
-                    $Tprojects[$file]['generated'] = array();
-                    //syntax
-                    $project_content = array_diff(scandir($project_dir), array('.', '..', ".metadata"));
-                    foreach ($project_content as $key => $value_c) {
-                        if (!is_dir($project_dir . $path_separator . $value_c)) {
-                            array_push($Tprojects[$file]['syntax'], $value_c);
-                        } elseif ($value_c == 'src-gen') {
-                            $project_content_gen = array_diff(scandir($project_dir . $path_separator . 'src-gen'), array('.', '..', ".metadata"));
-                            foreach ($project_content_gen as $key_g => $value_g) {
-                                if (!is_dir($project_dir . $path_separator . 'src-gen' . $path_separator . $value_g)) {
-                                    array_push($Tprojects[$file]['generated'], $value_g);
-                                }
-                            }
-                        }
-                    }
+        // if (is_dir($dir)) {
+        //     $files = array_diff(scandir($dir), array('.', '..', ".metadata"));
+        //     //print_test($files);
+        //     foreach ($files as $key => $file) {
+        //         if (is_dir($dir . $path_separator . $file)) {
+        //             $project_dir = $dir . $path_separator . $file;
+        //             $Tprojects[$file] = array();
+        //             $Tprojects[$file]['dir'] = $project_dir;
+        //             $Tprojects[$file]['syntax'] = array();
+        //             $Tprojects[$file]['generated'] = array();
+        //             //syntax
+        //             $project_content = array_diff(scandir($project_dir), array('.', '..', ".metadata"));
+        //             foreach ($project_content as $key => $value_c) {
+        //                 if (!is_dir($project_dir . $path_separator . $value_c)) {
+        //                     array_push($Tprojects[$file]['syntax'], $value_c);
+        //                 } elseif ($value_c == 'src-gen') {
+        //                     $project_content_gen = array_diff(scandir($project_dir . $path_separator . 'src-gen'), array('.', '..', ".metadata"));
+        //                     foreach ($project_content_gen as $key_g => $value_g) {
+        //                         if (!is_dir($project_dir . $path_separator . 'src-gen' . $path_separator . $value_g)) {
+        //                             array_push($Tprojects[$file]['generated'], $value_g);
+        //                         }
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
+
+        // Curl Request to get the list of projects
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, tomcat_api_url() . '/list_projects');
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $projects_list = curl_exec($ch);
+        if (curl_error($ch) ){
+           print_test(curl_error($ch));
+        }
+        else{
+            $projects_list = curl_exec($ch);
+            $Tprojects = json_decode($projects_list, true);
+        }
+        // Format the list of projects for View to display
+        $final_projects = array();
+        foreach ($Tprojects as $key => $value) {
+            $final_projects[$key]['dir'] = $key;
+            $final_projects[$key]['generated'] = array();
+            if (!empty($value)) {
+                foreach ($value as $key_c => $value_c) {
+                    array_push($final_projects[$key]['generated'], $value_c);
                 }
             }
+            else{
+                $final_projects[$key]['generated'] = array();   
+            }
         }
-        $data['project_result'] = $Tprojects;
+        //print_test($final_projects);
+        $data['project_result'] = $final_projects;
         $data['page_title'] = lng('Add new project');
         $data['top_buttons'] = get_top_button('all', lng_min('Upload configuration file'), 'project/new_project', lng_min('Upload configuration file'), ' fa-upload', '', ' btn-info ');
         $data['top_buttons'] .= "<li>" . anchor('install/relis_editor/admin', '<button class="btn btn-primary">  ' . lng_min('Open editor') . ' </button></li>', 'title="' . lng_min('Open editor') . '" ') . "</li>";
@@ -270,20 +301,39 @@ class Project extends CI_Controller
         //print_test($post_arr); exit;
         $error_array = array();
         $success_array = array();
+        // Curl Request to get the project configuration
+        $endpoint = tomcat_api_url() . '/get_project_configuration';
+
+        $project_params_for_curl = explode(path_separator(), $post_arr['selected_config']);
+        $params = array(
+            'project_name' => $project_params_for_curl[0],
+            'file_name' => $project_params_for_curl[1]
+        );
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $endpoint . '?' . http_build_query($params));
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $project_config = curl_exec($ch);
+        if (curl_error($ch) ){
+            print_test(curl_error($ch));
+        }
         if (empty($post_arr['selected_config'])) {
             array_push($error_array, lng("Error: Choose a file "));
-        } elseif (!is_file($post_arr['selected_config'])) {
+        } elseif (substr($project_params_for_curl[1], -4)!==".php") {
             //echo "File must be a .php";
             array_push($error_array, lng("File must be a .php"));
         } else {
-            $fp = fopen($post_arr['selected_config'], 'rb');
-            $line = fgets($fp);
-            $Tline = explode("//", $line);
-            if (empty($Tline[1])) {
+            
+            // $fp = fopen($post_arr['selected_config'], 'rb');
+            // $line = fgets($fp);
+            // $Tline = explode("//", $line);
+            if (empty($project_config)) {
                 //echo "Check the file used";
                 array_push($error_array, lng("Check the file used"));
             } else {
-                $project_short_name = trim($Tline[1]);
+                $project_short_name = explode("_",trim($project_params_for_curl[1],".php"));
+                $project_short_name = $project_short_name[2];
 
                 //Verifie if the project is already installed
                 $resul = $this->Project_dataAccess->select_project_id_by_label($project_short_name);
@@ -297,12 +347,7 @@ class Project extends CI_Controller
                     //Save the file in a temporal location
                     $project_specific_config_folder = get_ci_config('project_specific_config_folder');
                     $f_new_temp = fopen($project_specific_config_folder . "temp/install_config_" . $project_short_name . ".php", 'w+');
-                    rewind($fp);
-                    while (($line = fgets($fp)) !== false) {
-                        //fputs($f_new_temp, $line. "\n");
-                        fputs($f_new_temp, $line);
-                        //echo "$line<br>";
-                    }
+                    fputs($f_new_temp, $project_config);
                     fclose($f_new_temp);
                     //Retrieve the content to verify the validity of the file
                     $temp_table_config = $this->entity_configuration_lib->get_new_install_config($project_short_name);

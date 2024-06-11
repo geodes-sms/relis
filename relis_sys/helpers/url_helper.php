@@ -66,7 +66,25 @@ if ( ! function_exists('site_url'))
 		return get_instance()->config->site_url($uri, $protocol);
 	}
 }
+// ------------------------------------------------------------------------
 
+if ( ! function_exists('tomcat_api_url'))
+{
+	/**
+	 * Site URL
+	 *
+	 * Create a local URL based on your basepath. Segments can be passed via the
+	 * first parameter either as a string or an array.
+	 *
+	 * @param	string	$uri
+	 * @param	string	$protocol
+	 * @return	string
+	 */
+	function tomcat_api_url($uri = '', $protocol = NULL)
+	{
+		return get_instance()->config->item('tomcat_api_url');
+	}
+}
 // ------------------------------------------------------------------------
 
 if ( ! function_exists('base_url'))
