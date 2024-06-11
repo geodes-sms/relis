@@ -161,7 +161,7 @@ class Install extends CI_Controller
 		array_push($success_array, 'Setup file imported');
 		//Read installation configuration
 		$res_install_config = $this->entity_configuration_lib->get_install_config();
-		//	print_test($res_install_config);
+			//print_test($res_install_config); exit;
 		$project_short_name = $res_install_config['project_short_name'];
 		//cleaning old installation
 		if (!empty($res_install_config['class_action']) and $res_install_config['class_action'] != 'override') {

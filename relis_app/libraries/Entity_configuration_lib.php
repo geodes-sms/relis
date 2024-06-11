@@ -124,6 +124,10 @@ class Entity_configuration_lib
 				$table_configurations['screening'] = get_screening();
 				break;
 
+			case 'screening_inclusion_mapping':
+				require_once("screening/screening_inclusion_mapping_config.php");
+				$table_configurations['screening_inclusion_mapping'] = get_screening_inclusion_mapping_config();
+				break;
 			case 'screen_decison':
 				require_once("screening/screening_decision_configuration.php");
 				$table_configurations['screen_decison'] = get_screening_decision();

@@ -108,6 +108,19 @@ function get_configuration()
 		'input_select_values' => array(';' => ';', ',' => ',')
 	);
 
+	$fields['screening_inclusion_mode'] = array(
+		'field_title' => 'Screening inclusion mode',
+		'field_type' => 'text',
+		'field_value' => 'None',
+		'default_value' => 'None',
+		'field_size' => 50,
+		'mandatory' => ' mandatory ',
+		'input_type' => 'select',
+		'input_select_source' => 'array',
+		'input_select_values' => array('None' => 'None', 'One' => 'One', 'Any' => 'Any', 'All' => 'All'),
+
+	);
+
 	$fields['screening_screening_conflict_resolution'] = array(
 		'field_title' => 'Screening conflict resolution mode',
 		'field_type' => 'text',
@@ -119,20 +132,6 @@ function get_configuration()
 		'input_select_source' => 'array',
 		'input_select_values' => array('Unanimity' => 'Unanimity', 'Majority' => 'Majority'),
 
-	);
-
-	$fields['screening_inclusion_mode'] = array(
-		'field_title' => 'Inclusion mode',
-		'field_type' => 'text',
-		'field_value' => 'hehe',
-		'field_size' => 50,
-		'mandatory' => ' mandatory ',
-		'input_type' => 'select',
-		'input_select_source' => 'array',
-		'input_select_values' => array('None' => 'None',
-									   'One' => 'One',
-									   'Any' => 'Any',
-									   'All' => 'All'),
 	);
 
 	$fields['screening_conflict_type'] = array(

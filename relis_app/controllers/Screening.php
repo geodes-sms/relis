@@ -1672,6 +1672,7 @@ class Screening extends CI_Controller
                         $res_screening['in_criteria'][$criteria] = $res_screening['in_criteria'][$criteria] + 1;
                     }
                     $res_screening['all_criteria_two']++;
+                    
                     // Criteria per user
                     if (empty($res_screening['users'][$value['user_id']]['in_criteria'][$criteria])) {
                         $res_screening['users'][$value['user_id']]['in_criteria'][$criteria] = 1;
@@ -1730,11 +1731,12 @@ class Screening extends CI_Controller
                 'pourc' => '%'
             );
             $i = 1;
+            print_test($res_screening['all_criteria_two']);
             foreach ($res_screening['in_criteria'] as $key => $value) {
                 $result_per_criteria_two[$i] = array(
                     'criteria' => !empty($inclusion_crit[$key]) ? $inclusion_crit[$key] : 'Criteria ' . $key,
                     'Nbr' => $value,
-                    'pourc' => !empty($res_screening['all_criteria_two']) ? round(($value * 100 / $result['Included']), 2) : 0,
+                    'pourc' => !empty($res_screening['all_criteria_two']) ? round(($value * 100 / $res_screening['all_criteria_two']), 2) : 0,
                 );
                 $i++;
             }
@@ -2668,7 +2670,7 @@ class Screening extends CI_Controller
         $config_array = unserialize($post_arr['config_array']);
         if (isset($post_arr['reset'])) $screening_model->reset_screening(active_screening_phase());
         if (isset($post_arr['keep_one'])) $screening_model->keep_one_criterion();
-        $screening_model->update_unique_criteria($post_arr['screening_inclusion_mode']);
+        $screening_model->update_unique_criteria($config_array['screening_inclusion_mode']);
         $screening_model->edit_screening_config($config_array);
         redirect('element/display_element/configurations/1');
     }

@@ -131,7 +131,7 @@ function get_screening_set($table = 'screening', $title = 'Screening')
 		'on_edit' => 'enabled',
 		'on_list' => 'show'
 	);
-
+/*
 	$fields['inclusion_criteria'] = array(
 		'field_title' => 'Inclusion criteria',
 		'field_type' => 'number',
@@ -146,7 +146,7 @@ function get_screening_set($table = 'screening', $title = 'Screening')
 		'on_edit' => 'enabled',
 		'on_list' => 'show'
 	);
-
+*/
 
 	$fields['note'] = array(
 		'field_title' => 'Note',
