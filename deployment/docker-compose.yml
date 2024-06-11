@@ -1,15 +1,17 @@
-version: '3.7'
 services:
   db:
     container_name: relis-db
-    image: mariadb
+    image: mariadb:11.4
     restart: always
     environment:
       MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: "yes"
 
+    command: mariadbd --general-log=1 --general-log-file=/var/log/mysql/general.log --slow-query-log=1 --slow-query-log-file=/var/log/mysql/slow.log --log-output=FILE --log-error=/var/log/mysql/error.log
+
     volumes:
-      - ./docker/db/initial_db.sql:/docker-entrypoint-initdb.d/initial_db.sql
-      - ../:/u/relis/public_html
+      - ./db/initial_db.sql:/docker-entrypoint-initdb.d/initial_db.sql
+      - ../data/db:/var/lib/mysql
+      - ../logs/db:/var/log/mysql
 
   phpmyadmin:
     depends_on:
@@ -21,15 +23,14 @@ services:
     environment:
       - PMA_ARBITRARY=1
     volumes:
-      - ./docker/db/config.inc.php:/etc/phpmyadmin/config.inc.php
+      - ./db/config.inc.php:/etc/phpmyadmin/config.inc.php
       - ../:/u/relis/public_html
 
   tomcat:
     depends_on:
       - db
-    image: relis/tomcat-relis:latest
     build:
-      context: ../tomcat/
+      context: ./tomcat/
     volumes:
       - ../data/tomcat_data:/u/relis/public_html/workspace
     environment:
@@ -48,13 +49,13 @@ services:
   relis-application:
     depends_on:
       - db
-    image: relis-app
     container_name: relis-app
     build:
-      context: ./docker/
+      context: ./
       args:
         DIRECTORY_INDEX: index.php
         DOCUMENT_ROOT: /u/relis/public_html
+        ENV: dev
     entrypoint: /usr/local/bin/entrypoint.sh
     ports:
       - 8083:80

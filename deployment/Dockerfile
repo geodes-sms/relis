@@ -2,6 +2,7 @@ FROM php:7.3.30-apache-buster
 
 ARG DIRECTORY_INDEX
 ARG DOCUMENT_ROOT
+ARG ENV
 
 RUN apt-get autoclean && apt-get update && apt-get install -y \
     curl \
@@ -17,8 +18,7 @@ RUN apt-get autoclean && apt-get update && apt-get install -y \
 RUN apt-get install -y libicu-dev
 RUN docker-php-ext-install intl mysqli pdo pdo_mysql zip
 
-RUN pecl install xdebug-2.8.0 \
-    && docker-php-ext-enable xdebug
+RUN if [ "$ENV" = "prod" ]; then pecl install xdebug-2.8.0 && docker-php-ext-enable xdebug; fi
 
 
 # Install Composer
@@ -27,12 +27,6 @@ RUN composer --version
 
 ## Make a lsb-release file so the installer knows the os (necessary for debian)
 RUN cp /etc/os-release /etc/lsb-release
-
-## Create and switch user for a non-root installation
-RUN useradd -ms /bin/bash docker
-USER docker
-
-USER root
 
 #Set php.ini configuration
 

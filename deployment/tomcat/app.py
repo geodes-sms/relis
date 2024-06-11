@@ -14,15 +14,19 @@ def list_projects():
         projects = os.listdir("/u/relis/public_html/workspace/dslforge_workspace")
         projects = [i for i in projects if not i.startswith(".")]  # Remove hidden files
         for project in projects:
-            response[project.strip()] = {
-                "files": [
+            if os.path.isdir(
+                f"/u/relis/public_html/workspace/dslforge_workspace/{project.strip()}"
+            ) and os.path.exists(
+                f"/u/relis/public_html/workspace/dslforge_workspace/{project.strip()}/src-gen"
+            ):
+                response[project.strip()] = [
                     i
                     for i in os.listdir(
                         f"/u/relis/public_html/workspace/dslforge_workspace/{project.strip()}/src-gen"
                     )
                     if i.endswith(".php")
                 ]
-            }
+
         return JSONResponse(response)
     except Exception as e:
         return JSONResponse({"error": str(e)})
