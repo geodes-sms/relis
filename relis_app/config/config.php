@@ -21,8 +21,6 @@
  */
 defined('BASEPATH') or exit('No direct script access allowed');
 
-
-$config['base_url'] = 'http://localhost/relis/relis_dev';
 $config['index_page'] = '';
 $config['uri_protocol']	= 'REQUEST_URI';
 $config['url_suffix'] = '.html';
@@ -131,8 +129,6 @@ $config['sess_driver'] = 'database';
 $config['sess_driver'] = 'files';
 $config['sess_cookie_name'] = 'relis_session';
 $config['sess_expiration'] = 7200;
-$config['sess_save_path'] = "ci_sessions";
-$config['sess_save_path'] = "cside/sessions/";
 $config['sess_match_ip'] = FALSE;
 $config['sess_time_to_update'] = 300;
 $config['sess_regenerate_destroy'] = FALSE;
@@ -298,16 +294,8 @@ $config['csv_field_separator'] = ';';
 $config['csv_field_separator_export'] = ',';
 $config['csv_string_dellimitter'] = '"';
 
-
-$config['base_url'] = "http://localhost/relis/relis_dev";
-
-$config['sess_save_path'] = "C:/xampp/htdocs/relis/relis_dev/cside/sessions";
-$config['editor_generated_path'] = "D:\www\dslforge\workspace";
-$config['editor_generated_path'] = "C:/dslforge_workspace";
-$config['editor_url'] = "http://127.0.0.1:8080/relis/texteditor";
-
 $config['metrics_save_path'] = "C:/xampp/htdocs/relis/relis_dev/cside/metrics";
-$config['root_path'] = "C:/xampp/htdocs/relis/relis_dev";
+$config['root_path'] = "/u/relis/public_html/";
 
 //$config['screening_conflict_type'] = "IncludeExclude";//can also have ExclusionCriteria
 //$config['screening_conflict_type'] = "ExclusionCriteria";//can also have IncludeExclude
@@ -326,8 +314,8 @@ $config['project_specific_config_folder'] = "relis_app/libraries/table_config/pr
 
 // The prefix that will have the new databases for projects  installed
 $config['project_db_prefix'] = "relis_dev_correct_";
-$config['server_OS'] = "WINDOWS";
-$config['support_contact'] = "relis@relis.iro.umontreal.ca";
+$config['server_OS'] = "LINUX";
+$config['support_contact'] = "relis@iro.umontreal.ca";
 
 //Mail config
 $config['mail_protocol']    = "smtp";
@@ -341,7 +329,7 @@ $config['mail_reply_to']    = "example@gmail.com";
 $config['sess_save_path'] = "/u/relis/public_html/cside/sessions";
 $config['base_url'] = "http://localhost:8083/";
 $config['project_db_user'] = "root";
-$config['project_db_host'] = "relis_db";
+$config['project_db_host'] = "db";
 $config['project_db_pass'] = "";
-$config['editor_url'] = $config['base_url'] ."/relis/texteditor";
-$config['tomcat_api_url'] = "http://deployment-tomcat-1:8181/apis/tomcat";
+$config['editor_url'] = "http://tomcat:8080/relis/texteditor";
+$config['tomcat_api_url'] = "http://tomcat:8181/apis/tomcat";
