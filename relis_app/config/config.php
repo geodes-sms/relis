@@ -344,4 +344,4 @@ $config['project_db_user'] = "root";
 $config['project_db_host'] = "relis_db";
 $config['project_db_pass'] = "";
 $config['editor_url'] = $config['base_url'] ."/relis/texteditor";
-$config['tomcat_api_url'] = "http://relis_dev-tomcat-1:8181/apis/tomcat";
+$config['tomcat_api_url'] = "http://deployment-tomcat-1:8181/apis/tomcat";

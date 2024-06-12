@@ -5,13 +5,10 @@ services:
     restart: always
     environment:
       MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: "yes"
-
-    command: mariadbd --general-log=1 --general-log-file=/var/log/mysql/general.log --slow-query-log=1 --slow-query-log-file=/var/log/mysql/slow.log --log-output=FILE --log-error=/var/log/mysql/error.log
-
+      
     volumes:
       - ./db/initial_db.sql:/docker-entrypoint-initdb.d/initial_db.sql
       - ../data/db:/var/lib/mysql
-      - ../logs/db:/var/log/mysql
 
   phpmyadmin:
     depends_on:

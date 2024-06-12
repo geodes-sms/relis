@@ -202,10 +202,9 @@ class Project extends CI_Controller
         curl_setopt($ch, CURLOPT_HEADER, 0);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         $projects_list = curl_exec($ch);
-        if (curl_error($ch) ){
-           print_test(curl_error($ch));
-        }
-        else{
+        if (curl_error($ch)) {
+            print_test(curl_error($ch));
+        } else {
             $projects_list = curl_exec($ch);
             $Tprojects = json_decode($projects_list, true);
         }
@@ -218,9 +217,8 @@ class Project extends CI_Controller
                 foreach ($value as $key_c => $value_c) {
                     array_push($final_projects[$key]['generated'], $value_c);
                 }
-            }
-            else{
-                $final_projects[$key]['generated'] = array();   
+            } else {
+                $final_projects[$key]['generated'] = array();
             }
         }
         //print_test($final_projects);
@@ -315,16 +313,16 @@ class Project extends CI_Controller
         curl_setopt($ch, CURLOPT_HEADER, 0);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         $project_config = curl_exec($ch);
-        if (curl_error($ch) ){
+        if (curl_error($ch)) {
             print_test(curl_error($ch));
         }
         if (empty($post_arr['selected_config'])) {
             array_push($error_array, lng("Error: Choose a file "));
-        } elseif (substr($project_params_for_curl[1], -4)!==".php") {
+        } elseif (substr($project_params_for_curl[1], -4) !== ".php") {
             //echo "File must be a .php";
             array_push($error_array, lng("File must be a .php"));
         } else {
-            
+
             // $fp = fopen($post_arr['selected_config'], 'rb');
             // $line = fgets($fp);
             // $Tline = explode("//", $line);
@@ -332,8 +330,15 @@ class Project extends CI_Controller
                 //echo "Check the file used";
                 array_push($error_array, lng("Check the file used"));
             } else {
-                $project_short_name = explode("_",trim($project_params_for_curl[1],".php"));
-                $project_short_name = $project_short_name[2];
+                // TODO: Fix BUG for variable name
+                $prefix = 'classification_install_';
+                $str = $project_params_for_curl[1];
+
+                if (substr($str, 0, strlen($prefix)) == $prefix) {
+                    $str = substr($str, strlen($prefix));
+                }
+
+                $project_short_name = trim($str, ".php");
 
                 //Verifie if the project is already installed
                 $resul = $this->Project_dataAccess->select_project_id_by_label($project_short_name);
