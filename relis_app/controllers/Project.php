@@ -307,22 +307,20 @@ class Project extends CI_Controller
             'project_name' => $project_params_for_curl[0],
             'file_name' => $project_params_for_curl[1]
         );
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $endpoint . '?' . http_build_query($params));
-        curl_setopt($ch, CURLOPT_HEADER, 0);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        $project_config = curl_exec($ch);
-        if (curl_error($ch)) {
-            print_test(curl_error($ch));
-        }
         if (empty($post_arr['selected_config'])) {
             array_push($error_array, lng("Error: Choose a file "));
         } elseif (substr($project_params_for_curl[1], -4) !== ".php") {
             //echo "File must be a .php";
             array_push($error_array, lng("File must be a .php"));
         } else {
-
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $endpoint . '?' . http_build_query($params));
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            $project_config = curl_exec($ch);
+            if (curl_error($ch)) {
+                print_test(curl_error($ch));
+            }
             // $fp = fopen($post_arr['selected_config'], 'rb');
             // $line = fgets($fp);
             // $Tline = explode("//", $line);

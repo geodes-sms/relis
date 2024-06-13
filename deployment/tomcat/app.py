@@ -45,5 +45,25 @@ def get_project_configuration(project_name: str, file_name: str):
         return JSONResponse({"error": str(e)})
 
 
+@app.post("/apis/tomcat/save_project_configuration")
+def save_project_configuration(project_name: str, file_name: str, content: str):
+    # Your code to save project configuration goes here
+    try:
+        if not os.path.exists(
+            f"/u/relis/public_html/workspace/dslforge_workspace/{project_name}/src-gen"
+        ):
+            os.makedirs(
+                f"/u/relis/public_html/workspace/dslforge_workspace/{project_name}/src-gen"
+            )
+        with open(
+            f"/u/relis/public_html/workspace/dslforge_workspace/{project_name}/src-gen/{file_name}",
+            "w",
+        ) as f:
+            f.write(content)
+        return JSONResponse({"status": "success"})
+    except Exception as e:
+        return JSONResponse({"error": str(e)})
+
+
 if __name__ == "__main__":
     uvicorn.run(app, port=8181, host="0.0.0.0", log_level="info")
