@@ -164,8 +164,8 @@ function getProjectPath($projectName = "demoTestProject")
 
 function uploadProjectFile($projectName = "demoTestProject")
 {
-    $file - getProjectPath($projectName);
-    $rawfile = file_get_contents($file);
+
+    $rawfile = file_get_contents(getProjectPath($projectName));
     $data = array('project_name' => 'tests', 'file_name' => 'classification_install_' . $projectName . 'php',  'content' => $rawfile);
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, tomcat_api_url() . '/save_project_configuration');
