@@ -1035,6 +1035,7 @@ class Screening extends CI_Controller
             //print_test($inclusion_criteria); exit;
             $this->db2->trans_start();
             $res = $this->db2->update('screening_paper', $screening_save, array('screening_id' => $post_arr['screening_id']));
+            $this->db_current->where('screening_id', $post_arr['screening_id'])->delete('screen_inclusion_mapping');
             if ($res == 1) {
                 if (is_array($inclusion_criteria)) {
                     foreach($inclusion_criteria as $criteria) {
@@ -1541,6 +1542,10 @@ class Screening extends CI_Controller
         $users = $this->manager_lib->get_reference_select_values('users;user_name');
         $exclusion_crit = $this->manager_lib->get_reference_select_values('exclusioncrieria;ref_value');
         $inclusion_crit = $this->manager_lib->get_reference_select_values('inclusioncriteria;ref_value');
+        $default_crit_id = $this->get_default_criteria_id();
+        if ($default_crit_id) {
+            $inclusion_crit[$default_crit_id] = 'Default';
+        }
         //print_test($users);
         $ref_table_config = get_table_configuration('papers');
         $ref_table_config['current_operation'] = 'list_papers_screen';
@@ -1624,6 +1629,7 @@ class Screening extends CI_Controller
                 'nbr' => !empty($result['In conflict']) ? $result['In conflict'] : 0,
             )
         );
+        $data['inclusion_mode'] = get_appconfig_element('screening_inclusion_mode');
         $ref_table_config_s = get_table_configuration('screening');
         $ref_table_config_s['current_operation'] = 'list_screenings';
         $screenings = $this->DBConnection_mdl->get_list_mdl($ref_table_config_s, '_', 0, -1);
@@ -1663,8 +1669,10 @@ class Screening extends CI_Controller
                 }
             }
             // inclusion criteria
+            $screening_model = new Screening_dataAccess();
+            $value['inclusion_criteria'] = $screening_model->get_criteria_array($value['screening_id']);
             if ($value['screening_decision'] == 'Included' and !empty($value['inclusion_criteria'])) {
-                $criteria_arr = json_decode($value['inclusion_criteria'], true);
+                $criteria_arr = $value['inclusion_criteria'];
                 foreach ($criteria_arr as $criteria) {
                     if (empty($res_screening['in_criteria'][$criteria])) {
                         $res_screening['in_criteria'][$criteria] = 1;
@@ -1731,7 +1739,6 @@ class Screening extends CI_Controller
                 'pourc' => '%'
             );
             $i = 1;
-            print_test($res_screening['all_criteria_two']);
             foreach ($res_screening['in_criteria'] as $key => $value) {
                 $result_per_criteria_two[$i] = array(
                     'criteria' => !empty($inclusion_crit[$key]) ? $inclusion_crit[$key] : 'Criteria ' . $key,
@@ -2668,10 +2675,20 @@ class Screening extends CI_Controller
         $screening_model = new Screening_dataAccess();
         $post_arr = $this->input->post();
         $config_array = unserialize($post_arr['config_array']);
-        if (isset($post_arr['reset'])) $screening_model->reset_screening(active_screening_phase());
+        if (isset($post_arr['reset'])) $screening_model->reset_screening();
         if (isset($post_arr['keep_one'])) $screening_model->keep_one_criterion();
+        if (isset($post_arr['default_criterion'])) $screening_model->set_default_criterion();
         $screening_model->update_unique_criteria($config_array['screening_inclusion_mode']);
         $screening_model->edit_screening_config($config_array);
         redirect('element/display_element/configurations/1');
+    }
+
+    private function get_default_criteria_id() {
+        $query = $this->db_current->select('ref_id')
+                          ->where('ref_value', 'Default')
+                          ->get('ref_inclusioncriteria');
+
+        $result = $query->row();
+        return $result ? $result->ref_id : null;
     }
 }

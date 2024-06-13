@@ -59,10 +59,15 @@ function get_screening_inclusion_mapping_config()
 	);
 
 	$fields['criteria_id'] = array( // assigned to
+		'category_type' => 'IndependantDynamicCategory',
 		'field_title' => 'Screening phase',
 		'field_type' => 'int',
 		'field_size' => 11,
 		'mandatory' => ' mandatory ',
+		'number_of_values' => 1,
+		'input_type' => 'select',
+		'input_select_source' => 'table',
+		'input_select_values' => 'inclusioncriteria;ref_value',
 	);
 
 	$fields['mapping_active'] = array(

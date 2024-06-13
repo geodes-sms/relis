@@ -72,14 +72,7 @@
                         echo "<tr>";
                         foreach ($row as $k_cel => $v_cell) {
                             echo "<td>";
-                            // Check if $v_cell is an array
-                            if (is_array($v_cell)) {
-                                // If it's an array, implode its elements with |
-                                echo implode(" | ", $v_cell);
-                            } else {
-                                // If it's not an array, simply echo the value
-                                echo $v_cell;
-                            }
+                            echo $v_cell;
                             echo "</td>";
                         }
                         echo "</tr>";

@@ -43,7 +43,6 @@ class Manager_lib
 
 		if ($get_leaf) {
 			while (!empty($ref_table_config['fields'][$fields]['input_type']) and $ref_table_config['fields'][$fields]['input_type'] == 'select' and $ref_table_config['fields'][$fields]['input_select_source'] == 'table') {
-
 				$config = $ref_table_config['fields'][$fields]['input_select_values'];
 
 				$conf = explode(";", $config);
@@ -51,7 +50,7 @@ class Manager_lib
 				$ref_table = $conf[0];
 				$fields = $conf[1];
 				$ref_table_config = get_table_configuration($ref_table);
-
+				
 
 				//echo "<h1>$fields</h1>";
 			}
@@ -74,6 +73,7 @@ class Manager_lib
 					$config = $ref_table_config['fields'][$fields]['input_select_values'];
 					
 					$conf = explode(";", $config);
+					
 					//print_test($conf);
 					$ref_table = $conf[0];
 					$fields = $conf[1];
@@ -105,17 +105,15 @@ class Manager_lib
 						//print_test($ref_table_config);
 						$result[$value['refId']] = $value['refDesc'];
 						
-						
-						
 						while (!empty($ref_table_config['fields'][$fields]['input_type']) and $ref_table_config['fields'][$fields]['input_type'] == 'select' and $ref_table_config['fields'][$fields]['input_select_source'] == 'table') {
 							//	echo "<h1>bbbb</h1>";
 							//print_test($result);
 							
 							$config = $ref_table_config['fields'][$fields]['input_select_values'];
-							
 							$conf = explode(";", $config);
 							
 							$ref_table = $conf[0];
+							
 							$fields = $conf[1];
 							$ref_table_config = get_table_configuration($ref_table);
 							
@@ -274,24 +272,18 @@ class Manager_lib
 																function get_element_multi_values($config, $key_field, $element_id, $display_field = False)
 																{
 																	$Tvalues_source = explode(';', $config);
-																	
 																	$source_table_config = get_table_configuration($Tvalues_source[0]);
-																	if ($display_field)
-																	$display_field = $Tvalues_source[1];
-																else
-																$display_field = $source_table_config['table_id'];
-															
-															$extra_condition = " AND $key_field ='" . $element_id . "'";
-															
-															$res_values = $this->CI->DBConnection_mdl->get_reference_select_values($source_table_config, $display_field, $extra_condition);
-															
-															
-															$results = array();
-															
-															foreach ($res_values as $value) {
-																array_push($results, $value['refDesc']);
-																}
-																return $results;
+
+																	if ($display_field) $display_field = $Tvalues_source[1];
+																	else $display_field = $source_table_config['table_id'];
+
+																	$extra_condition = " AND $key_field ='" . $element_id . "'";
+																	$res_values = $this->CI->DBConnection_mdl->get_reference_select_values($source_table_config, $display_field, $extra_condition);
+																	$results = array();
+																	foreach ($res_values as $value) {
+																		array_push($results, $value['refDesc']);
+																		}
+																	return $results;
 																}
 																
 																/*
@@ -322,7 +314,6 @@ class Manager_lib
 						1 => 'Yes'
 					);
 				} elseif ($v['input_select_source'] == 'table') {
-
 
 					// recherches des auteurs par papier
 					if ($ref_table == 'papers' and $k == 'authors') {
@@ -545,7 +536,6 @@ class Manager_lib
 
 			}
 		}
-
 		return $item_data;
 
 	}

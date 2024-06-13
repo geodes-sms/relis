@@ -1187,13 +1187,14 @@ class Element extends CI_Controller
         foreach ($ref_table_config['operations'][$ref_table_operation]['fields'] as $k_field => $v) {
             if (!empty($ref_table_config['fields'][$k_field])) {
                 $field_det = $ref_table_config['fields'][$k_field];
+                
                 if (!empty($field_det['input_type']) and $field_det['input_type'] == 'select') {
                     if ($field_det['input_select_source'] == 'array') {
                         //print_test($v);
                         $dropoboxes[$k_field] = $field_det['input_select_values'];
-                    } elseif ($field_det['input_select_source'] == 'table') {
-                        $dropoboxes[$k_field] = $this->manager_lib->get_reference_select_values($field_det['input_select_values']);
-                        //	print_test($v);
+                        } elseif ($field_det['input_select_source'] == 'table') {
+                            $dropoboxes[$k_field] = $this->manager_lib->get_reference_select_values($field_det['input_select_values']);
+                            //	print_test($v);
                     } elseif ($field_det['input_select_source'] == 'yes_no') {
                         $dropoboxes[$k_field] = array(
                             '0' => "No",
@@ -1292,14 +1293,6 @@ class Element extends CI_Controller
             $element_array['links'] = '';
             foreach ($field_list as $key_field => $v_field) {
                 if (isset($value[$v_field])) {
-                    if ($v_field == 'inclusion_criteria') {
-                        $criteria_id_arr = json_decode($value[$v_field]);
-                        $criteria_arr = array();
-                        foreach ($criteria_id_arr as $criteria_id) {
-                            array_push($criteria_arr, $dropoboxes[$v_field][$criteria_id]);
-                        }
-                        $element_array[$v_field] = $criteria_arr;
-                    } else 
                     if (isset($dropoboxes[$v_field][$value[$v_field]])) {
                         $element_array[$v_field] = $dropoboxes[$v_field][$value[$v_field]];
                         } elseif (empty($value[$v_field]) and empty($ref_table_config['fields'][$v_field]['display_null'])) {
@@ -1307,26 +1300,29 @@ class Element extends CI_Controller
                             } else {
                         $element_array[$v_field] = $value[$v_field];
                     }
+                    
                 } else {
                     $element_array[$v_field] = "";
+                    //print_test($ref_table_config); exit;
                     if (
                         (isset($ref_table_config['fields'][$v_field]['number_of_values']) and $ref_table_config['fields'][$v_field]['number_of_values'] != 1) or
                         (isset($ref_table_config['fields'][$v_field]['category_type']) and $ref_table_config['fields'][$v_field]['category_type'] == 'WithSubCategories')
-                    ) { //recuperation pour les multivalues et les champs avec subcategory
-                        if (isset($ref_table_config['fields'][$v_field]['input_select_values']) and isset($ref_table_config['fields'][$v_field]['input_select_key_field'])) {
+                        ) { //recuperation pour les multivalues et les champs avec subcategory
+                            if (isset($ref_table_config['fields'][$v_field]['input_select_values']) and isset($ref_table_config['fields'][$v_field]['input_select_key_field'])) {
                             // récuperations des valeurs de cet element
                             $M_values = $this->manager_lib->get_element_multi_values($ref_table_config['fields'][$v_field]['input_select_values'], $ref_table_config['fields'][$v_field]['input_select_key_field'], $data['list'][$key][$table_id]);
                             $S_values = "";
                             foreach ($M_values as $k_m => $v_m) {
                                 if (isset($dropoboxes[$v_field][$v_m])) {
                                     $M_values[$k_m] = $dropoboxes[$v_field][$v_m];
-                                }
-                                $S_values .= empty($S_values) ? $M_values[$k_m] : " | " . $M_values[$k_m];
-                            }
-                            $element_array[$v_field] = $S_values;
+                                    }
+                                    $S_values .= empty($S_values) ? $M_values[$k_m] : " | " . $M_values[$k_m];
+                                    }
+                                    $element_array[$v_field] = $S_values;
                         }
                     }
                 }
+                
                 if (!empty($link_field_list[$v_field]))
                 $element_array[$v_field] = string_anchor(
             $link_field_list[$v_field]['link']['url'] . $value[$link_field_list[$v_field]['link']['id_field']],
@@ -1334,7 +1330,6 @@ class Element extends CI_Controller
             $link_field_list[$v_field]['link']['trim']
             );
             }
-            //print_test($element_array);
             /*
              * Ajout des liens(links) sur la liste
              * Adding links to the list
@@ -1377,7 +1372,6 @@ class Element extends CI_Controller
             array_push($list_to_display, $element_array);
             $i++;
         }
-        
         $data['list'] = $list_to_display;
         /*
          * Ajout de l'entête de la liste

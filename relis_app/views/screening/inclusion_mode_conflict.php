@@ -41,12 +41,12 @@
                       case 'NoneOne' :
                           echo ' <br> You may choose to restart the screening from scratch or assign default criteria to the already sreened papers. <br><br>'; 
                           echo '<button class="btn  btn-success btn-lg" type="submit" name="reset">Restart Screening</button>';
-                          echo '<button class="btn  btn-danger btn-lg" type="submit" name="no_reset">Proceed with default criterion</button>';
+                          echo '<button class="btn  btn-danger btn-lg" type="submit" name="default_criterion">Proceed with default criterion</button>';
                         break;
                       case 'NoneAny' :
                         echo ' <br> You may choose to restart the screening from scratch or assign default criteria to the already sreened papers. <br><br>'; 
                           echo '<button class="btn  btn-success btn-lg" type="submit" name="reset">Restart Screening</button>';
-                          echo '<button class="btn  btn-danger btn-lg" type="submit" name="no_reset">Proceed with default criterion</button>';
+                          echo '<button class="btn  btn-danger btn-lg" type="submit" name="default_criterion">Proceed with default criterion</button>';
                         break;
                       case 'AnyOne' :
                         echo ' <br> You may choose to restart the screening from scratch or let ReLiS keep one criterion at random for already screened papers. <br><br>'; 

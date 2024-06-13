@@ -181,15 +181,25 @@ function get_screening()
 	);
 
 	$fields['inclusion_criteria'] = array(
-		'field_title' => 'Inclusion criteria',
-		'field_type' => 'int',
+		'field_title' => 'Inclusion Criteria',
+		'field_type' => 'number',
+		'field_value' => 'normal',
 		'field_size' => 11,
 		'input_type' => 'select',
 		'input_select_source' => 'table',
-		'input_select_values' => 'inclusioncriteria;ref_value', //the reference table and the field to be displayed
-
+		'input_select_source_type' => 'normal',
+		'input_select_values' => 'screening_inclusion_mapping;criteria_id', //the reference table and the field to be displayed
+		'input_select_key_field' => 'screening_id',
+		'number_of_values' => '	',
+		'compute_result' => 'no',
+		'on_add' => 'not_set',
+		//not_set for drill_down
+		'on_edit' => 'not_set',
+		//not_set for drill_down
+		'on_list' => 'hidden', //for  number of values this must be hidden on list unless ther is an error while getting list from database
+		'category_type' => 'WithMultiValues',
+		'multi-select' => 'Yes'
 	);
-
 
 	$fields['screening_note'] = array(
 		'field_title' => 'Screening note',

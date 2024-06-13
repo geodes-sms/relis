@@ -135,12 +135,14 @@ class Screening_dataAccess extends CI_Model
             'screening_validator_assignment_type' => $config['screening_validator_assignment_type'],
             'validation_default_percentage' => $config['validation_default_percentage']
         );
-        return $res = $this->db2->update('config', $config_save, array('config_id' => $config['config_id']));
+        return $this->db2->update('config', $config_save, array('config_id' => $config['config_id']));
     }
 
-    function reset_screening($screening_phase = null) {
-        $sql = 'UPDATE screening_paper SET screening_status = "Reseted"' . ($screening_phase != '' ? ' WHERE screening_phase=' . $screening_phase : '');
-        return $this->db_current->query($sql);
+    function reset_screening() {
+        $sql = 'UPDATE screening_paper SET screening_status = "Reseted"';
+        $this->db_current->query($sql);
+        $sql = 'DELETE FROM screen_inclusion_mapping';
+        $this->db_current->query($sql);
     }
 
     function keep_one_criterion() {
@@ -179,5 +181,34 @@ class Screening_dataAccess extends CI_Model
         '
         : 'ALTER TABLE screen_inclusion_mapping DROP CONSTRAINT IF EXISTS unique_criteria';
         $this->db_current->query($sql);
+    }
+
+    public function get_criteria_array($screening_id) {
+        $sql = 'SELECT criteria_id FROM screen_inclusion_mapping WHERE screening_id = ?';
+        $query = $this->db_current->query($sql, array($screening_id));
+        $result = $query->result_array();
+        $criteria_ids = array_column($result, 'criteria_id');
+        return $criteria_ids;
+    }
+
+    public function set_default_criterion() {
+        $sql = "
+            INSERT INTO ref_inclusioncriteria (ref_value, ref_active)
+                SELECT 'Default', 0
+                    WHERE NOT EXISTS (
+                        SELECT 1
+                        FROM ref_inclusioncriteria
+                        WHERE ref_value = 'Default'
+                    );
+        ";
+        $this->db_current->query($sql);
+        $sql = "
+            INSERT INTO screen_inclusion_mapping (screening_id, criteria_id)
+                SELECT sp.screening_id, (SELECT ref_id FROM ref_inclusioncriteria WHERE ref_value = 'Default')
+                FROM screening_paper sp
+                WHERE sp.screening_status = 'Done';
+        ";
+        $this->db_current->query($sql);
+
     }
 }

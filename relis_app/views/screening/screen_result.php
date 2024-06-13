@@ -116,21 +116,32 @@
            	echo "<p>Empty!</p>";
            }
            echo  box_footer();
-
-           echo box_header("Statistics on Inclusion Criteria");
-           $tmpl = array (
-                   'table_open'  => '<table class="table table-striped table-hover">',
-                    'table_close'  => '</table>'
-           );
-           $this->table->set_template($tmpl);
-                       if(!empty($result_per_criteria_two))
-                       {
-                           echo $this->table->generate($result_per_criteria_two);
-                       }else{
-                           echo "<p>Empty!</p>";
-                       }
-
-           echo  box_footer();
+           if ($inclusion_mode != 'None') {
+            if ($inclusion_mode == 'All'){
+              echo box_header("Statistics on Inclusion Criteria");
+              $tmpl = array (
+                      'table_open'  => '<table class="table table-striped table-hover">',
+                       'table_close'  => '</table>'
+              );
+              echo "<p>All inclusion criteria prseent on included papers.</p>";
+            } else {
+              echo box_header("Statistics on Inclusion Criteria");
+              $tmpl = array (
+                      'table_open'  => '<table class="table table-striped table-hover">',
+                       'table_close'  => '</table>'
+              );
+              $this->table->set_template($tmpl);
+                          if(!empty($result_per_criteria_two))
+                          {
+                              echo $this->table->generate($result_per_criteria_two);
+                          }else{
+                              echo "<p>Empty!</p>";
+                          }
+   
+              echo  box_footer();
+            }
+           }
+           
 
 
 
