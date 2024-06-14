@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, File, UploadFile
 import os
 from fastapi.responses import JSONResponse, FileResponse
 import uvicorn
@@ -46,7 +46,9 @@ def get_project_configuration(project_name: str, file_name: str):
 
 
 @app.post("/apis/tomcat/save_project_configuration")
-def save_project_configuration(project_name: str, file_name: str, content: str):
+def save_project_configuration(
+    project_name: str, file_name: str, content: UploadFile = File(...)
+):
     # Your code to save project configuration goes here
     try:
         if not os.path.exists(
@@ -59,6 +61,7 @@ def save_project_configuration(project_name: str, file_name: str, content: str):
             f"/u/relis/public_html/workspace/dslforge_workspace/{project_name}/src-gen/{file_name}",
             "w",
         ) as f:
+            content = content.file.read().decode("utf-8")
             f.write(content)
         return JSONResponse({"status": "success"})
     except Exception as e:
