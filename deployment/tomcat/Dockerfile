@@ -9,11 +9,11 @@ RUN pip3 install fastapi uvicorn
 COPY app.py /app.py
 COPY ./relis.war /usr/local/tomcat/webapps/relis.war
 COPY ./entrypoint.sh /usr/local/bin
-COPY ../relis_app/helpers/tests/testFiles/project/classification_install_demoTestProject.php /u/relis/public_html/workspace/dslforge_workspace/tests/src-gen/classification_install_demoTestProject.php
+COPY ./testfiles/classification_install_demoTestProject.php /u/relis/public_html/workspace/dslforge_workspace/tests/src-gen/classification_install_demoTestProject.php
 
-COPY ../relis_app/helpers/tests/testFiles/project/classification_install_demoTestProject.pdf /u/relis/public_html/workspace/dslforge_workspace/tests/src-gen/classification_install_demoTestProject.pdf
+COPY ./testfiles/classification_install_demoTestProject.pdf /u/relis/public_html/workspace/dslforge_workspace/tests/src-gen/classification_install_demoTestProject.pdf
 
-COPY ../relis_app/helpers/tests/testFiles/project/classification_install_demoTestProject2.php /u/relis/public_html/workspace/dslforge_workspace/tests/src-gen/classification_install_demoTestProject2.php
+COPY ./testfiles/classification_install_demoTestProject2.php /u/relis/public_html/workspace/dslforge_workspace/tests/src-gen/classification_install_demoTestProject2.php
 
 
 RUN sed 's/\r$//g' /usr/local/bin/entrypoint.sh
