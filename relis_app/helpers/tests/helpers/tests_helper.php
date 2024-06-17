@@ -162,21 +162,6 @@ function getProjectPath($projectName = "demoTestProject")
     return 'relis_app/helpers/tests/testFiles/project/classification_install_' . $projectName . '.php';
 }
 
-function uploadProjectFile($projectName = "demoTestProject")
-{
-
-    $rawfile = curl_file_create(getProjectPath($projectName), 'text/plain', 'classification_install_' . $projectName . '.php');
-    $data = array('project_name' => 'tests', 'file_name' => 'classification_install_' . $projectName . 'php',  'content' => $rawfile);
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, tomcat_api_url() . '/save_project_configuration');
-    curl_setopt($ch, CURLOPT_POST, 1);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    $server_output = curl_exec($ch);
-    curl_close($ch);
-    return 'tests/classification_install_' . $projectName . '.php';
-}
-
 function deleteCreatedTestProject($projectName = "demoTestProject")
 {
     $ci = get_instance();

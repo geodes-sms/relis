@@ -351,7 +351,7 @@ class ProjectUnitTest
         $test_aspect = "Created database for the new project";
         $expected_value = "Created";
         $actual_value = "Not created";
-        $filePath = uploadProjectFile();
+        $filePath = 'tests/classificatio$filePath = uploadProjectFile();n_install_' . getProjectShortName() . '.php';
 
         $response = $this->http_client->response($this->controller, $action, ['selected_config' => $filePath], "POST");
 
@@ -389,7 +389,7 @@ class ProjectUnitTest
         $test_name = "Add a new project from relis editor with an already used project label";
         $test_aspect = "Table last ID";
         $expected_value = $this->ci->db->query("SELECT project_id FROM projects ORDER BY project_id DESC LIMIT 1")->row_array()['project_id'];
-        $filePath = uploadProjectFile();
+        $filePath = 'tests/classification_install_' . getProjectShortName() . '.php';
 
         $response = $this->http_client->response($this->controller, $action, ['selected_config' => $filePath], "POST");
 
