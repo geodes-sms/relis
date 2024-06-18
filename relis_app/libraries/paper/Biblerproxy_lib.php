@@ -32,11 +32,12 @@ class Biblerproxy_lib
 		but it can be changed using the setURL() method.
 	*/
 
-	private  $url = biblerproxy_url();
+	private  $url = "";
 
 	public function __construct()
 	{
 		$this->CI = &get_instance();
+		$this->url = biblerproxy_url();
 	}
 
 	//private function __construct()	{}
