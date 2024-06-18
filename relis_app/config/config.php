@@ -333,3 +333,4 @@ $config['project_db_host'] = "db";
 $config['project_db_pass'] = "";
 $config['editor_url'] = "http://tomcat:8080/relis/texteditor";
 $config['tomcat_api_url'] = "http://tomcat:8181/apis/tomcat";
+$config['biblerproxy_url'] = "http://relis_bibler/";

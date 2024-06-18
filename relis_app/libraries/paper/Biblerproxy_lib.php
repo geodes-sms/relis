@@ -32,11 +32,11 @@ class Biblerproxy_lib
 		but it can be changed using the setURL() method.
 	*/
 
-	private  $url='http://bibler:8000/';
+	private  $url = biblerproxy_url();
 
 	public function __construct()
 	{
-		$this->CI =& get_instance();
+		$this->CI = &get_instance();
 	}
 
 	//private function __construct()	{}
@@ -147,7 +147,7 @@ class Biblerproxy_lib
 	{
 		return $this->httpPost($this->url . "generateReport/", $data);
 	}
-	
+
 	public function fixJSON($json)
 	{
 		$regex = <<<'REGEX'
