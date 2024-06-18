@@ -138,7 +138,15 @@ CREATE TABLE `info` (
 
 LOCK TABLES `info` WRITE;
 /*!40000 ALTER TABLE `info` DISABLE KEYS */;
-INSERT INTO `info` VALUES (1,'ReLiS : a tool for conducting Systematic Review','Systematic review is a technique used to search for evidence in scientific literature that is conducted in a formal manner, following a well-defined process, according to
+INSERT INTO `info` VALUES (1,'ReLiS : a tool for conducting Systematic Review','<div class="container mt-5">
+  <div class="announcement-box" style="background-color: #f8f9fa; border: 1px solid #e2e2e2; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); margin: 20px 0;">
+    <div class="announcement-title" style="font-weight: bold; font-size: 1.5em; color: #343a40; margin-bottom: 10px;">New Release Announcement</div>
+    <div class="announcement-message" style="font-size: 1.1em; color: #495057;">
+      We are excited to announce the latest release of our project. You can use your existing credentials from previous releases to access the new features. Please note that projects from previous releases are not imported but can be accessed at 
+      <a href="https://archive.relis.umontreal.ca" target="_blank">archive.relis.umontreal.ca</a>.
+    </div>
+  </div>
+</div>Systematic review is a technique used to search for evidence in scientific literature that is conducted in a formal manner, following a well-defined process, according to
 a previously elaborated protocol. Conducting a systematic reviews involves many steps over a long period of time, and is often laborious and repetitive. This is why we have created ReLiS which provides essential software support to reviewers in conducting
 high quality systematic reviews. With ReLiS, you can planning, conducting, and reporting your review.\r\n
 <p>\r\n<i>ReLiS stands for Revue Litteraire SystÃ©matique which is French for Systematic Literature Reviews Relis literally translates to â€œrereadâ€.</i>\r\n</p>\r\n','','Home',1,1),(2,'Plan the review','ReLiS features a domain-specific language to define
