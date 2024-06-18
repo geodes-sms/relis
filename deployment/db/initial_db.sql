@@ -140,10 +140,10 @@ LOCK TABLES `info` WRITE;
 /*!40000 ALTER TABLE `info` DISABLE KEYS */;
 INSERT INTO `info` VALUES (1,'ReLiS : a tool for conducting Systematic Review','<div class="container mt-5">
   <div class="announcement-box" style="background-color: #d4edda; border: 1px solid #e2e2e2; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); margin: 20px 0;">
-    <div class="announcement-title" style="font-weight: bold; font-size: 1.5em; margin-bottom: 10px;">New Release Announcement</div>
+    <div class="announcement-title" style="font-weight: bold; font-size: 1.5em; margin-bottom: 10px;">New Release Announcement!</div>
     <div class="announcement-message" style="font-size: 1.1em;">
       We are excited to announce the latest release of our project. You can use your <strong>existing credentials</strong> from previous releases to access the new features. Please note that projects from previous releases are <strong>not imported</strong> but can be accessed at 
-      <a href="https://archive.relis.umontreal.ca" target="_blank"><strong>archive.relis.umontreal.ca</strong></a>.
+      <a href="https://relis-archive.iro.umontreal.ca" target="_blank"><strong>relis-archive.iro.umontreal.ca</strong></a>.
     </div>
   </div>
 </div>
