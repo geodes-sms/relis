@@ -351,7 +351,7 @@ class ProjectUnitTest
         $test_aspect = "Created database for the new project";
         $expected_value = "Created";
         $actual_value = "Not created";
-        $filePath = 'tests/classificatio$filePath = uploadProjectFile();n_install_' . getProjectShortName() . '.php';
+        $filePath = 'tests/classification_install_' . getProjectShortName() . '.php';
 
         $response = $this->http_client->response($this->controller, $action, ['selected_config' => $filePath], "POST");
 

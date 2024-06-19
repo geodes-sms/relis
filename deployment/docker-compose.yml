@@ -53,6 +53,8 @@ services:
         DIRECTORY_INDEX: index.php
         DOCUMENT_ROOT: /u/relis/public_html
         ENV: dev
+    env_file:
+      - .env
     entrypoint: /usr/local/bin/entrypoint.sh
     ports:
       - 8083:80
