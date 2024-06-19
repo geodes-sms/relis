@@ -48,6 +48,8 @@ jobs:
           elif [ "$response" == "failed" ]; then
             echo "The unit test failed"
             echo "Browse to http://localhost:8083/test/unit_test/relis_unit_test in you local browser for more details"
+            echo $response
+            curl http://localhost:8083/test/unit_test/relis_unit_test
             exit 1
 
           else
