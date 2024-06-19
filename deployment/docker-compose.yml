@@ -30,6 +30,10 @@ services:
       context: ./tomcat/
     volumes:
       - ../data/tomcat_data:/u/relis/public_html/workspace
+      - ./tomcat/testfiles/classification_install_demoTestProject.php:/u/relis/public_html/workspace/dslforge_workspace/tests/src-gen/classification_install_demoTestProject.php
+      - ./tomcat/testfiles/classification_install_demoTestProject.pdf:/u/relis/public_html/workspace/dslforge_workspace/tests/src-gen/classification_install_demoTestProject.pdf
+      - ./tomcat/testfiles/classification_install_demoTestProject2.php:/u/relis/public_html/workspace/dslforge_workspace/tests/src-gen/classification_install_demoTestProject2.php
+
     environment:
       MYSQL_DATABASE: db
       CATALINA_OPTS: '-Xms512M -Xmx1024M -server -XX:+UseParallelGC'
