@@ -199,3 +199,4 @@ workspace/
 .dockerignore
 SourcesForTests/
 **/data
+**/data*
