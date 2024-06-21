@@ -236,7 +236,7 @@
                         function validate_screen() {
                             var inclusion_mode = '<? echo $inclusion_mode ?>';
                             if ($('#decision').val() == 'excluded' && $('#criteria_ex').val() == '') {
-                                    alert("You must select an exclusion criteria");
+                                    alert("You must select an exclusion criterion.");
                                     return false;
                                 }else if ($('#decision').val() == 'accepted') {
                                     switch(inclusion_mode) {
@@ -244,19 +244,19 @@
                                             break;
                                         case "One" :
                                             if ($('#criteria_in').val() == '') {
-                                                alert("You must select a criterion.");
+                                                alert("You must select an inclusion criterion.");
                                                 return false;
                                             }
                                             break;
                                         case "Any" :
                                             if (!Array.isArray($('#criteria_in').val())) {
-                                                alert("At least one inclusion criterion must be met.");
+                                                alert("You must select at least one criterion.");
                                                 return false;
                                             }
                                         case "All":
                                             var allCriteriaCheck = document.getElementById('allCriteriaCheck').checked;
                                             if (!allCriteriaCheck) {
-                                                alert("All criteria must be met, otherwise exclude this paper.");
+                                                alert("All criteria must be valid, otherwise exclude this paper.");
                                                 return false;
                                             } 
                                             break;

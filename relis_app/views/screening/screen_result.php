@@ -117,14 +117,6 @@
            }
            echo  box_footer();
            if ($inclusion_mode != 'None') {
-            if ($inclusion_mode == 'All'){
-              echo box_header("Statistics on Inclusion Criteria");
-              $tmpl = array (
-                      'table_open'  => '<table class="table table-striped table-hover">',
-                       'table_close'  => '</table>'
-              );
-              echo "<p>All inclusion criteria prseent on included papers.</p>";
-            } else {
               echo box_header("Statistics on Inclusion Criteria");
               $tmpl = array (
                       'table_open'  => '<table class="table table-striped table-hover">',
@@ -140,7 +132,7 @@
    
               echo  box_footer();
             }
-           }
+           
            
 
 

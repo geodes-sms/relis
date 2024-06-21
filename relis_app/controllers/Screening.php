@@ -1718,7 +1718,7 @@ class Screening extends CI_Controller
         if (!empty($res_screening['criteria'])) {
             $result_per_criteria[0] = array(
                 'criteria' => 'Criteria ',
-                'Nbr' => 'Nbr',
+                'Nbr' => 'Papers',
                 'pourc' => '%'
             );
             $i = 1;
@@ -1732,20 +1732,34 @@ class Screening extends CI_Controller
             }
         }
         $result_per_criteria_two = array();
-        if (!empty($res_screening['in_criteria'])) {
+        if (!empty($res_screening['in_criteria']) || $data['inclusion_mode'] == 'All') {
             $result_per_criteria_two[0] = array(
                 'criteria' => 'Criteria ',
-                'Nbr' => 'Nbr',
+                'Nbr' => 'Papers',
                 'pourc' => '%'
             );
-            $i = 1;
-            foreach ($res_screening['in_criteria'] as $key => $value) {
-                $result_per_criteria_two[$i] = array(
-                    'criteria' => !empty($inclusion_crit[$key]) ? $inclusion_crit[$key] : 'Criteria ' . $key,
-                    'Nbr' => $value,
-                    'pourc' => !empty($res_screening['all_criteria_two']) ? round(($value * 100 / $res_screening['all_criteria_two']), 2) : 0,
-                );
-                $i++;
+            if ($data['inclusion_mode'] == 'All') {
+                $i = 1;
+                foreach ($inclusion_crit as $id => $val) {
+                    if ($val != 'Default' && !empty($id)) {
+                        $result_per_criteria_two[$i] = array(
+                            'criteria' => $val,
+                            'Nbr' => !empty($result['Included']) ? $result['Included'] : 0,
+                            'pourc' => 100,
+                        );
+                    }
+                    $i++;
+                }
+            } else {
+                $i = 1;
+                foreach ($res_screening['in_criteria'] as $key => $value) {
+                    $result_per_criteria_two[$i] = array(
+                        'criteria' => !empty($inclusion_crit[$key]) ? $inclusion_crit[$key] : 'Criteria ' . $key,
+                        'Nbr' => $value,
+                        'pourc' => !empty($res_screening['all_criteria_two']) ? round(($value * 100 / $res_screening['all_criteria_two']), 2) : 0,
+                    );
+                    $i++;
+                }
             }
         }
         //test if kappa is enabled
@@ -2649,6 +2663,10 @@ class Screening extends CI_Controller
         }
         if ($already_screened_papers == 0 || !$this->mode_conflict_exists($current_inclusion_mode, $new_inclusion_mode)) {
             //Save if no papers already screened or if there is no conflict
+            if ($already_screened_papers != 0 && $current_inclusion_mode == 'All' && $new_inclusion_mode == 'Any') {
+                //insert all criteria in mapping table when going from 'All' to 'Any' and there are screened papers.
+                $screening_model->set_all_criteria();
+            }
             $screening_model->edit_screening_config($post_arr);
             $screening_model->update_unique_criteria($post_arr['screening_inclusion_mode']);
             redirect('element/display_element/configurations/1');
@@ -2667,16 +2685,18 @@ class Screening extends CI_Controller
 
     private function mode_conflict_exists($current_mode, $new_mode) {
         $mode_string = $current_mode . $new_mode;
-        if ($mode_string == 'NoneOne' || $mode_string == 'NoneAny' || $mode_string == 'AnyOne') return true;
+        if ($mode_string == 'NoneOne' || $mode_string == 'NoneAny' || $mode_string == 'AnyOne' || $mode_string == 'AllOne') return true;
         return false;
     }
 
     public function solve_mode_conflict() {
-        $screening_model = new Screening_dataAccess();
         $post_arr = $this->input->post();
+        if (isset($post_arr['cancel'])) redirect('element/display_element/configurations/1');
+        $screening_model = new Screening_dataAccess();
         $config_array = unserialize($post_arr['config_array']);
         if (isset($post_arr['reset'])) $screening_model->reset_screening();
         if (isset($post_arr['keep_one'])) $screening_model->keep_one_criterion();
+        if (isset($post_arr['keep_one_from_all'])) $screening_model->keep_one_criterion(true);
         if (isset($post_arr['default_criterion'])) $screening_model->set_default_criterion();
         $screening_model->update_unique_criteria($config_array['screening_inclusion_mode']);
         $screening_model->edit_screening_config($config_array);

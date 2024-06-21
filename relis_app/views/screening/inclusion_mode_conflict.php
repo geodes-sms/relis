@@ -18,11 +18,6 @@
                   <div class="x_title">
                      <?php  //header_perspective('screen');?>
                     <h2><?php echo isset($page_title) ? $page_title :"" ; ?></h2>
-                    <?php 
-                    if(isset($top_buttons)){
-                    	echo "<ul class='nav navbar-right panel_toolbox'>$top_buttons</ul>";
-                    }                    
-                    ?>
                     <div class="clearfix"></div>
                     <h1>Inclusion mode conflict</h1>
                   </div>
@@ -38,24 +33,32 @@
                     echo form_open('screening/solve_mode_conflict', $attributes);
                     $conflict_name = $current_inclusion_mode . $post_arr['screening_inclusion_mode'];
                     switch($conflict_name) {
+
                       case 'NoneOne' :
                           echo ' <br> You may choose to restart the screening from scratch or assign default criteria to the already sreened papers. <br><br>'; 
                           echo '<button class="btn  btn-success btn-lg" type="submit" name="reset">Restart Screening</button>';
                           echo '<button class="btn  btn-danger btn-lg" type="submit" name="default_criterion">Proceed with default criterion</button>';
                         break;
+
                       case 'NoneAny' :
                         echo ' <br> You may choose to restart the screening from scratch or assign default criteria to the already sreened papers. <br><br>'; 
                           echo '<button class="btn  btn-success btn-lg" type="submit" name="reset">Restart Screening</button>';
                           echo '<button class="btn  btn-danger btn-lg" type="submit" name="default_criterion">Proceed with default criterion</button>';
                         break;
+
                       case 'AnyOne' :
                         echo ' <br> You may choose to restart the screening from scratch or let ReLiS keep one criterion at random for already screened papers. <br><br>'; 
                           echo '<button class="btn  btn-success btn-lg" type="submit" name="reset">Restart Screening</button>';
                           echo '<button class="btn  btn-danger btn-lg" type="submit" name="keep_one">Proceed with one criterion</button>';
-                        break;
+                          break;
+                      case 'AllOne' :
+                        echo ' <br> You may choose to restart the screening from scratch or let ReLiS keep one criterion at random for already screened papers. <br><br>'; 
+                          echo '<button class="btn  btn-success btn-lg" type="submit" name="reset">Restart Screening</button>';
+                          echo '<button class="btn  btn-danger btn-lg" type="submit" name="keep_one_from_all">Proceed with one criterion</button>';
+                          break;
                     }
                     echo '<br><br>';
-                    echo '<a href="javascript:history.go(-1)" title="Back"><button class="btn">Cancel</button></a>';
+                    echo '<button class="btn btn-lg" type="submit" name="cancel">Cancel</button>';
                   ?>
                   <input type="hidden" name="config_array" id="config_array" value="<? echo htmlspecialchars(serialize($post_arr)) ?>">
                   </h2>

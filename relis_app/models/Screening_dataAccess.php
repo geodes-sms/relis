@@ -107,21 +107,6 @@ class Screening_dataAccess extends CI_Model
 
     function edit_screening_config($config) {
         $this->db2 = $this->load->database(project_db(), TRUE);
-        /*$query = $this->db->query("CALL update_config_screening("
-            . $config['config_id'] . ","
-            . $config['config_id'] . ","
-            . $config['screening_on'] . ","
-            . $config['screening_result_on'] . ","
-            . $config['assign_papers_on'] . ","
-            . $config['screening_reviewer_number'] . ","
-            . $config['screening_inclusion_mode'] . ","
-            . $config['screening_conflict_type'] . ","
-            . $config['screening_screening_conflict_resolution'] . ","
-            . $config['use_kappa'] . ","
-            . $config['screening_validation_on'] . ","
-            . $config['screening_validator_assignment_type'] . ","
-            . $config['validation_default_percentage'] . ","
-        )");*/
         $config_save = array(
             'screening_on' => $config['screening_on'],
             'screening_result_on' => $config['screening_result_on'],
@@ -135,7 +120,10 @@ class Screening_dataAccess extends CI_Model
             'screening_validator_assignment_type' => $config['screening_validator_assignment_type'],
             'validation_default_percentage' => $config['validation_default_percentage']
         );
-        return $this->db2->update('config', $config_save, array('config_id' => $config['config_id']));
+        $this->db2->update('config', $config_save, array('config_id' => $config['config_id']));
+        if ($config['screening_inclusion_mode'] == 'None' || $config['screening_inclusion_mode'] == 'All') {
+            $this->db2->empty_table('screen_inclusion_mapping');
+        }
     }
 
     function reset_screening() {
@@ -145,21 +133,37 @@ class Screening_dataAccess extends CI_Model
         $this->db_current->query($sql);
     }
 
-    function keep_one_criterion() {
-        $sql = '
-        DELETE FROM screen_inclusion_mapping
-        WHERE (screening_id, criteria_id) IN (
-            SELECT screening_id, criteria_id
-            FROM (
-                SELECT 
-                    screening_id, 
-                    criteria_id,
-                    ROW_NUMBER() OVER(PARTITION BY screening_id ORDER BY criteria_id) AS row_num
-                FROM screen_inclusion_mapping
-            ) AS subquery
-            WHERE row_num > 1
-        );
-        ';
+    function keep_one_criterion($from_all = false) {
+        //if previous inclusion mode is 'All', insert first selected criteria as the one criterion
+        if ($from_all) {
+            $sql = "INSERT INTO screen_inclusion_mapping (screening_id, criteria_id, mapping_active)
+            SELECT sp.screening_id, ric.ref_id, 1
+            FROM screening_paper sp
+            CROSS JOIN (
+                SELECT ref_id
+                FROM ref_inclusioncriteria
+                WHERE ref_active = 1
+                ORDER BY ref_id
+                LIMIT 1
+            ) ric
+            WHERE sp.screening_status = 'Done';";
+        } else { //if previous mode is 'Any', delete extra criteria until there is only one left.
+            $sql = '
+            DELETE FROM screen_inclusion_mapping
+            WHERE (screening_id, criteria_id) IN (
+                SELECT screening_id, criteria_id
+                FROM (
+                    SELECT 
+                        screening_id, 
+                        criteria_id,
+                        ROW_NUMBER() OVER(PARTITION BY screening_id ORDER BY criteria_id) AS row_num
+                    FROM screen_inclusion_mapping
+                ) AS subquery
+                WHERE row_num > 1
+            );
+            ';
+        }
+        
         return $this->db_current->query($sql);
     }
 
@@ -210,5 +214,17 @@ class Screening_dataAccess extends CI_Model
         ";
         $this->db_current->query($sql);
 
+    }
+
+    //sets all active criteria in mapping table for screenings marked 'Done'
+    public function set_all_criteria() {
+        $clear_table = 'DELETE FROM screen_inclusion_mapping';
+        $set_criteria = "INSERT INTO screen_inclusion_mapping (screening_id, criteria_id, mapping_active)
+                            SELECT sp.screening_id, ric.ref_id, 1
+                            FROM screening_paper sp
+                            JOIN ref_inclusioncriteria ric ON ric.ref_active = 1
+                            WHERE sp.screening_status = 'Done';";
+        $this->db_current->query($clear_table);
+        $this->db_current->query($set_criteria);
     }
 }
