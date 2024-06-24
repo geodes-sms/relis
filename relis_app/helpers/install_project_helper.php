@@ -140,6 +140,7 @@ function populate_common_tables($target_db = 'current', $config = 'init')
 			'screening',
 			'screen_decison',
 			'screening_inclusion_mapping',
+			'screen_phase_config',
 			'operations',
 			'qa_questions',
 			'qa_responses',
@@ -222,6 +223,7 @@ function update_stored_procedure($config, $verbose = FALSE, $target_db = 'curren
 			'paper_author',
 			'venue',
 			'screen_phase',
+			'screen_phase_config',
 			'screening',
 			'screen_decison',
 			'str_mng'

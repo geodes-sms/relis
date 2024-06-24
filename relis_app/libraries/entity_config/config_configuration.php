@@ -118,7 +118,6 @@ function get_configuration()
 		'input_type' => 'select',
 		'input_select_source' => 'array',
 		'input_select_values' => array('None' => 'None', 'One' => 'One', 'Any' => 'Any', 'All' => 'All'),
-
 	);
 
 	$fields['screening_screening_conflict_resolution'] = array(
@@ -312,9 +311,8 @@ function get_configuration()
 		'input_type' => 'select',
 		'input_select_source' => 'yes_no',
 		'input_select_values' => '',
-	)
-
-	;
+	);
+	
 	$fields['qa_on'] = array(
 		'field_title' => 'Quality assessment enabled',
 		'field_type' => 'int',

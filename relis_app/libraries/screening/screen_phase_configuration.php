@@ -172,6 +172,7 @@ function get_config_screen_phase()
 
 	);
 
+
 	$fields['screen_phase_final'] = array(
 		'field_title' => 'Final phase',
 		'field_type' => 'int',
@@ -183,6 +184,20 @@ function get_config_screen_phase()
 		'input_select_values' => '',
 
 	);
+
+	$fields['config_type'] = array( // assigned to
+		'field_title' => 'Config type',
+		'field_type' => 'number',
+		'field_value' => 'normal',
+		'field_size' => 11,
+		'input_type' => 'select',
+		'input_select_source' => 'table',
+		'input_select_source_type' => 'normal',
+		'input_select_values' => 'screen_phase_config;config_type', //the reference table and the field to be displayed
+		'input_select_key_field' => 'screen_phase_id',
+		'number_of_values' => '',
+	);
+
 	$fields['phase_type'] = array(
 		'field_title' => 'Phase category',
 		'field_type' => 'text',
@@ -222,10 +237,10 @@ function get_config_screen_phase()
 		'field_type' => 'time',
 		'default_value' => 'CURRENT_TIMESTAMP',
 		'field_value' => bm_current_time('Y-m-d H:i:s'),
-
 		'field_size' => 20,
 		'mandatory' => ' mandatory ',
 	);
+
 	$fields['screen_phase_active'] = array(
 		'field_title' => 'Active',
 		'field_type' => 'int',
@@ -247,13 +262,13 @@ function get_config_screen_phase()
 		'operation_title' => 'Add a new screening phase',
 		'operation_description' => 'Add a new screening phase',
 		'page_title' => 'Add a new screening phase',
-		'save_function' => 'element/save_element',
+		//'save_function' => 'element/save_element',
 		'save_function' => 'screening/save_phase_screen',
 		'page_template' => 'general/frm_entity',
 		'redirect_after_save' => 'element/entity_list/list_screen_phases',
 		'db_save_model' => 'add_screen_phase',
 
-		'generate_stored_procedure' => False,
+		'generate_stored_procedurf' => False,
 
 		'fields' => array(
 			'screen_phase_id' => array('mandatory' => '', 'field_state' => 'hidden'),
@@ -290,7 +305,6 @@ function get_config_screen_phase()
 		'operation_title' => 'Add a new validation phase',
 		'operation_description' => 'Add a new validation phase',
 		'page_title' => 'Add a new validation phase',
-		'save_function' => 'element/save_element',
 		'save_function' => 'screening/save_phase_screen',
 		'page_template' => 'general/frm_entity',
 		'redirect_after_save' => 'element/entity_list/list_screen_phases',
@@ -336,7 +350,7 @@ function get_config_screen_phase()
 		'operation_title' => 'Edit a screening phase',
 		'operation_description' => 'Edit a screening phase',
 		'page_title' => 'Edit  screening phase ',
-		'save_function' => 'element/save_element',
+		//'save_function' => 'element/save_element',
 		'save_function' => 'screening/save_phase_screen',
 		'page_template' => 'general/frm_entity',
 
@@ -400,6 +414,13 @@ function get_config_screen_phase()
 			//'source_paper'=>array(),
 			//'source_paper_status'=>array(),
 			'screen_phase_state' => array(),
+			'config_type' => array(
+				'link' => array(
+					'url' => 'element/display_element/detail_screen_phase_config/',
+					'id_field' => 'screen_phase_id',
+					'trim' => '0'
+				)
+			),
 			'screen_phase_order' => array(),
 			//'phase_type'=>array(),
 			'screen_phase_final' => array()
@@ -425,7 +446,12 @@ function get_config_screen_phase()
 				'label' => 'Cancel',
 				'title' => 'Cancel the phase',
 				'url' => 'element/delete_element/remove_screen_phase/'
-			)
+			),
+			'edit' => array(
+				'label' => 'Config',
+				'title' => 'Custom configuration',
+				'url' => 'screening/edit_custom_phase/',
+			),
 
 		),
 
@@ -503,8 +529,6 @@ function get_config_screen_phase()
 		'redirect_after_delete' => 'element/entity_list/list_screen_phases',
 		'db_delete_model' => 'remove_screen_phase',
 		'generate_stored_procedure' => True,
-
-
 	);
 
 	$config['operations'] = $operations;

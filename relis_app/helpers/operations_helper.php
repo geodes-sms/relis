@@ -85,6 +85,17 @@ function check_operation($operation, $type = "List")
 		'tab_ref' => 'users',
 		'operation_id' => 'edit_user_min'
 	);
+	$operations['detail_screen_phase_config'] = array(
+		'type' => 'Detail',
+		'tab_ref' => 'screen_phase_config',
+		'operation_id' => 'detail_screen_phase_config'
+	);
+	$operations['edit_screen_phase_config'] = array(
+		'type' => 'Edit',
+		'tab_ref' => 'screen_phase_config',
+		'operation_id' => 'edit_screen_phase_config',
+	);
+	//	$operations['']
 
 	/*
 					includes several PHP files that define additional operations related to different modules, such as project, configuration, reference, 
@@ -161,7 +172,6 @@ function check_operation($operation, $type = "List")
 //function is used to generate stored procedures based on the provided entity configuration
 function create_stored_procedures($entity_config, $target_db = 'current', $verbose = FALSE, $run_query = TRUE)
 {
-
 	//The function calls the get_table_configuration() function to retrieve the configuration details for the entity specified by $entity_config in the $target_db database.
 	$table_configuration = get_table_configuration($entity_config, $target_db);
 

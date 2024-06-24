@@ -128,6 +128,11 @@ class Entity_configuration_lib
 				require_once("screening/screening_inclusion_mapping_config.php");
 				$table_configurations['screening_inclusion_mapping'] = get_screening_inclusion_mapping_config();
 				break;
+
+			case 'screen_phase_config':
+				require_once("screening/screen_phase_custom_configuration.php");
+				$table_configurations['screen_phase_config'] = get_screening_phase_config();
+				break;
 			case 'screen_decison':
 				require_once("screening/screening_decision_configuration.php");
 				$table_configurations['screen_decison'] = get_screening_decision();

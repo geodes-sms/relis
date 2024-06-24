@@ -17,7 +17,7 @@
  *
  * --------------------------------------------------------------------------
  *
- *  :Author: Brice Michel Bigendako
+ *  :Author: Abdelhamid Rouatbi
  */
 
 /*
@@ -50,7 +50,7 @@ function get_screening_inclusion_mapping_config()
 	);
 
 	$fields['screening_id'] = array(
-		'field_title' => 'Paper',
+		'field_title' => 'screening id',
 		'field_type' => 'int',
 		'field_size' => 11,
 		'mandatory' => ' mandatory ',
@@ -60,7 +60,7 @@ function get_screening_inclusion_mapping_config()
 
 	$fields['criteria_id'] = array( // assigned to
 		'category_type' => 'IndependantDynamicCategory',
-		'field_title' => 'Screening phase',
+		'field_title' => 'Criteria',
 		'field_type' => 'int',
 		'field_size' => 11,
 		'mandatory' => ' mandatory ',

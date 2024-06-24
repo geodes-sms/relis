@@ -73,7 +73,7 @@ class Screening extends CI_Controller
             $data['screening_completion']['done_papers'] = array(
                 'value' => $screening_completion['papers_done'],
                 'title' => 'Screened',
-                'url' => 'element/entity_list/list_my_screenings'
+                'url' => 'element/entity_list/enings'
             );
             $data['screening_completion']['conflict_papers'] = array(
                 'value' => $screening_completion['papers_in_conflict'],
@@ -885,7 +885,7 @@ class Screening extends CI_Controller
         $inclusion_crit = $this->manager_lib->get_reference_select_values('inclusioncriteria;ref_value');
         $data['exclusion_criteria'] = $exclusion_crit;
         $data['inclusion_criteria'] = $inclusion_crit;
-        $data['inclusion_mode'] = get_appconfig_element('screening_inclusion_mode');
+        $data['inclusion_mode'] = get_screening_config_element('screening_inclusion_mode');
         if (!empty($data['content_item'])) {
             //edit screening: used for conflict resolution
             $data['the_paper'] = $data['content_item']['paper_id'];
@@ -2415,6 +2415,11 @@ class Screening extends CI_Controller
             //	print_test($to_save); exit;
             if ($post_arr['operation_type'] == 'new') {
                 $res = $this->db2->insert('screen_phase', $to_save);
+                $phase_id = $this->db2->insert_id();
+                $phase_config_save = array(
+                    'screen_phase_id' => $phase_id
+                );
+                $res = $this->db2->insert('screen_phase_config', $phase_config_save);
             } else {
                 $res = $this->db2->update(
                     'screen_phase',
@@ -2710,5 +2715,10 @@ class Screening extends CI_Controller
 
         $result = $query->row();
         return $result ? $result->ref_id : null;
+    }
+
+    public function save_screen_phase_config() {
+        $post_arr = $this->input->post();
+        print_test($post_arr); exit;
     }
 }
