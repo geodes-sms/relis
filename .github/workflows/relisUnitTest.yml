@@ -44,6 +44,7 @@ jobs:
 
           if [ "$response" == "successful" ]; then
             echo "The unit test passed. Proceeding with the workflow."
+            echo "All Unit test passed" > ~/test_report.html
 
           elif [ "$response" == "failed" ]; then
             echo "The unit test failed"
@@ -54,9 +55,11 @@ jobs:
 
           else
             echo "The unit test has an error :"
-            echo $response
+            echo $response 
+            echo $response > ~/test_report.html
             exit 1
           fi
+
       - name: Upload the HTML Report
         uses: actions/upload-artifact@v4
         with:
