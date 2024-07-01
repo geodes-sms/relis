@@ -61,6 +61,7 @@ jobs:
           fi
 
       - name: Upload the HTML Report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: test-report.html
