@@ -1134,6 +1134,14 @@ class Element extends CI_Controller
         $op = check_operation($operation_name, 'List');
         $ref_table = $op['tab_ref'];
         $ref_table_operation = $op['operation_id'];
+
+        if($ref_table_operation == 'list_assignments_validation' or $ref_table_operation == 'list_screenings_validation'){
+            if (!get_appconfig_element('screening_validation_on')){
+                redirect('screening/screening');
+                exit;
+            }
+        }
+
         if (admin_config($ref_table))
             $data['left_menu_admin'] = True;
         /*

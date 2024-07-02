@@ -297,6 +297,7 @@ function update_screening_values($screening, $target_db = 'current')
 											 'review_per_paper'=>2,
 											 'conflict_type'=>'IncludeExclude',
 											 'conflict_resolution'=>'Unanimity',
+	                                         'status_to_validate'=>'Excluded',
 											 'validation_percentage'=>20,
 											 'validation_assigment_mode'=>'Normal',
 											 'phases'=>array(
@@ -320,7 +321,8 @@ function update_screening_values($screening, $target_db = 'current')
 	$config['screening_reviewer_number'] = !empty($screening['review_per_paper']) ? $screening['review_per_paper'] : "2";
 	$config['screening_screening_conflict_resolution'] = !empty($screening['conflict_resolution']) ? $screening['conflict_resolution'] : "Unanimity";
 	$config['screening_conflict_type'] = !empty($screening['conflict_type']) ? $screening['conflict_type'] : "IncludeExclude";
-	$config['validation_default_percentage'] = !empty($screening['validation_percentage']) ? $screening['validation_percentage'] : "20";
+	$config['screening_status_to_validate'] = !empty($screening['status_to_validate']) ? $screening['status_to_validate'] : "IncludedExcluded";
+    $config['validation_default_percentage'] = !empty($screening['validation_percentage']) ? $screening['validation_percentage'] : "20";
 	$config['screening_validator_assignment_type'] = !empty($screening['validation_assigment_mode']) ? $screening['validation_assigment_mode'] : "Normal";
 	$config['screening_on'] = 1;
 	$result = $ci->db3->update('config', $config, "config_id=1");
