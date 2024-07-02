@@ -83,8 +83,7 @@ function addTestUser()
     //add user in the db
     $ci->db->insert('users', $user_array);
     $user_id = $ci->db->insert_id();
-    $confimation_code = $res = $ci->bm_lib->random_str(12);
-    ;
+    $confimation_code = $res = $ci->bm_lib->random_str(12);;
     $ci->db->insert(
         'user_creation',
         array(
