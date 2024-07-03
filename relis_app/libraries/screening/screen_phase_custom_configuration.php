@@ -265,7 +265,7 @@ function get_screening_phase_config()
 		'operation_title' => 'Edit a screening phase configuration',
 		'operation_description' => 'Edit a screening phase configuration',
 		'page_title' => 'Edit screening phase configuration',
-		'save_function' => 'screening/save_screen_phase_config',
+		'save_function' => 'screening/edit_screening_config',
 		'page_template' => 'general/frm_entity',
 
 		'redirect_after_save' => 'element/entity_list/list_screen_phases',
@@ -275,7 +275,7 @@ function get_screening_phase_config()
 		'generate_stored_procedure' => False,
 
 		'fields' => array(
-			'config_type' => array('mandatory' => '', 'field_state' => 'enabled'),
+			'screen_phase_id' => array('mandatory' => '', 'field_state' => 'hidden'),
 			'screening_result_on' => array('mandatory' => '', 'field_state' => 'enabled'),
 			'assign_papers_on' => array('mandatory' => '', 'field_state' => 'enabled'),
 			'screening_reviewer_number' => array('mandatory' => '', 'field_state' => 'enabled'),

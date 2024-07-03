@@ -416,7 +416,7 @@ function get_config_screen_phase()
 			'screen_phase_state' => array(),
 			'config_type' => array(
 				'link' => array(
-					'url' => 'element/display_element/detail_screen_phase_config/',
+					'url' => 'screening/route_config/',
 					'id_field' => 'screen_phase_id',
 					'trim' => '0'
 				)
@@ -442,16 +442,23 @@ function get_config_screen_phase()
 										  'icon'=>'edit',
 										  'url'=>'element/edit_element/edit_screen_phase/',
 									  ),*/
+			'edit' => array(
+				'label' => 'Edit',
+				'title' => 'Edit screen phase',
+				'id_field' => 'screen_phase_id',
+				'url' => 'element/edit_element/edit_screen_phase/',
+			),
 			'delete' => array(
-				'label' => 'Cancel',
+				'label' => 'Remove',
 				'title' => 'Cancel the phase',
 				'url' => 'element/delete_element/remove_screen_phase/'
 			),
-			'edit' => array(
-				'label' => 'Config',
-				'title' => 'Custom configuration',
-				'url' => 'screening/edit_custom_phase/',
-			),
+			'config' => array(
+				'icon' => 'cog',
+				'label' => 'Toggle configuration type',
+				'url' => 'screening/toggle_phase_config/',
+			)
+			
 
 		),
 

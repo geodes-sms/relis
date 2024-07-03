@@ -1,4 +1,21 @@
-	<!-- Select2 -->
+<?php
+  function format_phase_titles($titles) {
+    $count = count($titles);
+    
+    if ($count === 0) {
+        return '';
+    } elseif ($count === 1) {
+        return $titles[0];
+    } elseif ($count === 2) {
+        return implode(' and ', $titles);
+    } else {
+        $last = array_pop($titles);
+        return implode(', ', $titles) . ', and ' . $last;
+    }
+}
+?>
+  
+  <!-- Select2 -->
     <script src="<?php echo site_url();?>cside/vendors/select2/dist/js/select2.full.min.js"></script>
 	<!-- page content -->
         <div class="right_col" role="main">
@@ -25,7 +42,13 @@
                   <div style='text-align:center'>
                   <h2>
                     Changing inclusion mode from <b>'<? echo $current_inclusion_mode ?>'</b> to <b>'<? echo $post_arr['screening_inclusion_mode'] ?>'</b>
-                    raises a conflict in already screened papers. How would you like to proceed ?
+                    raises a conflict in already screened papers for phase(s): 
+                      <?
+                          $titles = array_column($phases_title, 'phase_title');
+                          echo format_phase_titles($titles);
+                      ?>
+                    .
+                    How would you like to proceed ?
                     <br>
                   
                   <?php
@@ -61,6 +84,7 @@
                     echo '<button class="btn btn-lg" type="submit" name="cancel">Cancel</button>';
                   ?>
                   <input type="hidden" name="config_array" id="config_array" value="<? echo htmlspecialchars(serialize($post_arr)) ?>">
+                  <input type="hidden" name="affected_phases" id="affected_phases" value = "<? echo htmlspecialchars(serialize($phases_id)) ?>">
                   </h2>
                   
 <br />
@@ -74,3 +98,5 @@
           </div>
         </div>
         <!-- /page content -->  
+
+        

@@ -1256,6 +1256,11 @@ class Element extends CI_Controller
                     }
                     break;
                 default:
+                    if (!$is_guest) {
+                        if (!empty($link['url'])) {
+                            $push_link = true;
+                        }
+                    }
                     break;
             }
             if ($push_link and (!$project_published or $link_type == 'view'))

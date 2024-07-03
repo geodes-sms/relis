@@ -2063,28 +2063,5 @@ function path_separator()
 }	
 
 function get_screening_config_element($element_name) {
-    $phase_id = active_screening_phase();
-    if (empty($phase_id)) return get_appconfig_element($element_name);
-    $CI = get_instance();
-    $CI->db2 = $CI->load->database(project_db(), TRUE);
-	
-    $CI->db2->select('config_type');
-    $CI->db2->from('screen_phase_config');
-    $CI->db2->where('screen_phase_id', $phase_id);
-    $config_type_query = $CI->db2->get();
-	
-    if ($config_type_query->num_rows() > 0) $config_type = $config_type_query->row()->config_type;
-    else return get_appconfig_element($element_name);
-	
-    if ($config_type == 'Default') return get_appconfig_element($element_name);
-    print_test('a');
-
-    $CI->db2->select($element_name);
-    $CI->db2->from('screen_phase_config');
-    $CI->db2->where('screen_phase_id', $phase_id);
-    $element_query = $CI->db2->get();
-    if ($element_query->num_rows() > 0) return $element_query->row()->$element_name;
-
-    return get_appconfig_element($element_name);
-    
+    //123    
 }

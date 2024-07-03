@@ -2653,7 +2653,7 @@ class Screening extends CI_Controller
         return $interpretation;
     }
 
-    public function edit_screening_config() {
+    /* public function edit_screening_config() {
         $post_arr = $this->input->post();
         $screening_model = new Screening_dataAccess();
         $general_screening_completion = $this->get_user_completion(0, active_screening_phase(), 'Screening');
@@ -2666,6 +2666,7 @@ class Screening extends CI_Controller
             set_top_msg('You need to add inclusion criteria before making this change', "error");
             redirect('element/display_element/configurations/1');
         }
+
         if ($already_screened_papers == 0 || !$this->mode_conflict_exists($current_inclusion_mode, $new_inclusion_mode)) {
             //Save if no papers already screened or if there is no conflict
             if ($already_screened_papers != 0 && $current_inclusion_mode == 'All' && $new_inclusion_mode == 'Any') {
@@ -2688,11 +2689,6 @@ class Screening extends CI_Controller
 
     }
 
-    private function mode_conflict_exists($current_mode, $new_mode) {
-        $mode_string = $current_mode . $new_mode;
-        if ($mode_string == 'NoneOne' || $mode_string == 'NoneAny' || $mode_string == 'AnyOne' || $mode_string == 'AllOne') return true;
-        return false;
-    }
 
     public function solve_mode_conflict() {
         $post_arr = $this->input->post();
@@ -2706,8 +2702,95 @@ class Screening extends CI_Controller
         $screening_model->update_unique_criteria($config_array['screening_inclusion_mode']);
         $screening_model->edit_screening_config($config_array);
         redirect('element/display_element/configurations/1');
+    } */
+
+    private function mode_conflict_exists($current_mode, $new_mode) {
+        $mode_string = $current_mode . $new_mode;
+        if ($mode_string == 'NoneOne' || $mode_string == 'NoneAny' || $mode_string == 'AnyOne' || $mode_string == 'AllOne') return true;
+        return false;
     }
 
+    public function edit_screening_config($current_custom_config = null) {
+        $post_arr = $current_custom_config ? $current_custom_config : $this->input->post();
+        $phase_id = !array_key_exists('screen_phase_id', $post_arr) ? null : $post_arr['screen_phase_id'];
+        $config_type = $this->get_phase_config_type($phase_id);
+        $current_inclusion_mode = $this->get_phase_config_value($phase_id, 'screening_inclusion_mode');
+        $new_inclusion_mode = $post_arr['screening_inclusion_mode'];
+        $screening_model = new Screening_dataAccess();
+        
+        //Criterias must exist for modes other than None
+        if ($new_inclusion_mode != 'None' && $screening_model->count_inclusion_criteria() == 0) {
+            set_top_msg('You need to add inclusion criteria before making this change', "error");
+            redirect('element/entity_list/list_screen_phases');
+        }
+        
+        $affected_phases = $this->get_affected_phases($phase_id);
+
+        //count already screened papers
+        $this->db_current->from('screening_paper');
+        $this->db_current->where('screening_status', 'Done');
+        if (!empty($affected_phases)) {
+            $this->db_current->where_in('screening_phase', $affected_phases);
+        } else {
+            $already_screened_papers = 0;
+        }
+        $query = $this->db_current->get();
+        if ($query->num_rows() > 0) {
+            $already_screened_papers = $query->num_rows();
+        } else {
+            $already_screened_papers = 0;
+        }
+        
+        //Save if no papers already screened or if there is no conflict
+        if ($already_screened_papers == 0 || !$this->mode_conflict_exists($current_inclusion_mode, $new_inclusion_mode)) {
+            if ($already_screened_papers != 0 && $current_inclusion_mode == 'All' && $new_inclusion_mode == 'Any') {
+                //insert all criteria in mapping table when going from 'All' to 'Any' and there are screened papers.
+                $screening_model->set_all_criteria($affected_phases);
+            }
+            $screening_model->edit_screening_config($post_arr, $phase_id, $affected_phases);
+            redirect('element/entity_list/list_screen_phases');
+        }  else { 
+            $this->db2->where_in('screen_phase_id', $affected_phases);
+            $query = $this->db2->select('phase_title')->get('screen_phase');
+            $affected_phases_titles = $query->result_array();
+            //If screening already started and there is conflict, ask user how to solve it
+            $data['post_arr'] = $post_arr;
+            $data['phases_id'] = $affected_phases;
+            $data['phases_title'] = $affected_phases_titles;
+            $data['current_inclusion_mode'] = $current_inclusion_mode;
+            $data['top_buttons'] = get_top_button('back', 'Back', 'manage');
+            $data['left_menu_perspective']='left_menu_screening';
+            $data['project_perspective']='screening';
+            $data['page'] = 'screening/inclusion_mode_conflict';
+            $this->load->view('shared/body', $data);
+        }
+
+        
+    }
+
+    public function solve_mode_conflict() {
+
+        if (isset($post_arr['cancel'])) redirect('element/entity_list/list_screen_phases');
+        
+        $screening_model = new Screening_dataAccess();
+        $post_arr = $this->input->post();
+        $config_array = unserialize($post_arr['config_array']);
+        $affected_phases = unserialize($post_arr['affected_phases']);
+        $phase_id = !array_key_exists('screen_phase_id', $post_arr) ? null : $post_arr['screen_phase_id'];
+        
+        if (isset($post_arr['reset'])) $screening_model->reset_screening($affected_phases);
+        if (isset($post_arr['keep_one'])) $screening_model->keep_one_criterion($affected_phases);
+        if (isset($post_arr['keep_one_from_all'])) $screening_model->keep_one_criterion($affected_phases, true);
+        if (isset($post_arr['default_criterion'])) $screening_model->set_default_criterion($affected_phases);
+        $screening_model->edit_screening_config($post_arr, $phase_id, $affected_phases);
+
+        exit;
+    }
+/* 
+    public function solve_mode_conflict() {
+
+    }
+ */
     private function get_default_criteria_id() {
         $query = $this->db_current->select('ref_id')
                           ->where('ref_value', 'Default')
@@ -2717,8 +2800,106 @@ class Screening extends CI_Controller
         return $result ? $result->ref_id : null;
     }
 
-    public function save_screen_phase_config() {
-        $post_arr = $this->input->post();
-        print_test($post_arr); exit;
+    private function get_affected_phases($phase_id) {
+        if (empty($phase_id) or $this->get_phase_config_type($phase_id) == 'Default') {
+            $this->db_current->select('screen_phase_id');
+            $this->db_current->from('screen_phase_config');
+            $this->db_current->where('config_type', 'Default');
+            $subquery_result = $this->db_current->get();
+            if ($subquery_result->num_rows() > 0) {
+                foreach ($subquery_result->result() as $row) {
+                    $affected_phases[] = $row->screen_phase_id;
+                }
+            }
+        } else {
+            $affected_phases = [$phase_id];
+        }
+        return $affected_phases;
+    }
+
+    //switch phase config type between 'Default'and 'Custom'
+    public function toggle_phase_config($phase_id) {
+        $this->db2 = $this->load->database(project_db(), TRUE);
+        
+        $config_type = $this->get_phase_config_type($phase_id); 
+        $config = get_appconfig();
+
+        if ($config_type == 'Default') {
+            $config_save = array(
+                'config_type' => 'Custom',
+                'screening_result_on' => $config['screening_result_on'],
+                'assign_papers_on' => $config['assign_papers_on'],
+                'screening_reviewer_number' => $config['screening_reviewer_number'],
+                'screening_inclusion_mode' => $config['screening_inclusion_mode'],
+                'screening_conflict_type' => $config['screening_conflict_type'],
+                'screening_screening_conflict_resolution' => $config['screening_screening_conflict_resolution'],
+                'use_kappa' => $config['use_kappa'],
+                'screening_validation_on' => $config['screening_validation_on'],
+                'screening_validator_assignment_type' => $config['screening_validator_assignment_type'],
+                'validation_default_percentage' => $config['validation_default_percentage']
+            );
+            $this->db2->where('screen_phase_id', $phase_id);
+            $this->db2->update('screen_phase_config', $config_save);
+        }
+
+        if ($config_type == 'Custom') {
+            $this->db2->where('screen_phase_id', $phase_id);
+            $this->db2->update('screen_phase_config', array('config_type' => 'Default'));
+
+            $this->db2->where('screen_phase_id', $phase_id);
+            $query = $this->db2->get('screen_phase_config');
+            $current_custom_config = ($query->num_rows() > 0) ? $query->row_array() : array(); // Return the first row as an associative array
+            $this->edit_screening_config($current_custom_config);
+        }
+
+
+        redirect('element/entity_list/list_screen_phases');
+    }
+
+    //get value of config_type of given phase
+    public function get_phase_config_type($phase_id = null) {
+        if (!empty($phase_id)) {
+            $this->db2 = $this->load->database(project_db(), TRUE);
+            $this->db2->select('config_type');
+            $this->db2->from('screen_phase_config');
+            $this->db2->where('screen_phase_id', $phase_id);
+            $query = $this->db2->get();
+            $row = $query->row();  
+            $config_type = $row->config_type;
+        } else $config_type = 'Default';
+        return $config_type;
+    }
+
+    public function get_phase_config_value($phase_id, $value_name) {
+        $this->db2 = $this->load->database(project_db(), TRUE);
+        $config_type = $this->get_phase_config_type($phase_id);
+        if ($config_type == 'Custom') {
+            $this->db2->select($value_name);
+            $this->db2->from('screen_phase_config');
+            $this->db2->where('screen_phase_id', $phase_id);
+            $query = $this->db2->get();
+            $row = $query->row();
+            return $row->$value_name;
+        }
+        return get_appconfig_element($value_name);
+    }
+
+    //routes to proper config page (phase config if custom, project config if default)
+    public function route_config($phase_id) {
+        $config_type = $this->get_phase_config_type($phase_id);
+        $this->db2->select('screen_phase_config_id');
+        $this->db2->from('screen_phase_config');
+        $this->db2->where('screen_phase_id', $phase_id);
+        $config_id = $this->db2->get()->row()->screen_phase_config_id;
+        switch($config_type) {
+            case 'Default':
+                redirect('element/display_element/configurations/1');
+                break;
+            case 'Custom':
+                redirect('element/display_element/detail_screen_phase_config/' . $config_id);
+                break;
+            default:
+            break;
+        }
     }
 }
