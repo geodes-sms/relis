@@ -2,6 +2,7 @@ FROM php:7.3.30-apache-buster
 
 ARG DIRECTORY_INDEX
 ARG DOCUMENT_ROOT
+ARG ENV
 
 RUN apt-get autoclean && apt-get update && apt-get install -y \
     curl \
@@ -17,8 +18,7 @@ RUN apt-get autoclean && apt-get update && apt-get install -y \
 RUN apt-get install -y libicu-dev
 RUN docker-php-ext-install intl mysqli pdo pdo_mysql zip
 
-RUN pecl install xdebug-2.8.0 \
-    && docker-php-ext-enable xdebug
+RUN if [ "$ENV" = "dev" ]; then pecl install xdebug-2.8.0 && docker-php-ext-enable xdebug; fi
 
 
 # Install Composer
@@ -27,12 +27,6 @@ RUN composer --version
 
 ## Make a lsb-release file so the installer knows the os (necessary for debian)
 RUN cp /etc/os-release /etc/lsb-release
-
-## Create and switch user for a non-root installation
-RUN useradd -ms /bin/bash docker
-USER docker
-
-USER root
 
 #Set php.ini configuration
 
@@ -45,7 +39,7 @@ COPY ./php/conf/50_xdebug.ini "$PHP_INI_DIR/conf.d/50_xdebug.ini"
 RUN echo ${DIRECTORY_INDEX}
 RUN echo ${DOCUMENT_ROOT}
 ENV APACHE_DOCUMENT_ROOT ${DOCUMENT_ROOT}
-COPY ./apache/conf/vhost.conf /etc/apache2/sites-available
+COPY ./conf/vhost.conf /etc/apache2/sites-available
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 

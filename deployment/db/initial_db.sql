@@ -123,7 +123,7 @@ DROP TABLE IF EXISTS `info`;
 CREATE TABLE `info` (
   `info_id` int(11) NOT NULL AUTO_INCREMENT,
   `info_title` varchar(500) NOT NULL,
-  `info_desc` varchar(10000) DEFAULT NULL,
+  `info_desc` varchar(15000) DEFAULT NULL,
   `info_link` varchar(500) DEFAULT NULL,
   `info_type` enum('Home','Features','Help','Reference') NOT NULL DEFAULT 'Help',
   `info_order` int(2) NOT NULL DEFAULT '1',
@@ -138,7 +138,17 @@ CREATE TABLE `info` (
 
 LOCK TABLES `info` WRITE;
 /*!40000 ALTER TABLE `info` DISABLE KEYS */;
-INSERT INTO `info` VALUES (1,'ReLiS : a tool for conducting Systematic Review','Systematic review is a technique used to search for evidence in scientific literature that is conducted in a formal manner, following a well-defined process, according to
+INSERT INTO `info` VALUES (1,'ReLiS : a tool for conducting Systematic Review','<div class="container mt-5">
+  <div class="announcement-box" style="background-color: #d4edda; border: 1px solid #e2e2e2; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); margin: 20px 0;">
+    <div class="announcement-title" style="font-weight: bold; font-size: 1.5em; margin-bottom: 10px;">New Release Announcement!</div>
+    <div class="announcement-message" style="font-size: 1.1em;">
+      We are excited to announce the latest release of our project. You can use your <strong>existing credentials</strong> from previous releases to access the new features. Please note that projects from previous releases are <strong>not imported</strong> but can be accessed at 
+      <a href="https://relis-archive.iro.umontreal.ca" target="_blank"><strong>relis-archive.iro.umontreal.ca</strong></a>.
+    </div>
+  </div>
+</div>
+
+Systematic review is a technique used to search for evidence in scientific literature that is conducted in a formal manner, following a well-defined process, according to
 a previously elaborated protocol. Conducting a systematic reviews involves many steps over a long period of time, and is often laborious and repetitive. This is why we have created ReLiS which provides essential software support to reviewers in conducting
 high quality systematic reviews. With ReLiS, you can planning, conducting, and reporting your review.\r\n
 <p>\r\n<i>ReLiS stands for Revue Litteraire SystÃ©matique which is French for Systematic Literature Reviews Relis literally translates to â€œrereadâ€.</i>\r\n</p>\r\n','','Home',1,1),(2,'Plan the review','ReLiS features a domain-specific language to define
@@ -753,6 +763,40 @@ On line 7 of the R Library file, make sure it states the proper name and path to
     <li>Shapiro Wilk''s test (for all continuous variables): use the <code>shapiro_wilk_test_vector</code> variable</li>
     <li>Pearson''s correlation test (for all continuous variables): use the <code>pearson_cor_test_vector</code> variable</li>
     <li>Spearman''s correlation test (for all continuous variables): use the <code>spearman_cor_test_vector</code> variable</li>
+</ul>
+<hr>
+<a name="export_python"><h3>Export to Python</h3></a>
+ 
+<p>You can export the results of the classification to Python and run statistical analysis on them. When you generate (button "update file") the environment, you will then be able to download the files required to run the statistical analysis on your local machine.</p>
+ 
+<p>The file to execute in R is the R configuration script. It contains a list of commented lines which consist of all possible statistical tests and plots available in the R library. Uncomment the lines plots/tests you wish to consider then run the script.</p>
+<p><strong>Note:</strong> Every file you need will be downloaded inside the ZIP file. You should have a .csv, containing all your data, and 2 python scripts, the kernel and the playground, that are needed to generate a proper statistical analysis environment. Make sure every file are inside the same folder when the scripts are executed.</p>
+ 
+<p>The Python statistical environment supports the following plots and statistical tests. They are accessible by using the correpsonding variable. For example, <code>evo_plots([Variables.cocoa_origin], True)</code> outputs the evolutive statistics of the <code>cocoa_origin</code> variable (this variable corresponds to a nominal category in the data extraction form).</p>
+<h4><b>Descriptive statistics</b></h4>
+<ul>
+    <li>Descriptive frequency tables (for all nominal variables): use the <code>desc_frequency_table</code> variable</li>
+    <li>Bar plots (for all nominal variables): use the <code>desc_bar_plot</code> variable</li>
+    <li>Statistics (for all continuous variables): use the <code>desc_statistics</code> variable</li>
+    <li>Box plots (for all continuous variables): use the <code>desc_box_plot</code> variable</li>
+    <li>Violin plots (for all continuous variables): use the <code>desc_violin_plot</code> variable</li>
+</ul>
+<h4><b>Evolution statistics</b></h4>
+<ul>
+    <li>Evolution frequency tables (for each nominal variables, with respect to the publication years of the references): use the <code>evo_frequency_table</code> variable</li>
+    <li>Evolution plots (for all nominal variables, with respect to the publication years of the references): use the <code>evo_plot</code> variable</li>
+</ul>
+<h4><b>Comparative statistics</b></h4>
+<ul>
+    <li>Comparative frequency tables (for all nominal variables): use the <code>comp_frequency_table</code> variable</li>
+    <li>Stacked bar plots (for all nominal variables): use the <code>comp_stacked_bar_plot</code> variable</li>
+    <li>Grouped bar plots (for all nominal variables): use the <code>comp_grouped_bar_plot</code> variable</li>
+    <li>Bubble charts (for all nominal variables): use the <code>comp_bubble_chart</code> variable</li>
+    <li>Chi Squared test (for all nominal variables): use the <code>comp_chi_squared_test</code> variable</li>
+<p><strong>Note:</strong> Originally this was "Fisher\'s exact test", but this test had some problems, so we replaced it with chi_squared for an alternative solution.</p>
+    <li>Shapiro Wilk\'s test (for all continuous variables): use the <code>comp_shapiro_wilk_test</code> variable</li>
+    <li>Pearson\'s correlation test (for all continuous variables): use the <code>comp_pearson_cor_test</code> variable</li>
+    <li>Spearman\'s correlation test (for all continuous variables): use the <code>comp_spearman_cor_test</code> variable</li>
 </ul>','','Help',9,1);
 /*!40000 ALTER TABLE `info` ENABLE KEYS */;
 UNLOCK TABLES;

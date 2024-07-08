@@ -196,3 +196,7 @@ phpmyadmin/tmp/*
 
 workspace/
 
+.dockerignore
+SourcesForTests/
+**/data
+**/data*

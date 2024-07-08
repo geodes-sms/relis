@@ -70,7 +70,7 @@
                 if (!empty($project_detail['generated'])) {
                   echo "<optgroup label='" . $project . "'>";
                   foreach ($project_detail['generated'] as $key => $value) {
-                    echo "<option value='" . $dir . $path_separator . "src-gen" . $path_separator . $value . "'>$value</option>";
+                    echo "<option value='" . $dir . $path_separator . $value . "'>$value</option>";
                   }
                   echo "</optgroup>";
                 }
