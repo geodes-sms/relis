@@ -755,3 +755,10 @@ function deleteReportingFiles()
         }
     }
 }
+
+//Adds inclusion/exclusion criteria. $type must be either "inclusioncriteria" or "exclusioncrieria"
+function addCriteria($name, $type) {
+    $ci = get_instance();
+    return $ci->db->query("INSERT into relis_dev_correct_" . getProjectShortName() . ".ref_" . $type . "(ref_value) values('$name')");
+
+}

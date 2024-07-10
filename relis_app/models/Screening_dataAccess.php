@@ -138,9 +138,9 @@ class Screening_dataAccess extends CI_Model
 
     function reset_screening($affected_phases) {
 
-        $this->db->where('screening_status', 'done');
-        $this->db->where_in('screening_phase', $affected_phases);
-        $this->db->update('screening_paper', array("screening_status" => "Reseted"));
+        $this->db_current->where('screening_status', 'done');
+        $this->db_current->where_in('screening_phase', $affected_phases);
+        $this->db_current->update('screening_paper', array("screening_status" => "Reseted"));
 
         $affected_phases_str = implode(',', array_map('intval', $affected_phases));
             $sql = "DELETE FROM screen_inclusion_mapping 
@@ -149,44 +149,39 @@ class Screening_dataAccess extends CI_Model
                 FROM screening_paper 
                 WHERE screening_phase IN ($affected_phases_str)
             )";
-            $this->db2->query($sql);
+            $this->db_current->query($sql);
     }
 
     function keep_one_criterion($affected_phases, $from_all = false) {
         $affected_phases_str = implode(',', array_map('intval', $affected_phases));
         //if previous inclusion mode is 'All', insert first selected criteria as the one criterion
         if ($from_all) {
-            $sql = "INSERT INTO screen_inclusion_mapping (screening_id, criteria_id, mapping_active)
-            SELECT sp.screening_id, ric.ref_id, 1
-            FROM screening_paper sp WHERE screen_phase_id IN ($affected_phases_str)
-            CROSS JOIN (
-                SELECT ref_id
-                FROM ref_inclusioncriteria
-                WHERE ref_active = 1
-                ORDER BY ref_id
-                LIMIT 1
-            ) ric
-            WHERE sp.screening_status = 'Done';";
-        } else { //if previous mode is 'Any', delete extra criteria until there is only one left.
+                $sql = "
+                    INSERT INTO screen_inclusion_mapping (screening_id, criteria_id, mapping_active)
+                        SELECT sp.screening_id, ric.ref_id, 1
+                        FROM screening_paper sp 
+                        CROSS JOIN (
+                            SELECT ref_id
+                            FROM ref_inclusioncriteria
+                            WHERE ref_active = 1
+                            ORDER BY ref_id
+                            LIMIT 1
+                        ) ric
+                        WHERE sp.screening_phase IN ($affected_phases_str)
+                        AND sp.screening_status = 'Done'
+                        AND sp.screening_decision = 'Included';
+                    ";
+        }  else { //if previous mode is 'Any', delete extra criteria until there is only one left.
             $sql = "
-            DELETE FROM screen_inclusion_mapping
-            WHERE (screening_id, criteria_id) IN (
-                SELECT screening_id, criteria_id
-                FROM (
-                    SELECT 
-                        screening_id, 
-                        criteria_id,
-                        ROW_NUMBER() OVER(PARTITION BY screening_id ORDER BY criteria_id) AS row_num
-                    FROM screen_inclusion_mapping
-                    WHERE screening_id IN (
-                        SELECT screening_id
-                        FROM screen_paper
-                        WHERE screen_phase IN ($affected_phases_str)
-                    )
-                ) AS subquery
-                WHERE row_num > 1
-            );
-        ";
+                delete from screen_inclusion_mapping where inclusion_mapping_id not in (SELECT inclusion_mapping_id
+                    FROM screen_inclusion_mapping AS outer_table
+                    WHERE inclusion_mapping_id = (
+                    SELECT inclusion_mapping_id
+                    FROM screen_inclusion_mapping AS inner_table
+                    WHERE inner_table.screening_id = outer_table.screening_id
+                    ORDER BY inclusion_mapping_id
+                    LIMIT 1
+                    ))";
         }
         
         return $this->db_current->query($sql);
@@ -223,7 +218,7 @@ class Screening_dataAccess extends CI_Model
             INSERT INTO screen_inclusion_mapping (screening_id, criteria_id)
                 SELECT sp.screening_id, (SELECT ref_id FROM ref_inclusioncriteria WHERE ref_value = 'Default')
                 FROM screening_paper sp
-                WHERE sp.screening_status = 'Done' AND sp.screening_id IN ($affected_phases_str);
+                WHERE sp.screening_status = 'Done' AND sp.screening_decision = 'Included' AND sp.screening_phase IN ($affected_phases_str);
         ";
         $this->db_current->query($sql);
 

@@ -2769,7 +2769,6 @@ class Screening extends CI_Controller
     }
 
     public function solve_mode_conflict() {
-
         if (isset($post_arr['cancel'])) redirect('element/entity_list/list_screen_phases');
         
         $screening_model = new Screening_dataAccess();
@@ -2782,9 +2781,7 @@ class Screening extends CI_Controller
         if (isset($post_arr['keep_one'])) $screening_model->keep_one_criterion($affected_phases);
         if (isset($post_arr['keep_one_from_all'])) $screening_model->keep_one_criterion($affected_phases, true);
         if (isset($post_arr['default_criterion'])) $screening_model->set_default_criterion($affected_phases);
-        $screening_model->edit_screening_config($post_arr, $phase_id, $affected_phases);
-
-        exit;
+        $screening_model->edit_screening_config($config_array, $phase_id, $affected_phases);
     }
 /* 
     public function solve_mode_conflict() {
