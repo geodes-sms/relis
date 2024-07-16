@@ -46,6 +46,10 @@ services:
     container_name: bibler
     image: relis/bibler
     restart: always
+    networks:
+      default:
+        aliases:
+          - relisbibler
 
   relis-application:
     depends_on:
