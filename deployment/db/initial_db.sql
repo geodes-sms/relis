@@ -485,7 +485,7 @@ articles','ReLiS allows you to manually add references or import a list from CSV
     <p>\r\nTo create the configuration, you must:\r\n
         <p>\r\n
             <ul>\r\n
-                <li>Create a folder with a short name of your project</li>\r\n
+                <li>Create a folder with a short name of your project. The name must be <b>without spaces</b>, underscores(_) can be used.</li>\r\n
                 <li>Inside the folder, create a model with the name of your project</li>\r\n</ul>\r\n\r\n
             <p>\r\nYou can either write the complete configuration of your project right away or just write the minimum necessary to create an initial version of your project. Then you can come back and enhance it with more features.\r\nAt minimum, you need
                 to write:\r\n</p>\r\n<pre>\r\n<b>PROJECT</b> short_name \"Long name\"\r\n<b>CLASSIFICATION</b>\r\n<b>note</b>\r\n</pre>\r\n
