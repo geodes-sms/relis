@@ -277,6 +277,9 @@ class ScreeningUnitTest
         $expected_nbrOfUser = 2;
         $expected_nbrOfPapers = 5;
 
+        //activate assign_papers_on
+        $this->ci->db->query("UPDATE relis_dev_correct_" . getProjectShortName() . ".config SET assign_papers_on = 1");
+
         //add 5 papers to test Project
         addBibtextPapersToProject("relis_app/helpers/tests/testFiles/paper/5_bibPapers.bib");
         $response = $this->http_client->response($this->controller, $action);
@@ -930,6 +933,9 @@ class ScreeningUnitTest
         $expected_value = ['included' => "0", 'excluded' => "0", 'conflict' => "0"];
         $actual_value = "";
 
+        //activate screening_result_on
+        $this->ci->db->query("UPDATE relis_dev_correct_" . getProjectShortName() . ".config SET screening_result_on = 1");
+
         $response = $this->http_client->response($this->controller, $action);
 
         if ($response['status_code'] >= 400) {
@@ -1470,6 +1476,9 @@ class ScreeningUnitTest
         $expected_nbrOfUser = 2;
         $expected_nbrOfPapers = 2;
 
+        //activate screening_validation_on
+        $this->ci->db->query("UPDATE relis_dev_correct_" . getProjectShortName() . ".config SET screening_validation_on = 1");
+
         //Add validator
         addUserToProject(getDemoUserId(), "Validator");
 
@@ -1779,6 +1788,10 @@ class ScreeningUnitTest
         $action = "screen_paper_validation";
         $test_name = "handle the display of a paper for screening";
         $test_aspect = "Http response code";
+
+        //activate screening_validation_on
+        $this->ci->db->query("UPDATE relis_dev_correct_" . getProjectShortName() . ".config SET screening_validation_on = 1");
+
         $expected_value = http_code()[200];
         $response = $this->http_client->response($this->controller, $action);
 
@@ -1802,6 +1815,10 @@ class ScreeningUnitTest
         $action = "screen_completion";
         $test_name = "calculate and display the completion progress of screening validation for users";
         $test_aspect = "Http response code";
+
+        //activate screening_result_on
+        $this->ci->db->query("UPDATE relis_dev_correct_" . getProjectShortName() . ".config SET screening_result_on = 1");
+
         $expected_value = http_code()[200];
         $response = $this->http_client->response($this->controller, $action . "/validate");
 
@@ -1825,6 +1842,10 @@ class ScreeningUnitTest
         $action = "screen_validation_result";
         $test_name = "Display screening validation statistics and results";
         $test_aspect = "Http response code";
+
+        //activate screening_validation_on
+        $this->ci->db->query("UPDATE relis_dev_correct_" . getProjectShortName() . ".config SET screening_validation_on = 1");
+
         $expected_value = http_code()[200];
         $response = $this->http_client->response($this->controller, $action);
 

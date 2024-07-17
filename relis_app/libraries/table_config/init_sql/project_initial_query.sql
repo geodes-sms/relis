@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS `config` (
   `key_paper_serial` int(10) NOT NULL DEFAULT '1',
   `validation_default_percentage` int(3) NOT NULL DEFAULT '20',
   `screening_reviewer_number` int(3) NOT NULL DEFAULT '2',
-  `screening_status_to_validate` enum('IncludedExcluded','Excluded','Included') NOT NULL DEFAULT 'IncludedExcluded',
+  `screening_status_to_validate` enum('IncludedExcluded','Excluded','Included') NOT NULL DEFAULT 'Excluded',
   `screening_validator_assignment_type` enum('Normal','Veto','Info') NOT NULL DEFAULT 'Normal',
   `qa_on` int(2) NOT NULL DEFAULT '0',
   `qa_open` int(2) NOT NULL DEFAULT '0',
