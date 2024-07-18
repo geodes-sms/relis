@@ -148,7 +148,7 @@ function get_configuration()
 		'mandatory' => ' mandatory ',
 		'input_type' => 'select',
 		'input_select_source' => 'array',
-		'input_select_values' => array('IncludeExclude' => 'Inclusion - exclusion', 'ExclusionCriteria' => 'Exclusion criteria'),
+		'input_select_values' => array('IncludeExclude' => 'Inclusion - exclusion', 'InclusionCriteria' => 'Inclusion criteria', 'ExclusionCriteria' => 'Exclusion criteria', 'AllCriteria' => 'All criteria'),
 		'initial_value' => 'IncludeExclude',
 		'compute_result' => 'no',
 		'on_add' => 'enabled',
@@ -225,7 +225,21 @@ function get_configuration()
 		'on_list' => 'show'
 	);
 
-
+    $fields['screening_status_to_validate'] = array(
+        'field_title' => 'Screening status to validate',
+        'field_type' => 'text',
+        'field_value' => 'normal',
+        'field_size' => 50,
+        'mandatory' => ' mandatory ',
+        'input_type' => 'select',
+        'input_select_source' => 'array',
+        'input_select_values' => array('Included' => 'Included', 'Excluded' => 'Excluded', 'IncludedExcluded' => 'Included & excluded'),
+        'initial_value' => 'Excluded',
+        'compute_result' => 'no',
+        'on_add' => 'enabled',
+        'on_edit' => 'enabled',
+        'on_list' => 'show'
+    );
 
 	$fields['classification_on'] = array(
 		'field_title' => 'Classification activated',

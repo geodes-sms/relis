@@ -636,6 +636,7 @@ function get_classification_demoTestProject2()
 	$screening['conflict_type'] = 'ExclusionCriteria';
 	$screening['conflict_resolution'] = 'Unanimity';
 	$screening['validation_assigment_mode'] = 'Normal';
+    $screening['status_to_validate'] = 'Excluded';
 	$screening['validation_percentage'] = '10';
 	$screening['exclusion_criteria'] = array();
 	array_push($screening['exclusion_criteria'], "EC1: Too short ");
