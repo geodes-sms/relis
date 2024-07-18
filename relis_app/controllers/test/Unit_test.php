@@ -107,7 +107,7 @@ class Unit_test extends CI_Controller
         // Record the start time of the tests
         $startTime = microtime(true);
 
-        /* $this->userUnitTest->run_tests();
+        $this->userUnitTest->run_tests();
         $this->projectUnitTest->run_tests();
         $this->paperUnitTest->run_tests();
         $this->screeningUnitTest->run_tests();
@@ -124,7 +124,7 @@ class Unit_test extends CI_Controller
         $this->relisManagerUnitTest->run_tests();
         $this->apiUnitTest->run_tests();
         $this->apiQueryUnitTest->run_tests();
-        $this->opUnitTest->run_tests(); */
+        $this->opUnitTest->run_tests();
         $this->inclusion_mode_conflictUnitTest->run_tests();
 
 
