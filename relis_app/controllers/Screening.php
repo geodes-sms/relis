@@ -2711,20 +2711,20 @@ class Screening extends CI_Controller
     }
 
     public function edit_screening_config($current_custom_config = null) {
+        $model = new Screening_dataAccess();
         $post_arr = $current_custom_config ? $current_custom_config : $this->input->post();
         $phase_id = !array_key_exists('screen_phase_id', $post_arr) ? null : $post_arr['screen_phase_id'];
-        $config_type = $this->get_phase_config_type($phase_id);
-        $current_inclusion_mode = $this->get_phase_config_value($phase_id, 'screening_inclusion_mode');
+        $config_type = $model->get_phase_config_type($phase_id);
+        $current_inclusion_mode = $model->get_phase_config_value($phase_id, 'screening_inclusion_mode');
         $new_inclusion_mode = $post_arr['screening_inclusion_mode'];
-        $screening_model = new Screening_dataAccess();
         
         //Criterias must exist for modes other than None
-        if ($new_inclusion_mode != 'None' && $screening_model->count_inclusion_criteria() == 0) {
+        if ($new_inclusion_mode != 'None' && $model->count_inclusion_criteria() == 0) {
             set_top_msg('You need to add inclusion criteria before making this change', "error");
             redirect('element/entity_list/list_screen_phases');
         }
         
-        $affected_phases = $this->get_affected_phases($phase_id);
+        $affected_phases = $model->get_affected_phases($phase_id);
 
         //count already screened papers
         $this->db_current->from('screening_paper');
@@ -2745,9 +2745,9 @@ class Screening extends CI_Controller
         if ($already_screened_papers == 0 || !$this->mode_conflict_exists($current_inclusion_mode, $new_inclusion_mode)) {
             if ($already_screened_papers != 0 && $current_inclusion_mode == 'All' && $new_inclusion_mode == 'Any') {
                 //insert all criteria in mapping table when going from 'All' to 'Any' and there are screened papers.
-                $screening_model->set_all_criteria($affected_phases);
+                $model->set_all_criteria($affected_phases);
             }
-            $screening_model->edit_screening_config($post_arr, $phase_id, $affected_phases);
+            $model->edit_screening_config($post_arr, $phase_id, $affected_phases);
             redirect('element/entity_list/list_screen_phases');
         }  else { 
             $this->db2->where_in('screen_phase_id', $affected_phases);
@@ -2797,28 +2797,12 @@ class Screening extends CI_Controller
         return $result ? $result->ref_id : null;
     }
 
-    private function get_affected_phases($phase_id) {
-        if (empty($phase_id) or $this->get_phase_config_type($phase_id) == 'Default') {
-            $this->db_current->select('screen_phase_id');
-            $this->db_current->from('screen_phase_config');
-            $this->db_current->where('config_type', 'Default');
-            $subquery_result = $this->db_current->get();
-            if ($subquery_result->num_rows() > 0) {
-                foreach ($subquery_result->result() as $row) {
-                    $affected_phases[] = $row->screen_phase_id;
-                }
-            }
-        } else {
-            $affected_phases = [$phase_id];
-        }
-        return $affected_phases;
-    }
 
     //switch phase config type between 'Default'and 'Custom'
     public function toggle_phase_config($phase_id) {
         $this->db2 = $this->load->database(project_db(), TRUE);
-        
-        $config_type = $this->get_phase_config_type($phase_id); 
+        $model = new Screening_dataAccess();
+        $config_type = $model->get_phase_config_type($phase_id); 
         $config = get_appconfig();
 
         if ($config_type == 'Default') {
@@ -2853,37 +2837,12 @@ class Screening extends CI_Controller
         redirect('element/entity_list/list_screen_phases');
     }
 
-    //get value of config_type of given phase
-    public function get_phase_config_type($phase_id = null) {
-        if (!empty($phase_id)) {
-            $this->db2 = $this->load->database(project_db(), TRUE);
-            $this->db2->select('config_type');
-            $this->db2->from('screen_phase_config');
-            $this->db2->where('screen_phase_id', $phase_id);
-            $query = $this->db2->get();
-            $row = $query->row();  
-            $config_type = $row->config_type;
-        } else $config_type = 'Default';
-        return $config_type;
-    }
-
-    public function get_phase_config_value($phase_id, $value_name) {
-        $this->db2 = $this->load->database(project_db(), TRUE);
-        $config_type = $this->get_phase_config_type($phase_id);
-        if ($config_type == 'Custom') {
-            $this->db2->select($value_name);
-            $this->db2->from('screen_phase_config');
-            $this->db2->where('screen_phase_id', $phase_id);
-            $query = $this->db2->get();
-            $row = $query->row();
-            return $row->$value_name;
-        }
-        return get_appconfig_element($value_name);
-    }
+    
 
     //routes to proper config page (phase config if custom, project config if default)
     public function route_config($phase_id) {
-        $config_type = $this->get_phase_config_type($phase_id);
+        $model = new Screening_dataAccess();
+        $config_type = $model->get_phase_config_type($phase_id);
         $this->db2->select('screen_phase_config_id');
         $this->db2->from('screen_phase_config');
         $this->db2->where('screen_phase_id', $phase_id);

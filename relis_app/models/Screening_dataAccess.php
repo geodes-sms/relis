@@ -173,15 +173,24 @@ class Screening_dataAccess extends CI_Model
                     ";
         }  else { //if previous mode is 'Any', delete extra criteria until there is only one left.
             $sql = "
-                delete from screen_inclusion_mapping where inclusion_mapping_id not in (SELECT inclusion_mapping_id
+                DELETE FROM screen_inclusion_mapping 
+                WHERE inclusion_mapping_id NOT IN (
+                    SELECT inclusion_mapping_id
                     FROM screen_inclusion_mapping AS outer_table
                     WHERE inclusion_mapping_id = (
-                    SELECT inclusion_mapping_id
-                    FROM screen_inclusion_mapping AS inner_table
-                    WHERE inner_table.screening_id = outer_table.screening_id
-                    ORDER BY inclusion_mapping_id
-                    LIMIT 1
-                    ))";
+                        SELECT inclusion_mapping_id
+                        FROM screen_inclusion_mapping AS inner_table
+                        WHERE inner_table.screening_id = outer_table.screening_id
+                        ORDER BY inclusion_mapping_id
+                        LIMIT 1
+                        )
+                ) 
+                AND screening_id IN (
+                    SELECT screening_id
+                    FROM screening_paper
+                    WHERE screening_phase IN (" . implode(',', $affected_phases) . ")
+                    );
+                ";
         }
         
         return $this->db_current->query($sql);
@@ -253,6 +262,50 @@ class Screening_dataAccess extends CI_Model
 
         // Return the number of affected rows
         return $this->db_current->affected_rows();
+    }
+
+    public function get_affected_phases($phase_id) {
+        if (empty($phase_id) or $this->get_phase_config_type($phase_id) == 'Default') {
+            $this->db_current->select('screen_phase_id');
+            $this->db_current->from('screen_phase_config');
+            $this->db_current->where('config_type', 'Default');
+            $subquery_result = $this->db_current->get();
+            if ($subquery_result->num_rows() > 0) {
+                foreach ($subquery_result->result() as $row) {
+                    $affected_phases[] = $row->screen_phase_id;
+                }
+            }
+        } else {
+            $affected_phases = [$phase_id];
+        }
+        return $affected_phases;
+    }
+
+    public function get_phase_config_type($phase_id = null) {
+        if (!empty($phase_id)) {
+            $this->db_current = $this->load->database(project_db(), TRUE);
+            $this->db_current->select('config_type');
+            $this->db_current->from('screen_phase_config');
+            $this->db_current->where('screen_phase_id', $phase_id);
+            $query = $this->db_current->get();
+            $row = $query->row();  
+            $config_type = $row->config_type;
+        } else $config_type = 'Default';
+        return $config_type;
+    }
+
+    public function get_phase_config_value($phase_id, $value_name) {
+        $this->db_current = $this->load->database(project_db(), TRUE);
+        $config_type = $this->get_phase_config_type($phase_id);
+        if ($config_type == 'Custom') {
+            $this->db_current->select($value_name);
+            $this->db_current->from('screen_phase_config');
+            $this->db_current->where('screen_phase_id', $phase_id);
+            $query = $this->db_current->get();
+            $row = $query->row();
+            return $row->$value_name;
+        }
+        return get_appconfig_element($value_name);
     }
 
 }

@@ -14,10 +14,11 @@ class inclusion_mode_conflictUnitTest {
     function run_tests() {
         $this->TestInitialize();
         $this->changeModeWhenNoInclusionCriteria();
+        $this->affected_phases();
         $this->defaultCriteria_one();
         $this->keepOneFromAny();
         $this->keepOneFromAll();
-        $this->resetScreening();
+        $this->resetScreening(); 
     }
 
     private function TestInitialize() {
@@ -68,6 +69,22 @@ class inclusion_mode_conflictUnitTest {
         }
 
         run_test($this->controller, $action, $test_name, $test_aspect, $expected_value, $actual_value);
+    }
+
+    private function affected_phases() {
+        $action = "get_affected_phases (Model method)";
+        $test_name = "Testing is changes are made to the right affected phases";
+        $test_aspect = "Affected phases";
+        $expected_value = json_encode(array(1));
+        $actual_value = "";
+
+        addScreeningPhase("Link");
+        $this->ci->db->query("UPDATE relis_dev_correct_" . getProjectShortName() . ".screen_phase_config SET config_type = 'Custom' WHERE screen_phase_config_id = 2");
+
+        $model = new Screening_dataAccess();
+        $actual_value = json_encode($model->get_affected_phases(getScreeningPhaseId("Abstract")));
+
+        run_test($this->controller, $action, $test_name, $test_aspect, $actual_value, $actual_value);
     }
 
     private function defaultCriteria_one() {
@@ -137,7 +154,7 @@ class inclusion_mode_conflictUnitTest {
         $actual_value = "No";
 
         addCriteria("inclusion 2", "inclusioncriteria");
-        addcslashes("inclusion 3", "inclusioncriteria");
+        addCriteria("inclusion 3", "inclusioncriteria");
     
         $query = $this->ci->db->query("
             INSERT INTO relis_dev_correct_" . getProjectShortName() . 
