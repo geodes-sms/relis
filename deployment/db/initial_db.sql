@@ -859,6 +859,7 @@ CREATE TABLE `projects` (
 
 LOCK TABLES `projects` WRITE;
 /*!40000 ALTER TABLE `projects` DISABLE KEYS */;
+INSERT INTO `projects` VALUES (1, 'demo_relis', 'Demo ReLiS', 'Demo ReLiS', 1, NULL, current_timestamp(), 0, 1);
 /*!40000 ALTER TABLE `projects` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -968,6 +969,7 @@ CREATE TABLE `userproject` (
 
 LOCK TABLES `userproject` WRITE;
 /*!40000 ALTER TABLE `userproject` DISABLE KEYS */;
+INSERT INTO `userproject` VALUES (1, 2, 1,'Reviewer', 2, current_timestamp(), 1);
 /*!40000 ALTER TABLE `userproject` ENABLE KEYS */;
 UNLOCK TABLES;
 

@@ -1112,6 +1112,28 @@ function has_user_role($role, $user = 0, $project_id = 0)
 
 }
 
+//check if demo user has the demo project initialed (added_by=2 when demo project hasn't been initialed)
+function has_demo_project_initialed($user = 0)
+{
+
+    $ci = get_instance();
+
+    if ($user == 0) {
+        $user = $ci->session->userdata('user_id');
+    }
+
+    $sql = "select userproject_id from userproject where user_id=$user AND added_by=1 ";
+    $user_res = $ci->db->query($sql)->num_rows();
+    if ($user_res > 0) {
+        return TRUE;
+    } else {
+        $sql = "UPDATE userproject SET added_by = 1 WHERE user_id=$user ";
+        $res = $ci->manage_mdl->run_query($sql);
+        return FALSE;
+    }
+
+}
+
 //retrieve the role of a user within a project
 function get_user_role($user = 0, $project_id = 0)
 {

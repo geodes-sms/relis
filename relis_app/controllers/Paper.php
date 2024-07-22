@@ -841,7 +841,14 @@ class Paper extends CI_Controller
         if (!empty($exist)) {
             set_top_msg(" $exist papers already exist", 'error');
         }
-        redirect('screening/screening');
+        if(!has_usergroup(3)){
+            redirect('screening/screening');
+        }
+        else{
+            unset($_POST['data_array']);
+            unset($_POST['papers_sources']);
+            redirect('home');
+        }
     }
 
     /*
@@ -1917,5 +1924,21 @@ month={Aug},}
     {
         //moved to library
         return $this->table_ref_lib->ref_table_config($_table);
+    }
+
+    //import papers into the demo project
+    public function import_demo_project_paper(){
+
+        $bibFilePath = 'demo_relis.bib';
+
+        //import papers
+        $bibtextString = file_get_contents($bibFilePath);
+        $Tpapers = $this->get_bibler_result($bibtextString, "multi_bibtex");
+        $paperData = json_encode($Tpapers['paper_array']);
+
+        $_POST['data_array'] = $paperData;
+        $_POST['papers_sources'] = "";
+        $this->import_papers_save_bibtext();
+
     }
 }

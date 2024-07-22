@@ -230,7 +230,13 @@ class User extends CI_Controller
                 }
                 $this->session->set_userdata('active_language', $default_lang);
                 set_log('Connection', 'User connected');
-                redirect('home');
+                if (!has_demo_project_initialed()){
+                    $project_short_name = 'demo_relis';
+                    redirect('project/save_new_project_part2/' . $project_short_name);
+                }
+                else{
+                    redirect('home');
+                }
             }
         }
     }

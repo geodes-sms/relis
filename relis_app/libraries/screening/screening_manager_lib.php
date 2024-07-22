@@ -207,8 +207,10 @@ class Screening_manager_lib
 			$menu['settings']['menu']['str_mng'] = array('label' => 'Label Management', 'url' => 'element/entity_list/list_str_mng', 'icon' => 'text-width');
 			$menu['settings']['menu']['install_form_editor'] = array('label' => 'Update Project Config', 'url' => 'install/install_form_editor', 'icon' => 'refresh');
 
-			$menu['settings']['menu']['Configuration_managment'] = array('label' => 'Configuration_managment', 'url' => 'admin/list_configurations', 'icon' => 'cog');
-			if (debug_coment_active())
+            if (has_usergroup(1)) {
+                $menu['settings']['menu']['Configuration_managment'] = array('label' => 'Configuration_managment', 'url' => 'admin/list_configurations', 'icon' => 'cog');
+            }
+                if (debug_coment_active())
 				$menu['settings']['menu']['debug'] = array('label' => 'Debug Comment', 'url' => 'element/entity_list/list_debug', 'icon' => 'cogs');
 
 		}
