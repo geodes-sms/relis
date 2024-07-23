@@ -23,8 +23,8 @@ class ProjectUnitTest
         $this->saveNewProject_notPhpFile();
         $this->saveNewProject_validInstallationFile();
         $this->saveNewProject_existingLabel();
-        $this->projectList_1projectInstalled();
         $this->projectList_2projectsInstalled();
+        $this->projectList_3projectsInstalled();
         $this->remove_project();
         $this->saveNewProjectFromRelisEditor_notPhpFile();
         $this->saveNewProjectFromRelisEditor_validInstallationFile();
@@ -214,15 +214,15 @@ class ProjectUnitTest
     /*
      * Test 7
      * Action : projects_list
-     * Description : Display the list of installed projects when 1 project is installed.
+     * Description : Display the list of installed projects when 2 projects are installed.
      * Expected result: check if the projects list returned is correct
      */
-    private function projectList_1projectInstalled()
+    private function projectList_2projectsInstalled()
     {
         $action = "projects_list";
-        $test_name = "Display the list of installed projects when 1 project is installed";
+        $test_name = "Display the list of installed projects when 2 projects are installed";
         $test_aspect = "Installed project(s)";
-        $expected_value = '{"nombre":1,"list":[{"project_id":"' . getProjectDetails()['project_id'] . '","project_label":"demoTestProject","project_title":"Demo Test Project","project_description":"Demo Test Project","project_creator":"1","project_icon":null,"creation_time":"' . getProjectDetails()['creation_time'] . '","project_public":"0","project_active":"1"}]}';
+        $expected_value = '{"nombre":2,"list":[{"project_id":"' . getProjectDetails('demo_relis')['project_id'] . '","project_label":"demo_relis","project_title":"Demo ReLiS","project_description":"Demo ReLiS","project_creator":"1","project_icon":null,"creation_time":"' . getProjectDetails('demo_relis')['creation_time'] . '","project_public":"0","project_active":"1"},{"project_id":"' . getProjectDetails()['project_id'] . '","project_label":"demoTestProject","project_title":"Demo Test Project","project_description":"Demo Test Project","project_creator":"1","project_icon":null,"creation_time":"' . getProjectDetails()['creation_time'] . '","project_public":"0","project_active":"1"}]}';
 
         $response = $this->http_client->response($this->controller, $action);
 
@@ -247,7 +247,7 @@ class ProjectUnitTest
      * Description : Display the list of installed projects when more than 1 project is installed.
      * Expected result: check if the projects list returned is correct
      */
-    private function projectList_2projectsInstalled()
+    private function projectList_3projectsInstalled()
     {
         $action = "projects_list";
         $test_name = "Display the list of installed projects when more than 1 project is installed";
@@ -255,7 +255,7 @@ class ProjectUnitTest
 
         //install second project
         createDemoProject("demoTestProject2");
-        $expected_value = '{"nombre":2,"list":[{"project_id":"' . getProjectDetails()['project_id'] . '","project_label":"demoTestProject","project_title":"Demo Test Project","project_description":"Demo Test Project","project_creator":"1","project_icon":null,"creation_time":"' . getProjectDetails()['creation_time'] . '","project_public":"0","project_active":"1"},{"project_id":"' . getProjectDetails('demoTestProject2')['project_id'] . '","project_label":"demoTestProject2","project_title":"Demo Test Project","project_description":"Demo Test Project","project_creator":"1","project_icon":null,"creation_time":"' . getProjectDetails('demoTestProject2')['creation_time'] . '","project_public":"0","project_active":"1"}]}';
+        $expected_value = '{"nombre":3,"list":[{"project_id":"' . getProjectDetails('demo_relis')['project_id'] . '","project_label":"demo_relis","project_title":"Demo ReLiS","project_description":"Demo ReLiS","project_creator":"1","project_icon":null,"creation_time":"' . getProjectDetails('demo_relis')['creation_time'] . '","project_public":"0","project_active":"1"},{"project_id":"' . getProjectDetails()['project_id'] . '","project_label":"demoTestProject","project_title":"Demo Test Project","project_description":"Demo Test Project","project_creator":"1","project_icon":null,"creation_time":"' . getProjectDetails()['creation_time'] . '","project_public":"0","project_active":"1"},{"project_id":"' . getProjectDetails('demoTestProject2')['project_id'] . '","project_label":"demoTestProject2","project_title":"Demo Test Project","project_description":"Demo Test Project","project_creator":"1","project_icon":null,"creation_time":"' . getProjectDetails('demoTestProject2')['creation_time'] . '","project_public":"0","project_active":"1"}]}';
 
         $response = $this->http_client->response($this->controller, $action);
 
