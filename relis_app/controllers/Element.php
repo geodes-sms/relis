@@ -1178,7 +1178,7 @@ class Element extends CI_Controller
         $ref_table_config['current_operation'] = $ref_table_operation;
         //		 Fetching and storing the data from venue table into $data variable
         $data = $this->DBConnection_mdl->get_list_mdl($ref_table_config, $val, $page, $rec_per_page);
-        
+        //	print_test($data);
         /*
          * récupération des correspondances des clés externes pour l'affichage  suivant la structure de la table
          * retrieval of the correspondences of the external keys for display according to the structure of the table
