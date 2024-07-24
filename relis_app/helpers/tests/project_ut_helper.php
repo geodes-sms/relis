@@ -324,7 +324,7 @@ class ProjectUnitTest
         $test_name = "Add a new project from relis editor with an installation file which is not a .php file";
         $test_aspect = "Table last ID";
         $expected_value = $this->ci->db->query("SELECT project_id FROM projects ORDER BY project_id DESC LIMIT 1")->row_array()['project_id'];
-        $filePath = 'relis_app/helpers/tests/testFiles/project/classification_install_' . getProjectShortName() . '.pdf';
+        $filePath = 'tests/classification_install_' . getProjectShortName() . '.pdf';
 
         $response = $this->http_client->response($this->controller, $action, ['selected_config' => $filePath], "POST");
 
@@ -349,9 +349,9 @@ class ProjectUnitTest
         $action = "save_new_project_editor";
         $test_name = "Add a new project from relis editor with a valid project installation configuration file";
         $test_aspect = "Created database for the new project";
-        $filePath = getProjectPath();
         $expected_value = "Created";
         $actual_value = "Not created";
+        $filePath = 'tests/classification_install_' . getProjectShortName() . '.php';
 
         $response = $this->http_client->response($this->controller, $action, ['selected_config' => $filePath], "POST");
 
@@ -389,7 +389,7 @@ class ProjectUnitTest
         $test_name = "Add a new project from relis editor with an already used project label";
         $test_aspect = "Table last ID";
         $expected_value = $this->ci->db->query("SELECT project_id FROM projects ORDER BY project_id DESC LIMIT 1")->row_array()['project_id'];
-        $filePath = getProjectPath();
+        $filePath = 'tests/classification_install_' . getProjectShortName() . '.php';
 
         $response = $this->http_client->response($this->controller, $action, ['selected_config' => $filePath], "POST");
 

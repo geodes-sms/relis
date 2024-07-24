@@ -116,4 +116,3 @@ $db['default'] = array(
 );
 
 // Added configuration
-

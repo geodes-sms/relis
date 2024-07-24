@@ -19,27 +19,29 @@
  * 
  *  :Author: Brice Michel Bigendako
  */
-function install_form($values=array(),$error=array()){?>
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <!-- Meta, title, CSS, favicons, etc. -->
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+function install_form($values = array(), $error = array())
+{ ?>
+	<!DOCTYPE html>
+	<html lang="en">
 
-    <title>ReLis | Setup </title>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<!-- Meta, title, CSS, favicons, etc. -->
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Bootstrap -->
-    <link href="../cside/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link href="../cside/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+		<title>ReLis | Setup </title>
 
-    <!-- Custom Theme Style -->
-    <link href="../cside/css/custom.css" rel="stylesheet">
-    <link href="../cside/css/install.css" rel="stylesheet">
-  </head>
+		<!-- Bootstrap -->
+		<link href="../cside/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+		<!-- Font Awesome -->
+		<link href="../cside/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+
+		<!-- Custom Theme Style -->
+		<link href="../cside/css/custom.css" rel="stylesheet">
+		<link href="../cside/css/install.css" rel="stylesheet">
+	</head>
 
   <body style="background:#F7F7F7;">
     <div class="">
@@ -320,15 +322,16 @@ function install_form($values=array(),$error=array()){?>
               <div class="clearfix"></div>
               <div class="separator">
 
-                
-                <div class="clearfix"></div>
-                
-              </div>
-            </form>
-          </section>
-        </div>
-      </div>
-    </div>
-  </body>
-</html>
-<?php }?>
+
+								<div class="clearfix"></div>
+
+							</div>
+						</form>
+					</section>
+				</div>
+			</div>
+		</div>
+	</body>
+
+	</html>
+<?php } ?>

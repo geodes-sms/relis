@@ -1132,6 +1132,7 @@ class ManagerUnitTest
             'use_kappa' => array(0, 1),
             'screening_validation_on' => array(0, 1),
             'screening_validator_assignment_type' => 'Normal',
+            'screening_status_to_validate' => 'Excluded',
             'validation_default_percentage' => 50
         );
 

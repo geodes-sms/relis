@@ -141,7 +141,7 @@ function get_configuration()
 		'mandatory' => ' mandatory ',
 		'input_type' => 'select',
 		'input_select_source' => 'array',
-		'input_select_values' => array('IncludeExclude' => 'Inclusion - exclusion', 'ExclusionCriteria' => 'Exclusion criteria'),
+		'input_select_values' => array('IncludeExclude' => 'Inclusion - exclusion', 'InclusionCriteria' => 'Inclusion criteria', 'ExclusionCriteria' => 'Exclusion criteria', 'AllCriteria' => 'All criteria'),
 		'initial_value' => 'IncludeExclude',
 	);
 
@@ -284,7 +284,7 @@ function get_configuration()
 		'mandatory' => ' mandatory ',
 		'input_type' => 'select',
 		'input_select_source' => 'array',
-		'input_select_values' => array('Excluded' => 'Excluded', 'Included' => 'Included'),
+		'input_select_values' => array('Included' => 'Included', 'Excluded' => 'Excluded', 'IncludedExcluded' => 'Included & excluded'),
 		'initial_value' => 'Excluded',
 
 	);
@@ -449,6 +449,7 @@ function get_configuration()
 			'use_kappa' => array('group' => 'screen'),
 			'screening_validation_on' => array('group' => 'screen'),
 			'screening_validator_assignment_type' => array('group' => 'screen'),
+            'screening_status_to_validate' => array('group' => 'screen'),
 			'validation_default_percentage' => array('group' => 'screen'),
 
 			'qa_on' => array('group' => 'qa'),
@@ -667,6 +668,7 @@ function get_configuration()
 			'screening_screening_conflict_resolution' => array(),
 			'use_kappa' => array(),
 			'validation_default_percentage' => array(),
+            'screening_status_to_validate' => array(),
 			'screening_validator_assignment_type' => array(),
 		),
 
@@ -809,6 +811,7 @@ function get_configuration()
 			'use_kappa' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
 			'screening_validation_on' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
 			'screening_validator_assignment_type' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
+            'screening_status_to_validate' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
 			'validation_default_percentage' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
 		),
 

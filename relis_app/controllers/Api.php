@@ -294,9 +294,9 @@ class Api extends CI_Controller
 
 	//retrieves screening information for a specific project ID
 	private function get_screening($project_id) //not used
-	{
-		//$this->initialise_user($project_id);
-		$screening = array();
+    {
+        //$this->initialise_user($project_id);
+        $screening = array();
 		$screening_phases = $this->db_project->order_by('screen_phase_order', 'ASC')
 			->get_where('screen_phase', array('screen_phase_active' => 1))
 			->result_array();
@@ -305,7 +305,7 @@ class Api extends CI_Controller
 			->get_where('ref_exclusioncrieria', array('ref_active' => 1))
 			->result_array();
 		$this->db_project->select('ref_value as criteria');
-		$screening['exclusion_criteria'] = $this->db_project
+		$screening['inclusion_criteria'] = $this->db_project
 			->get_where('ref_inclusioncriteria', array('ref_active' => 1))
 			->result_array();
 		foreach ($screening_phases as $key => $phase) {

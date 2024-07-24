@@ -1,15 +1,14 @@
-version: '3.7'
 services:
   db:
     container_name: relis-db
-    image: mariadb
+    image: mariadb:11.4
     restart: always
     environment:
       MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: "yes"
-
+      
     volumes:
-      - ./docker/db/initial_db.sql:/docker-entrypoint-initdb.d/initial_db.sql
-      - ../:/u/relis/public_html
+      - ./db/initial_db.sql:/docker-entrypoint-initdb.d/initial_db.sql
+      - ../data/db:/var/lib/mysql
 
   phpmyadmin:
     depends_on:
@@ -21,38 +20,49 @@ services:
     environment:
       - PMA_ARBITRARY=1
     volumes:
-      - ./docker/db/config.inc.php:/etc/phpmyadmin/config.inc.php
+      - ./db/config.inc.php:/etc/phpmyadmin/config.inc.php
       - ../:/u/relis/public_html
 
   tomcat:
     depends_on:
       - db
-    image: tomcat:8.5.51-jdk8-openjdk-slim
+    build:
+      context: ./tomcat/
     volumes:
-      - ./docker/tomcat/relis.war:/usr/local/tomcat/webapps/relis.war
-      - ../:/u/relis/public_html
+      - ../data/tomcat_data:/u/relis/public_html/workspace
+      - ./tomcat/testfiles/classification_install_demoTestProject.php:/u/relis/public_html/workspace/dslforge_workspace/tests/src-gen/classification_install_demoTestProject.php
+      - ./tomcat/testfiles/classification_install_demoTestProject.pdf:/u/relis/public_html/workspace/dslforge_workspace/tests/src-gen/classification_install_demoTestProject.pdf
+      - ./tomcat/testfiles/classification_install_demoTestProject2.php:/u/relis/public_html/workspace/dslforge_workspace/tests/src-gen/classification_install_demoTestProject2.php
+
     environment:
       MYSQL_DATABASE: db
       CATALINA_OPTS: '-Xms512M -Xmx1024M -server -XX:+UseParallelGC'
       JAVA_OPTS: '-Djava.security.egd=file:///dev/urandom'
     ports:
       - 8088:8080
+      - 8089:8181
 
   bibler:
     container_name: bibler
     image: relis/bibler
     restart: always
+    networks:
+      default:
+        aliases:
+          - relisbibler
 
   relis-application:
     depends_on:
       - db
-    image: relis-app
     container_name: relis-app
     build:
-      context: ./docker/
+      context: ./
       args:
         DIRECTORY_INDEX: index.php
         DOCUMENT_ROOT: /u/relis/public_html
+        ENV: dev
+    env_file:
+      - .env
     entrypoint: /usr/local/bin/entrypoint.sh
     ports:
       - 8083:80

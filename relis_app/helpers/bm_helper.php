@@ -1306,6 +1306,7 @@ function get_paper_screen_result($paper_id)
 	$excluded = 0;
 	$reviewers = "";
 	$started = False;
+    $include_crit = array();
 	$exclude_crit = array();
 	foreach ($res_assignment as $key => $value) {
 
@@ -1319,6 +1320,8 @@ function get_paper_screen_result($paper_id)
 		} else {
 			if ($value['decision'] == 'accepted') {
 				$accepted++;
+                $include_crit[$value['inclusion_criteria']] = isset($include_crit[$value['inclusion_criteria']]) ? ($include_crit[$value['inclusion_criteria']] + 1) : 1;
+
 			} else {
 
 				$excluded++;
@@ -1359,15 +1362,19 @@ function get_paper_screen_result($paper_id)
 		} else {
 			if ($accepted == 0) {
 				$paper_decision = "Excluded";
-				if (get_appconfig_element('screening_conflict_type') == 'ExclusionCriteria' and count($exclude_crit) > 1) { //Conflict when different exclusion criteria
+				if ((get_appconfig_element('screening_conflict_type') == 'ExclusionCriteria' or get_appconfig_element('screening_conflict_type') == 'AllCriteria') and count($exclude_crit) > 1) { //Conflict when different exclusion criteria
 
 					$paper_decision = "In conflict";
 
 				}
 
 			} elseif ($excluded == 0) {
-
 				$paper_decision = "Included";
+                if ((get_appconfig_element('screening_conflict_type') == 'InclusionCriteria' or get_appconfig_element('screening_conflict_type') == 'AllCriteria') and count($include_crit) > 1) { //Conflict when different inclusion criteria
+
+                    $paper_decision = "In conflict";
+
+                }
 			} else {
 
 				$paper_decision = "In conflict";
@@ -1401,6 +1408,7 @@ function get_paper_screen_status($paper_id)
 	$accepted = 0;
 	$excluded = 0;
 	$started = False;
+    $include_crit = array();
 	$exclude_crit = array();
 	foreach ($res_assignment as $key => $value) {
 
@@ -1409,7 +1417,9 @@ function get_paper_screen_status($paper_id)
 		} else {
 			if ($value['screening_decision'] == 'accepted') {
 				$accepted++;
-			} else {
+                $include_crit[$value['inclusion_criteria']] = isset($include_crit[$value['inclusion_criteria']]) ? ($include_crit[$value['inclusion_criteria']] + 1) : 1;
+
+            } else {
 				$excluded++;
 				$exclude_crit[$value['exclusion_criteria']] = isset($exclude_crit[$value['exclusion_criteria']]) ? ($exclude_crit[$value['exclusion_criteria']] + 1) : 1;
 
@@ -1449,15 +1459,19 @@ function get_paper_screen_status($paper_id)
 		} else {
 			if ($accepted == 0) {
 				$paper_decision = "Excluded";
-				if (get_appconfig_element('screening_conflict_type') == 'ExclusionCriteria' and count($exclude_crit) > 1) { //Conflict when different exclusion criteria
+				if ((get_appconfig_element('screening_conflict_type') == 'ExclusionCriteria' or get_appconfig_element('screening_conflict_type') == 'AllCriteria') and count($exclude_crit) > 1) { //Conflict when different exclusion criteria
 
 					$paper_decision = "In conflict";
 
 				}
 
 			} elseif ($excluded == 0) {
-
 				$paper_decision = "Included";
+                if ((get_appconfig_element('screening_conflict_type') == 'InclusionCriteria' or get_appconfig_element('screening_conflict_type') == 'AllCriteria') and count($include_crit) > 1) { //Conflict when different inclusion criteria
+
+                    $paper_decision = "In conflict";
+
+                }
 			} else {
 
 				$paper_decision = "In conflict";
@@ -1634,6 +1648,7 @@ function get_paper_screen_status_new($paper_id, $screening_phase = "", $return =
 	$excluded = 0;
 	$started = False;
 	$exclude_crit = array();
+    $include_crit = array();
 	$reviewers = "";
 
 	$Veto = array(
@@ -1641,6 +1656,7 @@ function get_paper_screen_status_new($paper_id, $screening_phase = "", $return =
 		'accepted' => 0,
 		'excluded' => 0,
 		'pending' => 0,
+        'include_crit' => array(),
 		'exclude_crit' => array()
 
 	);
@@ -1650,6 +1666,7 @@ function get_paper_screen_status_new($paper_id, $screening_phase = "", $return =
 		'accepted' => 0,
 		'excluded' => 0,
 		'pending' => 0,
+        'include_crit' => array(),
 		'exclude_crit' => array()
 	);
 
@@ -1658,6 +1675,7 @@ function get_paper_screen_status_new($paper_id, $screening_phase = "", $return =
 		'accepted' => 0,
 		'excluded' => 0,
 		'pending' => 0,
+        'include_crit' => array(),
 		'exclude_crit' => array()
 	);
 
@@ -1685,6 +1703,9 @@ function get_paper_screen_status_new($paper_id, $screening_phase = "", $return =
 			if ($value['screening_decision'] == 'Included') {
 				$accepted++;
 				${$value['assignment_type']}['accepted']++;
+                ${$value['assignment_type']}['include_crit'][$value['inclusion_criteria']] = isset(${$value['assignment_type']}['include_crit'][$value['inclusion_criteria']]) ? (${$value['assignment_type']}['include_crit'][$value['inclusion_criteria']] + 1) : 1;
+                $include_crit[$value['inclusion_criteria']] = isset($include_crit[$value['inclusion_criteria']]) ? ($include_crit[$value['inclusion_criteria']] + 1) : 1;
+
 			} else {
 				${$value['assignment_type']}['excluded']++;
 				$excluded++;
@@ -1706,12 +1727,14 @@ function get_paper_screen_status_new($paper_id, $screening_phase = "", $return =
 		$pending = $Veto['pending'];
 		$accepted = $Veto['accepted'];
 		$excluded = $Veto['excluded'];
+        $include_crit = $Veto['include_crit'];
 		$exclude_crit = $Veto['exclude_crit'];
 
 	} else {
 		$pending = $Normal['pending'];
 		$accepted = $Normal['accepted'];
 		$excluded = $Normal['excluded'];
+        $include_crit = $Normal['include_crit'];
 		$exclude_crit = $Normal['exclude_crit'];
 	}
 
@@ -1746,15 +1769,20 @@ function get_paper_screen_status_new($paper_id, $screening_phase = "", $return =
 		} else {
 			if ($accepted == 0) {
 				$paper_decision = "Excluded";
-				if (get_appconfig_element('screening_conflict_type') == 'ExclusionCriteria' and count($exclude_crit) > 1) { //Conflict when different exclusion criteria
+				if ((get_appconfig_element('screening_conflict_type') == 'ExclusionCriteria' or get_appconfig_element('screening_conflict_type') == 'AllCriteria') and count($exclude_crit) > 1) { //Conflict when different exclusion criteria
 
 					$paper_decision = "In conflict";
 
 				}
 
 			} elseif ($excluded == 0) {
-
 				$paper_decision = "Included";
+                if((get_appconfig_element('screening_conflict_type') == 'InclusionCriteria' or get_appconfig_element('screening_conflict_type') == 'AllCriteria') and count($include_crit) > 1){ //Conflict when different inclusion criteria
+
+                    $paper_decision = "In conflict";
+
+                }
+
 			} else {
 
 				$paper_decision = "In conflict";
@@ -1926,7 +1954,12 @@ function active_screening_phase_info()
 
 function screening_validation_source_paper_status()
 {
-	return 'Excluded';
+    if(get_appconfig_element('screening_status_to_validate') == 'IncludedExcluded'){
+        return 'all';
+    }
+	else{
+        return get_appconfig_element('screening_status_to_validate');
+    }
 }
 
 //access the value of the 'screening_validator_assignment_type' configuration element.

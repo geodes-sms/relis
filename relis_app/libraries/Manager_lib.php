@@ -1157,7 +1157,7 @@ class Manager_lib
 		if (can_manage_project() and !$project_published)
 			$menu['adm']['menu']['plan']['sub_menu']['assignment_screen'] = array('label' => 'Assign Classification', 'url' => 'data_extraction/class_assignment_set', 'icon' => '');
 
-		if (can_validate_project() and !$project_published)
+		if (can_validate_project() and !$project_published and get_appconfig_element('screening_validation_on'))
 			$menu['adm']['menu']['plan']['sub_menu']['validate_screen_assign'] = array('label' => 'Assign Validation', 'url' => 'data_extraction/class_assignment_validation_set', 'icon' => '');
 
 		$menu['adm']['menu']['plan']['sub_menu']['exclusioncrieria'] = array('label' => 'Exclusion Criteria', 'url' => 'element/entity_list/list_exclusioncrieria', 'icon' => '');
@@ -1334,7 +1334,9 @@ class Manager_lib
 
 			}
 
-			$menu['general']['menu']['result'] = array('label' => 'Statistics', 'url' => 'screening/screen_result', 'icon' => 'th');
+            if (get_appconfig_element('screening_result_on')) {
+                $menu['general']['menu']['result'] = array('label' => 'Statistics', 'url' => 'screening/screen_result', 'icon' => 'th');
+            }
 
 			if (get_appconfig_element('screening_validation_on')) {
 
@@ -1358,10 +1360,10 @@ class Manager_lib
 				);
 
 				$menu['adm']['menu']['plan'] = array('label' => 'Planning', 'url' => '', 'icon' => 'th');
-				if (can_manage_project())
+				if (can_manage_project() and get_appconfig_element('assign_papers_on'))
 					$menu['adm']['menu']['plan']['sub_menu']['assignment_screen'] = array('label' => 'Assign Screening', 'url' => 'screening/assignment_screen', 'icon' => '');
 
-				if (can_validate_project())
+				if (can_validate_project() and get_appconfig_element('screening_validation_on'))
 					$menu['adm']['menu']['plan']['sub_menu']['validate_screen_assign'] = array('label' => 'Assign Validation', 'url' => 'screening/validate_screen_set', 'icon' => '');
 
 				$menu['adm']['menu']['plan']['sub_menu']['inclusioncriteria'] = array('label' => 'Inclusion Criteria', 'url' => 'element/entity_list/list_inclusioncriteria', 'icon' => '');
@@ -1457,8 +1459,9 @@ class Manager_lib
 			if (get_appconfig_element('screening_on'))
 				$menu['settings']['menu']['configuration']['sub_menu']['screen_phases'] = array('label' => 'Screening Phases', 'url' => 'element/entity_list/list_screen_phases', 'icon' => '');
 
-			$menu['settings']['menu']['configuration']['sub_menu']['exclusioncrieria'] = array('label' => 'Exclusion Criteria', 'url' => 'element/entity_list/list_exclusioncrieria', 'icon' => '');
-			$menu['settings']['menu']['configuration']['sub_menu']['inclusioncrieria'] = array('label' => 'Inclusion Criteria', 'url' => 'element/entity_list/list_inclusioncriteria', 'icon' => '');
+
+            $menu['settings']['menu']['configuration']['sub_menu']['exclusioncrieria'] = array('label' => 'Exclusion Criteria', 'url' => 'element/entity_list/list_exclusioncrieria', 'icon' => '');
+			$menu['settings']['menu']['configuration']['sub_menu']['inclusioncrtieria'] = array('label' => 'Inclusion Criteria', 'url' => 'element/entity_list/list_inclusioncriteria', 'icon' => '');
 
 
 			$menu['settings']['menu']['configuration']['sub_menu']['papers_sources'] = array('label' => 'Papers Sources', 'url' => 'element/entity_list/list_papers_sources', 'icon' => '');

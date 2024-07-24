@@ -163,13 +163,15 @@ class Screening extends CI_Controller
         //print_test($data);
         //$shortut operations
         $action_but = array();
-        if (can_manage_project() and !$project_published)
+        if (can_manage_project() and !$project_published and get_appconfig_element('assign_papers_on'))
             $action_but['assign_screen'] = get_top_button('all', 'Assign papers for screening', 'screening/assignment_screen', 'Assign papers', 'fa-mail-forward', '', ' btn-info action_butt col-md-2 col-sm-2 col-xs-12 ', False);
         if (can_review_project() and !$project_published)
             $action_but['screen'] = get_top_button('all', 'Screen papers', 'screening/screen_paper', 'Screen', 'fa-search', '', ' btn-info action_butt col-md-2 col-sm-2 col-xs-12 ', False);
-        if (can_manage_project() or get_appconfig_element('screening_result_on')) {
+        if (can_manage_project()) {
             $action_but['screen_result'] = get_top_button('all', 'Screening progress', 'screening/screen_completion', 'Progress', 'fa-tasks', '', ' btn-info action_butt col-md-2 col-sm-2 col-xs-12 ', False);
-            $action_but['screen_completion'] = get_top_button('all', 'Screening Statistics', 'screening/screen_result', 'Statistics', 'fa-th', '', ' btn-info action_butt col-md-2 col-sm-2 col-xs-12 ', False);
+            if (get_appconfig_element('screening_result_on')) {
+                $action_but['screen_completion'] = get_top_button('all', 'Screening Statistics', 'screening/screen_result', 'Statistics', 'fa-th', '', ' btn-info action_butt col-md-2 col-sm-2 col-xs-12 ', False);
+            }
         }
         $data['action_but_screen'] = $action_but;
         $action_but = array();
@@ -510,7 +512,7 @@ class Screening extends CI_Controller
         redirect('screening/screening_select');
     }
 
-    //test fonction used to merge my csv file with the screening result
+    //test function used to merge my csv file with the screening result
     private function screen_mine()
     {
         echo "brice";
@@ -626,6 +628,11 @@ class Screening extends CI_Controller
     {
         if (!active_screening_phase()) {
             redirect('home');
+            exit;
+        }
+
+        if(!get_appconfig_element('assign_papers_on')){
+            redirect('screening/screening');
             exit;
         }
         /*$error=FALSE;
@@ -868,6 +875,11 @@ class Screening extends CI_Controller
 
     function screen_paper_validation()
     {
+        if (!get_appconfig_element('screening_validation_on')){
+            redirect('screening/screening');
+            exit;
+        }
+
         $this->screen_paper('screen_validation');
     }
 
@@ -1477,6 +1489,10 @@ class Screening extends CI_Controller
     public function screen_completion($type = 'screening')
     {
         if ($type == 'validate') {
+            if (!get_appconfig_element('screening_validation_on')){
+                redirect('screening/screening');
+                exit;
+            }
             $assignments = $this->Screening_dataAccess->get_user_assigned_papers(0, 'screen_validation', active_screening_phase());
         } else {
             $assignments = $this->Screening_dataAccess->get_user_assigned_papers(0, 'simple_screen', active_screening_phase());
@@ -1539,6 +1555,11 @@ class Screening extends CI_Controller
      */
     public function screen_result($type = 1, $api = 0)
     {
+        if(!get_appconfig_element('screening_result_on')){
+            redirect('screening/screening');
+            exit;
+        }
+
         $users = $this->manager_lib->get_reference_select_values('users;user_name');
         $exclusion_crit = $this->manager_lib->get_reference_select_values('exclusioncrieria;ref_value');
         $inclusion_crit = $this->manager_lib->get_reference_select_values('inclusioncriteria;ref_value');
@@ -1795,6 +1816,11 @@ class Screening extends CI_Controller
     //gather and display validation statistics and results, including the list of screenings with paper details, validation decisions, and match status
     public function screen_validation_result()
     {
+        if (!get_appconfig_element('screening_validation_on')){
+            redirect('screening/screening');
+            exit;
+        }
+
         //Get all papers
         $res_papers = $this->get_papers_to_screen();
         $papers = array();
@@ -2022,13 +2048,24 @@ class Screening extends CI_Controller
             redirect('home');
             exit;
         }
+
+        if (!get_appconfig_element('screening_validation_on')){
+            redirect('screening/screening');
+            exit;
+        }
+
         $screening_phase_info = active_screening_phase_info();
         //print_test($screening_phase_info);
         $screening_phase_id = active_screening_phase();
         $paper_source = $screening_phase_id;
-        $paper_source_status = screening_validation_source_paper_status(); //Excluded
+        $paper_source_status = screening_validation_source_paper_status();
         $phase_title = $screening_phase_info['phase_title'];
-        $append_title = "( $paper_source_status papers  from $phase_title )";
+        if($paper_source_status == 'all'){
+            $append_title = "( Included & excluded papers  from $phase_title )";
+        }
+        else {
+            $append_title = "( $paper_source_status papers  from $phase_title )";
+        }
         //echo $append_title;
         $data['papers_sources'] = $paper_source;
         $data['paper_source_status'] = $paper_source_status;

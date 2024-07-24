@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS `config` (
   `csv_field_separator` enum(';',',') NOT NULL DEFAULT ';',
   `csv_field_separator_export` enum(';',',') NOT NULL DEFAULT ',',
   `screening_screening_conflict_resolution` enum('Unanimity','Majority') NOT NULL DEFAULT 'Unanimity',
-  `screening_conflict_type` enum('IncludeExclude','ExclusionCriteria') NOT NULL DEFAULT 'IncludeExclude',
+  `screening_conflict_type` enum('IncludeExclude','InclusionCriteria','ExclusionCriteria','AllCriteria') NOT NULL DEFAULT 'IncludeExclude',
   `import_papers_on` int(2) NOT NULL DEFAULT '1',
   `assign_papers_on` int(2) NOT NULL DEFAULT '1',
   `screening_on` int(2) NOT NULL DEFAULT '0',
@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS `config` (
   `key_paper_serial` int(10) NOT NULL DEFAULT '1',
   `validation_default_percentage` int(3) NOT NULL DEFAULT '20',
   `screening_reviewer_number` int(3) NOT NULL DEFAULT '2',
-  `screening_status_to_validate` enum('Excluded','Included') NOT NULL DEFAULT 'Excluded',
+  `screening_status_to_validate` enum('IncludedExcluded','Excluded','Included') NOT NULL DEFAULT 'Excluded',
   `screening_validator_assignment_type` enum('Normal','Veto','Info') NOT NULL DEFAULT 'Normal',
   `qa_on` int(2) NOT NULL DEFAULT '0',
   `qa_open` int(2) NOT NULL DEFAULT '0',
@@ -72,8 +72,8 @@ CREATE TABLE IF NOT EXISTS `config` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1;;;;
 
 
-INSERT INTO `config` (`config_id`, `config_type`, `editor_url`, `editor_generated_path`, `csv_field_separator`, `csv_field_separator_export`, `screening_screening_conflict_resolution`, `screening_conflict_type`, `import_papers_on`, `assign_papers_on`, `screening_validation_on`, `screening_result_on`, `source_papers_on`, `search_strategy_on`,`key_paper_prefix`,`key_paper_serial`, `config_active`) VALUES
-(1, 'default', 'http://127.0.0.1:8080/relis/texteditor', 'C:/dslforge_workspace', ';', ',', 'Unanimity', 'IncludeExclude', 1, 1, 1,  1, 1, 1,'Paper_',1, 1);;;;
+INSERT INTO `config` (`config_id`, `config_type`, `editor_url`, `editor_generated_path`, `csv_field_separator`, `csv_field_separator_export`, `screening_screening_conflict_resolution`, `screening_conflict_type`, `import_papers_on`, `assign_papers_on`, `screening_validation_on`, `screening_result_on`, `source_papers_on`, `search_strategy_on`,`key_paper_prefix`,`key_paper_serial`, `screening_status_to_validate`, `config_active`) VALUES
+(1, 'default', 'http://127.0.0.1:8080/relis/texteditor', 'C:/dslforge_workspace', ';', ',', 'Unanimity', 'IncludeExclude', 1, 1, 1,  1, 1, 1,'Paper_',1,'Excluded', 1);;;;
 
 DROP TABLE IF EXISTS `exclusion`;;;;
 CREATE TABLE IF NOT EXISTS `exclusion` (
