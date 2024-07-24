@@ -890,6 +890,7 @@ class Screening extends CI_Controller
         $ref_table = $op['tab_ref'];
         $ref_table_operation = $op['operation_id'];
         $table_config = get_table_configuration($ref_table);
+        $model = new Screening_dataAccess();
         //print_test($table_config);
         $data['screen_type'] = $screen_type;
         //Get screening criteria
@@ -897,7 +898,7 @@ class Screening extends CI_Controller
         $inclusion_crit = $this->manager_lib->get_reference_select_values('inclusioncriteria;ref_value');
         $data['exclusion_criteria'] = $exclusion_crit;
         $data['inclusion_criteria'] = $inclusion_crit;
-        $data['inclusion_mode'] = get_screening_config_element('screening_inclusion_mode');
+        $data['inclusion_mode'] = $model->get_phase_config_value(active_screening_phase(), "screening_inclusion_mode");
         if (!empty($data['content_item'])) {
             //edit screening: used for conflict resolution
             $data['the_paper'] = $data['content_item']['paper_id'];

@@ -1703,8 +1703,8 @@ function get_paper_screen_status_new($paper_id, $screening_phase = "", $return =
 			if ($value['screening_decision'] == 'Included') {
 				$accepted++;
 				${$value['assignment_type']}['accepted']++;
-                ${$value['assignment_type']}['include_crit'][$value['inclusion_criteria']] = isset(${$value['assignment_type']}['include_crit'][$value['inclusion_criteria']]) ? (${$value['assignment_type']}['include_crit'][$value['inclusion_criteria']] + 1) : 1;
-                $include_crit[$value['inclusion_criteria']] = isset($include_crit[$value['inclusion_criteria']]) ? ($include_crit[$value['inclusion_criteria']] + 1) : 1;
+                //${$value['assignment_type']}['include_crit'][$value['inclusion_criteria']] = isset(${$value['assignment_type']}['include_crit'][$value['inclusion_criteria']]) ? (${$value['assignment_type']}['include_crit'][$value['inclusion_criteria']] + 1) : 1;
+                //$include_crit[$value['inclusion_criteria']] = isset($include_crit[$value['inclusion_criteria']]) ? ($include_crit[$value['inclusion_criteria']] + 1) : 1;
 
 			} else {
 				${$value['assignment_type']}['excluded']++;
