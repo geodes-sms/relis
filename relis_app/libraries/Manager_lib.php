@@ -272,6 +272,7 @@ class Manager_lib
 																function get_element_multi_values($config, $key_field, $element_id, $display_field = False)
 																{
 																	$Tvalues_source = explode(';', $config);
+
 																	$source_table_config = get_table_configuration($Tvalues_source[0]);
 
 																	if ($display_field) $display_field = $Tvalues_source[1];

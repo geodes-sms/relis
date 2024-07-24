@@ -73,7 +73,7 @@ class Screening extends CI_Controller
             $data['screening_completion']['done_papers'] = array(
                 'value' => $screening_completion['papers_done'],
                 'title' => 'Screened',
-                'url' => 'element/entity_list/enings'
+                'url' => 'element/entity_list/list_my_screenings'
             );
             $data['screening_completion']['conflict_papers'] = array(
                 'value' => $screening_completion['papers_in_conflict'],
@@ -2653,57 +2653,6 @@ class Screening extends CI_Controller
         return $interpretation;
     }
 
-    /* public function edit_screening_config() {
-        $post_arr = $this->input->post();
-        $screening_model = new Screening_dataAccess();
-        $general_screening_completion = $this->get_user_completion(0, active_screening_phase(), 'Screening');
-        $already_screened_papers = $general_screening_completion['papers_done'];
-        $current_inclusion_mode = get_appconfig_element('screening_inclusion_mode');
-        $new_inclusion_mode = $post_arr['screening_inclusion_mode'];
-        
-        if ($new_inclusion_mode != 'None' && $screening_model->count_inclusion_criteria() == 0) {
-            //Criterias must exist for modes other than None
-            set_top_msg('You need to add inclusion criteria before making this change', "error");
-            redirect('element/display_element/configurations/1');
-        }
-
-        if ($already_screened_papers == 0 || !$this->mode_conflict_exists($current_inclusion_mode, $new_inclusion_mode)) {
-            //Save if no papers already screened or if there is no conflict
-            if ($already_screened_papers != 0 && $current_inclusion_mode == 'All' && $new_inclusion_mode == 'Any') {
-                //insert all criteria in mapping table when going from 'All' to 'Any' and there are screened papers.
-                $screening_model->set_all_criteria();
-            }
-            $screening_model->edit_screening_config($post_arr);
-            $screening_model->update_unique_criteria($post_arr['screening_inclusion_mode']);
-            redirect('element/display_element/configurations/1');
-        } else { 
-            //If screening already started and there is conflict, ask user how to solve it
-            $data['post_arr'] = $post_arr;
-            $data['current_inclusion_mode'] = $current_inclusion_mode;
-            $data['top_buttons'] = get_top_button('back', 'Back', 'manage');
-            $data['left_menu_perspective']='left_menu_screening';
-            $data['project_perspective']='screening';
-            $data['page'] = 'screening/inclusion_mode_conflict';
-            $this->load->view('shared/body', $data);
-        }
-
-    }
-
-
-    public function solve_mode_conflict() {
-        $post_arr = $this->input->post();
-        if (isset($post_arr['cancel'])) redirect('element/display_element/configurations/1');
-        $screening_model = new Screening_dataAccess();
-        $config_array = unserialize($post_arr['config_array']);
-        if (isset($post_arr['reset'])) $screening_model->reset_screening();
-        if (isset($post_arr['keep_one'])) $screening_model->keep_one_criterion();
-        if (isset($post_arr['keep_one_from_all'])) $screening_model->keep_one_criterion(true);
-        if (isset($post_arr['default_criterion'])) $screening_model->set_default_criterion();
-        $screening_model->update_unique_criteria($config_array['screening_inclusion_mode']);
-        $screening_model->edit_screening_config($config_array);
-        redirect('element/display_element/configurations/1');
-    } */
-
     private function mode_conflict_exists($current_mode, $new_mode) {
         $mode_string = $current_mode . $new_mode;
         if ($mode_string == 'NoneOne' || $mode_string == 'NoneAny' || $mode_string == 'AnyOne' || $mode_string == 'AllOne') return true;
@@ -2783,11 +2732,7 @@ class Screening extends CI_Controller
         if (isset($post_arr['default_criterion'])) $screening_model->set_default_criterion($affected_phases);
         $screening_model->edit_screening_config($config_array, $phase_id, $affected_phases);
     }
-/* 
-    public function solve_mode_conflict() {
 
-    }
- */
     private function get_default_criteria_id() {
         $query = $this->db_current->select('ref_id')
                           ->where('ref_value', 'Default')

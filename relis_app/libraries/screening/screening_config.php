@@ -131,22 +131,7 @@ function get_screening_set($table = 'screening', $title = 'Screening')
 		'on_edit' => 'enabled',
 		'on_list' => 'show'
 	);
-/*
-	$fields['inclusion_criteria'] = array(
-		'field_title' => 'Inclusion criteria',
-		'field_type' => 'number',
-		'field_value' => 'normal',
-		'field_size' => 11,
-		'mandatory' => ' ',
-		'input_type' => 'select',
-		'input_select_source' => 'table',
-		'input_select_values' => 'ref_inclusioncriteria;ref_value', //the reference table and the field to be displayed
 
-		'on_add' => 'enabled',
-		'on_edit' => 'enabled',
-		'on_list' => 'show'
-	);
-*/
 
 	$fields['note'] = array(
 		'field_title' => 'Note',

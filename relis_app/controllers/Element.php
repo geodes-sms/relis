@@ -718,7 +718,7 @@ class Element extends CI_Controller
         //print_test($table_config); exit;
         if (!empty($post_arr[$table_config['table_id']])) {
             $data['current_element'] = $post_arr[$table_config['table_id']];
-            //print_test($data); exit;
+            //print_test($data);
         }
         if ($post_arr['operation_type'] == 'new') {
             $var_check = "on_add";
@@ -1187,7 +1187,6 @@ class Element extends CI_Controller
         foreach ($ref_table_config['operations'][$ref_table_operation]['fields'] as $k_field => $v) {
             if (!empty($ref_table_config['fields'][$k_field])) {
                 $field_det = $ref_table_config['fields'][$k_field];
-                
                 if (!empty($field_det['input_type']) and $field_det['input_type'] == 'select') {
                     if ($field_det['input_select_source'] == 'array') {
                         //print_test($v);
@@ -1327,7 +1326,6 @@ class Element extends CI_Controller
                         }
                     }
                 }
-                
                 if (!empty($link_field_list[$v_field]))
                 $element_array[$v_field] = string_anchor(
             $link_field_list[$v_field]['link']['url'] . $value[$link_field_list[$v_field]['link']['id_field']],

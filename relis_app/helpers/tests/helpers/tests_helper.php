@@ -376,7 +376,7 @@ function screenPapers($screenPhaseField, $done = -1, $reviewPerpaper = 1, $inclu
 }
 
 //$done = Nbr of papers to screen; $include = Nbr of papers to include
-function    assignPapers_and_performScreening($userIds = array(), $screenPhaseField, $done = -1, $include = -1)
+function assignPapers_and_performScreening($userIds = array(), $screenPhaseField, $done = -1, $include = -1)
 {
     $ci = get_instance();
     $http_client = new Http_client();

@@ -360,6 +360,7 @@ function dropdown_multi_form_bm($label, $name, $id, $values = array(), $selected
 						<div class="form-group ">' . form_label($label . $mandatory, $name, array(
 			'class' => 'control-label col-md-3 col-sm-3 col-xs-12'
 		)) . '<div class="col-md-6 col-sm-6 col-xs-12">' . form_dropdown($name . "[]", $values, $selected, 'id="' . $id . '"  multiple="multiple" class=" class_' . $id . ' form-control col-md-7 col-xs-12 select2_multiplexx ' . $classe . ' "  ' . $readonly) . '</div></div>';
+
 	$number_selected = "";
 	if ($number_of_values != "*") {
 		$number_selected = "maximumSelectionLength: $number_of_values ,";
@@ -2061,7 +2062,3 @@ function path_separator()
 		return '/';
 	}
 }	
-
-function get_screening_config_element($element_name) {
-    //123    
-}

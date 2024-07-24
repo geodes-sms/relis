@@ -163,16 +163,6 @@ function get_config_screen_phase()
 
 	);
 
-	$fields['screen_phase_test'] = array(
-		'field_title' => 'test',
-		'field_type' => 'number',
-		'field_size' => 2,
-		'input_type' => 'text',
-		'mandatory' => ' mandatory '
-
-	);
-
-
 	$fields['screen_phase_final'] = array(
 		'field_title' => 'Final phase',
 		'field_type' => 'int',
@@ -268,7 +258,7 @@ function get_config_screen_phase()
 		'redirect_after_save' => 'element/entity_list/list_screen_phases',
 		'db_save_model' => 'add_screen_phase',
 
-		'generate_stored_procedurf' => False,
+		'generate_stored_procedure' => False,
 
 		'fields' => array(
 			'screen_phase_id' => array('mandatory' => '', 'field_state' => 'hidden'),

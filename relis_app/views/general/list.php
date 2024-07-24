@@ -19,7 +19,7 @@
               <div class="col-md-12 col-sm-12 col-xs-12">
                 <div class="x_panel" >
                   <div class="x_title">
-                    <h2><?php echo 'isset($page_title) ? $page_title:"" ;' ?></h2>
+                    <h2><?php echo isset($page_title) ? $page_title:"" ; ?></h2>
                     <?php 
                     if(isset($top_buttons)){
                     	echo "<ul class='nav navbar-right panel_toolbox'>$top_buttons</ul>";

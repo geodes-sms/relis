@@ -68,14 +68,14 @@
                     </thead>
                     <tbody>
                       <?php 
+                    	
                     	foreach ($list as $key_row => $row) {
-                        echo "<tr>";
+                    		echo"<tr>";
                         foreach ($row as $k_cel => $v_cell) {
-                            echo "<td>";
-                            echo $v_cell;
-                            echo "</td>";
+                    			echo "<td>".$v_cell."</td>";
                         }
-                        echo "</tr>";
+                    		
+                    		echo"</tr>";
                     }
                     	?>
                    </tbody> 
