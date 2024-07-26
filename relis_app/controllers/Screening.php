@@ -2704,12 +2704,12 @@ class Screening extends CI_Controller
         $config_type = $model->get_phase_config_type($phase_id);
         $current_inclusion_mode = $model->get_phase_config_value($phase_id, 'screening_inclusion_mode');
         $new_inclusion_mode = $post_arr['screening_inclusion_mode'];
-        
+        $redirect_url = $phase_id ? 'element/entity_list/list_screen_phases' : 'element/display_element/configurations/1';
         //Criterias must exist for modes other than None
         if ($new_inclusion_mode != 'None' && $model->count_inclusion_criteria() == 0) {
             set_top_msg('You need to add inclusion criteria before making this change', "error");
-            redirect('element/entity_list/list_screen_phases');
-        }
+            redirect($redirect_url);
+        }   
         
         $affected_phases = $model->get_affected_phases($phase_id);
 
@@ -2735,7 +2735,7 @@ class Screening extends CI_Controller
                 $model->set_all_criteria($affected_phases);
             }
             $model->edit_screening_config($post_arr, $phase_id, $affected_phases);
-            redirect('element/entity_list/list_screen_phases');
+            redirect($redirect_url);
         }  else { 
             $this->db2->where_in('screen_phase_id', $affected_phases);
             $query = $this->db2->select('phase_title')->get('screen_phase');
@@ -2826,6 +2826,7 @@ class Screening extends CI_Controller
     public function route_config($phase_id) {
         $model = new Screening_dataAccess();
         $config_type = $model->get_phase_config_type($phase_id);
+        $this->db2 = $this->load->database(project_db(), TRUE);
         $this->db2->select('screen_phase_config_id');
         $this->db2->from('screen_phase_config');
         $this->db2->where('screen_phase_id', $phase_id);

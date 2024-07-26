@@ -305,7 +305,15 @@ class Screening_dataAccess extends CI_Model
             $row = $query->row();
             return $row->$value_name;
         }
-        return get_appconfig_element($value_name);
+        $ci = get_instance();
+
+        $config = $ci->DBConnection_mdl->get_row_details('config', '1');
+    
+        if (!empty($config[$value_name])) {
+            return $config[$value_name];
+        } else {
+            return "0";
+        }
     }
 
 }

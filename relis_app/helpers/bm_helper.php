@@ -829,6 +829,10 @@ function get_appconfig($element = "all", $source = "db")
 */	
 function get_appconfig_element($element = "all", $source = "db")
 {
+	if (is_screening_config_element($element) && active_screening_phase()) {
+		$screening_model = new Screening_dataAccess();
+		return $screening_model->get_phase_config_value(active_screening_phase(), $element);
+	}
 	$ci = get_instance();
 
 	$config = $ci->DBConnection_mdl->get_row_details('config', '1');
@@ -839,6 +843,22 @@ function get_appconfig_element($element = "all", $source = "db")
 		return "0";
 	}
 
+}
+
+function is_screening_config_element($element) {
+	return in_array($element, array (
+		'screening_inclusion_mode',
+		'screening_screening_conflict_resolution',
+		'screening_conflict_type',
+		'assign_papers_on',
+		'screening_result_on',
+		'screening_validation_on',
+		'screening_reviewer_number',
+		'screening_status_to_validate',
+		'screening_validator_assignment_type',
+		'use_kappa',
+		'validation_default_percentage'
+	));
 }
 
 /*
@@ -1685,10 +1705,19 @@ function get_paper_screen_status_new($paper_id, $screening_phase = "", $return =
 		//---------
 		$res_assignment[$key]['user_name'] = $users[$value['user_id']];
 		$reviewers .= $users[$value['user_id']] . " | ";
-
+		
+		//get inclusion criteria
+		$screening_model = new Screening_dataAccess();
+		$inclusion_criteria_ids = $screening_model->get_criteria_array($res_assignment[$key]['screening_id']);
+		$criteria2 = $ci->manager_lib->get_reference_select_values('inclusioncriteria;ref_value');
+		$inclusion_criteria = array();
+		foreach ($inclusion_criteria_ids as $id) {
+			array_push($inclusion_criteria, $criteria2[$id]);
+		}
+		$inclusion_criteria = implode(' | ', $inclusion_criteria);
 
 		$res_assignment[$key]['exclusion_criteria'] = empty($criteria[$value['exclusion_criteria']]) ? "" : $criteria[$value['exclusion_criteria']];
-		//$res_assignment[$key]['inclusion_criteria'] = empty($criteria[$value['inclusion_criteria']]) ? "" : $criteria[$value['inclusion_criteria']];
+		$res_assignment[$key]['inclusion_criteria'] = empty($inclusion_criteria) ? "" : $inclusion_criteria;
 
 		//----------
 		//$ass_type=$value['assignment_type'];
@@ -1703,8 +1732,8 @@ function get_paper_screen_status_new($paper_id, $screening_phase = "", $return =
 			if ($value['screening_decision'] == 'Included') {
 				$accepted++;
 				${$value['assignment_type']}['accepted']++;
-                //${$value['assignment_type']}['include_crit'][$value['inclusion_criteria']] = isset(${$value['assignment_type']}['include_crit'][$value['inclusion_criteria']]) ? (${$value['assignment_type']}['include_crit'][$value['inclusion_criteria']] + 1) : 1;
-                //$include_crit[$value['inclusion_criteria']] = isset($include_crit[$value['inclusion_criteria']]) ? ($include_crit[$value['inclusion_criteria']] + 1) : 1;
+                ${$value['assignment_type']}['include_crit'][$value['inclusion_criteria']] = isset(${$value['assignment_type']}['include_crit'][$value['inclusion_criteria']]) ? (${$value['assignment_type']}['include_crit'][$value['inclusion_criteria']] + 1) : 1;
+                $include_crit[$value['inclusion_criteria']] = isset($include_crit[$inclusion_criteria]) ? ($include_crit[$inclusion_criteria] + 1) : 1;
 
 			} else {
 				${$value['assignment_type']}['excluded']++;
