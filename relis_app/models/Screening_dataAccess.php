@@ -137,7 +137,7 @@ class Screening_dataAccess extends CI_Model
     }
 
     function reset_screening($affected_phases) {
-
+        $this->db_current = $this->load->database(project_db(), TRUE);
         $this->db_current->where('screening_status', 'done');
         $this->db_current->where_in('screening_phase', $affected_phases);
         $this->db_current->update('screening_paper', array("screening_status" => "Reseted"));
@@ -153,6 +153,7 @@ class Screening_dataAccess extends CI_Model
     }
 
     function keep_one_criterion($affected_phases, $from_all = false) {
+        $this->db_current = $this->load->database(project_db(), TRUE);
         $affected_phases_str = implode(',', array_map('intval', $affected_phases));
         //if previous inclusion mode is 'All', insert first selected criteria as the one criterion
         if ($from_all) {
@@ -197,11 +198,13 @@ class Screening_dataAccess extends CI_Model
     }
 
     function count_inclusion_criteria() {
+        $this->db_current = $this->load->database(project_db(), TRUE);
         $sql = 'SELECT COUNT(*) AS count FROM ref_inclusioncriteria where ref_active=1';
         return $this->db_current->query($sql)->row()->count;
     }
 
     public function get_criteria_array($screening_id) {
+        $this->db_current = $this->load->database(project_db(), TRUE);
         $sql = 'SELECT criteria_id FROM screen_inclusion_mapping WHERE screening_id = ?';
         $query = $this->db_current->query($sql, array($screening_id));
         $result = $query->result_array();
@@ -210,6 +213,7 @@ class Screening_dataAccess extends CI_Model
     }
 
     public function set_default_criterion($affected_phases) {
+        $this->db_current = $this->load->database(project_db(), TRUE);
         $affected_phases_str = implode(',', array_map('intval', $affected_phases));
 
         $sql = "
@@ -239,6 +243,7 @@ class Screening_dataAccess extends CI_Model
         if (empty($affected_phases)) {
             return 0;
         }
+        $this->db_current = $this->load->database(project_db(), TRUE);
 
         //delete affected records in screen_inclusion_mapping table
         $this->db_current->select('screening_id');
@@ -265,6 +270,7 @@ class Screening_dataAccess extends CI_Model
     }
 
     public function get_affected_phases($phase_id) {
+        $this->db_current = $this->load->database(project_db(), TRUE);
         if (empty($phase_id) or $this->get_phase_config_type($phase_id) == 'Default') {
             $this->db_current->select('screen_phase_id');
             $this->db_current->from('screen_phase_config');
@@ -282,6 +288,7 @@ class Screening_dataAccess extends CI_Model
     }
 
     public function get_phase_config_type($phase_id = null) {
+        $this->db_current = $this->load->database(project_db(), TRUE);
         if (!empty($phase_id)) {
             $this->db_current = $this->load->database(project_db(), TRUE);
             $this->db_current->select('config_type');
