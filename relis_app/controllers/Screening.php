@@ -1805,7 +1805,7 @@ class Screening extends CI_Controller
                     //'screening_decision'=>$papers[$value['paper_id']]['screening_status'],
                     'validation_descision' => $value['screening_decision']
                 );
-                if ($screenings[$key]['validation_descision'] == screening_validation_source_paper_status()) {
+                if ($screenings[$key]['validation_descision'] == screening_validation_source_paper_status() or screening_validation_source_paper_status() == 'all') {
                     $nbr_matched++;
                     $screenings[$key]['matched'] = 'Yes';
                 } else {
@@ -2026,7 +2026,13 @@ class Screening extends CI_Controller
         } else {
             $data['assign_to_connected'] = False;
         }
-        $papers = $this->get_papers_to_screen($paper_source, $paper_source_status, '', 'Validation');
+        if ($paper_source_status == 'all'){
+            $papers_included = $this->get_papers_to_screen($paper_source, 'Included', '', 'Validation');
+            $papers_excluded = $this->get_papers_to_screen($paper_source, 'Excluded', '', 'Validation');
+            $papers = array_merge_recursive($papers_included, $papers_excluded);
+        }else{
+            $papers = $this->get_papers_to_screen($paper_source, $paper_source_status, '', 'Validation');
+        }
         //	print_test($papers['assigned']);
         $data['paper_source'] = $paper_source;
         $paper_list[0] = array('Key', 'Title');
