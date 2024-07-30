@@ -158,6 +158,20 @@ function populate_common_tables($target_db = 'current', $config = 'init')
 		//create tables
 		//print_test($values);
 		$table_configuration = get_table_configuration($value, $target_db);
+
+        //modify configuration when it is demo project
+        if ($target_db == 'demo_relis' && $value == 'config'){
+            $table_configuration['fields']['screening_result_on']['default_value'] = '1';
+            $table_configuration['fields']['assign_papers_on']['default_value'] = '1';
+            $table_configuration['fields']['qa_open']['default_value'] = '1';
+            $table_configuration['fields']['classification_on']['field_value'] = '1';
+            $table_configuration['fields']['classification_on']['default_value'] = '1';
+        }
+        if ($target_db == 'demo_relis' && $value == 'screen_phase'){
+            $table_configuration['fields']['phase_state']['field_value'] = 'Open';
+            $table_configuration['fields']['phase_state']['default_value'] = 'Open';
+        }
+
 		$res = create_table_configuration($table_configuration, $target_db);
 	}
 }

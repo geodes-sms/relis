@@ -163,11 +163,11 @@ class Screening extends CI_Controller
         //print_test($data);
         //$shortut operations
         $action_but = array();
-        if (can_manage_project() and !$project_published and get_appconfig_element('assign_papers_on'))
+        if ((can_manage_project() or has_usergroup(3)) and !$project_published and get_appconfig_element('assign_papers_on'))
             $action_but['assign_screen'] = get_top_button('all', 'Assign papers for screening', 'screening/assignment_screen', 'Assign papers', 'fa-mail-forward', '', ' btn-info action_butt col-md-2 col-sm-2 col-xs-12 ', False);
         if (can_review_project() and !$project_published)
             $action_but['screen'] = get_top_button('all', 'Screen papers', 'screening/screen_paper', 'Screen', 'fa-search', '', ' btn-info action_butt col-md-2 col-sm-2 col-xs-12 ', False);
-        if (can_manage_project()) {
+        if (can_manage_project() or has_usergroup(3)) {
             $action_but['screen_result'] = get_top_button('all', 'Screening progress', 'screening/screen_completion', 'Progress', 'fa-tasks', '', ' btn-info action_butt col-md-2 col-sm-2 col-xs-12 ', False);
             if (get_appconfig_element('screening_result_on')) {
                 $action_but['screen_completion'] = get_top_button('all', 'Screening Statistics', 'screening/screen_result', 'Statistics', 'fa-th', '', ' btn-info action_butt col-md-2 col-sm-2 col-xs-12 ', False);

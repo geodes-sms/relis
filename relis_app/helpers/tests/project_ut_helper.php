@@ -19,12 +19,13 @@ class ProjectUnitTest
         $this->accessProjectControllerWithoutLogin();
         $this->TestInitialize();
         $this->newProjectForm();
+        $this->projectList_demoprojectInstalled();
         $this->newProjectForm_fromRelisEditor();
         $this->saveNewProject_notPhpFile();
         $this->saveNewProject_validInstallationFile();
         $this->saveNewProject_existingLabel();
-        $this->projectList_1projectInstalled();
         $this->projectList_2projectsInstalled();
+        $this->projectList_3projectsInstalled();
         $this->remove_project();
         $this->saveNewProjectFromRelisEditor_notPhpFile();
         $this->saveNewProjectFromRelisEditor_validInstallationFile();
@@ -122,6 +123,36 @@ class ProjectUnitTest
 
     /*
      * Test 4
+     * Action : projects_list
+     * Description : Display the list of installed projects which contains the demo project
+     * Expected result: check if the demo project is correctly written in the database
+     */
+    private function projectList_demoprojectInstalled()
+    {
+        $action = "projects_list";
+        $test_name = "Display the list of installed projects which contains the demo project";
+        $test_aspect = "Installed project(s)";
+        $expected_value = '{"nombre":1,"list":[{"project_id":"' . getProjectDetails('demo_relis')['project_id'] . '","project_label":"demo_relis","project_title":"Demo ReLiS","project_description":"Demo ReLiS","project_creator":"1","project_icon":null,"creation_time":"' . getProjectDetails('demo_relis')['creation_time'] . '","project_public":"0","project_active":"1"}]}';
+
+        $response = $this->http_client->response($this->controller, $action);
+
+        if ($response['status_code'] >= 400) {
+            $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
+        } else {
+            //get the list of installed projects
+            $ci = get_instance();
+            $ref_table_config = get_table_configuration("project");
+            $ref_table_config['current_operation'] = 'list_projects';
+            $projectsList = $ci->DBConnection_mdl->get_list_mdl($ref_table_config);
+
+            $actual_value = json_encode($projectsList);
+        }
+
+        run_test($this->controller, $action, $test_name, $test_aspect, $expected_value, $actual_value);
+    }
+
+    /*
+     * Test 5
      * Action : save_new_project
      * Description : Add a new project with an installation file which is not a .php file.
      * Scenario : When the user add a new project, the project should not be created in the database
@@ -147,7 +178,7 @@ class ProjectUnitTest
     }
 
     /*
-     * Test 5
+     * Test 6
      * Action : save_new_project
      * Description : Add a new project with a valid project installation configuration file.
      * Scenario : When the user add a new project, a new database should be created representing the new project
@@ -186,7 +217,7 @@ class ProjectUnitTest
     }
 
     /*
-     * Test 6
+     * Test 7
      * Action : save_new_project
      * Description : Add a new project with an already used project label (project_short_name).
      * Scenario : When the user add a new project with an existing project label, the project should not be created in the database
@@ -212,17 +243,17 @@ class ProjectUnitTest
     }
 
     /*
-     * Test 7
+     * Test 8
      * Action : projects_list
-     * Description : Display the list of installed projects when 1 project is installed.
+     * Description : Display the list of installed projects when 2 projects are installed.
      * Expected result: check if the projects list returned is correct
      */
-    private function projectList_1projectInstalled()
+    private function projectList_2projectsInstalled()
     {
         $action = "projects_list";
-        $test_name = "Display the list of installed projects when 1 project is installed";
+        $test_name = "Display the list of installed projects when 2 projects are installed";
         $test_aspect = "Installed project(s)";
-        $expected_value = '{"nombre":1,"list":[{"project_id":"' . getProjectDetails()['project_id'] . '","project_label":"demoTestProject","project_title":"Demo Test Project","project_description":"Demo Test Project","project_creator":"1","project_icon":null,"creation_time":"' . getProjectDetails()['creation_time'] . '","project_public":"0","project_active":"1"}]}';
+        $expected_value = '{"nombre":2,"list":[{"project_id":"' . getProjectDetails('demo_relis')['project_id'] . '","project_label":"demo_relis","project_title":"Demo ReLiS","project_description":"Demo ReLiS","project_creator":"1","project_icon":null,"creation_time":"' . getProjectDetails('demo_relis')['creation_time'] . '","project_public":"0","project_active":"1"},{"project_id":"' . getProjectDetails()['project_id'] . '","project_label":"demoTestProject","project_title":"Demo Test Project","project_description":"Demo Test Project","project_creator":"1","project_icon":null,"creation_time":"' . getProjectDetails()['creation_time'] . '","project_public":"0","project_active":"1"}]}';
 
         $response = $this->http_client->response($this->controller, $action);
 
@@ -242,12 +273,12 @@ class ProjectUnitTest
     }
 
     /*
-     * Test 8
+     * Test 9
      * Action : projects_list
      * Description : Display the list of installed projects when more than 1 project is installed.
      * Expected result: check if the projects list returned is correct
      */
-    private function projectList_2projectsInstalled()
+    private function projectList_3projectsInstalled()
     {
         $action = "projects_list";
         $test_name = "Display the list of installed projects when more than 1 project is installed";
@@ -255,7 +286,7 @@ class ProjectUnitTest
 
         //install second project
         createDemoProject("demoTestProject2");
-        $expected_value = '{"nombre":2,"list":[{"project_id":"' . getProjectDetails()['project_id'] . '","project_label":"demoTestProject","project_title":"Demo Test Project","project_description":"Demo Test Project","project_creator":"1","project_icon":null,"creation_time":"' . getProjectDetails()['creation_time'] . '","project_public":"0","project_active":"1"},{"project_id":"' . getProjectDetails('demoTestProject2')['project_id'] . '","project_label":"demoTestProject2","project_title":"Demo Test Project","project_description":"Demo Test Project","project_creator":"1","project_icon":null,"creation_time":"' . getProjectDetails('demoTestProject2')['creation_time'] . '","project_public":"0","project_active":"1"}]}';
+        $expected_value = '{"nombre":3,"list":[{"project_id":"' . getProjectDetails('demo_relis')['project_id'] . '","project_label":"demo_relis","project_title":"Demo ReLiS","project_description":"Demo ReLiS","project_creator":"1","project_icon":null,"creation_time":"' . getProjectDetails('demo_relis')['creation_time'] . '","project_public":"0","project_active":"1"},{"project_id":"' . getProjectDetails()['project_id'] . '","project_label":"demoTestProject","project_title":"Demo Test Project","project_description":"Demo Test Project","project_creator":"1","project_icon":null,"creation_time":"' . getProjectDetails()['creation_time'] . '","project_public":"0","project_active":"1"},{"project_id":"' . getProjectDetails('demoTestProject2')['project_id'] . '","project_label":"demoTestProject2","project_title":"Demo Test Project","project_description":"Demo Test Project","project_creator":"1","project_icon":null,"creation_time":"' . getProjectDetails('demoTestProject2')['creation_time'] . '","project_public":"0","project_active":"1"}]}';
 
         $response = $this->http_client->response($this->controller, $action);
 
@@ -278,7 +309,7 @@ class ProjectUnitTest
     }
 
     /*
-     * Test 9
+     * Test 10
      * Action : remove_project
      * Description : Remove installed project.
      * Expected result : "Project removed"
@@ -310,7 +341,7 @@ class ProjectUnitTest
     }
 
     /*
-     * Test 10
+     * Test 11
      * Action : save_new_project_editor
      * Description : Add a new project from relis editor with an installation file which is not a .php file.
      * Scenario : When the user add a new project, the project should not be created in the database
@@ -338,7 +369,7 @@ class ProjectUnitTest
     }
 
     /*
-     * Test 11
+     * Test 12
      * Action : save_new_project_editor
      * Description : Add a new project from relis editor with a valid project installation configuration file.
      * Scenario : When the user add a new project, a new database should be created representing the new project
@@ -377,7 +408,7 @@ class ProjectUnitTest
     }
 
     /*
-     * Test 12
+     * Test 13
      * Action : save_new_project_editor
      * Description : Add a new project from relis editor with an already used project label (project_short_name).
      * Scenario : When the user add a new project with an existing project label, the project should not be created in the database
@@ -403,7 +434,7 @@ class ProjectUnitTest
     }
 
     /*
-     * Test 13
+     * Test 14
      * Action : set_project
      * Description : Set the project as active project in the user session.
      * Expected userdata(project_db) session: demoTestProject
@@ -427,7 +458,7 @@ class ProjectUnitTest
     }
 
     /*
-     * Test 14
+     * Test 15
      * Action : set_project2
      * Description : switch and update the active project in the session
      * Expected userdata(project_db) session: demoTestProject
@@ -451,7 +482,7 @@ class ProjectUnitTest
     }
 
     /*
-     * Test 15
+     * Test 16
      * Action : publish_project
      * Description : Publish Project.
      * Expected "project_public" field in the projects table : 1
@@ -475,7 +506,7 @@ class ProjectUnitTest
     }
 
     /*
-     * Test 16
+     * Test 17
      * Action : publish_project
      * Description : Reopen Project.
      * Expected "project_public" field in the projects table : 0

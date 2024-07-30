@@ -111,7 +111,7 @@ class Screening_manager_lib
 				);
 
 				$menu['adm']['menu']['plan'] = array('label' => 'Planning', 'url' => '', 'icon' => 'th');
-				if (can_manage_project() and get_appconfig_element('assign_papers_on'))
+				if ((can_manage_project() or has_usergroup(3)) and get_appconfig_element('assign_papers_on'))
 					$menu['adm']['menu']['plan']['sub_menu']['assignment_screen'] = array('label' => 'Assign Screening', 'url' => 'screening/assignment_screen', 'icon' => '');
 
 				if (can_validate_project() and get_appconfig_element('screening_validation_on'))
@@ -207,8 +207,10 @@ class Screening_manager_lib
 			$menu['settings']['menu']['str_mng'] = array('label' => 'Label Management', 'url' => 'element/entity_list/list_str_mng', 'icon' => 'text-width');
 			$menu['settings']['menu']['install_form_editor'] = array('label' => 'Update Project Config', 'url' => 'install/install_form_editor', 'icon' => 'refresh');
 
-			$menu['settings']['menu']['Configuration_managment'] = array('label' => 'Configuration_managment', 'url' => 'admin/list_configurations', 'icon' => 'cog');
-			if (debug_coment_active())
+            if (has_usergroup(1)) {
+                $menu['settings']['menu']['Configuration_managment'] = array('label' => 'Configuration_managment', 'url' => 'admin/list_configurations', 'icon' => 'cog');
+            }
+                if (debug_coment_active())
 				$menu['settings']['menu']['debug'] = array('label' => 'Debug Comment', 'url' => 'element/entity_list/list_debug', 'icon' => 'cogs');
 
 		}
