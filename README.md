@@ -48,14 +48,13 @@ The project can be installed locally using docker. Make sure to follow the pre-r
 
 ### Build and run the application:
 1. Clone the project from GitHub (git clone https://github.com/geodes-sms/relis.git)
-2. Run following command from the directory **relis_deployment/**
+2. On Windows, ensure the end-of-line encoding for the files **deployment/entrypoint.sh** and **deployment/tomcat/entrypoint.sh** use UNIX LF (not CR LF).
+3. Run following command from the directory **deployment/**
    > docker-compose build 
    
-
-3. Run following command from the directory **relis_deployment/**
+4. Run following command from the directory **deployment/**
     > docker-compose up -d
    
-4. (For **windows users** , if you get the error `relis-application-service | standard_init_linux.go:211: exec user process caused "no such file or directory"`: check if the file **relis_deployment/docker/entrypoint.sh** EOL is not CRLF;  if it is, convert it from CRLF to LF and go back to step 3.)
 5. From your browser go to url **localhost:8083** to access the application. Default credentials  are: `Username: admin` `Password: 123`
 6. For test purpose you can also access the database using PHPMyAdmin on **localhost:8083/phpmyadmin**. Default credentials are: `Username: root` `Password:`
    
