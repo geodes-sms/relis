@@ -151,7 +151,7 @@ INSERT INTO `info` VALUES (1,'ReLiS : a tool for conducting Systematic Review','
 Systematic review is a technique used to search for evidence in scientific literature that is conducted in a formal manner, following a well-defined process, according to
 a previously elaborated protocol. Conducting a systematic reviews involves many steps over a long period of time, and is often laborious and repetitive. This is why we have created ReLiS which provides essential software support to reviewers in conducting
 high quality systematic reviews. With ReLiS, you can planning, conducting, and reporting your review.\r\n
-<p>\r\n<i>ReLiS stands for Revue Litteraire SystÃ©matique which is French for Systematic Literature Reviews Relis literally translates to â€œrereadâ€.</i>\r\n</p>\r\n','','Home',1,1),(2,'Plan the review','ReLiS features a domain-specific language to define
+<p>\r\n<i>ReLiS stands for Revue Litt&eacute;raire Syst&eacute;matique, which is French for systematic literature reviews: Relis literally translates to "reread".</i>\r\n</p>\r\n','','Home',1,1),(2,'Plan the review','ReLiS features a domain-specific language to define
 a protocol that will guide the process of conducting the review. That protocol will help to generate a project tailored to the needs of the review. ReLiS supports an iterative process: you can revise the protocol and add more articles at any time.','','Features',1,1),(3,'Import
 papers','ReLiS allows you to add references manually or import a list of them from CSV, BibTeX or EndNote files.\r\n
 <hr>\r\n
