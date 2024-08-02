@@ -57,7 +57,6 @@ function get_configuration()
 		'default_value' => 'auto_increment'
 	);
 
-
 	$fields['config_type'] = array(
 		'field_title' => 'Configuration type',
 		'field_type' => 'text',
@@ -75,6 +74,7 @@ function get_configuration()
 		'input_type' => 'text',
 		'mandatory' => ' mandatory '
 	);
+
 	$fields['editor_generated_path'] = array(
 		'field_title' => 'Editor workspace location',
 		'field_type' => 'text',
@@ -95,6 +95,7 @@ function get_configuration()
 		'input_select_source' => 'array',
 		'input_select_values' => array(';' => ';', ',' => ',')
 	);
+
 	$fields['csv_field_separator_export'] = array(
 		'field_title' => 'CSV separator for export',
 		'field_type' => 'text',
@@ -105,6 +106,18 @@ function get_configuration()
 		'input_type' => 'select',
 		'input_select_source' => 'array',
 		'input_select_values' => array(';' => ';', ',' => ',')
+	);
+
+	$fields['screening_inclusion_mode'] = array(
+		'field_title' => 'Screening inclusion mode',
+		'field_type' => 'text',
+		'field_value' => 'None',
+		'default_value' => 'None',
+		'field_size' => 50,
+		'mandatory' => ' mandatory ',
+		'input_type' => 'select',
+		'input_select_source' => 'array',
+		'input_select_values' => array('None' => 'None', 'One' => 'One', 'Any' => 'Any', 'All' => 'All'),
 	);
 
 	$fields['screening_screening_conflict_resolution'] = array(
@@ -124,14 +137,12 @@ function get_configuration()
 		'field_title' => 'Conflict criteria',
 		'field_type' => 'text',
 		'field_value' => 'IncludeExclude',
-		'field_value' => 'IncludeExclude',
 		'field_size' => 50,
 		'mandatory' => ' mandatory ',
 		'input_type' => 'select',
 		'input_select_source' => 'array',
 		'input_select_values' => array('IncludeExclude' => 'Inclusion - exclusion', 'InclusionCriteria' => 'Inclusion criteria', 'ExclusionCriteria' => 'Exclusion criteria', 'AllCriteria' => 'All criteria'),
 		'initial_value' => 'IncludeExclude',
-
 	);
 
 	$fields['import_papers_on'] = array(
@@ -177,6 +188,7 @@ function get_configuration()
 		'input_select_source' => 'yes_no',
 		'input_select_values' => '',
 	);
+
 	$fields['screening_validation_on'] = array(
 		'field_title' => 'Screening validation activated',
 		'field_type' => 'int',
@@ -187,8 +199,6 @@ function get_configuration()
 		'input_select_source' => 'yes_no',
 		'input_select_values' => '',
 	);
-
-
 
 	$fields['classification_on'] = array(
 		'field_title' => 'Classification activated',
@@ -301,9 +311,8 @@ function get_configuration()
 		'input_type' => 'select',
 		'input_select_source' => 'yes_no',
 		'input_select_values' => '',
-	)
-
-	;
+	);
+	
 	$fields['qa_on'] = array(
 		'field_title' => 'Quality assessment enabled',
 		'field_type' => 'int',
@@ -430,11 +439,11 @@ function get_configuration()
 			'source_papers_on' => array('group' => 'papers'),
 			'search_strategy_on' => array('group' => 'papers'),
 
-
 			'screening_on' => array('group' => 'screen'),
 			'screening_result_on' => array('group' => 'screen'),
 			'assign_papers_on' => array('group' => 'screen'),
 			'screening_reviewer_number' => array('group' => 'screen'),
+			'screening_inclusion_mode' => array('group' => 'screen'),
 			'screening_conflict_type' => array('group' => 'screen'),
 			'screening_screening_conflict_resolution' => array('group' => 'screen'),
 			'use_kappa' => array('group' => 'screen'),
@@ -661,8 +670,6 @@ function get_configuration()
 			'validation_default_percentage' => array(),
             'screening_status_to_validate' => array(),
 			'screening_validator_assignment_type' => array(),
-
-
 		),
 
 
@@ -782,7 +789,8 @@ function get_configuration()
 		'operation_title' => 'Edit screening configurations',
 		'operation_description' => 'Edit screening configurations',
 		'page_title' => 'Edit screening settings ',
-		'save_function' => 'element/save_element',
+		//'save_function' => 'Element/save_element',
+		'save_function' => 'Screening/edit_screening_config',
 		'page_template' => 'general/frm_entity',
 
 		'redirect_after_save' => 'element/display_element/configurations/1',
@@ -797,6 +805,7 @@ function get_configuration()
 			'screening_result_on' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
 			'assign_papers_on' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
 			'screening_reviewer_number' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
+			'screening_inclusion_mode' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
 			'screening_conflict_type' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
 			'screening_screening_conflict_resolution' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
 			'use_kappa' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
@@ -804,7 +813,6 @@ function get_configuration()
 			'screening_validator_assignment_type' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
             'screening_status_to_validate' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
 			'validation_default_percentage' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
-
 		),
 
 		'top_links' => array(

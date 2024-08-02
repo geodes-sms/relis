@@ -544,13 +544,13 @@ function save_screening($data)
         $ci->db2 = $ci->load->database(project_db(), TRUE);
         $screening_phase = !empty($post_arr['screening_phase']) ? $post_arr['screening_phase'] : 1;
         $exclusion_criteria = ($post_arr['decision'] == 'excluded') ? $post_arr['criteria_ex'] : NULL;
-        $inclusion_criteria = ($post_arr['decision'] == 'accepted') ? $post_arr['criteria_in'] : NULL;
+        //$inclusion_criteria = ($post_arr['decision'] == 'accepted') ? $post_arr['criteria_in'] : NULL;
         $screening_decision = ($post_arr['decision'] == 'excluded') ? 'Excluded' : 'Included';
         $screening_save = array(
             'screening_note' => $post_arr['note'],
             'screening_decision' => $screening_decision,
             'exclusion_criteria' => $exclusion_criteria,
-            'inclusion_criteria' => $inclusion_criteria,
+            //'inclusion_criteria' => $inclusion_criteria,
             'screening_time' => bm_current_time('Y-m-d H:i:s'),
             'screening_status' => 'Done',
         );
@@ -566,7 +566,7 @@ function save_screening($data)
             'user' => active_user_id(),
             'decision' => $screening_decision,
             'criteria' => $exclusion_criteria,
-            'criteria2' => $inclusion_criteria,
+            //'criteria2' => $inclusion_criteria,
             'note' => $post_arr['note'],
             'paper_status' => $paper_status,
             'screening_time' => bm_current_time('Y-m-d H:i:s'),

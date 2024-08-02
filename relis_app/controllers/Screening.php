@@ -890,6 +890,7 @@ class Screening extends CI_Controller
         $ref_table = $op['tab_ref'];
         $ref_table_operation = $op['operation_id'];
         $table_config = get_table_configuration($ref_table);
+        $model = new Screening_dataAccess();
         //print_test($table_config);
         $data['screen_type'] = $screen_type;
         //Get screening criteria
@@ -897,6 +898,7 @@ class Screening extends CI_Controller
         $inclusion_crit = $this->manager_lib->get_reference_select_values('inclusioncriteria;ref_value');
         $data['exclusion_criteria'] = $exclusion_crit;
         $data['inclusion_criteria'] = $inclusion_crit;
+        $data['inclusion_mode'] = $model->get_phase_config_value(active_screening_phase(), "screening_inclusion_mode");
         if (!empty($data['content_item'])) {
             //edit screening: used for conflict resolution
             $data['the_paper'] = $data['content_item']['paper_id'];
@@ -1037,13 +1039,40 @@ class Screening extends CI_Controller
             $screening_save = array(
                 'screening_note' => $post_arr['note'],
                 'screening_decision' => $screening_decision,
+                'screening_id' => $post_arr['screening_id'],
                 'exclusion_criteria' => $exclusion_criteria,
-                'inclusion_criteria' => $inclusion_criteria,
+                //'inclusion_criteria' => $inclusion_criteria,
                 'screening_time' => bm_current_time('Y-m-d H:i:s'),
                 'screening_status' => 'Done',
             );
-            //print_test($screening_save); exit;
+            //print_test($inclusion_criteria); exit;
+            $this->db2->trans_start();
             $res = $this->db2->update('screening_paper', $screening_save, array('screening_id' => $post_arr['screening_id']));
+            $this->db_current->where('screening_id', $post_arr['screening_id'])->delete('screen_inclusion_mapping');
+            if ($res == 1) {
+                if (is_array($inclusion_criteria)) {
+                    foreach($inclusion_criteria as $criteria) {
+                        $criteria_save = array(
+                            'screening_id' => $post_arr['screening_id'],
+                            'criteria_id' => $criteria,
+                        );
+                        $res = $this->db2->insert('screen_inclusion_mapping', $criteria_save);
+                    }
+                } else if (!empty($inclusion_criteria)){
+                    $criteria_save = array(
+                        'screening_id' => $post_arr['screening_id'],
+                        'criteria_id' => $inclusion_criteria,
+                    );
+                    $res = $this->db2->insert('screen_inclusion_mapping', $criteria_save);
+                }
+                
+            }
+            $this->db2->trans_complete();
+            if ($this->db2->trans_status() === FALSE) {
+                $this->db2->trans_rollback();
+            } else {
+                $this->db2->trans_commit();
+            }
             $screen_phase_detail = $this->DBConnection_mdl->get_row_details('get_screen_phase_detail', $screening_phase, TRUE);
             $screening_phase_last_status = $screen_phase_detail['screen_phase_final'];
             $paper_status = get_paper_screen_status_new($post_arr['paper_id'], $screening_phase);
@@ -1535,6 +1564,10 @@ class Screening extends CI_Controller
         $users = $this->manager_lib->get_reference_select_values('users;user_name');
         $exclusion_crit = $this->manager_lib->get_reference_select_values('exclusioncrieria;ref_value');
         $inclusion_crit = $this->manager_lib->get_reference_select_values('inclusioncriteria;ref_value');
+        $default_crit_id = $this->get_default_criteria_id();
+        if ($default_crit_id) {
+            $inclusion_crit[$default_crit_id] = 'Default';
+        }
         //print_test($users);
         $ref_table_config = get_table_configuration('papers');
         $ref_table_config['current_operation'] = 'list_papers_screen';
@@ -1618,6 +1651,7 @@ class Screening extends CI_Controller
                 'nbr' => !empty($result['In conflict']) ? $result['In conflict'] : 0,
             )
         );
+        $data['inclusion_mode'] = get_appconfig_element('screening_inclusion_mode');
         $ref_table_config_s = get_table_configuration('screening');
         $ref_table_config_s['current_operation'] = 'list_screenings';
         $screenings = $this->DBConnection_mdl->get_list_mdl($ref_table_config_s, '_', 0, -1);
@@ -1630,7 +1664,6 @@ class Screening extends CI_Controller
         $res_screening['all_criteria'] = 0;
         $res_screening['all_criteria_two'] = 0;
         $key = 0;
-        //	print_test($screenings);
         foreach ($screenings['list'] as $key => $value) {
             $res_screening['total']++;
             if (empty($res_screening['users'][$value['user_id']][$value['screening_decision']])) {
@@ -1658,24 +1691,27 @@ class Screening extends CI_Controller
                 }
             }
             // inclusion criteria
+            $screening_model = new Screening_dataAccess();
+            $value['inclusion_criteria'] = $screening_model->get_criteria_array($value['screening_id']);
             if ($value['screening_decision'] == 'Included' and !empty($value['inclusion_criteria'])) {
-                if (empty($res_screening['in_criteria'][$value['inclusion_criteria']])) {
-                    //	echo "<p>bbb</p>";
-                    $res_screening['in_criteria'][$value['inclusion_criteria']] = 1;
-                } else {
-                    //	echo "<p>cccc</p>";
-                    $res_screening['in_criteria'][$value['inclusion_criteria']] = $res_screening['in_criteria'][$value['inclusion_criteria']] + 1;
-                }
-                $res_screening['all_criteria_two']++;
-                //critérias per user
-                if (empty($res_screening['users'][$value['user_id']]['in_criteria'][$value['inclusion_criteria']])) {
-                    //	echo "<p>bbb</p>";
-                    $res_screening['users'][$value['user_id']]['in_criteria'][$value['inclusion_criteria']] = 1;
-                } else {
-                    //	echo "<p>cccc</p>";
-                    $res_screening['users'][$value['user_id']]['in_criteria'][$value['inclusion_criteria']] = $res_screening['users'][$value['user_id']]['in_criteria'][$value['inclusion_criteria']] + 1;
+                $criteria_arr = $value['inclusion_criteria'];
+                foreach ($criteria_arr as $criteria) {
+                    if (empty($res_screening['in_criteria'][$criteria])) {
+                        $res_screening['in_criteria'][$criteria] = 1;
+                    } else {
+                        $res_screening['in_criteria'][$criteria] = $res_screening['in_criteria'][$criteria] + 1;
+                    }
+                    $res_screening['all_criteria_two']++;
+                    
+                    // Criteria per user
+                    if (empty($res_screening['users'][$value['user_id']]['in_criteria'][$criteria])) {
+                        $res_screening['users'][$value['user_id']]['in_criteria'][$criteria] = 1;
+                    } else {
+                        $res_screening['users'][$value['user_id']]['in_criteria'][$criteria] = $res_screening['users'][$value['user_id']]['in_criteria'][$criteria] + 1;
+                    }
                 }
             }
+            
         }
         //  list to be displayed for  result per user
         $result_per_user = array();
@@ -1704,7 +1740,7 @@ class Screening extends CI_Controller
         if (!empty($res_screening['criteria'])) {
             $result_per_criteria[0] = array(
                 'criteria' => 'Criteria ',
-                'Nbr' => 'Nbr',
+                'Nbr' => 'Papers',
                 'pourc' => '%'
             );
             $i = 1;
@@ -1718,20 +1754,34 @@ class Screening extends CI_Controller
             }
         }
         $result_per_criteria_two = array();
-        if (!empty($res_screening['in_criteria'])) {
+        if (!empty($res_screening['in_criteria']) || $data['inclusion_mode'] == 'All') {
             $result_per_criteria_two[0] = array(
                 'criteria' => 'Criteria ',
-                'Nbr' => 'Nbr',
+                'Nbr' => 'Papers',
                 'pourc' => '%'
             );
-            $i = 1;
-            foreach ($res_screening['in_criteria'] as $key => $value) {
-                $result_per_criteria_two[$i] = array(
-                    'criteria' => !empty($inclusion_crit[$key]) ? $inclusion_crit[$key] : 'Criteria ' . $key,
-                    'Nbr' => $value,
-                    'pourc' => !empty($res_screening['all_criteria_two']) ? round(($value * 100 / $res_screening['all_criteria_two']), 2) : 0,
-                );
-                $i++;
+            if ($data['inclusion_mode'] == 'All') {
+                $i = 1;
+                foreach ($inclusion_crit as $id => $val) {
+                    if ($val != 'Default' && !empty($id)) {
+                        $result_per_criteria_two[$i] = array(
+                            'criteria' => $val,
+                            'Nbr' => !empty($result['Included']) ? $result['Included'] : 0,
+                            'pourc' => 100,
+                        );
+                    }
+                    $i++;
+                }
+            } else {
+                $i = 1;
+                foreach ($res_screening['in_criteria'] as $key => $value) {
+                    $result_per_criteria_two[$i] = array(
+                        'criteria' => !empty($inclusion_crit[$key]) ? $inclusion_crit[$key] : 'Criteria ' . $key,
+                        'Nbr' => $value,
+                        'pourc' => !empty($res_screening['all_criteria_two']) ? round(($value * 100 / $res_screening['all_criteria_two']), 2) : 0,
+                    );
+                    $i++;
+                }
             }
         }
         //test if kappa is enabled
@@ -2409,6 +2459,11 @@ class Screening extends CI_Controller
             //	print_test($to_save); exit;
             if ($post_arr['operation_type'] == 'new') {
                 $res = $this->db2->insert('screen_phase', $to_save);
+                $phase_id = $this->db2->insert_id();
+                $phase_config_save = array(
+                    'screen_phase_id' => $phase_id
+                );
+                $res = $this->db2->insert('screen_phase_config', $phase_config_save);
             } else {
                 $res = $this->db2->update(
                     'screen_phase',
@@ -2640,5 +2695,157 @@ class Screening extends CI_Controller
         else
             $interpretation = 'something went wrong...';
         return $interpretation;
+    }
+
+    private function mode_conflict_exists($current_mode, $new_mode) {
+        $mode_string = $current_mode . $new_mode;
+        if ($mode_string == 'NoneOne' || $mode_string == 'NoneAny' || $mode_string == 'AnyOne' || $mode_string == 'AllOne') return true;
+        return false;
+    }
+
+    public function edit_screening_config($current_custom_config = null) {
+        $model = new Screening_dataAccess();
+        $post_arr = $current_custom_config ? $current_custom_config : $this->input->post();
+        $phase_id = !array_key_exists('screen_phase_id', $post_arr) ? null : $post_arr['screen_phase_id'];
+        $config_type = $model->get_phase_config_type($phase_id);
+        $current_inclusion_mode = $model->get_phase_config_value($phase_id, 'screening_inclusion_mode');
+        $new_inclusion_mode = $post_arr['screening_inclusion_mode'];
+        $redirect_url = $phase_id ? 'element/entity_list/list_screen_phases' : 'element/display_element/configurations/1';
+        //Criterias must exist for modes other than None
+        if ($new_inclusion_mode != 'None' && $model->count_inclusion_criteria() == 0) {
+            set_top_msg('You need to add inclusion criteria before making this change', "error");
+            redirect($redirect_url);
+        }   
+        
+        $affected_phases = $model->get_affected_phases($phase_id);
+
+        //count already screened papers
+        $this->db_current->from('screening_paper');
+        $this->db_current->where('screening_status', 'Done');
+        if (!empty($affected_phases)) {
+            $this->db_current->where_in('screening_phase', $affected_phases);
+        } else {
+            $already_screened_papers = 0;
+        }
+        $query = $this->db_current->get();
+        if ($query->num_rows() > 0) {
+            $already_screened_papers = $query->num_rows();
+        } else {
+            $already_screened_papers = 0;
+        }
+        
+        //Save if no papers already screened or if there is no conflict
+        if ($already_screened_papers == 0 || !$this->mode_conflict_exists($current_inclusion_mode, $new_inclusion_mode)) {
+            if ($already_screened_papers != 0 && $current_inclusion_mode == 'All' && $new_inclusion_mode == 'Any') {
+                //insert all criteria in mapping table when going from 'All' to 'Any' and there are screened papers.
+                $model->set_all_criteria($affected_phases);
+            }
+            $model->edit_screening_config($post_arr, $phase_id, $affected_phases);
+            redirect($redirect_url);
+        }  else { 
+            $this->db2->where_in('screen_phase_id', $affected_phases);
+            $query = $this->db2->select('phase_title')->get('screen_phase');
+            $affected_phases_titles = $query->result_array();
+            //If screening already started and there is conflict, ask user how to solve it
+            $data['post_arr'] = $post_arr;
+            $data['phases_id'] = $affected_phases;
+            $data['phases_title'] = $affected_phases_titles;
+            $data['current_inclusion_mode'] = $current_inclusion_mode;
+            $data['top_buttons'] = get_top_button('back', 'Back', 'manage');
+            $data['left_menu_perspective']='left_menu_screening';
+            $data['project_perspective']='screening';
+            $data['page'] = 'screening/inclusion_mode_conflict';
+            $this->load->view('shared/body', $data);
+        }
+
+        
+    }
+
+    public function solve_mode_conflict() {
+        if (isset($post_arr['cancel'])) redirect('element/entity_list/list_screen_phases');
+        
+        $screening_model = new Screening_dataAccess();
+        $post_arr = $this->input->post();
+        $config_array = unserialize($post_arr['config_array']);
+        $affected_phases = unserialize($post_arr['affected_phases']);
+        $phase_id = !array_key_exists('screen_phase_id', $post_arr) ? null : $post_arr['screen_phase_id'];
+        
+        if (isset($post_arr['reset'])) $screening_model->reset_screening($affected_phases);
+        if (isset($post_arr['keep_one'])) $screening_model->keep_one_criterion($affected_phases);
+        if (isset($post_arr['keep_one_from_all'])) $screening_model->keep_one_criterion($affected_phases, true);
+        if (isset($post_arr['default_criterion'])) $screening_model->set_default_criterion($affected_phases);
+        $screening_model->edit_screening_config($config_array, $phase_id, $affected_phases);
+    }
+
+    private function get_default_criteria_id() {
+        $query = $this->db_current->select('ref_id')
+                          ->where('ref_value', 'Default')
+                          ->get('ref_inclusioncriteria');
+
+        $result = $query->row();
+        return $result ? $result->ref_id : null;
+    }
+
+
+    //switch phase config type between 'Default'and 'Custom'
+    public function toggle_phase_config($phase_id) {
+        $this->db2 = $this->load->database(project_db(), TRUE);
+        $model = new Screening_dataAccess();
+        $config_type = $model->get_phase_config_type($phase_id); 
+        $config = get_appconfig();
+
+        if ($config_type == 'Default') {
+            $config_save = array(
+                'config_type' => 'Custom',
+                'screening_result_on' => $config['screening_result_on'],
+                'assign_papers_on' => $config['assign_papers_on'],
+                'screening_reviewer_number' => $config['screening_reviewer_number'],
+                'screening_inclusion_mode' => $config['screening_inclusion_mode'],
+                'screening_conflict_type' => $config['screening_conflict_type'],
+                'screening_screening_conflict_resolution' => $config['screening_screening_conflict_resolution'],
+                'use_kappa' => $config['use_kappa'],
+                'screening_validation_on' => $config['screening_validation_on'],
+                'screening_validator_assignment_type' => $config['screening_validator_assignment_type'],
+                'validation_default_percentage' => $config['validation_default_percentage']
+            );
+            $this->db2->where('screen_phase_id', $phase_id);
+            $this->db2->update('screen_phase_config', $config_save);
+        }
+
+        if ($config_type == 'Custom') {
+            $this->db2->where('screen_phase_id', $phase_id);
+            $this->db2->update('screen_phase_config', array('config_type' => 'Default'));
+
+            $this->db2->where('screen_phase_id', $phase_id);
+            $query = $this->db2->get('screen_phase_config');
+            $current_custom_config = ($query->num_rows() > 0) ? $query->row_array() : array(); // Return the first row as an associative array
+            $this->edit_screening_config($current_custom_config);
+        }
+
+
+        redirect('element/entity_list/list_screen_phases');
+    }
+
+    
+
+    //routes to proper config page (phase config if custom, project config if default)
+    public function route_config($phase_id) {
+        $model = new Screening_dataAccess();
+        $config_type = $model->get_phase_config_type($phase_id);
+        $this->db2 = $this->load->database(project_db(), TRUE);
+        $this->db2->select('screen_phase_config_id');
+        $this->db2->from('screen_phase_config');
+        $this->db2->where('screen_phase_id', $phase_id);
+        $config_id = $this->db2->get()->row()->screen_phase_config_id;
+        switch($config_type) {
+            case 'Default':
+                redirect('element/display_element/configurations/1');
+                break;
+            case 'Custom':
+                redirect('element/display_element/detail_screen_phase_config/' . $config_id);
+                break;
+            default:
+            break;
+        }
     }
 }

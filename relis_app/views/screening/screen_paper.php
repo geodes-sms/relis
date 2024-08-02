@@ -11,7 +11,7 @@
         </div>
 
         <div class="clearfix"></div>
-
+        
         <div class="row">
 
             <div class="col-md-12 col-sm-12 col-xs-12">
@@ -70,6 +70,7 @@
 
 
                                     <?php
+                                    
                                     if (!empty($paper_abstract)) {
                                         echo " <p><b>Abstract :</b> <br/>";
                                         echo $paper_abstract;
@@ -130,13 +131,42 @@
                                     <br /><br />
 
                                     <?php
-
-                                    echo '<div class="exclusion_crit" >' . dropdown_form_bm('Excluded criteria', 'criteria_ex', 'criteria_ex', $exclusion_criteria, !empty($content_item['exclusion_criteria']) ? $content_item['exclusion_criteria'] : 0) . "</div>";
-
-                                    if (!empty($inclusion_criteria)) {
-                                        echo '<div class="inclusion_crit" style="display: none">' . dropdown_form_bm('Included criteria', 'criteria_in', 'criteria_in', $inclusion_criteria, !empty($content_item['inclusion_criteria']) ? $content_item['inclusion_criteria'] : 0) . "</div>";
+                                    switch ($inclusion_mode) {
+                                        case 'One':
+                                            echo '<div class="inclusion_crit" style="display: none">' . dropdown_form_bm('Included criteria', 'criteria_in', 'criteria_in', $inclusion_criteria, !empty($content_item['inclusion_criteria']) ? $content_item['inclusion_criteria'] : 0) . "</div>";
+                                            break;
+                                        case 'Any':
+                                            echo '<div class="inclusion_crit" style="display: none">' . dropdown_multi_form_bm('Included criteria', 'criteria_in', 'criteria_in', $inclusion_criteria) . "</div>";
+                                            break;
+                                        case 'All':
+                                            echo '<h4>';
+                                            echo '<div class="inclusion_crit" style="display: none">';
+                                            echo 'Are all criteria met ? <br><br>';
+                                            echo '<ul>';
+                                            foreach ($inclusion_criteria as $inclusion_criterion) {
+                                                if ($inclusion_criterion != 'Select...') echo '<li>' . $inclusion_criterion . '</li>' . '<br>';
+                                            }
+                                            echo '<div class="container mt-5">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="" id="allCriteriaCheck" style="width:1.5em; height:1.5em">
+                                                <label class="form-check-label" for="allCriteriaCheck" style="font-size:1.25em; margin-left:0.25em">
+                                                    Yes
+                                                </label>
+                                            </div>
+                                        </div>';
+                                            echo '</h4>';
+                                            break;
+                                        default:
+                                            // nothing in case of 'None'
+                                            break;
                                     }
-
+                                    
+                                    echo '<div class="exclusion_crit" >' . dropdown_form_bm('Excluded criteria', 'criteria_ex', 'criteria_ex', $exclusion_criteria, !empty($content_item['exclusion_criteria']) ? $content_item['exclusion_criteria'] : 0) . "</div>";
+                                    /*
+                                    if (!empty($inclusion_criteria)) {
+                                        echo '<div class="inclusion_crit" style="display: none">' . dropdown_multi_form_bm('Included criteria', 'criteria_in', 'criteria_in', $inclusion_criteria, !empty($content_item['inclusion_criteria']) ? $content_item['inclusion_criteria'] : 0) . "</div>";
+                                    }
+                                    */
                                     echo input_textarea_bm('Note ', 'note', 'note', !empty($content_item['screening_note']) ? $content_item['screening_note'] : '');
 
                                     //  echo  form_hidden(array( 'decision' => 'exclude'));
@@ -159,6 +189,8 @@
                                         value="<?php echo $assignment_id ?>" />
                                     <input type="hidden" name="screen_type" id="screen_type"
                                         value="<?php echo $screen_type ?>" />
+                                        <input type="hidden" name="inclusion_mode" id="inclusion_mode"
+                                        value="<?php echo $inclusion_mode ?>" />
                                     <div class="ln_solid"></div>
                                     <div style='text-align:center'>
 
@@ -201,20 +233,39 @@
 
 
                     <script>
-
                         function validate_screen() {
+                            var inclusion_mode = '<? echo $inclusion_mode ?>';
                             if ($('#decision').val() == 'excluded' && $('#criteria_ex').val() == '') {
-                                    alert("You must select an exclusion criteria");
+                                    alert("You must select an exclusion criterion.");
                                     return false;
-                                } else if ($('#decision').val()=='accepted' && $('#criteria_in').val() == '') {                                    
-                                    alert("You must select an inclusion criteria");
-                                    return false;
+                                }else if ($('#decision').val() == 'accepted') {
+                                    switch(inclusion_mode) {
+                                        case "None" :
+                                            break;
+                                        case "One" :
+                                            if ($('#criteria_in').val() == '') {
+                                                alert("You must select an inclusion criterion.");
+                                                return false;
+                                            }
+                                            break;
+                                        case "Any" :
+                                            if (!Array.isArray($('#criteria_in').val())) {
+                                                alert("You must select at least one criterion.");
+                                                return false;
+                                            }
+                                        case "All":
+                                            var allCriteriaCheck = document.getElementById('allCriteriaCheck').checked;
+                                            if (!allCriteriaCheck) {
+                                                alert("All criteria must be valid, otherwise exclude this paper.");
+                                                return false;
+                                            } 
+                                            break;
+                                    }
+                                    return true;
                                 }
-                                return true;
-                            }
+                        }
 
                         function include_paper() {
-
                             var content = $('.screen_decision_include').html();
                             $('.screen_decision').html(content);
                             $('.exclusion_crit').hide();

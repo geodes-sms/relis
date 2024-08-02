@@ -43,6 +43,8 @@ class Unit_test extends CI_Controller
     private $manageUnitTest;
     private $managerUnitTest;
     private $relisManagerUnitTest;
+    private $inclusion_mode_conflictUnitTest;
+    private $customScreeningPhaseConfigTest;
 
     function __construct()
     {
@@ -71,10 +73,11 @@ class Unit_test extends CI_Controller
         $this->load->helper('tests/api_ut');
         $this->load->helper('tests/apiquery_ut');
         $this->load->helper('tests/op_ut');
+        $this->load->helper('tests/inclusion_mode_conflict_ut');
         $this->load->library('unit_test');
 
         $this->unit->use_strict(TRUE);
-        $this->unit->set_test_items(array('test_controller', 'test_action', 'test_name', 'test_aspect', 'res_value', 'test_value', 'result'));
+        $this->unit->set_test_items(array('test_controller', 'test_action', 'test_name', 'test_aspect', 'res_value', 'test_value', 'result')); //à voir
 
         $this->userUnitTest = new UserUnitTest();
         $this->projectUnitTest = new ProjectUnitTest();
@@ -94,6 +97,9 @@ class Unit_test extends CI_Controller
         $this->apiUnitTest = new ApiUnitTest();
         $this->apiQueryUnitTest = new ApiQueryUnitTest();
         $this->opUnitTest = new OpUnitTest();
+        $this->inclusion_mode_conflictUnitTest = new inclusion_mode_conflictUnitTest();
+        //$this->screeningInclusionModeConflictsTest = new X
+        //$this->customScreeningPhaseConfigTest = new X
     }
 
     public function relis_unit_test($result = "html_report")
@@ -119,6 +125,8 @@ class Unit_test extends CI_Controller
         $this->apiUnitTest->run_tests();
         $this->apiQueryUnitTest->run_tests();
         $this->opUnitTest->run_tests();
+        $this->inclusion_mode_conflictUnitTest->run_tests();
+
 
         // Record the end time of the tests
         $endTime = microtime(true);

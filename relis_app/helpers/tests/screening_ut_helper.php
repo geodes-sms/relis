@@ -78,6 +78,8 @@ class ScreeningUnitTest
         $this->http_client->response("user", "check_form", ['user_username' => 'admin', 'user_password' => '123'], "POST");
         //create test Project
         createDemoProject();
+        $this->ci->db->query("INSERT INTO relis_dev_correct_" . getProjectShortName() . ".screen_phase_config(screen_phase_id) values(1)");
+
         //add users to test Project
         addUserToProject(getAdminUserId(), "Reviewer");
         addUserToProject(getTestUserId(), "Reviewer");

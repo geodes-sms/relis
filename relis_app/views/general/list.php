@@ -43,11 +43,9 @@
                     if(isset($nav_pre_link)) {//Navigation links
                     
                     	$nav_page_position=isset($nav_page_position)?$nav_page_position:3;
-                    		
                     	?>
                     		<div id="nav1" class="col-md-5 col-xs-12 dataTables_paginate ">
                     	<?php
-                    											
                     		$this->bm_lib->get_pagination($nav_pre_link,$nombre,$nav_page_position);
                     											?>											
                     		</div>
@@ -59,7 +57,6 @@
                     		'table_open'  => '<table class="table table-striped table-hover">',
                     		'table_close'  => '</table>'
                     );
-                    
                     $this->table->set_template($tmpl);
                     if(isset($nombre) AND $nombre>0)
                     {

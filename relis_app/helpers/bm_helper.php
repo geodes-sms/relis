@@ -368,8 +368,8 @@ function dropdown_multi_form_bm($label, $name, $id, $values = array(), $selected
 	$script = '
 			<script>
 			 $(".class_' . $id . '").select2({
-          
-          placeholder: "' . lng_min('Select multi') . ' ...",
+		  width: "100%",
+          placeholder: "' . lng_min(' Select multi') . ' ...",
           ' . $number_selected . '
           allowClear: true
         });
@@ -829,6 +829,10 @@ function get_appconfig($element = "all", $source = "db")
 */	
 function get_appconfig_element($element = "all", $source = "db")
 {
+	if (is_screening_config_element($element) && active_screening_phase()) {
+		$screening_model = new Screening_dataAccess();
+		return $screening_model->get_phase_config_value(active_screening_phase(), $element);
+	}
 	$ci = get_instance();
 
 	$config = $ci->DBConnection_mdl->get_row_details('config', '1');
@@ -839,6 +843,22 @@ function get_appconfig_element($element = "all", $source = "db")
 		return "0";
 	}
 
+}
+
+function is_screening_config_element($element) {
+	return in_array($element, array (
+		'screening_inclusion_mode',
+		'screening_screening_conflict_resolution',
+		'screening_conflict_type',
+		'assign_papers_on',
+		'screening_result_on',
+		'screening_validation_on',
+		'screening_reviewer_number',
+		'screening_status_to_validate',
+		'screening_validator_assignment_type',
+		'use_kappa',
+		'validation_default_percentage'
+	));
 }
 
 /*
@@ -1335,7 +1355,7 @@ function get_paper_screen_result($paper_id)
 	$ci->db2 = $ci->load->database(project_db(), TRUE);
 
 
-	$sql = "select A.*,S.screening_id,S.decision,S.exclusion_criteria,S.inclusion_criteria,S.note as screening_note,S.screening_time from assignment_screen A 	LEFT JOIN screening S ON (A.assignment_id = S.assignment_id AND S.	screening_active=1)  where A.paper_id = $paper_id AND 	A.assignment_active  ";
+	$sql = "select A.*,S.screening_id,S.decision,S.exclusion_criteria,S.note as screening_note,S.screening_time from assignment_screen A 	LEFT JOIN screening S ON (A.assignment_id = S.assignment_id AND S.	screening_active=1)  where A.paper_id = $paper_id AND 	A.assignment_active  ";
 
 	$res_assignment = $ci->db2->query($sql)->result_array();
 
@@ -1674,7 +1694,6 @@ function get_paper_screen_status_new($paper_id, $screening_phase = "", $return =
 	$criteria2 = $ci->manager_lib->get_reference_select_values('inclusioncriteria;ref_value');
 
 
-
 	///-------
 
 
@@ -1726,10 +1745,19 @@ function get_paper_screen_status_new($paper_id, $screening_phase = "", $return =
 		//---------
 		$res_assignment[$key]['user_name'] = $users[$value['user_id']];
 		$reviewers .= $users[$value['user_id']] . " | ";
-
+		
+		//get inclusion criteria
+		$screening_model = new Screening_dataAccess();
+		$inclusion_criteria_ids = $screening_model->get_criteria_array($res_assignment[$key]['screening_id']);
+		$criteria2 = $ci->manager_lib->get_reference_select_values('inclusioncriteria;ref_value');
+		$inclusion_criteria = array();
+		foreach ($inclusion_criteria_ids as $id) {
+			array_push($inclusion_criteria, $criteria2[$id]);
+		}
+		$inclusion_criteria = implode(' | ', $inclusion_criteria);
 
 		$res_assignment[$key]['exclusion_criteria'] = empty($criteria[$value['exclusion_criteria']]) ? "" : $criteria[$value['exclusion_criteria']];
-		$res_assignment[$key]['inclusion_criteria'] = empty($criteria[$value['inclusion_criteria']]) ? "" : $criteria[$value['inclusion_criteria']];
+		$res_assignment[$key]['inclusion_criteria'] = empty($inclusion_criteria) ? "" : $inclusion_criteria;
 
 		//----------
 		//$ass_type=$value['assignment_type'];
@@ -1744,8 +1772,8 @@ function get_paper_screen_status_new($paper_id, $screening_phase = "", $return =
 			if ($value['screening_decision'] == 'Included') {
 				$accepted++;
 				${$value['assignment_type']}['accepted']++;
-                ${$value['assignment_type']}['include_crit'][$value['inclusion_criteria']] = isset(${$value['assignment_type']}['include_crit'][$value['inclusion_criteria']]) ? (${$value['assignment_type']}['include_crit'][$value['inclusion_criteria']] + 1) : 1;
-                $include_crit[$value['inclusion_criteria']] = isset($include_crit[$value['inclusion_criteria']]) ? ($include_crit[$value['inclusion_criteria']] + 1) : 1;
+                ${$value['assignment_type']}['include_crit'][$inclusion_criteria] = isset(${$value['assignment_type']}['include_crit'][$inclusion_criteria]) ? (${$value['assignment_type']}['include_crit'][$inclusion_criteria] + 1) : 1;
+                $include_crit[$inclusion_criteria] = isset($include_crit[$inclusion_criteria]) ? ($include_crit[$inclusion_criteria] + 1) : 1;
 
 			} else {
 				${$value['assignment_type']}['excluded']++;
@@ -1924,7 +1952,6 @@ function create_view($config, $target_db = 'current', $run_query = TRUE, $verbos
 //generate a list of stored procedures based on the provided configuration data
 function generate_stored_procedure_list($config, $target_db = 'current', $run_query = TRUE, $verbose = TRUE)
 {
-
 	$ci = get_instance();
 	return $ci->manage_stored_procedure_lib->generate_stored_procedure_list($config, $target_db, $run_query, $verbose);
 }
@@ -2136,4 +2163,4 @@ function path_separator()
 	} else {
 		return '/';
 	}
-}
+}	

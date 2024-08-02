@@ -1548,7 +1548,6 @@ END";
 	 */
 	public function generate_stored_procedure_detail($config, $target_db = 'current', $run_query = TRUE, $verbose = TRUE)
 	{
-
 		$target_db = ($target_db == 'current') ? project_db() : $target_db;
 		$this->CI->db2 = $this->CI->load->database($target_db, TRUE);
 
@@ -1577,14 +1576,13 @@ END";
 WHERE " . $config['table_id'] . "= _row_id;
 COMMIT;
 END";
-
-		if ($verbose)
-			echo "<p>$procedure</p>";
-		if ($run_query) {
-			$res = $this->CI->db2->query($procedure);
-			if ($verbose)
-				echo "<p>$res</p>";
-		}
+if ($verbose)
+echo "<p>$procedure</p>";
+if ($run_query) {
+	$res = $this->CI->db2->query($procedure);
+	if ($verbose)
+	echo "<p>$res</p>";
+}
 
 
 

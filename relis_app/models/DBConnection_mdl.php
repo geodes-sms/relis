@@ -708,7 +708,6 @@ class DBConnection_mdl extends CI_Model
 	 */
 	function get_list_mdl($ref_table_config, $val = '_', $page = 0, $rec_per_page = 0, $extra_condition = '')
 	{
-
 		$current_operation = $ref_table_config['current_operation'];
 
 
@@ -724,7 +723,6 @@ class DBConnection_mdl extends CI_Model
 				}
 			}
 		}
-
 
 		$config = $ref_table_config['config_label'];
 
@@ -766,10 +764,7 @@ class DBConnection_mdl extends CI_Model
 			$data = $this->db2->query("CALL " . $stored_procedure . "(" . $page . "," . $rec_per_page . ",'" . $search . "' " . $extra_parameters . ") ");
 			mysqli_next_result($this->db2->conn_id);
 		}
-
 		$result['list'] = $data->result_array();
-
-
 		return $result;
 
 	}

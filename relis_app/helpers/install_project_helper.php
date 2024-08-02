@@ -139,6 +139,8 @@ function populate_common_tables($target_db = 'current', $config = 'init')
 			'screen_phase',
 			'screening',
 			'screen_decison',
+			'screening_inclusion_mapping',
+			'screen_phase_config',
 			'operations',
 			'qa_questions',
 			'qa_responses',
@@ -156,7 +158,6 @@ function populate_common_tables($target_db = 'current', $config = 'init')
 		//$res=$this->create_table_config($tab_config,$target_db);
 		//$res=$this->manage_stored_procedure_lib->create_table_config($tab_config,$target_db);
 		//create tables
-		//print_test($values);
 		$table_configuration = get_table_configuration($value, $target_db);
 
         //modify configuration when it is demo project
@@ -173,6 +174,7 @@ function populate_common_tables($target_db = 'current', $config = 'init')
         }
 
 		$res = create_table_configuration($table_configuration, $target_db);
+		
 	}
 }
 
@@ -235,6 +237,7 @@ function update_stored_procedure($config, $verbose = FALSE, $target_db = 'curren
 			'paper_author',
 			'venue',
 			'screen_phase',
+			'screen_phase_config',
 			'screening',
 			'screen_decison',
 			'str_mng'
