@@ -493,10 +493,13 @@ class Project extends CI_Controller
         ///	$res_sql = $this->manage_mdl->run_query($sql_add_config,false,$project_short_name);
         //print_test($res_sql);
 
-        $res_sql = $this->Project_dataAccess->insert_into_project($project_short_name, $project_title, $creator);
+        if (!has_usergroup(3)){
+            $res_sql = $this->Project_dataAccess->insert_into_project($project_short_name, $project_title, $creator);
+        }
+
 
         //Add the user as project admin
-        if (!has_usergroup(1)) {
+        if (!has_usergroup(1) and !has_usergroup(3)) {
             $project_id = $this->get_last_added_project();
 
             $res_sql = $this->Project_dataAccess->insert_into_userproject($creator, $project_id);
@@ -514,6 +517,23 @@ class Project extends CI_Controller
         //echo "<h2>Installation done</h3>";
         //echo anchor('home','<h2> Start the Application </h3>');
         project_install_result($error_array, $success_array);
+        if (has_usergroup(3)){
+            $project_id = 1;
+
+            //set project
+            $item_data = $this->DBConnection_mdl->get_row_details('project', $project_id);
+            if (!empty($item_data)) {
+                $this->session->set_userdata('project_db', $item_data['project_label']);
+                $this->session->set_userdata('project_id', $project_id);
+                $this->session->set_userdata('project_title', $item_data['project_title']);
+                $this->session->set_userdata('project_public', $item_data['project_public']);
+                $this->session->set_userdata('working_perspective', 'screen');
+                $this->session->set_userdata('current_screen_phase', 0);
+            }
+
+            //import example papers
+            redirect('paper/import_demo_project_paper');
+        }
     }
 
     //remove the project from the database

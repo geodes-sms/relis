@@ -33,6 +33,7 @@ services:
       - ./tomcat/testfiles/classification_install_demoTestProject.php:/u/relis/public_html/workspace/dslforge_workspace/tests/src-gen/classification_install_demoTestProject.php
       - ./tomcat/testfiles/classification_install_demoTestProject.pdf:/u/relis/public_html/workspace/dslforge_workspace/tests/src-gen/classification_install_demoTestProject.pdf
       - ./tomcat/testfiles/classification_install_demoTestProject2.php:/u/relis/public_html/workspace/dslforge_workspace/tests/src-gen/classification_install_demoTestProject2.php
+      - ./tomcat/demofiles/classification_install_demo_relis.php:/u/relis/public_html/workspace/dslforge_workspace/demo_relis/src-gen/classification_install_demo_relis.php
 
     environment:
       MYSQL_DATABASE: db
