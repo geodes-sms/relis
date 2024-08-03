@@ -296,7 +296,12 @@ class Screening_dataAccess extends CI_Model
             $this->db_current->where('screen_phase_id', $phase_id);
             $query = $this->db_current->get();
             $row = $query->row();  
-            $config_type = $row->config_type;
+            if (empty($row)) {
+                $config_type = 'Default';
+            } else {
+                $row = $query->row();  
+                $config_type = $row->config_type;
+            }
         } else $config_type = 'Default';
         return $config_type;
     }
