@@ -270,6 +270,7 @@ class Screening_dataAccess extends CI_Model
     }
 
     public function get_affected_phases($phase_id) {
+        $affected_phases = array();
         $this->db_current = $this->load->database(project_db(), TRUE);
         if (empty($phase_id) or $this->get_phase_config_type($phase_id) == 'Default') {
             $this->db_current->select('screen_phase_id');
@@ -279,6 +280,15 @@ class Screening_dataAccess extends CI_Model
             if ($subquery_result->num_rows() > 0) {
                 foreach ($subquery_result->result() as $row) {
                     $affected_phases[] = $row->screen_phase_id;
+                }
+            } else {
+                //fix for cases where screen phases don't have a matching phase config in screen_phase_config table
+                $this->db_current->select('screen_phase_id');
+                $this->db_current->from('screen_phase');
+                $result = $this->db_current->get();
+                foreach ($result->result() as $id) {
+                    $this->add_phase_config($id);
+                    array_push($affected_phases, $id);
                 }
             }
         } else {
@@ -296,7 +306,12 @@ class Screening_dataAccess extends CI_Model
             $this->db_current->where('screen_phase_id', $phase_id);
             $query = $this->db_current->get();
             $row = $query->row();  
-            $config_type = $row->config_type;
+            if (empty($row)) {
+                $this->add_phase_config($phase_id);
+                $config_type = 'Default';
+            } else {
+                $config_type = $row->config_type;
+            }
         } else $config_type = 'Default';
         return $config_type;
     }
@@ -320,6 +335,33 @@ class Screening_dataAccess extends CI_Model
             return $config[$value_name];
         } else {
             return "0";
+        }
+    }
+
+    private function add_phase_config($phase_id) {
+        $this->db_current->select('config_type');
+        $this->db_current->from('screen_phase_config');
+        $this->db_current->where('screen_phase_id', $phase_id);
+        $query = $this->db_current->get();
+        $row = $query->row();  
+        if (empty($row)) {
+            $config = get_appconfig();
+            $config_save = array(
+                'config_type' => 'Default',
+                'screen_phase_id' => $phase_id,
+                'screening_result_on' => $config['screening_result_on'],
+                'assign_papers_on' => $config['assign_papers_on'],
+                'screening_reviewer_number' => $config['screening_reviewer_number'],
+                'screening_inclusion_mode' => $config['screening_inclusion_mode'],
+                'screening_conflict_type' => $config['screening_conflict_type'],
+                'screening_screening_conflict_resolution' => $config['screening_screening_conflict_resolution'],
+                'use_kappa' => $config['use_kappa'],
+                'screening_validation_on' => $config['screening_validation_on'],
+                'screening_validator_assignment_type' => $config['screening_validator_assignment_type'],
+                'validation_default_percentage' => $config['validation_default_percentage']
+            );
+            $this->db_current->where('screen_phase_id', $phase_id);
+            $this->db_current->insert('screen_phase_config', $config_save);
         }
     }
 
