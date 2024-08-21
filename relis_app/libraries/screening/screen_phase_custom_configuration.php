@@ -39,7 +39,7 @@ function get_screening_phase_config()
 	$config['entity_label'] = 'Screening';
 	$config['entity_label_plural'] = 'Screening';
 	
-	require_once BASEPATH. "entity_config/config_configuration.php";
+	require_once APPPATH. "libraries/entity_config/config_configuration.php";
 	$general_config = get_configuration();
 
 	$fields['screen_phase_config_id'] = array(
