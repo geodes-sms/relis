@@ -22,11 +22,11 @@ jobs:
           fi
 
       - name: Build Docker Image
-        run: docker-compose build
+        run: docker compose build
         working-directory: deployment
 
       - name: Run Docker Containers
-        run: docker-compose up -d
+        run: docker compose up -d
         working-directory: deployment
 
       - name: Wait for Application to Start
