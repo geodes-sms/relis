@@ -134,6 +134,10 @@ class Biblerproxy_lib
 	//Imports a BibTeX string for the "reliS" system.
 	public function importbibtexstringforrelis($data)
 	{
+        if (has_usergroup(3)){
+            $url = 'http://bibler:8000/';
+            return $this->httpPost($url . "importbibtexstringforrelis/", $data);
+        }
 		return $this->httpPost($this->url . "importbibtexstringforrelis/", $data);
 	}
 

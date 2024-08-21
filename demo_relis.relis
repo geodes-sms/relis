@@ -2,7 +2,7 @@ PROJECT demo_relis "Demo ReLiS"
 
 SCREENING
 
-Reviews 2
+Reviews 1
 Conflict on Criteria resolved_by Unanimity
 Criteria =   ["EC1: Too short ","EC2: Not abour chocolate" ]
 Sources = ["Google Scholar","Chocolate DB"]
