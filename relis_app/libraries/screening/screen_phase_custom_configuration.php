@@ -35,10 +35,11 @@ function get_screening_phase_config()
 	$config['table_name'] = 'screen_phase_config';
 	$config['table_id'] = 'screen_phase_config_id';
 	$config['table_active_field'] = 'config_active'; //to detect deleted records
-
+	
 	$config['entity_label'] = 'Screening';
 	$config['entity_label_plural'] = 'Screening';
-
+	
+	require_once BASEPATH. "entity_config/config_configuration.php";
 	$general_config = get_configuration();
 
 	$fields['screen_phase_config_id'] = array(
