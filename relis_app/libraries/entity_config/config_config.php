@@ -241,6 +241,20 @@ function get_configuration()
         'on_list' => 'show'
     );
 
+    $fields['assign_to_non_screened_validator_on'] = array(
+        'field_title' => 'Assign to non-screened validator',
+        'field_type' => 'text',
+        'field_value' => '0_1',
+        'field_size' => 1,
+        'input_type' => 'select',
+        'input_select_source' => 'yes_no',
+        'input_select_values' => '',
+        'initial_value' => 1,
+        'on_add' => 'enabled',
+        'on_edit' => 'enabled',
+        'on_list' => 'show'
+    );
+
 	$fields['classification_on'] = array(
 		'field_title' => 'Classification activated',
 		'field_type' => 'text',

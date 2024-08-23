@@ -2878,6 +2878,7 @@ class Screening extends CI_Controller
                 'use_kappa' => $config['use_kappa'],
                 'screening_validation_on' => $config['screening_validation_on'],
                 'screening_validator_assignment_type' => $config['screening_validator_assignment_type'],
+                'assign_to_non_screened_validator_on' => $config['assign_to_non_screened_validator_on'],
                 'validation_default_percentage' => $config['validation_default_percentage']
             );
             $this->db2->where('screen_phase_id', $phase_id);

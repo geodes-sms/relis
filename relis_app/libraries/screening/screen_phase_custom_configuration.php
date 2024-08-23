@@ -166,7 +166,18 @@ function get_screening_phase_config()
 
 	);
 
-	$fields['screening_validator_assignment_type'] = array(
+    $fields['assign_to_non_screened_validator_on'] = array(
+        'field_title' => 'Assign to non-screened validator',
+        'field_type' => 'int',
+        'field_size' => '1',
+        'field_value' => '1',
+        'default_value' => '0',
+        'input_type' => 'select',
+        'input_select_source' => 'yes_no',
+        'input_select_values' => '',
+    );
+
+    $fields['screening_validator_assignment_type'] = array(
 		'field_title' => 'Validation mode',
 		'field_type' => 'text',
 		'field_value' => 'Normal',
@@ -240,7 +251,8 @@ function get_screening_phase_config()
 			'use_kappa' => array(),
 			'screening_validation_on' => array(),
 			'screening_validator_assignment_type' => array(),
-			'validation_default_percentage' => array(),
+            'assign_to_non_screened_validator_on' => array(),
+            'validation_default_percentage' => array(),
 
 			),
 
@@ -285,7 +297,8 @@ function get_screening_phase_config()
 			'use_kappa' => array('mandatory' => '', 'field_state' => 'enabled'),
 			'screening_validation_on' => array('mandatory' => '', 'field_state' => 'enabled'),
 			'screening_validator_assignment_type' => array('mandatory' => '', 'field_state' => 'enabled'),
-			'validation_default_percentage' => array('mandatory' => '', 'field_state' => 'enabled'),
+            'assign_to_non_screened_validator_on' => array('mandatory' => '', 'field_state' => 'enabled'),
+            'validation_default_percentage' => array('mandatory' => '', 'field_state' => 'enabled'),
 
 		),
 

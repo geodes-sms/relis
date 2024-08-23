@@ -255,7 +255,18 @@ function get_configuration()
 		'mandatory' => ' mandatory '
 	);
 
-	$fields['validation_default_percentage'] = array(
+    $fields['assign_to_non_screened_validator_on'] = array(
+        'field_title' => 'Assign to non-screened validator',
+        'field_type' => 'int',
+        'field_size' => '1',
+        'field_value' => '1',
+        'default_value' => '0',
+        'input_type' => 'select',
+        'input_select_source' => 'yes_no',
+        'input_select_values' => '',
+    );
+
+    $fields['validation_default_percentage'] = array(
 		'field_title' => 'Default percentage of papers to validate',
 		'field_type' => 'int',
 		'field_value' => '20',
@@ -450,7 +461,8 @@ function get_configuration()
 			'screening_validation_on' => array('group' => 'screen'),
 			'screening_validator_assignment_type' => array('group' => 'screen'),
             'screening_status_to_validate' => array('group' => 'screen'),
-			'validation_default_percentage' => array('group' => 'screen'),
+            'assign_to_non_screened_validator_on' => array('group' => 'screen'),
+            'validation_default_percentage' => array('group' => 'screen'),
 
 			'qa_on' => array('group' => 'qa'),
 			'qa_cutt_off_score' => array('group' => 'qa'),
@@ -669,7 +681,8 @@ function get_configuration()
 			'use_kappa' => array(),
 			'validation_default_percentage' => array(),
             'screening_status_to_validate' => array(),
-			'screening_validator_assignment_type' => array(),
+            'assign_to_non_screened_validator_on' => array(),
+            'screening_validator_assignment_type' => array(),
 		),
 
 
@@ -727,7 +740,8 @@ function get_configuration()
 			'key_paper_serial' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
 			'validation_default_percentage' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
 			'screening_status_to_validate' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
-			'screening_validator_assignment_type' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
+            'assign_to_non_screened_validator_on' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
+            'screening_validator_assignment_type' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
 
 		),
 
@@ -812,7 +826,8 @@ function get_configuration()
 			'screening_validation_on' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
 			'screening_validator_assignment_type' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
             'screening_status_to_validate' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
-			'validation_default_percentage' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
+            'assign_to_non_screened_validator_on' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
+            'validation_default_percentage' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
 		),
 
 		'top_links' => array(

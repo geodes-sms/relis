@@ -57,6 +57,7 @@ class inclusion_mode_conflictUnitTest {
             'use_kappa' => true,
             'screening_validation_on' => true,
             'screening_validator_assignment_type' => "Normal",
+            'assign_to_non_screened_validator_on' => false,
             'validation_default_percentage' => 20
         );
 
@@ -120,6 +121,7 @@ class inclusion_mode_conflictUnitTest {
                 'use_kappa' => '1',
                 'screening_validation_on' => '0',
                 'screening_validator_assignment_type' => 'Normal',
+                'assign_to_non_screened_validator_on' => '0',
                 'validation_default_percentage' => '10',
             )),
             'affected_phases' => serialize(array(
@@ -186,6 +188,7 @@ class inclusion_mode_conflictUnitTest {
                 'use_kappa' => '1',
                 'screening_validation_on' => '0',
                 'screening_validator_assignment_type' => 'Normal',
+                'assign_to_non_screened_validator_on' => '0',
                 'validation_default_percentage' => '10',
             )),
             'affected_phases' => serialize(array(
@@ -226,6 +229,7 @@ class inclusion_mode_conflictUnitTest {
             'use_kappa' => true,
             'screening_validation_on' => true,
             'screening_validator_assignment_type' => "Normal",
+            'assign_to_non_screened_validator_on' => false,
             'validation_default_percentage' => 20
         );
 
@@ -258,6 +262,7 @@ class inclusion_mode_conflictUnitTest {
                     'use_kappa' => '1',
                     'screening_validation_on' => '0',
                     'screening_validator_assignment_type' => 'Normal',
+                    'assign_to_non_screened_validator_on' => '0',
                     'validation_default_percentage' => '10',
                 )),
                 'affected_phases' => serialize(array(
@@ -301,6 +306,7 @@ class inclusion_mode_conflictUnitTest {
             'use_kappa' => true,
             'screening_validation_on' => true,
             'screening_validator_assignment_type' => "Normal",
+            'assign_to_non_screened_validator_on' => false,
             'validation_default_percentage' => 20
         );
 
@@ -333,6 +339,7 @@ class inclusion_mode_conflictUnitTest {
                     'use_kappa' => '1',
                     'screening_validation_on' => '0',
                     'screening_validator_assignment_type' => 'Normal',
+                    'assign_to_non_screened_validator_on' => '0',
                     'validation_default_percentage' => '10',
                 )),
                 'affected_phases' => serialize(array(

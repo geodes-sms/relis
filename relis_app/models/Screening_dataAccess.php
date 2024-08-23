@@ -145,6 +145,7 @@ class Screening_dataAccess extends CI_Model
             'use_kappa' => $config['use_kappa'],
             'screening_validation_on' => $config['screening_validation_on'],
             'screening_validator_assignment_type' => $config['screening_validator_assignment_type'],
+            'assign_to_non_screened_validator_on' => $config['assign_to_non_screened_validator_on'],
             'validation_default_percentage' => $config['validation_default_percentage']
         );
             if (!$phase_id) $config_save['screening_on'] = $config['screening_on'];
@@ -386,6 +387,7 @@ class Screening_dataAccess extends CI_Model
                 'use_kappa' => $config['use_kappa'],
                 'screening_validation_on' => $config['screening_validation_on'],
                 'screening_validator_assignment_type' => $config['screening_validator_assignment_type'],
+                'assign_to_non_screened_validator_on' => $config['assign_to_non_screened_validator_on'],
                 'validation_default_percentage' => $config['validation_default_percentage']
             );
             $this->db_current->where('screen_phase_id', $phase_id);
