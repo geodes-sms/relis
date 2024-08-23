@@ -53,6 +53,34 @@ class Screening_dataAccess extends CI_Model
         return $paper_assigned;
     }
 
+    function select_screening_paper_by_criteria($source_status, $exclusion_criteria_name, $screening_phase)
+    {
+        //get the id of selected criteria
+        $ref_id_sql = "SELECT ref_id FROM ref_exclusioncrieria WHERE ref_value = ? AND ref_active = 1";
+        $ref_id_result = $this->db_current->query($ref_id_sql, $exclusion_criteria_name)->row_array();
+
+        if (empty($ref_id_result)) {
+            return array();
+        }
+
+        $ref_id = $ref_id_result['ref_id'];
+
+        $sql = "SELECT paper.id, paper.bibtexKey, paper.title, ref_exclusioncrieria.ref_value AS exclusion
+        FROM screening_paper
+        INNER JOIN ref_exclusioncrieria ON ref_exclusioncrieria.ref_id = screening_paper.exclusion_criteria
+        INNER JOIN paper ON paper.id = screening_paper.paper_id
+        INNER JOIN screen_decison ON screen_decison.paper_id = screening_paper.paper_id
+        WHERE screening_paper.screening_phase = ? AND screening_paper.exclusion_criteria = ?
+        AND screen_decison.screening_decision = ?
+        GROUP BY paper.id, paper.bibtexKey, paper.title, ref_exclusioncrieria.ref_value
+        ORDER BY paper.bibtexKey, screening_paper.screening_time
+        ";
+
+        $all_papers = $this->db_current->query($sql, array($screening_phase, $ref_id, $source_status))->result_array();
+
+        return $all_papers;
+    }
+
     function get_all_screenings($screening_phase)
     {
         $sql = "select * from screening_paper where assignment_role='Screening' AND screening_phase = $screening_phase AND screening_status='Done' AND   screening_active=1 ";

@@ -738,7 +738,7 @@ class Screening extends CI_Controller
      * The purpose of this function is to retrieve and organize papers for screening based on the provided source, 
      * source status, current phase, and assignment role
      */
-    function get_papers_to_screen($source = 'all', $source_status = 'all', $current_phase = "", $assignment_role = "")
+    function get_papers_to_screen($source = 'all', $source_status = 'all', $current_phase = "", $assignment_role = "", $validation_by_criteria = "")
     {
         //$source_status="Included";
         //$source='1';
@@ -746,7 +746,12 @@ class Screening extends CI_Controller
             $current_phase = active_screening_phase();
         }
 
-        $all_papers = $this->Screening_dataAccess->select_screening_all_papers($source, $source_status);
+        if (empty($validation_by_criteria) or $validation_by_criteria == 'None'){
+            $all_papers = $this->Screening_dataAccess->select_screening_all_papers($source, $source_status);
+        }
+        else{
+            $all_papers = $this->Screening_dataAccess->select_screening_paper_by_criteria($source_status, $validation_by_criteria, $current_phase);
+        }
 
         $result['all_papers'] = $all_papers;
         // get papers already assigned in current phase
@@ -2102,6 +2107,9 @@ class Screening extends CI_Controller
         $data['users'] = $_assign_user;
         $data['number_papers'] = count($papers['to_assign']);
         $data['number_papers_assigned'] = count($papers['assigned']);
+        //Get screening criteria
+        $validation_by_exclusion_criteria = $this->manager_lib->get_reference_select_values('exclusioncrieria;ref_value', False);
+        $data['validation_by_exclusion_criteria'] = $validation_by_exclusion_criteria;
         $data['percentage_of_papers'] = get_appconfig_element('validation_default_percentage');
         $data['papers_categories'] = array('Excluded' => 'Excluded', 'Included' => 'Included', 'all' => 'All');
         $data['page_title'] = lng('Assign papers for validation ' . $append_title);
@@ -2113,6 +2121,55 @@ class Screening extends CI_Controller
          * Chargement de la vue avec les données préparés dans le controleur suivant le type d'affichage : (popup modal ou pas)
          */
         $this->load->view('shared/body', $data);
+    }
+
+    public function get_papers_by_criteria($data = array()) {
+        header('Content-Type: application/json');
+        $validation_by_criteria = $this->input->post('validation_by_criteria');
+        $screening_phase_id = active_screening_phase();
+        $paper_source = $screening_phase_id;
+        $screening_phase_info = active_screening_phase_info();
+        $phase_title = $screening_phase_info['phase_title'];
+        if(!empty($validation_by_criteria)){
+            $criteria_list = implode(', ', $validation_by_criteria);
+            $append_title = "( Excluded papers by $criteria_list from $phase_title )";
+        }
+        else{
+            $append_title = "( Excluded papers  from $phase_title )";
+        }
+        $page_title = lng('Assign papers for validation ' . $append_title);
+
+        // Initialize the result arrays
+        $papers = array(
+            'to_assign' => array(),
+            'assigned' => array(),
+            'all_papers' => array()
+        );
+
+        if (!empty($validation_by_criteria)) {
+            foreach ($validation_by_criteria as $criteria) {
+                $result = $this->get_papers_to_screen($paper_source, 'Excluded', '', 'Validation', $criteria);
+                // Merge the 'to_assign', 'assigned', and 'all_papers' papers
+                $papers['to_assign'] = array_merge($papers['to_assign'], $result['to_assign']);
+                $papers['assigned'] = array_merge($papers['assigned'], $result['assigned']);
+                $papers['all_papers'] = array_merge($papers['all_papers'], $result['all_papers']);
+            }
+        } else {
+            $papers = $this->get_papers_to_screen($paper_source, 'Excluded', '', 'Validation');
+        }
+
+        $paper_list[0] = array('Key', 'Title');
+        foreach ($papers['to_assign'] as $key => $value) {
+            $paper_list[$key + 1] = array($value['bibtexKey'], $value['title']);
+        }
+
+        $updated_data = array(
+            'number_papers' => count($papers['to_assign']),
+            'number_papers_assigned' => count($papers['assigned']),
+            'paper_list' => $paper_list,
+            'page_title' => $page_title
+        );
+        echo json_encode($updated_data);
     }
 
     //responsible for assigning papers for validation based on the previous screening phase.
@@ -2198,6 +2255,7 @@ class Screening extends CI_Controller
         $post_arr = $this->input->post();
         $users = array();
         $i = 1;
+        $validation_by_exclusion_criteria_toggle = 'off';
         $percentage = intval($post_arr['percentage']);
         if (empty($percentage)) {
             $data['err_msg'] = lng(' Please provide  "Percentage of papers" ');
@@ -2206,6 +2264,10 @@ class Screening extends CI_Controller
             $data['err_msg'] = lng("Please provide a correct value of percentage");
             $this->validate_screen_set($data);
         } else {
+            // Check if 'Validation by exclusion criteria' is open
+            if (!empty($post_arr['validation_by_exclusion_criteria_toggle'])){
+                $validation_by_exclusion_criteria_toggle = $post_arr['validation_by_exclusion_criteria_toggle'];
+            }
             // Get selected users
             if (!empty($post_arr['assign_papers_to'])) { // assign to connected user
                 array_push($users, $post_arr['assign_papers_to']);
@@ -2228,11 +2290,21 @@ class Screening extends CI_Controller
                 $screening_phase_info = active_screening_phase_info();
                 $phase_title = $screening_phase_info['phase_title'];
                 $reviews_per_paper = 1;
-                $papers_all = $this->get_papers_to_screen($papers_sources, $paper_source_status, '', 'Validation');
-                $papers = $papers_all['to_assign'];
+                if ($validation_by_exclusion_criteria_toggle == 'on'){
+                    $validation_by_criteria = $post_arr['choose_exclusion_criteria'];
+                    $papers = array();
+                    foreach ($validation_by_criteria as $criteria) {
+                        $result = $this->get_papers_to_screen($papers_sources, 'Excluded', '', 'Validation', $criteria);
+                        $papers = array_merge($papers, $result['to_assign']);
+                    }
+                }
+                else {
+                    $papers_all = $this->get_papers_to_screen($papers_sources, $paper_source_status, '', 'Validation');
+                    $papers = $papers_all['to_assign'];
+                }
                 $papers_to_validate_nbr = round(count($papers) * $percentage / 100);
                 $operation_description = "Assign $percentage % ($papers_to_validate_nbr) of " . $paper_source_status . " papers for $phase_title";
-                //	print_test($papers);
+//                	print_test($papers);
                 shuffle($papers); // randomize the list
                 $assign_papers = array();
                 $this->db2 = $this->load->database(project_db(), TRUE);
