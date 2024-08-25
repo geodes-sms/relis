@@ -1,5 +1,5 @@
 <?php //demoTestProject
-function get_classification_demoTestProject()
+function get_classification_demoTestProject2()
 {
 	$reference_tables = array(); //from nowit will worklike this
 	$config = array();
@@ -7,7 +7,7 @@ function get_classification_demoTestProject()
 	$result['screen_action'] = 'override';
 	$result['qa_action'] = 'override';
 	$result['project_title'] = 'Demo Test Project';
-	$result['project_short_name'] = 'demoTestProject';
+	$result['project_short_name'] = 'demoTestProject2';
 	$config['classification']['table_name'] = 'classification';
 	$config['classification']['config_id'] = 'classification';
 	$config['classification']['table_id'] = 'class_id';
@@ -636,16 +636,19 @@ function get_classification_demoTestProject()
 	$screening['conflict_type'] = 'ExclusionCriteria';
 	$screening['conflict_resolution'] = 'Unanimity';
 	$screening['validation_assigment_mode'] = 'Normal';
-    $screening['status_to_validate'] = 'Excluded';
 	$screening['validation_percentage'] = '10';
-	//$screening['inclusion_mode'] = 'One';
+	
+	$screening['inclusion_mode'] = 'One';
 	$screening['use_kappa'] = true;
+	
 	$screening['exclusion_criteria'] = array();
 	array_push($screening['exclusion_criteria'], "EC1: Too short ");
 	array_push($screening['exclusion_criteria'], "EC2: Not abour chocolate");
-	/* $screening['inclusion_criteria'] = array();
+
+	$screening['inclusion_criteria'] = array();
 	array_push($screening['inclusion_criteria'], "IC1: Published at most 2 years ago");
-	array_push($screening['inclusion_criteria'], "IC2: Longer than 10 pages"); */
+	array_push($screening['inclusion_criteria'], "IC2: Longer than 10 pages");
+
 	$screening['source_papers'] = array();
 	array_push($screening['source_papers'], "Google Scholar");
 	array_push($screening['source_papers'], "Chocolate DB");
@@ -659,6 +662,25 @@ function get_classification_demoTestProject()
 			'title' => "Title",
 			'description' => "Screen by title",
 			'fields' => 'Title|',
+		)
+	);
+
+	array_push(
+		$screening['phases'],
+		array(
+			'title' => "Full-text",
+			'description' => "Screen by full-text",
+			'fields' => "Title|Abstract|Link|Preview",
+			'order' => 10,
+			'final' => true,
+			'config' => array(
+				'review_per_paper' => 4,
+				'conflict_type' => 'ExclusionCriteria',
+				'conflict_resolution' => 'Unanimity',
+				'validation_assigment_mode' => 'Normal',
+				'validation_percentage' => '10',
+				'use_kappa' => true
+			)
 		)
 	);
 

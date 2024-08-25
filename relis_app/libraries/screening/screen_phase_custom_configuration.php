@@ -35,11 +35,12 @@ function get_screening_phase_config()
 	$config['table_name'] = 'screen_phase_config';
 	$config['table_id'] = 'screen_phase_config_id';
 	$config['table_active_field'] = 'config_active'; //to detect deleted records
-
+	
 	$config['entity_label'] = 'Screening';
 	$config['entity_label_plural'] = 'Screening';
-
-
+	
+	require_once APPPATH. "libraries/entity_config/config_configuration.php";
+	$general_config = get_configuration();
 
 	$fields['screen_phase_config_id'] = array(
 		'field_title' => '#',
@@ -72,134 +73,17 @@ function get_screening_phase_config()
 		'mandatory' => 'mandatory',
 	);
 
-	$fields['screening_inclusion_mode'] = array(
-		'field_title' => 'Screening inclusion mode',
-		'field_type' => 'text',
-		'field_value' => 'None',
-		'default_value' => 'None',
-		'field_size' => 50,
-		'mandatory' => ' mandatory ',
-		'input_type' => 'select',
-		'input_select_source' => 'array',
-		'input_select_values' => array('None' => 'None', 'One' => 'One', 'Any' => 'Any', 'All' => 'All'),
-	);
-
-	$fields['screening_screening_conflict_resolution'] = array(
-		'field_title' => 'Screening conflict resolution mode',
-		'field_type' => 'text',
-		'field_value' => 'Unanimity',
-		'default_value' => 'Unanimity',
-		'field_size' => 50,
-		'mandatory' => ' mandatory ',
-		'input_type' => 'select',
-		'input_select_source' => 'array',
-		'input_select_values' => array('Unanimity' => 'Unanimity', 'Majority' => 'Majority'),
-
-	);
-
-	$fields['screening_conflict_type'] = array(
-		'field_title' => 'Conflict criteria',
-		'field_type' => 'text',
-		'field_value' => 'IncludeExclude',
-		'field_size' => 50,
-		'mandatory' => ' mandatory ',
-		'input_type' => 'select',
-		'input_select_source' => 'array',
-		'input_select_values' => array('IncludeExclude' => 'Inclusion - exclusion', 'ExclusionCriteria' => 'Exclusion criteria'),
-		'initial_value' => 'IncludeExclude',
-	);
-
-	$fields['assign_papers_on'] = array(
-		'field_title' => 'Paper assignment enabled',
-		'field_type' => 'int',
-		'field_size' => '1',
-		'field_value' => '1',
-		'default_value' => '0',
-		'input_type' => 'select',
-		'input_select_source' => 'yes_no',
-		'input_select_values' => '',
-	);
-
-	$fields['screening_result_on'] = array(
-		'field_title' => 'Screening result enabled',
-		'field_type' => 'int',
-		'field_size' => '1',
-		'field_value' => '1',
-		'default_value' => '0',
-		'input_type' => 'select',
-		'input_select_source' => 'yes_no',
-		'input_select_values' => '',
-	);
-
-	$fields['screening_validation_on'] = array(
-		'field_title' => 'Screening validation activated',
-		'field_type' => 'int',
-		'field_size' => '1',
-		'field_value' => '1',
-		'default_value' => '0',
-		'input_type' => 'select',
-		'input_select_source' => 'yes_no',
-		'input_select_values' => '',
-	);
-
-	$fields['screening_reviewer_number'] = array(
-		'field_title' => 'Number of reviews per paper',
-		'field_type' => 'int',
-		'field_value' => '2',
-		'default_value' => '2',
-		'field_size' => 3,
-		'input_type' => 'text',
-		'mandatory' => ' mandatory '
-	);
-
-	$fields['screening_status_to_validate'] = array(
-		'field_title' => 'Screening status to validate',
-		'field_type' => 'text',
-		'field_value' => 'Excluded',
-		'field_value' => 'Excluded',
-		'field_size' => 50,
-		'mandatory' => ' mandatory ',
-		'input_type' => 'select',
-		'input_select_source' => 'array',
-		'input_select_values' => array('Excluded' => 'Excluded', 'Included' => 'Included'),
-		'initial_value' => 'Excluded',
-
-	);
-
-	$fields['screening_validator_assignment_type'] = array(
-		'field_title' => 'Validation mode',
-		'field_type' => 'text',
-		'field_value' => 'Normal',
-		'field_value' => 'Normal',
-		'field_size' => 50,
-		'mandatory' => ' mandatory ',
-		'input_type' => 'select',
-		'input_select_source' => 'array',
-		'input_select_values' => array('Normal' => 'Normal', 'Veto' => 'Veto', 'Info' => 'Info'),
-		'initial_value' => 'Excluded',
-
-	);
-
-	$fields['use_kappa'] = array(
-		'field_title' => 'Use kappa',
-		'field_type' => 'int',
-		'field_size' => '1',
-		'field_value' => '0',
-		'default_value' => '1',
-		'input_type' => 'select',
-		'input_select_source' => 'yes_no',
-		'input_select_values' => '',
-	);
-
-	$fields['validation_default_percentage'] = array(
-		'field_title' => 'Default percentage of papers to validate',
-		'field_type' => 'int',
-		'field_value' => '20',
-		'default_value' => '20',
-		'field_size' => 3,
-		'input_type' => 'text',
-		'mandatory' => ' mandatory '
-	);
+	$fields['screening_inclusion_mode'] = $general_config['fields']['screening_inclusion_mode'];
+	$fields['screening_screening_conflict_resolution'] = $general_config['fields']['screening_screening_conflict_resolution'];
+	$fields['screening_conflict_type'] = $general_config['fields']['screening_conflict_type'];
+	$fields['assign_papers_on'] = $general_config['fields']['assign_papers_on'];
+	$fields['screening_result_on'] = $general_config['fields']['screening_result_on'];
+	$fields['screening_validation_on'] = $general_config['fields']['screening_validation_on'];
+	$fields['screening_reviewer_number'] = $general_config['fields']['screening_reviewer_number'];
+	$fields['screening_status_to_validate'] = $general_config['fields']['screening_status_to_validate'];
+	$fields['screening_validator_assignment_type'] = $general_config['fields']['screening_validator_assignment_type'];
+	$fields['use_kappa'] = $general_config['fields']['use_kappa'];
+	$fields['validation_default_percentage'] = $general_config['fields']['validation_default_percentage'];
 
 	$fields['config_active'] = array(
 		'field_title' => 'Active',

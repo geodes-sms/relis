@@ -186,6 +186,8 @@ function get_config_screen_phase()
 		'input_select_values' => 'screen_phase_config;config_type', //the reference table and the field to be displayed
 		'input_select_key_field' => 'screen_phase_id',
 		'number_of_values' => '',
+		'on_list' => 'hidden', //for  number of values this must be hidden on list unless ther is an error while getting list from database
+		'category_type' => 'WithMultiValues',
 	);
 
 	$fields['phase_type'] = array(

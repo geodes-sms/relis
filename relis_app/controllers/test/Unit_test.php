@@ -98,8 +98,6 @@ class Unit_test extends CI_Controller
         $this->apiQueryUnitTest = new ApiQueryUnitTest();
         $this->opUnitTest = new OpUnitTest();
         $this->inclusion_mode_conflictUnitTest = new inclusion_mode_conflictUnitTest();
-        //$this->screeningInclusionModeConflictsTest = new X
-        //$this->customScreeningPhaseConfigTest = new X
     }
 
     public function relis_unit_test($result = "html_report")

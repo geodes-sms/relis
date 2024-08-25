@@ -18,7 +18,7 @@ class inclusion_mode_conflictUnitTest {
         $this->defaultCriteria_one();
         $this->keepOneFromAny();
         $this->keepOneFromAll();
-        $this->resetScreening(); 
+        $this->resetScreening();
     }
 
     private function TestInitialize() {
@@ -75,14 +75,14 @@ class inclusion_mode_conflictUnitTest {
         $action = "get_affected_phases (Model method)";
         $test_name = "Testing is changes are made to the right affected phases";
         $test_aspect = "Affected phases";
-        $expected_value = json_encode(array(1));
+        $expected_value = json_encode(array(3));
         $actual_value = "";
 
         addScreeningPhase("Link");
-        $this->ci->db->query("UPDATE relis_dev_correct_" . getProjectShortName() . ".screen_phase_config SET config_type = 'Custom' WHERE screen_phase_config_id = 2");
+        $this->ci->db->query("UPDATE relis_dev_correct_" . getProjectShortName() . ".screen_phase_config SET config_type = 'Custom' WHERE screen_phase_config_id = 3");
 
         $model = new Screening_dataAccess();
-        $actual_value = json_encode($model->get_affected_phases(getScreeningPhaseId("Abstract")));
+        $actual_value = json_encode($model->get_affected_phases(getScreeningPhaseId("Link")));
 
         run_test($this->controller, $action, $test_name, $test_aspect, $actual_value, $actual_value);
     }
@@ -209,7 +209,7 @@ class inclusion_mode_conflictUnitTest {
         run_test($this->controller, $action, $test_name, $test_aspect, $expected_value, $actual_value);
     }
 
-    private function keepOneFromAll() {
+    private function    keepOneFromAll() {
         $action = "solve_mode_conflict";
         $test_name = "Testing if one random criteria is added properly when switching from All to One inclusion mode";
         $test_aspect = "How many criteria were added?";
