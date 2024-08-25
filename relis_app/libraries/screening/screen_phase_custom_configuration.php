@@ -75,7 +75,7 @@ function get_screening_phase_config()
 
 	$fields['screening_inclusion_mode'] = $general_config['fields']['screening_inclusion_mode'];
 	$fields['screening_screening_conflict_resolution'] = $general_config['fields']['screening_screening_conflict_resolution'];
-	$fields['screening_scscreening_conflict_typereening_conflict_resolution'] = $general_config['fields']['screening_conflict_type'];
+	$fields['screening_conflict_type'] = $general_config['fields']['screening_conflict_type'];
 	$fields['assign_papers_on'] = $general_config['fields']['assign_papers_on'];
 	$fields['screening_result_on'] = $general_config['fields']['screening_result_on'];
 	$fields['screening_validation_on'] = $general_config['fields']['screening_validation_on'];

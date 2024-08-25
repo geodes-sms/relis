@@ -638,9 +638,14 @@ function get_classification_demoTestProject()
 	$screening['validation_assigment_mode'] = 'Normal';
     $screening['status_to_validate'] = 'Excluded';
 	$screening['validation_percentage'] = '10';
+	//$screening['inclusion_mode'] = 'One';
+	$screening['use_kappa'] = true;
 	$screening['exclusion_criteria'] = array();
 	array_push($screening['exclusion_criteria'], "EC1: Too short ");
 	array_push($screening['exclusion_criteria'], "EC2: Not abour chocolate");
+	/* $screening['inclusion_criteria'] = array();
+	array_push($screening['inclusion_criteria'], "IC1: Published at most 2 years ago");
+	array_push($screening['inclusion_criteria'], "IC2: Longer than 10 pages"); */
 	$screening['source_papers'] = array();
 	array_push($screening['source_papers'], "Google Scholar");
 	array_push($screening['source_papers'], "Chocolate DB");
