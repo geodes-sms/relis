@@ -341,6 +341,8 @@ function update_screening_values($screening, $target_db = 'current')
 	$config['screening_status_to_validate'] = !empty($screening['status_to_validate']) ? $screening['status_to_validate'] : "Excluded";
     $config['validation_default_percentage'] = !empty($screening['validation_percentage']) ? $screening['validation_percentage'] : "20";
 	$config['screening_validator_assignment_type'] = !empty($screening['validation_assigment_mode']) ? $screening['validation_assigment_mode'] : "Normal";
+	$config['screening_inclusion_mode'] = !empty($screening['inclusion_mode']) ? $screening['inclusion_mode'] : "None";
+	$config['use_kappa'] = isset($screening['use_kappa']) ? $screening['use_kappa'] : 1;
 	$config['screening_on'] = 1;
 	$result = $ci->db3->update('config', $config, "config_id=1");
 	//add new phases
@@ -350,7 +352,6 @@ function update_screening_values($screening, $target_db = 'current')
 		//get total number
 		$nbr_phase = count($screening['phases']);
 		$i = 1;
-		$all_phases = array();
 		foreach ($screening['phases'] as $key => $value) {
 			$conf_phase['phase_title'] = !empty($value['title']) ? $value['title'] : "Phase " . $i;
 			$conf_phase['description'] = !empty($value['description']) ? $value['description'] : "";
@@ -358,16 +359,32 @@ function update_screening_values($screening, $target_db = 'current')
 			$conf_phase['screen_phase_final'] = ($nbr_phase == $i) ? '1' : "0";
 			$conf_phase['screen_phase_order '] = $i * 10;
 			$conf_phase['added_by'] = active_user_id();
-			array_push($all_phases, $conf_phase);
+
+			$ci->db3->insert('screen_phase', $conf_phase);
+			//insert corresponding phase config
+			if ($ci->db3->affected_rows() > 0) {
+				$phase_config = array();
+				$phase_config['screen_phase_id'] = $ci->db3->insert_id();
+				$phase_config['config_type'] = isset($value['config']) ? 'Custom' : 'Default';
+				if ($phase_config['config_type'] == 'Custom') {
+					$phase_config['screening_reviewer_number'] = !empty($value['config']['review_per_paper']) ? $value['config']['review_per_paper'] : $config['screening_reviewer_number'];
+					$phase_config['screening_screening_conflict_resolution'] = !empty($value['config']['conflict_resolution']) ? $value['config']['conflict_resolution'] : $config['screening_screening_conflict_resolution'];
+					$phase_config['screening_conflict_type'] = !empty($value['config']['conflict_type']) ? $value['config']['conflict_type'] : $config['screening_conflict_type'];
+					$phase_config['screening_status_to_validate'] = !empty($value['config']['status_to_validate']) ? $value['config']['status_to_validate'] : $config['screening_status_to_validate'];
+					$phase_config['validation_default_percentage'] = !empty($value['config']['validation_percentage']) ? $value['config']['validation_percentage'] : $config['validation_default_percentage'];
+					$phase_config['screening_validator_assignment_type'] = !empty($value['config']['validation_assigment_mode']) ? $value['config']['validation_assigment_mode'] : $config['screening_validator_assignment_type'];
+					$phase_config['screening_inclusion_mode'] = !empty($value['config']['inclusion_mode']) ? $value['config']['inclusion_mode'] : $config['screening_inclusion_mode'];
+					$phase_config['use_kappa'] = isset($screening['use_kappa']) ? $value['config']['use_kappa'] : $config['use_kappa'];
+				}
+				$ci->db3->insert('screen_phase_config', $phase_config);
+			}
 			$i++;
 		}
-		//print_test($all_phases);
-		$result = $ci->db3->insert_batch('screen_phase', $all_phases);
-		//print_test($result);
 	}
 	// Add exclusion criteria , sourcepapers,and searc_strategy
 	$screen_configs_to_save = array(
 		'exclusion_criteria' => array('table' => 'ref_exclusioncrieria'),
+		'inclusion_criteria' => array('table' => 'ref_inclusioncriteria'),
 		'source_papers' => array('table' => 'ref_papers_sources'),
 		'search_startegy' => array('table' => 'ref_search_strategy'),
 	);
