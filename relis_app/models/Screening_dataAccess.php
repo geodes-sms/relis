@@ -81,6 +81,14 @@ class Screening_dataAccess extends CI_Model
         return $all_papers;
     }
 
+    function get_user_screened_papers($user_id, $screening_phase) {
+        $sql = "SELECT paper_id FROM screening_paper WHERE assignment_role='Screening' AND screening_phase = $screening_phase AND screening_status='Done' AND  screening_active=1 
+                                       AND user_id = ? AND screening_phase = ? ";
+
+        $user_screenings = $this->db_current->query($sql, array($user_id, $screening_phase))->result_array();
+        return $user_screenings;
+    }
+
     function get_all_screenings($screening_phase)
     {
         $sql = "select * from screening_paper where assignment_role='Screening' AND screening_phase = $screening_phase AND screening_status='Done' AND   screening_active=1 ";

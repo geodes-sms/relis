@@ -2104,6 +2104,14 @@ class Screening extends CI_Controller
             }
         }
         //	print_test($users);
+        if (get_appconfig_element('assign_to_non_screened_validator_on')){
+            // Get assignable papers
+            $user_papers_map = array();
+            foreach ($_assign_user as $user_id => $user_name) {
+                $user_papers_map[$user_id] = $this->get_assignable_papers($user_id, $screening_phase_id, $papers['to_assign']);
+            }
+            $data['user_papers_map'] = $user_papers_map;
+        }
         $data['users'] = $_assign_user;
         $data['number_papers'] = count($papers['to_assign']);
         $data['number_papers_assigned'] = count($papers['assigned']);
@@ -2121,6 +2129,22 @@ class Screening extends CI_Controller
          * Chargement de la vue avec les données préparés dans le controleur suivant le type d'affichage : (popup modal ou pas)
          */
         $this->load->view('shared/body', $data);
+    }
+
+    function get_assignable_papers($user_id, $screen_phase_id, $papers) {
+        // Gets a list of papers that the user has screened
+        $screened_papers = $this->Screening_dataAccess->get_user_screened_papers($user_id, $screen_phase_id);
+        $screened_paper_ids = array_column($screened_papers, 'paper_id');
+
+        // Filter out papers that the user has not screened
+        $assignable_papers = array();
+        foreach ($papers as $paper) {
+            if (!in_array($paper['id'], $screened_paper_ids)) {
+                $assignable_papers[] = $paper;
+            }
+        }
+
+        return $assignable_papers;
     }
 
     public function get_papers_by_criteria($data = array()) {
@@ -2288,6 +2312,7 @@ class Screening extends CI_Controller
                 $papers_sources = $post_arr['papers_sources'];
                 $paper_source_status = $post_arr['paper_source_status'];
                 $screening_phase_info = active_screening_phase_info();
+                $screen_phase_id = $screening_phase_info['screen_phase_id'];
                 $phase_title = $screening_phase_info['phase_title'];
                 $reviews_per_paper = 1;
                 if ($validation_by_exclusion_criteria_toggle == 'on'){
@@ -2303,39 +2328,148 @@ class Screening extends CI_Controller
                     $papers = $papers_all['to_assign'];
                 }
                 $papers_to_validate_nbr = round(count($papers) * $percentage / 100);
+                if ($papers_to_validate_nbr <= 0) {
+                    $data['err_msg'] = " No papers selected for assignment. Please increase the percentage of papers to be assigned.";
+                    $this->validate_screen_set($data);
+                    return;
+                }
                 $operation_description = "Assign $percentage % ($papers_to_validate_nbr) of " . $paper_source_status . " papers for $phase_title";
 //                	print_test($papers);
                 shuffle($papers); // randomize the list
                 $assign_papers = array();
                 $this->db2 = $this->load->database(project_db(), TRUE);
                 $operation_code = active_user_id() . "_" . time();
-                foreach ($papers as $key => $value) {
-                    if ($key < $papers_to_validate_nbr) {
-                        $assign_papers[$key]['paper'] = $value['id'];
-                        $assign_papers[$key]['users'] = array();
-                        $assignment_save = array(
-                            'paper_id' => $value['id'],
-                            'user_id' => '',
-                            'assignment_note' => '',
-                            'assignment_type' => screening_validator_assignment_type(),
-                            'operation_code' => $operation_code,
-                            'assignment_mode' => 'auto',
-                            'assignment_role' => 'Validation',
-                            'screening_phase' => $currect_screening_phase,
-                            'assigned_by' => $this->session->userdata('user_id')
-                        );
-                        $j = 1;
-                        //the table to save assignments
+                if (get_appconfig_element('assign_to_non_screened_validator_on')){
+                    // Get assignable papers for each user
+                    $user_papers_map = array();
+                    foreach ($users as $user) {
+                        $user_papers_map[$user] = $this->get_assignable_papers($user, $screen_phase_id, $papers);
+
+                    }
+
+                    // Sort users by the number of assignable papers from low to high
+                    uasort($user_papers_map, function($a, $b) {
+                        return count($a) > count($b);
+                    });
+
+                    // Get all assignable papers
+                    $all_assignable_papers = array();
+                    foreach ($user_papers_map as $user_papers) {
+                        foreach ($user_papers as $paper) {
+                            $all_assignable_papers[$paper['id']] = $paper;
+                        }
+                    }
+                    $all_assignable_papers = array_values($all_assignable_papers);
+
+//                    print_test('papers_to_validate_nbr: '.$papers_to_validate_nbr);
+
+                    if (count($all_assignable_papers) < $papers_to_validate_nbr) {
+                        $data['err_msg'] = " Selected users cannot be assigned the required number of papers. Please select more users or reduce the percentage of papers to be assigned.";
+                        $this->validate_screen_set($data);
+                        return;
+                    }
+
+                    // The number of papers each user has been assigned
+                    $assigned_papers = array();
+                    foreach ($users as $user) {
+                        $assigned_papers[$user] = 0;
+                    }
+
+                    foreach ($all_assignable_papers as $paper) {
+                        // Get validators who can be assigned this paper
+                        $eligible_users = array();
+                        foreach ($user_papers_map as $user => $user_papers) {
+                            if (in_array($paper, $user_papers)) {
+                                if (!isset($assign_papers[$user])) {
+                                    $assign_papers[$user] = [];
+                                }
+                                $eligible_users[$user] = count($assign_papers[$user]);
+                            }
+                        }
+
+                        // Sort in ascending order according to the number of papers assigned
+                        asort($eligible_users);
+
+                        $final_user = null;
+                        foreach ($eligible_users as $user => $assigned_count) {
+                            if (is_null($final_user)) {
+                                $final_user = $user;
+                            } elseif ($assigned_count == $assigned_papers[$final_user]) {
+                                // If the number of assigned papers is the same, select validators with fewer papers to be assigned
+                                if (count($user_papers_map[$user]) < count($user_papers_map[$final_user])) {
+                                    $final_user = $user;
+                                }
+                            } else {
+                                break;
+                            }
+                        }
+
+                        $assign_papers[$final_user][] = $paper; // papers assigned under best average
+                        $assigned_papers[$final_user]++; // number of papers assigned
+
+                    }
+
+                    // Assign papers as expected number
+                    for ($i = 0, $j =0; $j < $papers_to_validate_nbr; $i++){
+                        foreach ($users as $user){
+                            if ($j >= $papers_to_validate_nbr){
+                                break;
+                            }
+                            if ($assigned_papers[$user] > 0) {
+                                $assignments_to_save[] = array(
+                                    'paper_id' => $assign_papers[$user][$i]['id'],
+                                    'user_id' => $user,
+                                    'assignment_note' => '',
+                                    'assignment_type' => screening_validator_assignment_type(),
+                                    'operation_code' => $operation_code,
+                                    'assignment_mode' => 'auto',
+                                    'assignment_role' => 'Validation',
+                                    'screening_phase' => $currect_screening_phase,
+                                    'assigned_by' => $this->session->userdata('user_id')
+                                );
+                                $assigned_papers[$user]--;
+                                $j++;
+                            }
+                        }
+                    }
+
+//                    print_test($assignments_to_save);exit();
+
+                    if (!empty($assignments_to_save)) {
                         $table_name = get_table_configuration('screening', 'current', 'table_name');
-                        while ($j <= $reviews_per_paper) {
-                            $temp_user = ($key % count($users)) + $j;
-                            if ($temp_user >= count($users))
-                                $temp_user = $temp_user - count($users);
-                            array_push($assign_papers[$key]['users'], $users[$temp_user]);
-                            $assignment_save['user_id'] = $users[$temp_user];
-                            //print_test($assignment_save);
-                            $this->db2->insert($table_name, $assignment_save);
-                            $j++;
+                        $this->db2->insert_batch($table_name, $assignments_to_save);
+                    }
+
+                }
+                else {
+                    foreach ($papers as $key => $value) {
+                        if ($key < $papers_to_validate_nbr) {
+                            $assign_papers[$key]['paper'] = $value['id'];
+                            $assign_papers[$key]['users'] = array();
+                            $assignment_save = array(
+                                'paper_id' => $value['id'],
+                                'user_id' => '',
+                                'assignment_note' => '',
+                                'assignment_type' => screening_validator_assignment_type(),
+                                'operation_code' => $operation_code,
+                                'assignment_mode' => 'auto',
+                                'assignment_role' => 'Validation',
+                                'screening_phase' => $currect_screening_phase,
+                                'assigned_by' => $this->session->userdata('user_id')
+                            );
+                            $j = 1;
+                            //the table to save assignments
+                            $table_name = get_table_configuration('screening', 'current', 'table_name');
+                            while ($j <= $reviews_per_paper) {
+                                $temp_user = ($key % count($users)) + $j;
+                                if ($temp_user >= count($users))
+                                    $temp_user = $temp_user - count($users);
+                                array_push($assign_papers[$key]['users'], $users[$temp_user]);
+                                $assignment_save['user_id'] = $users[$temp_user];
+                                //print_test($assignment_save);
+                                $this->db2->insert($table_name, $assignment_save);
+                                $j++;
+                            }
                         }
                     }
                 }

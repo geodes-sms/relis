@@ -64,8 +64,12 @@
                         	echo ' <p class="lead">Select validator(s) </p>';
                         	$i=1;
 		                        foreach ($users as $user_id => $user_name) {
-		                        	echo checkbox_form_bm($user_name,'user_'.$i,'user_'.$user_id,$user_id);
-		                        	$i++;
+                                    if (get_appconfig_element('assign_to_non_screened_validator_on')){
+                                        echo checkbox_form_bm($user_name.' (papers available to assign: ' . count($user_papers_map[$user_id]) . ')','user_'.$i,'user_'.$user_id,$user_id);
+                                    }else {
+                                        echo checkbox_form_bm($user_name, 'user_' . $i, 'user_' . $user_id, $user_id);
+                                    }
+                                    $i++;
 		                        }
 
 
