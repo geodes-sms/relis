@@ -55,6 +55,7 @@ class ScreeningUnitTest
         $this->saveAssignmentValidation_emptyUsers();
         $this->saveAssignmentValidation_50percent();
         $this->saveAssignmentValidation_100percent();
+        $this->saveAssignmentValidation_by1criteria();
         $this->screenPaperValidation();
         $this->screenValidationCompletion();
         $this->screenValidationResult();
@@ -1781,6 +1782,68 @@ class ScreeningUnitTest
 
     /*
      * Test 39
+     * Action : save_assign_screen_validation
+     * Description : save the assignments of papers for screening validation by exclusion criteria EC1 with 100%.
+     * Expected Paper assignements :
+     *          - All papers excluded by criteria EC1 are added in the project DB in screening_paper table
+     *          - assign_papers_valida operation inserted in operations table in the project DB
+     */
+    private function saveAssignmentValidation_by1criteria()
+    {
+        $action = "save_assign_screen_validation";
+        $test_name = "Save the assignments of papers for screening validation by exclusion criteria EC1 with 100%";
+
+        $test_assignement = "Paper assignements";
+        $expected_assignement = "Assigned";
+
+        //initialise the Database
+        $this->TestInitialize();
+        //add 5 papers to test Project
+        addBibtextPapersToProject("relis_app/helpers/tests/testFiles/paper/5_bibPapers.bib");
+        //select screening phase as active phase
+        $this->http_client->response("screening", "select_screen_phase" . "/" . getScreeningPhaseId("Title"));
+        //screening papers by excluding 5 papers with first 3 excluded by EC1
+        assignPapers_and_performScreening([getAdminUserId()], "Title", $done = 5, $include = 0, $criteria = 1);
+
+        $postData = [
+            "number_of_users" => 1,
+            "screening_phase" => getScreeningPhaseId("Title"),
+            "papers_sources" => 1,
+            "paper_source_status" => "Excluded",
+            "user_1" => getAdminUserId(),
+            "validation_by_exclusion_criteria_toggle" => "on",
+            "choose_exclusion_criteria" => array('0' => 'EC1: Too short'),
+            "percentage" => 100,
+        ];
+        $response = $this->http_client->response($this->controller, $action, $postData, "POST");
+
+        if ($response['status_code'] >= 400) {
+            $actual_assignement = "<span style='color:red'>" . $response['content'] . "</span>";
+        } else {
+            $actual_assignement = "Not assigned";
+
+            // Check if all the papers have been assigned
+            $excludedPaperIds = $this->ci->db->query("SELECT paper_id FROM relis_dev_correct_" . getProjectShortName() . ".screening_paper WHERE screening_decision='Excluded' AND exclusion_criteria = '1'")->result_array();
+            $excludedPaperIdList = array();
+            foreach ($excludedPaperIds as $paperId) {
+                $excludedPaperIdList[] = $paperId['paper_id'];
+            }
+            $excludedPaperIdList = implode(',', $excludedPaperIdList);
+            $nbrOfAssignment = $this->ci->db->query("SELECT COUNT(*) AS row_count FROM relis_dev_correct_" . getProjectShortName() . ".screening_paper WHERE paper_id IN (" . $excludedPaperIdList . ") AND assignment_role = 'validation'")->row_array()['row_count'];
+
+            //Check if the assign_papers_valida operation is inserted in operations table in the project DB
+            $operation = $this->ci->db->query("SELECT * FROM relis_dev_correct_" . getProjectShortName() . ".operations WHERE operation_type = 'assign_papers_valida' AND operation_state = 'Active' AND operation_active = 1")->row_array();
+
+            if (count($excludedPaperIds) == $nbrOfAssignment && !empty($operation)) {
+                $actual_assignement = "Assigned";
+            }
+        }
+
+        run_test($this->controller, $action, $test_name, $test_assignement, $expected_assignement, $actual_assignement);
+    }
+
+    /*
+     * Test 40
      * Action : screen_paper_validation
      * Description : handle the display of a paper for screening validation
      * Expected HTTP Response Code : 200 OK (indicating a successful response from the server).
@@ -1807,7 +1870,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 40
+     * Test 41
      * Action : screen_completion
      * Description : calculate and display the completion progress of screening validation for users.
      * Expected HTTP Response Code : 200 OK (indicating a successful response from the server).
@@ -1834,7 +1897,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 41
+     * Test 42
      * Action : screen_validation_result
      * Description : Display screening validation statistics and results.
      * Expected HTTP Response Code : 200 OK (indicating a successful response from the server).
@@ -1861,7 +1924,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 42
+     * Test 43
      * Action : remove_screening
      * Description : Remove a screening entry from the database.
      * Expected update in DB
@@ -1891,7 +1954,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 43
+     * Test 44
      * Action : remove_screening_validation
      * Description : Handle the removal of screening validation entries from the database.
      * Expected update in DB
@@ -1921,7 +1984,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 44
+     * Test 45
      * Action : screening
      * Description : Display screening home page with 4 papers screened.
      * Expected result: check if displayed data is correct
@@ -1952,7 +2015,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 45
+     * Test 46
      * Action : screening
      * Description : Display screening home page with 0 paper screened.
      * Expected result: check if displayed data is correct
