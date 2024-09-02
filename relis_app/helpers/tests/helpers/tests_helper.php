@@ -375,7 +375,7 @@ function screenPapers($screenPhaseField, $done = -1, $reviewPerpaper = 1, $inclu
 }
 
 //$done = Nbr of papers to screen; $include = Nbr of papers to include
-function assignPapers_and_performScreening($userIds = array(), $screenPhaseField, $done = -1, $include = -1)
+function assignPapers_and_performScreening($userIds = array(), $screenPhaseField, $done = -1, $include = -1, $criteria = -1)
 {
     $ci = get_instance();
     $http_client = new Http_client();
@@ -422,7 +422,16 @@ function assignPapers_and_performScreening($userIds = array(), $screenPhaseField
             $data = ["criteria_ex" => "", "criteria_in" => "", "note" => "", "screening_id" => $screening_paper['screening_id'], "decision" => "accepted", "operation_type" => "new", "screening_phase" => $screening_paper['screening_phase'], "operation_source" => "list_screen/mine_screen", "paper_id" => $screening_paper['paper_id'], "assignment_id" => $screening_paper['screening_id'], "screen_type" => "simple_screen"];
         } else {
             //exclude papers
-            $data = ["criteria_ex" => 1, "criteria_in" => "", "note" => "", "screening_id" => $screening_paper['screening_id'], "decision" => "excluded", "operation_type" => "new", "screening_phase" => $screening_paper['screening_phase'], "operation_source" => "list_screen/mine_screen", "paper_id" => $screening_paper['paper_id'], "assignment_id" => $screening_paper['screening_id'], "screen_type" => "simple_screen"];
+            if ($criteria == -1){//Validation normally
+                $data = ["criteria_ex" => 1, "criteria_in" => "", "note" => "", "screening_id" => $screening_paper['screening_id'], "decision" => "excluded", "operation_type" => "new", "screening_phase" => $screening_paper['screening_phase'], "operation_source" => "list_screen/mine_screen", "paper_id" => $screening_paper['paper_id'], "assignment_id" => $screening_paper['screening_id'], "screen_type" => "simple_screen"];
+            }else{//Validation by exclusion criteria
+                if ($i <= 3){
+                    $data = ["criteria_ex" => 1, "criteria_in" => "", "note" => "", "screening_id" => $screening_paper['screening_id'], "decision" => "excluded", "operation_type" => "new", "screening_phase" => $screening_paper['screening_phase'], "operation_source" => "list_screen/mine_screen", "paper_id" => $screening_paper['paper_id'], "assignment_id" => $screening_paper['screening_id'], "screen_type" => "simple_screen"];
+                }//import 3 of criteria EC1
+                else{
+                    $data = ["criteria_ex" => 2, "criteria_in" => "", "note" => "", "screening_id" => $screening_paper['screening_id'], "decision" => "excluded", "operation_type" => "new", "screening_phase" => $screening_paper['screening_phase'], "operation_source" => "list_screen/mine_screen", "paper_id" => $screening_paper['paper_id'], "assignment_id" => $screening_paper['screening_id'], "screen_type" => "simple_screen"];
+                }
+            }
         }
 
         save_screening($data);
