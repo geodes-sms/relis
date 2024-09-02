@@ -256,7 +256,7 @@ function get_configuration()
 	);
 
     $fields['assign_to_non_screened_validator_on'] = array(
-        'field_title' => 'Assign to non-screened validator',
+        'field_title' => 'Assign papers to validators who have not screened them',
         'field_type' => 'int',
         'field_size' => '1',
         'field_value' => '1',
