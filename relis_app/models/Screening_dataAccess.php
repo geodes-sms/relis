@@ -81,6 +81,14 @@ class Screening_dataAccess extends CI_Model
         return $all_papers;
     }
 
+    function get_user_screened_papers($user_id, $screening_phase) {
+        $sql = "SELECT paper_id FROM screening_paper WHERE assignment_role='Screening' AND screening_phase = $screening_phase AND screening_status='Done' AND  screening_active=1 
+                                       AND user_id = ? AND screening_phase = ? ";
+
+        $user_screenings = $this->db_current->query($sql, array($user_id, $screening_phase))->result_array();
+        return $user_screenings;
+    }
+
     function get_all_screenings($screening_phase)
     {
         $sql = "select * from screening_paper where assignment_role='Screening' AND screening_phase = $screening_phase AND screening_status='Done' AND   screening_active=1 ";
@@ -145,6 +153,7 @@ class Screening_dataAccess extends CI_Model
             'use_kappa' => $config['use_kappa'],
             'screening_validation_on' => $config['screening_validation_on'],
             'screening_validator_assignment_type' => $config['screening_validator_assignment_type'],
+            'assign_to_non_screened_validator_on' => $config['assign_to_non_screened_validator_on'],
             'validation_default_percentage' => $config['validation_default_percentage']
         );
             if (!$phase_id) $config_save['screening_on'] = $config['screening_on'];
@@ -386,6 +395,7 @@ class Screening_dataAccess extends CI_Model
                 'use_kappa' => $config['use_kappa'],
                 'screening_validation_on' => $config['screening_validation_on'],
                 'screening_validator_assignment_type' => $config['screening_validator_assignment_type'],
+                'assign_to_non_screened_validator_on' => $config['assign_to_non_screened_validator_on'],
                 'validation_default_percentage' => $config['validation_default_percentage']
             );
             $this->db_current->where('screen_phase_id', $phase_id);

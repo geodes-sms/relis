@@ -857,6 +857,7 @@ function is_screening_config_element($element) {
 		'screening_status_to_validate',
 		'screening_validator_assignment_type',
 		'use_kappa',
+        'assign_to_non_screened_validator_on',
 		'validation_default_percentage'
 	));
 }

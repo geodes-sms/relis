@@ -58,6 +58,7 @@ CREATE TABLE IF NOT EXISTS `config` (
   `validation_default_percentage` int(3) NOT NULL DEFAULT '20',
   `screening_reviewer_number` int(3) NOT NULL DEFAULT '2',
   `screening_status_to_validate` enum('IncludedExcluded','Excluded','Included') NOT NULL DEFAULT 'Excluded',
+  `assign_to_non_screened_validator_on` int(2) NOT NULL DEFAULT '0',
   `screening_validator_assignment_type` enum('Normal','Veto','Info') NOT NULL DEFAULT 'Normal',
   `qa_on` int(2) NOT NULL DEFAULT '0',
   `qa_open` int(2) NOT NULL DEFAULT '0',
@@ -72,8 +73,8 @@ CREATE TABLE IF NOT EXISTS `config` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1;;;;
 
 
-INSERT INTO `config` (`config_id`, `config_type`, `editor_url`, `editor_generated_path`, `csv_field_separator`, `csv_field_separator_export`, `screening_screening_conflict_resolution`, `screening_conflict_type`, `import_papers_on`, `assign_papers_on`, `screening_validation_on`, `screening_result_on`, `source_papers_on`, `search_strategy_on`,`key_paper_prefix`,`key_paper_serial`, `screening_status_to_validate`, `config_active`) VALUES
-(1, 'default', 'http://127.0.0.1:8080/relis/texteditor', 'C:/dslforge_workspace', ';', ',', 'Unanimity', 'IncludeExclude', 1, 1, 1,  1, 1, 1,'Paper_',1,'Excluded', 1);;;;
+INSERT INTO `config` (`config_id`, `config_type`, `editor_url`, `editor_generated_path`, `csv_field_separator`, `csv_field_separator_export`, `screening_screening_conflict_resolution`, `screening_conflict_type`, `import_papers_on`, `assign_papers_on`, `screening_validation_on`, `screening_result_on`, `source_papers_on`, `search_strategy_on`,`key_paper_prefix`,`key_paper_serial`, `screening_status_to_validate`, `assign_to_non_screened_validator_on`, `config_active`) VALUES
+(1, 'default', 'http://127.0.0.1:8080/relis/texteditor', 'C:/dslforge_workspace', ';', ',', 'Unanimity', 'IncludeExclude', 1, 1, 1,  1, 1, 1,'Paper_',1,'Excluded', 0, 1);;;;
 
 DROP TABLE IF EXISTS `exclusion`;;;;
 CREATE TABLE IF NOT EXISTS `exclusion` (

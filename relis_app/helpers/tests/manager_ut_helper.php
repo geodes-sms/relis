@@ -1133,6 +1133,7 @@ class ManagerUnitTest
             'screening_validation_on' => array(0, 1),
             'screening_validator_assignment_type' => 'Normal',
             'screening_status_to_validate' => 'Excluded',
+            'assign_to_non_screened_validator_on' => array(0, 1),
             'validation_default_percentage' => 50
         );
 

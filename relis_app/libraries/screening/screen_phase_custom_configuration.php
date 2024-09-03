@@ -81,6 +81,7 @@ function get_screening_phase_config()
 	$fields['screening_validation_on'] = $general_config['fields']['screening_validation_on'];
 	$fields['screening_reviewer_number'] = $general_config['fields']['screening_reviewer_number'];
 	$fields['screening_status_to_validate'] = $general_config['fields']['screening_status_to_validate'];
+    $fields['assign_to_non_screened_validator_on'] = $general_config['fields']['assign_to_non_screened_validator_on'];
 	$fields['screening_validator_assignment_type'] = $general_config['fields']['screening_validator_assignment_type'];
 	$fields['use_kappa'] = $general_config['fields']['use_kappa'];
 	$fields['validation_default_percentage'] = $general_config['fields']['validation_default_percentage'];
@@ -124,7 +125,8 @@ function get_screening_phase_config()
 			'use_kappa' => array(),
 			'screening_validation_on' => array(),
 			'screening_validator_assignment_type' => array(),
-			'validation_default_percentage' => array(),
+            'assign_to_non_screened_validator_on' => array(),
+            'validation_default_percentage' => array(),
 
 			),
 
@@ -169,7 +171,8 @@ function get_screening_phase_config()
 			'use_kappa' => array('mandatory' => '', 'field_state' => 'enabled'),
 			'screening_validation_on' => array('mandatory' => '', 'field_state' => 'enabled'),
 			'screening_validator_assignment_type' => array('mandatory' => '', 'field_state' => 'enabled'),
-			'validation_default_percentage' => array('mandatory' => '', 'field_state' => 'enabled'),
+            'assign_to_non_screened_validator_on' => array('mandatory' => '', 'field_state' => 'enabled'),
+            'validation_default_percentage' => array('mandatory' => '', 'field_state' => 'enabled'),
 
 		),
 
