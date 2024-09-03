@@ -678,6 +678,31 @@ function save_assignment_screen($data)
     }
 }
 
+//The purpose of this function is to handle the remove of screening entry from the database
+function remove_screening($screen_id)
+{
+    $ci = get_instance();
+
+    $ci->db2 = $ci->load->database(project_db(), TRUE);
+    $config = "screen";
+    $screen_detail = $ci->DBConnection_mdl->get_row_details($config, $screen_id);
+    $ci->db2->update('screening_paper', array('screening_active' => 0), array('screening_id' => $screen_id));
+    $ci->db2->update('screening_paper', array('screening_status' => 'Pending'), array('screening_id' => $screen_id));
+    update_paper_status_status($screen_detail['paper_id']);
+}
+
+//The purpose of this function is to handle the removal of screening validation entries from the database
+function remove_screening_validation($screen_id)
+{
+    $ci = get_instance();
+
+    $ci->db2 = $ci->load->database(project_db(), TRUE);
+    $config = "screen";
+    $screen_detail = $ci->DBConnection_mdl->get_row_details($config, $screen_id);
+    $ci->db2->update('screening_paper', array('screening_active' => 0), array('screening_id' => $screen_id));
+    $ci->db2->update('screening_paper', array('screening_status' => 'Pending'), array('screening_id' => $screen_id));
+}
+
 /**
  * The purpose of this function is to retrieve and organize papers for screening based on the provided source, 
  * source status, current phase, and assignment role

@@ -50,6 +50,7 @@ class ScreeningUnitTest
         $this->displayPaperScreen();
         $this->listScreen();
         $this->validateScreenSet();
+        $this->saveAssignmentValidation_assignToNotScreenedUser();
         $this->saveAssignmentValidation_emptyPercentage();
         $this->saveAssignmentValidation_invalidPercentage();
         $this->saveAssignmentValidation_emptyUsers();
@@ -1538,6 +1539,166 @@ class ScreeningUnitTest
     /*
      * Test 34
      * Action : save_assign_screen_validation
+     * Description : save the assignments of papers for screening validation to whom have not screened them.
+     * Expected Paper assignements :
+     *          - The numbers of papers each user are assigned all between 1 and 2. (5 papers for 3 user)
+     *          - assign_papers_valida operation inserted in operations table in the project DB
+     */
+    private function saveAssignmentValidation_assignToNotScreenedUser()
+    {
+        $action = "save_assign_screen_validation";
+        $test_name = "Save the assignments of papers for screening validation to whom have not screened them";
+
+        $test_assignement = "Paper assignements";
+        $expected_assignement = "Assigned";
+
+        //activate assign_to_non_screened_validator_on
+        $this->ci->db->query("UPDATE relis_dev_correct_" . getProjectShortName() . ".config SET assign_to_non_screened_validator_on = 1");
+
+        //initialise the Database
+        $this->TestInitialize();
+        //select screening phase as active phase
+        $screenPhaseID = getScreeningPhaseId("Title");
+        $this->http_client->response("screening", "select_screen_phase" . "/" . $screenPhaseID);
+
+        $AdminUserId = getAdminUserId();
+        $TestUserId = getTestUserId();
+        $DemoUserId = getDemoUserId();
+
+        //add 1 paper & screening paper for admin and test user
+        addBibtextPapersToProject("relis_app/helpers/tests/testFiles/paper/1_bibPaper.bib");
+        $data = [
+            "number_of_users" => 2,
+            "screening_phase" => $screenPhaseID,
+            "papers_sources" => "all",
+            "paper_source_status" => "all",
+            "user_1" => $AdminUserId,
+            "user_2" => $TestUserId,
+            "reviews_per_paper" => 2
+        ];
+        save_assignment_screen($data);
+        for ($i = 1; $i <= 2; $i++) {
+            $screening_paper = $this->ci->db->query("SELECT * FROM relis_dev_correct_" . getProjectShortName() . ".screening_paper WHERE screening_decision IS NULL AND assignment_role = 'Screening'")->row_array();
+            $data = ["criteria_ex" => 1, "criteria_in" => "", "note" => "", "screening_id" => $screening_paper['screening_id'], "decision" => "excluded", "operation_type" => "new", "screening_phase" => $screening_paper['screening_phase'], "operation_source" => "list_screen/mine_screen", "paper_id" => $screening_paper['paper_id'], "assignment_id" => $screening_paper['screening_id'], "screen_type" => "simple_screen"];
+            save_screening($data);
+        }
+
+        //add 2 papers & screening papers for admin user
+        addBibtextPapersToProject("relis_app/helpers/tests/testFiles/paper/2_bibPapers.bib");
+        $data = [
+            "number_of_users" => 1,
+            "screening_phase" => $screenPhaseID,
+            "papers_sources" => "all",
+            "paper_source_status" => "all",
+            "user_1" => $AdminUserId,
+            "reviews_per_paper" => 1
+        ];
+        save_assignment_screen($data);
+        for ($i = 1; $i <= 2; $i++) {
+            $screening_paper = $this->ci->db->query("SELECT * FROM relis_dev_correct_" . getProjectShortName() . ".screening_paper WHERE screening_decision IS NULL AND assignment_role = 'Screening'")->row_array();
+            $data = ["criteria_ex" => 1, "criteria_in" => "", "note" => "", "screening_id" => $screening_paper['screening_id'], "decision" => "excluded", "operation_type" => "new", "screening_phase" => $screening_paper['screening_phase'], "operation_source" => "list_screen/mine_screen", "paper_id" => $screening_paper['paper_id'], "assignment_id" => $screening_paper['screening_id'], "screen_type" => "simple_screen"];
+            save_screening($data);
+        }
+
+        //add 1 paper & screening paper for test user
+        addBibtextPapersToProject("relis_app/helpers/tests/testFiles/paper/1_bibPaper_b.bib");
+        $data = [
+            "number_of_users" => 1,
+            "screening_phase" => $screenPhaseID,
+            "papers_sources" => "all",
+            "paper_source_status" => "all",
+            "user_1" => $TestUserId,
+            "reviews_per_paper" => 1
+        ];
+        save_assignment_screen($data);
+        $screening_paper = $this->ci->db->query("SELECT * FROM relis_dev_correct_" . getProjectShortName() . ".screening_paper WHERE screening_decision IS NULL AND assignment_role = 'Screening'")->row_array();
+        $data = ["criteria_ex" => 1, "criteria_in" => "", "note" => "", "screening_id" => $screening_paper['screening_id'], "decision" => "excluded", "operation_type" => "new", "screening_phase" => $screening_paper['screening_phase'], "operation_source" => "list_screen/mine_screen", "paper_id" => $screening_paper['paper_id'], "assignment_id" => $screening_paper['screening_id'], "screen_type" => "simple_screen"];
+        save_screening($data);
+
+        //add 1 paper & screening paper for demo user
+        addBibtextPapersToProject("relis_app/helpers/tests/testFiles/paper/1_bibPaper_c.bib");
+        $data = [
+            "number_of_users" => 1,
+            "screening_phase" => $screenPhaseID,
+            "papers_sources" => "all",
+            "paper_source_status" => "all",
+            "user_1" => $DemoUserId,
+            "reviews_per_paper" => 1
+        ];
+        save_assignment_screen($data);
+        $screening_paper = $this->ci->db->query("SELECT * FROM relis_dev_correct_" . getProjectShortName() . ".screening_paper WHERE screening_decision IS NULL AND assignment_role = 'Screening'")->row_array();
+        $data = ["criteria_ex" => 1, "criteria_in" => "", "note" => "", "screening_id" => $screening_paper['screening_id'], "decision" => "excluded", "operation_type" => "new", "screening_phase" => $screening_paper['screening_phase'], "operation_source" => "list_screen/mine_screen", "paper_id" => $screening_paper['paper_id'], "assignment_id" => $screening_paper['screening_id'], "screen_type" => "simple_screen"];
+        save_screening($data);
+
+        $postData = [
+            "number_of_users" => 3,
+            "screening_phase" => getScreeningPhaseId("Title"),
+            "papers_sources" => 1,
+            "paper_source_status" => "Excluded",
+            "user_1" => getAdminUserId(),
+            "user_2" => getTestUserId(),
+            "user_3" => getDemoUserId(),
+            "percentage" => 100,
+        ];
+        $response = $this->http_client->response($this->controller, $action, $postData, "POST");
+
+        if ($response['status_code'] >= 400) {
+            $actual_assignement = "<span style='color:red'>" . $response['content'] . "</span>";
+        } else {
+            $actual_assignement = "Not assigned";
+
+            // Check if all the papers have been assigned as expected
+            $excludedPaperIds = $this->ci->db->query("SELECT paper_id FROM relis_dev_correct_" . getProjectShortName() . ".screening_paper WHERE screening_decision='Excluded'")->result_array();
+            $excludedPaperIdList = array();
+            foreach ($excludedPaperIds as $paperId) {
+                $excludedPaperIdList[] = $paperId['paper_id'];
+            }
+            $excludedPaperIdList = array_unique($excludedPaperIdList);
+            $excludedPaperIdList = implode(',', $excludedPaperIdList);
+
+            $users = [getAdminUserId(), getTestUserId(), getDemoUserId()];
+
+            $flag = 0;//Check if the number is as expected
+            foreach ($users as $user) {
+                $nbrOfAssignment = $this->ci->db->query("SELECT COUNT(*) AS row_count FROM relis_dev_correct_" . getProjectShortName() . ".screening_paper WHERE user_id = $user AND paper_id IN (" . $excludedPaperIdList . ") AND assignment_role = 'validation'")->row_array()['row_count'];
+                if ($nbrOfAssignment == 1 or $nbrOfAssignment == 2){
+                    $flag = 1;
+                }
+                else{
+                    $flag = 0;
+                    break;
+                }
+            }
+
+            //Check if the assign_papers_valida operation is inserted in operations table in the project DB
+            $operation = $this->ci->db->query("SELECT * FROM relis_dev_correct_" . getProjectShortName() . ".operations WHERE operation_type = 'assign_papers_valida' AND operation_state = 'Active' AND operation_active = 1")->row_array();
+
+            if ($flag == 1 && !empty($operation)) {
+                $actual_assignement = "Assigned";
+            }
+
+            //deactivate assign_to_non_screened_validator_on
+            $this->ci->db->query("UPDATE relis_dev_correct_" . getProjectShortName() . ".config SET assign_to_non_screened_validator_on = 0");
+
+            // Remove screenings
+            $screening_ids = $this->ci->db->query("SELECT screening_id FROM relis_dev_correct_" . getProjectShortName() . ".screening_paper WHERE user_id IN ('" . $TestUserId . "', '" . $DemoUserId . "', '" . $AdminUserId . "') AND assignment_role='Screening'")->result_array();
+            foreach ($screening_ids as $id) {
+                remove_screening($id['screening_id']);
+            }
+
+            // Remove screening validations
+            $validation_ids = $this->ci->db->query("SELECT screening_id FROM relis_dev_correct_" . getProjectShortName() . ".screening_paper WHERE user_id IN ('" . $TestUserId . "', '" . $DemoUserId . "', '" . $AdminUserId . "') AND assignment_role='Validation'")->result_array();
+            foreach ($validation_ids as $id) {
+                remove_screening_validation($id['screening_id']);
+            }
+        }
+
+        run_test($this->controller, $action, $test_name, $test_assignement, $expected_assignement, $actual_assignement);
+    }
+
+    /*
+     * Test 35
+     * Action : save_assign_screen_validation
      * Description : Handle the saving of paper assignments for screening validation with empty percentage in POST request.
      * Expected Paper assignements : 
      *          - No papers are added in the project DB in screening_paper table
@@ -1581,7 +1742,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 35
+     * Test 36
      * Action : save_assign_screen_validation
      * Description : Handle the saving of paper assignments for screening validation with invalid percentage (>100) in POST request.
      * Expected Paper assignements : 
@@ -1626,7 +1787,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 36
+     * Test 37
      * Action : save_assign_screen_validation
      * Description : Handle the saving of paper assignments for screening validation with empty users in POST request.
      * Expected Paper assignements : 
@@ -1670,7 +1831,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 37
+     * Test 38
      * Action : save_assign_screen_validation
      * Description : save the assignments of papers for screening validation with 50% of paper assignement.
      * Expected Paper assignements : 
@@ -1721,7 +1882,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 38
+     * Test 39
      * Action : save_assign_screen_validation
      * Description : save the assignments of papers for screening validation with 100% of paper assignement.
      * Expected Paper assignements : 
@@ -1781,7 +1942,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 39
+     * Test 40
      * Action : save_assign_screen_validation
      * Description : save the assignments of papers for screening validation by exclusion criteria EC1 with 100%.
      * Expected Paper assignements :
@@ -1843,7 +2004,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 40
+     * Test 41
      * Action : screen_paper_validation
      * Description : handle the display of a paper for screening validation
      * Expected HTTP Response Code : 200 OK (indicating a successful response from the server).
@@ -1870,7 +2031,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 41
+     * Test 42
      * Action : screen_completion
      * Description : calculate and display the completion progress of screening validation for users.
      * Expected HTTP Response Code : 200 OK (indicating a successful response from the server).
@@ -1897,7 +2058,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 42
+     * Test 43
      * Action : screen_validation_result
      * Description : Display screening validation statistics and results.
      * Expected HTTP Response Code : 200 OK (indicating a successful response from the server).
@@ -1924,7 +2085,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 43
+     * Test 44
      * Action : remove_screening
      * Description : Remove a screening entry from the database.
      * Expected update in DB
@@ -1954,7 +2115,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 44
+     * Test 45
      * Action : remove_screening_validation
      * Description : Handle the removal of screening validation entries from the database.
      * Expected update in DB
@@ -1984,7 +2145,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 45
+     * Test 46
      * Action : screening
      * Description : Display screening home page with 4 papers screened.
      * Expected result: check if displayed data is correct
@@ -2015,7 +2176,7 @@ class ScreeningUnitTest
     }
 
     /*
-     * Test 46
+     * Test 47
      * Action : screening
      * Description : Display screening home page with 0 paper screened.
      * Expected result: check if displayed data is correct
