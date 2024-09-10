@@ -362,7 +362,8 @@ class ScreeningUnitTest
             "paper_source_status" => "all",
             "user_1" => $user_1,
             "user_2" => $user_2,
-            "reviews_per_paper" => 1
+            "reviews_per_paper" => 1,
+            "assign_all_paper_checkbox" => "on"
         ];
         $response = $this->http_client->response($this->controller, $action, $postData, "POST");
 
@@ -410,7 +411,8 @@ class ScreeningUnitTest
             "paper_source_status" => "all",
             "user_1" => $user_1,
             "user_2" => $user_2,
-            "reviews_per_paper" => ""
+            "reviews_per_paper" => "",
+            "assign_all_paper_checkbox" => "on"
         ];
         $response = $this->http_client->response($this->controller, $action, $postData, "POST");
 
@@ -458,7 +460,8 @@ class ScreeningUnitTest
             "paper_source_status" => "all",
             "user_1" => $user_1,
             "user_2" => $user_2,
-            "reviews_per_paper" => 3
+            "reviews_per_paper" => 3,
+            "assign_all_paper_checkbox" => "on"
         ];
         $response = $this->http_client->response($this->controller, $action, $postData, "POST");
 
@@ -502,7 +505,8 @@ class ScreeningUnitTest
             "screening_phase" => getScreeningPhaseId("Title"),
             "papers_sources" => "all",
             "paper_source_status" => "all",
-            "reviews_per_paper" => 1
+            "reviews_per_paper" => 1,
+            "assign_all_paper_checkbox" => "on"
         ];
         $response = $this->http_client->response($this->controller, $action, $postData, "POST");
 
@@ -596,7 +600,8 @@ class ScreeningUnitTest
             "papers_sources" => "all",
             "paper_source_status" => "all",
             "user_1" => $userId,
-            "reviews_per_paper" => 1
+            "reviews_per_paper" => 1,
+            "assign_all_paper_checkbox" => "on"
         ];
 
         $response = $this->http_client->response($this->controller, $action, $postData, "POST");
@@ -649,7 +654,8 @@ class ScreeningUnitTest
             "user_1" => getAdminUserId(),
             "user_2" => getTestUserId(),
             "user_3" => getDemoUserId(),
-            "reviews_per_paper" => 1
+            "reviews_per_paper" => 1,
+            "assign_all_paper_checkbox" => "on"
         ];
         //Select screening phase
         $this->http_client->response($this->controller, "select_screen_phase" . "/" . getScreeningPhaseId("Title"));
@@ -710,7 +716,8 @@ class ScreeningUnitTest
             "user_1" => getAdminUserId(),
             "user_2" => getTestUserId(),
             "user_3" => getDemoUserId(),
-            "reviews_per_paper" => 1
+            "reviews_per_paper" => 1,
+            "assign_all_paper_checkbox" => "on"
         ];
         //Select screening phase
         $this->http_client->response($this->controller, "select_screen_phase" . "/" . getScreeningPhaseId("Title"));
@@ -773,7 +780,8 @@ class ScreeningUnitTest
             "paper_source_status" => "all",
             "user_1" => getAdminUserId(),
             "user_2" => getTestUserId(),
-            "reviews_per_paper" => 1
+            "reviews_per_paper" => 1,
+            "assign_all_paper_checkbox" => "on"
         ];
         //Select screening phase
         $this->http_client->response($this->controller, "select_screen_phase" . "/" . getScreeningPhaseId("Title"));
@@ -855,7 +863,8 @@ class ScreeningUnitTest
             "paper_source_status" => "all",
             "user_1" => getAdminUserId(),
             "user_2" => getTestUserId(),
-            "reviews_per_paper" => 2
+            "reviews_per_paper" => 2,
+            "assign_all_paper_checkbox" => "on"
         ];
         //Select screening phase
         $this->http_client->response($this->controller, "select_screen_phase" . "/" . getScreeningPhaseId("Title"));
@@ -1827,7 +1836,8 @@ class ScreeningUnitTest
             "papers_sources" => "all",
             "paper_source_status" => "all",
             "user_1" => $AdminUserId,
-            "reviews_per_paper" => 1
+            "reviews_per_paper" => 1,
+            "assign_all_paper_checkbox" => "on"
         ];
         save_assignment_screen($data);
         for ($i = 1; $i <= 2; $i++) {
