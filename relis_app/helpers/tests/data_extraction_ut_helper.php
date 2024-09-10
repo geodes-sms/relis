@@ -21,6 +21,7 @@ class Data_extractionUnitTest
         $this->deActivateClassification();
         $this->displayAssignementForm();
         $this->saveAssignmentclass_emptyUsers();
+        $this->saveAssignment_3of5papers_2reviewers();
         $this->saveAssignment_5papers_1reviewer();
         $this->saveAssignment_6papers_3reviewers();
         $this->saveAssignment_5papers_3reviewers();
@@ -210,6 +211,56 @@ class Data_extractionUnitTest
     /*
      * Test 5
      * Action : class_assignment_save
+     * Description : Test the number of assignment per reviewer with 3 out of 5 papers to assign to 2 reviewers.
+     * Expected Paper assignements :
+     *          - The three assigned papers are added to the project database in the "assigned" table, one reviewer is assigned 1 papers and the other reviewer is assigned 2 papers.
+     *          - assign_class operation inserted in operations table in the project DB
+     */
+    private function saveAssignment_3of5papers_2reviewers()
+    {
+        $action = "class_assignment_save";
+        $test_name = "Handle the saving of paper assignments for classification with 3 out of 5 papers to assign to 2 reviewers";
+        $test_assignement = "Paper assignements";
+        $expected_assignement = "Assigned";
+        $actual_assignement = "Not assigned";
+
+        //initialise the Database
+        $this->TestInitialize();
+        //add 5 papers to test Project
+        addBibtextPapersToProject("relis_app/helpers/tests/testFiles/paper/5_bibPapers.bib");
+        //perform screening
+        assignPapers_and_performScreening([getAdminUserId()], 'Title');
+
+        $postData = ["number_of_users" => 2, "percentage" => 100, "user_1" => getAdminUserId(), "user_2" => getTestUserId(), "assign_all_paper_checkbox" => "off", "number_of_papers_to_assign" => 3];
+        $response = $this->http_client->response($this->controller, $action, $postData, "POST");
+
+        if ($response['status_code'] >= 400) {
+            $actual_assignement = "<span style='color:red'>" . $response['content'] . "</span>";
+        } else {
+            // Check the number of papers assigned to the first user
+            $nbrOfAssignment1 = $this->ci->db->query("SELECT COUNT(*) AS row_count FROM relis_dev_correct_" . getProjectShortName() . ".assigned WHERE assigned_user_id = " . getAdminUserId())->row_array()['row_count'];
+
+            // Check the number of papers assigned to the second user
+            $nbrOfAssignment2 = $this->ci->db->query("SELECT COUNT(*) AS row_count FROM relis_dev_correct_" . getProjectShortName() . ".assigned WHERE assigned_user_id = " . getTestUserId())->row_array()['row_count'];
+
+            //Check if the assign_class operation is inserted in operations table in the project DB
+            $operation = $this->ci->db->query("SELECT * FROM relis_dev_correct_" . getProjectShortName() . ".operations WHERE operation_type = 'assign_class' AND operation_desc = 'Assign  papers for classification' AND operation_state = 'Active' AND operation_active = 1")->row_array();
+
+            if (abs($nbrOfAssignment1 - $nbrOfAssignment2) == 1 && !empty($operation)) {
+                $actual_assignement = "Assigned";
+            }
+        }
+
+        // Cleanup: Remove the papers assignment and operation records
+        $this->ci->db->query("DELETE FROM relis_dev_correct_" . getProjectShortName() . ".assigned WHERE assigned_user_id IN (" . getAdminUserId() . ", " . getTestUserId() . ")");
+        $this->ci->db->query("DELETE FROM relis_dev_correct_" . getProjectShortName() . ".operations WHERE operation_type = 'assign_class' AND operation_desc = 'Assign papers for classification' AND operation_state = 'Active' AND operation_active = 1");
+
+        run_test($this->controller, $action, $test_name, $test_assignement, $expected_assignement, $actual_assignement);
+    }
+
+    /*
+     * Test 6
+     * Action : class_assignment_save
      * Description : Test the number of assignment per reviewer with 5 papers to assign to 1 reviewer.
      * Expected Paper assignements : 
      *          - The five assigned papers are added to the project database in the "assigned" table with the reviewer's user ID assigned to the "assigned_user_id" field for all five papers.
@@ -245,7 +296,7 @@ class Data_extractionUnitTest
     }
 
     /*
-     * Test 6
+     * Test 7
      * Action : class_assignment_save
      * Description : Test the number of assignment per reviewer with 6 papers to assign to 3 reviewers.
      * Expected Paper assignements : 
@@ -292,7 +343,7 @@ class Data_extractionUnitTest
     }
 
     /*
-     * Test 7
+     * Test 8
      * Action : class_assignment_save
      * Description : Test the number of assignment per reviewer with 5 papers to assign to 3 reviewers.
      * Expected Paper assignements : 
@@ -344,7 +395,7 @@ class Data_extractionUnitTest
     }
 
     /*
-     * Test 8
+     * Test 9
      * Action : class_assignment_save
      * Description : Test the number of assignment per reviewer with 5 papers to assign to 2 reviewers.
      * Expected Paper assignements : 
@@ -390,7 +441,7 @@ class Data_extractionUnitTest
     }
 
     /*
-     * Test 9
+     * Test 10
      * Action : display_paper
      * Description : Display paper details to perform classification
      * Expected displayed paper
@@ -426,7 +477,7 @@ class Data_extractionUnitTest
     }
 
     /*
-     * Test 10
+     * Test 11
      * Action : class_completion
      * Description : retrieves completion information for classification
      * Expected completion calculation
@@ -462,7 +513,7 @@ class Data_extractionUnitTest
     }
 
     /*
-     * Test 11
+     * Test 12
      * Action : list_classification
      * Description : display the list of all classifications done.
      * Expected HTTP Response Code : 200 OK (indicating a successful response from the server).
@@ -485,7 +536,7 @@ class Data_extractionUnitTest
     }
 
     /*
-     * Test 12
+     * Test 13
      * Action : list_classification
      * Description : display the list of all classifications done in page 7.
      * Expected HTTP Response Code : 200 OK (indicating a successful response from the server).
@@ -508,7 +559,7 @@ class Data_extractionUnitTest
     }
 
     /*
-     * Test 13
+     * Test 14
      * Action : list_classification
      * Description : display the list of all classifications done with no dynamic table.
      * Expected HTTP Response Code : 200 OK (indicating a successful response from the server).
@@ -531,7 +582,7 @@ class Data_extractionUnitTest
     }
 
     /*
-     * Test 14
+     * Test 15
      * Action : list_classification_dt
      * Description : display the list of all classifications done using Java script datatable.
      * Expected HTTP Response Code : 200 OK (indicating a successful response from the server).
@@ -554,7 +605,7 @@ class Data_extractionUnitTest
     }
 
     /*
-     * Test 15
+     * Test 16
      * Action : list_classification_dt
      * Description : display the list of all classifications done in page 7 using Java script datatable.
      * Expected HTTP Response Code : 200 OK (indicating a successful response from the server).
@@ -577,7 +628,7 @@ class Data_extractionUnitTest
     }
 
     /*
-     * Test 16
+     * Test 17
      * Action : search_classification
      * Description : Search and display classification info with a string that matches 5 papers.
      * Expected displayed papers and number of displayed papers: 5
@@ -612,7 +663,7 @@ class Data_extractionUnitTest
     }
 
     /*
-     * Test 17
+     * Test 18
      * Action : search_classification
      * Description : Search and display classification info with a string that matches 1 paper.
      * Expected displayed paper(s) and number of displayed papers: 1
@@ -651,7 +702,7 @@ class Data_extractionUnitTest
     }
 
     /*
-     * Test 18
+     * Test 19
      * Action : search_classification
      * Description : Search and display classification info with a string that matches 0 paper.
      * Expected displayed paper(s) and number of displayed papers: 0
@@ -687,7 +738,7 @@ class Data_extractionUnitTest
     }
 
     /*
-     * Test 19
+     * Test 20
      * Action : edit_classification
      * Description : Display the form to edit a classification.
      * Expected displayed correct form fields
@@ -735,7 +786,7 @@ class Data_extractionUnitTest
     }
 
     /*
-     * Test 20
+     * Test 21
      * Action : edit_classification
      * Description : Display the form to edit a classification with modal view.
      * Expected HTTP Response Code : 200 OK (indicating a successful response from the server).
@@ -758,7 +809,7 @@ class Data_extractionUnitTest
     }
 
     /*
-     * Test 21
+     * Test 22
      * Action : new_classification
      * Description : Display the form for a new classification.
      * Expected displayed correct form fields
@@ -807,7 +858,7 @@ class Data_extractionUnitTest
     }
 
     /*
-     * Test 22
+     * Test 23
      * Action : new_classification_modal
      * Description : Display the form for a new classification in the modal view.
      * Expected HTTP Response Code : 200 OK (indicating a successful response from the server).
@@ -830,7 +881,7 @@ class Data_extractionUnitTest
     }
 
     /*
-     * Test 23
+     * Test 24
      * Action : class_assignment_validation_set
      * Description : load the view to display the classification validation assignment form
      * Expected Number of users available for classification validation
@@ -876,7 +927,7 @@ class Data_extractionUnitTest
     }
 
     /*
-     * Test 24
+     * Test 25
      * Action : class_validation_assignment_save
      * Description : Handle the saving of paper assignments for classification validation with empty percentage in POST request.
      * Expected Paper assignements : 
@@ -912,7 +963,7 @@ class Data_extractionUnitTest
     }
 
     /*
-     * Test 25
+     * Test 26
      * Action : class_validation_assignment_save
      * Description : Handle the saving of paper assignments for classification validation with Wrong percentage (150%) in POST request.
      * Expected Paper assignements : 
@@ -948,7 +999,7 @@ class Data_extractionUnitTest
     }
 
     /*
-     * Test 26
+     * Test 27
      * Action : class_validation_assignment_save
      * Description : Handle the saving of paper assignments for classification validation with empty users in POST request.
      * Expected Paper assignements : 
@@ -991,7 +1042,7 @@ class Data_extractionUnitTest
     }
 
     /*
-     * Test 27
+     * Test 28
      * Action : class_validation_assignment_save
      * Description : save the assignments of papers for classification validation with 30% of paper assignement.
      * Expected Paper assignements : 
@@ -1031,7 +1082,7 @@ class Data_extractionUnitTest
     }
 
     /*
-     * Test 28
+     * Test 29
      * Action : class_validation_assignment_save
      * Description : save the assignments of papers for classification validation with 100% of paper assignement.
      * Expected Paper assignements : 
@@ -1087,7 +1138,7 @@ class Data_extractionUnitTest
     }
 
     /*
-     * Test 29
+     * Test 30
      * Action : display_paper_validation
      * Description : Display paper details to perform classification validation
      * Expected displayed paper
@@ -1124,7 +1175,7 @@ class Data_extractionUnitTest
     }
 
     /*
-     * Test 30
+     * Test 31
      * Action : class_validate
      * Description : perform the validation of a classification for a specific paper as Correct QA.
      * Expected update in DB : In the assigned table, the validation field become "Correct"
@@ -1149,7 +1200,7 @@ class Data_extractionUnitTest
     }
 
     /*
-     * Test 31
+     * Test 32
      * Action : class_validate
      * Description : perform the validation of a classification for a specific paper as not correct QA.
      * Expected update in DB : In the assigned table, the validation field become "Not Correct"
@@ -1174,7 +1225,7 @@ class Data_extractionUnitTest
     }
 
     /*
-     * Test 32
+     * Test 33
      * Action : class_completion
      * Description : retrieves completion information for classification validation
      * Expected HTTP Response Code : 200
@@ -1198,7 +1249,7 @@ class Data_extractionUnitTest
     }
 
     /*
-     * Test 33
+     * Test 34
      * Action : remove_classification
      * Description : remove a classification entry for a project and redirect to data_extraction/display_paper
      * Expected removed classification: the class_active field in the classification table become 0
@@ -1223,7 +1274,7 @@ class Data_extractionUnitTest
     }
 
     /* 
-     * Test 34
+     * Test 35
      * Action : remove_classification
      * Description : remove a classification entry for a project and redirect to paper/view_paper
      * Expected removed classification: the class_active field in the classification table become 0
