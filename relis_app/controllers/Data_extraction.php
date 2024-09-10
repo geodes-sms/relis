@@ -968,6 +968,11 @@ class Data_extraction extends CI_Controller
 			$reviews_per_paper = 1;
 			$papers_all = $this->get_papers_for_classification();
 			$papers = $papers_all['papers_to_assign'];
+            if (isset($post_arr['assign_by_number_checkbox']) && $post_arr['assign_by_number_checkbox'] == 'on') {
+                $number_of_papers_to_assign = intval($post_arr['number_of_papers_to_assign']);
+            } else {
+                $number_of_papers_to_assign = count($papers);
+            }
 			//		print_test($papers);
 			$papers_to_validate_nbr = round(count($papers) * $percentage / 100);
 			$operation_description = "Assign  papers for classification";
@@ -978,7 +983,11 @@ class Data_extraction extends CI_Controller
 			$assign_papers = array();
 			$this->db2 = $this->load->database(project_db(), TRUE);
 			$operation_code = active_user_id() . "_" . time();
+            $assigned_count = 0;
 			foreach ($papers as $key => $value) {
+                if ($assigned_count >= $number_of_papers_to_assign) {
+                    break;
+                }
 				if ($key < $papers_to_validate_nbr) {
 					//$assign_papers[$key]['paper']=$value['id'];
 					//$assign_papers[$key]['users']=array();
@@ -1002,6 +1011,7 @@ class Data_extraction extends CI_Controller
 						$j++;
 					}
 				}
+                $assigned_count++;
 			}
 			//exit;
 			//	print_test();

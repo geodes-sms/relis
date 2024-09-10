@@ -792,7 +792,7 @@ class Screening extends CI_Controller
     function save_assignment_screen()
     {
         $post_arr = $this->input->post();
-        //	print_test($post_arr); exit;
+//        	print_test($post_arr); exit;
         $users = array();
         $i = 1;
         if (empty($post_arr['reviews_per_paper'])) {
@@ -822,11 +822,21 @@ class Screening extends CI_Controller
                 //Get all papers
                 //	$papers=$this->get_papers_to_screen($papers_sources);
                 $papers = $this->get_papers_to_screen($papers_sources, $paper_source_status);
+                if (isset($post_arr['assign_by_number_checkbox']) && $post_arr['assign_by_number_checkbox'] == 'on') {
+                    $number_of_papers_to_assign = intval($post_arr['number_of_papers_to_assign']);
+                } else {
+                    $number_of_papers_to_assign = count($papers['to_assign']);
+                }
                 //	print_test($papers); exit;
                 $assign_papers = array();
                 $this->db2 = $this->load->database(project_db(), TRUE);
                 $operation_code = active_user_id() . "_" . time();
+
+                $assigned_count = 0;
                 foreach ($papers['to_assign'] as $key => $value) {
+                    if ($assigned_count >= $number_of_papers_to_assign) {
+                        break;
+                    }
                     $assign_papers[$key]['paper'] = $value['id'];
                     $assign_papers[$key]['users'] = array();
                     $assignment_save = array(
@@ -853,6 +863,7 @@ class Screening extends CI_Controller
                         $this->db2->insert($table_name, $assignment_save);
                         $j++;
                     }
+                    $assigned_count++;
                 }
                 $operation_arr = array(
                     'operation_code' => $operation_code,

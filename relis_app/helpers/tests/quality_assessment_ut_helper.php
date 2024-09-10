@@ -23,6 +23,7 @@ class Quality_assessmentUnitTest
         $this->deActivateQA();
         $this->loadAssignmentView();
         $this->saveAssignmentQA_emptyUsers();
+        $this->saveAssignmentQA_2of5papers_2reviewers();
         $this->saveAssignmentQA_4papers_1reviewer();
         $this->saveAssignmentQA_6papers_3reviewers();
         $this->saveAssignmentQA_5papers_3reviewers();
@@ -237,8 +238,54 @@ class Quality_assessmentUnitTest
         run_test($this->controller, $action, $test_name, $test_assignement, $expected_assignement, $actual_assignement);
     }
 
+
     /*
      * Test 5
+     * Action : qa_assignment_save
+     * Description : Test the number of assignment per reviewer with 2 out of 5 papers to assign to 2 reviewers.
+     * Expected Paper assignements :
+     *          - The three assigned papers are added to the project database in the "qa_assignment" table, one reviewer is assigned 1 papers each.
+     *          - assign_qa operation inserted in operations table in the project DB
+     */
+    private function saveAssignmentQA_2of5papers_2reviewers()
+    {
+        $action = "qa_assignment_save";
+        $test_name = "Test the number of assignment per reviewer with 2 out of 5 papers to assign to 2 reviewers";
+        $test_assignement = "Paper assignements";
+        $expected_assignement = "Assigned";
+        $actual_assignement = "Not assigned";
+
+        //initialise the Database
+        $this->TestInitialize();
+        //add 5 papers to test Project
+        addBibtextPapersToProject("relis_app/helpers/tests/testFiles/paper/5_bibPapers.bib");
+        //perform screening
+        assignPapers_and_performScreening([getAdminUserId()], 'Title');
+
+        $postData = ["number_of_users" => 2, "percentage" => 100, "user_1" => getAdminUserId(), "user_2" => getTestUserId(), "assign_by_number_checkbox" => "on", "number_of_papers_to_assign" => 2];
+        $response = $this->http_client->response($this->controller, $action, $postData, "POST");
+
+        if ($response['status_code'] >= 400) {
+            $actual_assignement = "<span style='color:red'>" . $response['content'] . "</span>";
+        } else {
+            // Check the number of papers assigned to the first user
+            $nbrOfAssignment1 = $this->ci->db->query("SELECT COUNT(*) AS row_count FROM relis_dev_correct_" . getProjectShortName() . ".qa_assignment WHERE assigned_to = " . getAdminUserId())->row_array()['row_count'];
+            // Check the number of papers assigned to the second user
+            $nbrOfAssignment2 = $this->ci->db->query("SELECT COUNT(*) AS row_count FROM relis_dev_correct_" . getProjectShortName() . ".qa_assignment WHERE assigned_to = " . getTestUserId())->row_array()['row_count'];
+
+            //Check if the assign_qa operation is inserted in operations table in the project DB
+            $operation = $this->ci->db->query("SELECT * FROM relis_dev_correct_" . getProjectShortName() . ".operations WHERE operation_type = 'assign_qa' AND operation_desc = 'Assign  papers for QA' AND operation_state = 'Active' AND operation_active = 1")->row_array();
+
+            if ($nbrOfAssignment1 == 1 && $nbrOfAssignment2 == 1 && !empty($operation)) {
+                $actual_assignement = "Assigned";
+            }
+
+            run_test($this->controller, $action, $test_name, $test_assignement, $expected_assignement, $actual_assignement);
+        }
+    }
+
+    /*
+     * Test 6
      * Action : qa_assignment_save
      * Description : Test the number of assignment per reviewer with 4 papers to assign to 1 reviewer.
      * Expected Paper assignements : 
@@ -275,7 +322,7 @@ class Quality_assessmentUnitTest
     }
 
     /*
-     * Test 6
+     * Test 7
      * Action : qa_assignment_save
      * Description : Test the number of assignment per reviewer with 6 papers to assign to 3 reviewers.
      * Expected Paper assignements : 
@@ -324,7 +371,7 @@ class Quality_assessmentUnitTest
     }
 
     /*
-     * Test 7
+     * Test 8
      * Action : qa_assignment_save
      * Description : Test the number of assignment per reviewer with 5 papers to assign to 3 reviewers.
      * Expected Paper assignements : 
@@ -376,7 +423,7 @@ class Quality_assessmentUnitTest
     }
 
     /*
-     * Test 8
+     * Test 9
      * Action : qa_assignment_save
      * Description : Test the number of assignment per reviewer with 5 papers to assign to 2 reviewers.
      * Expected Paper assignements : 
@@ -421,7 +468,7 @@ class Quality_assessmentUnitTest
     }
 
     /*
-     * Test 9
+     * Test 10
      * Action : qa_conduct_list
      * Description : Display the list of all QA conduct results 
      * Expected number of papers listed
@@ -461,7 +508,7 @@ class Quality_assessmentUnitTest
     }
 
     /*
-     * Test 10
+     * Test 11
      * Action : qa_conduct_list
      * Description : display the list of pending QA conduct results
      * Expected number of papers listed
@@ -492,7 +539,7 @@ class Quality_assessmentUnitTest
     }
 
     /*
-     * Test 11
+     * Test 12
      * Action : qa_conduct_list
      * Description : display the list of done QA conduct results
      * Expected number of papers listed
@@ -523,7 +570,7 @@ class Quality_assessmentUnitTest
     }
 
     /*
-     * Test 12
+     * Test 13
      * Action : qa_conduct_list
      * Description : display the list of excluded QA conduct results
      * Expected number of papers listed
@@ -556,7 +603,7 @@ class Quality_assessmentUnitTest
     }
 
     /*
-     * Test 13
+     * Test 14
      * Action : qa_conduct_list
      * Description : display the list of a specific QA conduct results
      * Expected paper listed
@@ -585,7 +632,7 @@ class Quality_assessmentUnitTest
 
     /*
      * 
-     * Test 14 
+     * Test 15
      * Action : qa_conduct_save
      * Description : Edit the QA done for a paper
      * Expected database update: 
@@ -631,7 +678,7 @@ class Quality_assessmentUnitTest
     }
 
     /*
-     * Test 15
+     * Test 16
      * Action : qa_completion
      * Description : retrieves and display completion information for QA
      * Expected HTTP Response Code : 200
@@ -655,7 +702,7 @@ class Quality_assessmentUnitTest
     }
 
     /*
-     * Test 16
+     * Test 17
      * Action : qa_conduct_detail
      * Description : display the detailed information and results of a specific quality assessment (QA) conduct
      * Expected HTTP Response Code : 200
@@ -679,7 +726,7 @@ class Quality_assessmentUnitTest
     }
 
     /*
-     * Test 17
+     * Test 18
      * Action : qa_exlusion
      * Description : exclude a paper from quality assessment
      * Expected update in DB : In the paper table, the screening_status field become "Excluded_QA" and classification_status field become "Waiting"
@@ -704,7 +751,7 @@ class Quality_assessmentUnitTest
     }
 
     /*
-     * Test 18
+     * Test 19
      * Action : qa_exlusion
      * Description : cancel the exclusion of a paper from quality assessment
      * Expected update in DB : In the paper table, the screening_status field become "Included" and classification_status field become "To classify"
@@ -729,7 +776,7 @@ class Quality_assessmentUnitTest
     }
 
     /*
-     * Test 19
+     * Test 20
      * Action : qa_conduct_save
      * Description : save the QA for a paper by answering all QA questions.
      * Expected QA score : 4.5
@@ -803,7 +850,7 @@ class Quality_assessmentUnitTest
     }
 
     /*
-     * Test 20
+     * Test 21
      * Action : qa_conduct_save
      * Description : save the QA for a paper by answering only one QA question.
      * Expected database update: 
@@ -866,7 +913,7 @@ class Quality_assessmentUnitTest
     }
 
     /*
-     * Test 21
+     * Test 22
      * Action : qa_conduct_result
      * Description : display the overall result of all quality assessment (QA) conducts
      * Expected correct score for each QA assessment
@@ -901,7 +948,7 @@ class Quality_assessmentUnitTest
     }
 
     /*
-     * Test 22
+     * Test 23
      * Action : qa_conduct_result
      * Description : display the overall result of excluded quality assessment (QA) conducts
      * Expected HTTP Response Code : 200
@@ -927,7 +974,7 @@ class Quality_assessmentUnitTest
     }
 
     /*
-     * Test 23
+     * Test 24
      * Action : qa_assignment_validation_set
      * Description : loads the form for assigning papers for quality assessment validation
      * Expected HTTP Response Code : 200
@@ -960,7 +1007,7 @@ class Quality_assessmentUnitTest
     }
 
     /*
-     * Test 24
+     * Test 25
      * Action : qa_validation_assignment_save
      * Description : Handle the saving of paper assignments for QA validation with empty percentage in POST request.
      * Expected Paper assignements : 
@@ -996,7 +1043,7 @@ class Quality_assessmentUnitTest
     }
 
     /*
-     * Test 25
+     * Test 26
      * Action : qa_validation_assignment_save
      * Description : Handle the saving of paper assignments for QA validation with invalid percentage (>100) in POST request.
      * Expected Paper assignements : 
@@ -1032,7 +1079,7 @@ class Quality_assessmentUnitTest
     }
 
     /*
-     * Test 26
+     * Test 27
      * Action : qa_validation_assignment_save
      * Description : Handle the saving of paper assignments for QA validation with empty users in POST request.
      * Expected Paper assignements : 
@@ -1068,7 +1115,7 @@ class Quality_assessmentUnitTest
     }
 
     /*
-     * Test 27
+     * Test 28
      * Action : qa_validation_assignment_save
      * Description : save the assignments of papers for quality assessment validation with 30% of paper assignement.
      * Expected Paper assignements : 
@@ -1112,7 +1159,7 @@ class Quality_assessmentUnitTest
     }
 
     /*
-     * Test 28
+     * Test 29
      * Action : qa_validation_assignment_save
      * Description : save the assignments of papers for quality assessment validation with 100% of paper assignement.
      * Expected Paper assignements : 
@@ -1163,7 +1210,7 @@ class Quality_assessmentUnitTest
     }
 
     /*
-     * Test 29
+     * Test 30
      * Action : qa_conduct_list_val
      * Description : display the list of all QA validation conduct results
      * Expected number of papers listed
@@ -1206,7 +1253,7 @@ class Quality_assessmentUnitTest
     }
 
     /*
-     * Test 30
+     * Test 31
      * Action : qa_conduct_list_val
      * Description : display the list of pending QA validation conduct results
      * Expected number of papers listed
@@ -1237,7 +1284,7 @@ class Quality_assessmentUnitTest
     }
 
     /*
-     * Test 31
+     * Test 32
      * Action : qa_conduct_list_val
      * Description : display the list of done QA validation conduct results
      * Expected number of papers listed
@@ -1268,7 +1315,7 @@ class Quality_assessmentUnitTest
     }
 
     /*
-     * Test 32
+     * Test 33
      * Action : qa_conduct_list_val
      * Description : display the list of excluded QA validation conduct results
      * Expected number of papers listed
@@ -1300,7 +1347,7 @@ class Quality_assessmentUnitTest
     }
 
     /*
-     * Test 33
+     * Test 34
      * Action : qa_conduct_list_val
      * Description : display the list of a specific QA validation conduct results
      * Expected number of papers listed
@@ -1329,7 +1376,7 @@ class Quality_assessmentUnitTest
     }
 
     /*
-     * Test 34
+     * Test 35
      * Action : qa_completion
      * Description : retrieves and display completion information for QA validation
      * Expected HTTP Response Code : 200
@@ -1353,7 +1400,7 @@ class Quality_assessmentUnitTest
     }
 
     /*
-     * Test 35
+     * Test 36
      * Action : qa_exclude_low_quality
      * Description : exclude all papers with low quality
      * Expected update in DB : In the paper table, the screening_status field become "Excluded_QA" and classification_status field become "Waiting"
@@ -1386,7 +1433,7 @@ class Quality_assessmentUnitTest
     }
 
     /*
-     * Test 36
+     * Test 37
      * Action : qa_validate
      * Description : perform the validation of a quality assessment for a specific paper as Correct QA.
      * Expected update in DB : In the qa_validation_assignment table, the validation field become "Correct"
@@ -1415,7 +1462,7 @@ class Quality_assessmentUnitTest
     }
 
     /*
-     * Test 37
+     * Test 38
      * Action : qa_validate
      * Description : perform the validation of a quality assessment for a specific paper as not correct QA.
      * Expected update in DB : In the qa_validation_assignment table, the validation field become "Not Correct"
@@ -1440,7 +1487,7 @@ class Quality_assessmentUnitTest
     }
 
     /*
-     * Test 38
+     * Test 39
      * Action : qa
      * Description : handles various aspects related to the QA perspective.
      * Expected HTTP Response Code : 200

@@ -75,6 +75,25 @@
 
               echo input_form_bm(lng('Reviews per paper'), 'reviews_per_paper', 'reviews_per_paper', $reviews_per_paper);
 
+              echo "<hr/>";
+
+              $label = "Assign a number of papers";
+              $name = 'assign_by_number_checkbox';
+              $id = 'assign_by_number_checkbox';
+              echo '<div class="form-group">';
+              echo form_label($label, $name, array('class' => 'control-label col-md-3 col-sm-3 col-xs-12'));
+              echo '<div class="col-md-6 col-sm-6 col-xs-12">';
+              echo '<input type="checkbox" id="' . $id . '" name="' . $name . '" class="js-switch" onchange="toggleNumberPapersField()" />';
+              echo '</div></div>';
+
+              echo '<div id="number_of_papers_field" style="display: none;">';
+              echo '<div class="form-group">';
+              echo form_label('The number of papers to assign', 'number_of_papers_to_assign', array('class' => 'control-label col-md-3 col-sm-3 col-xs-12'));
+              echo '<div class="col-md-6 col-sm-6 col-xs-12">';
+              echo '<input type="number" id="number_of_papers_to_assign" name="number_of_papers_to_assign" min="0" max="' . $number_papers . '" class="form-control" value="0" />';
+              echo '</div></div>';
+              echo '</div>';
+
 
               ?>
               <div class="ln_solid"></div>
@@ -121,3 +140,15 @@
   </div>
 </div>
 <!-- /page content -->
+
+<script>
+    function toggleNumberPapersField() {
+        var checkbox = document.getElementById('assign_by_number_checkbox');
+        var numberField = document.getElementById('number_of_papers_field');
+        if (checkbox.checked) {
+            numberField.style.display = 'block';
+        } else {
+            numberField.style.display = 'none';
+        }
+    }
+</script>
