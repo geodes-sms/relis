@@ -636,10 +636,19 @@ function save_assignment_screen($data)
             $reviews_per_paper = $post_arr['reviews_per_paper'];
             //Get all papers
             $papers = get_papers_to_screen($papers_sources, $paper_source_status);
+            if (isset($post_arr['assign_all_paper_checkbox']) && $post_arr['assign_all_paper_checkbox'] == 'off') {
+                $number_of_papers_to_assign = intval($post_arr['number_of_papers_to_assign']);
+            } else {
+                $number_of_papers_to_assign = count($papers['to_assign']);
+            }
             $assign_papers = array();
             $ci->db2 = $ci->load->database(project_db(), TRUE);
             $operation_code = active_user_id() . "_" . time();
+            $assigned_count = 0;
             foreach ($papers['to_assign'] as $key => $value) {
+                if ($assigned_count >= $number_of_papers_to_assign) {
+                    break;
+                }
                 $assign_papers[$key]['paper'] = $value['id'];
                 $assign_papers[$key]['users'] = array();
                 $assignment_save = array(
@@ -666,6 +675,7 @@ function save_assignment_screen($data)
                     $ci->db2->insert("relis_dev_correct_" . getProjectShortName() . "." . $table_name, $assignment_save);
                     $j++;
                 }
+                $assigned_count++;
             }
             $operation_arr = array(
                 'operation_code' => $operation_code,
