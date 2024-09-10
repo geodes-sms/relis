@@ -83,7 +83,8 @@
               echo '<div class="form-group">';
               echo form_label($label, $name, array('class' => 'control-label col-md-3 col-sm-3 col-xs-12'));
               echo '<div class="col-md-6 col-sm-6 col-xs-12">';
-              echo '<input type="checkbox" id="' . $id . '" name="' . $name . '" class="js-switch" onchange="toggleNumberPapersField()" checked />';
+              echo '<input type="hidden" name="' . $name . '" value="off">';
+              echo '<input type="checkbox" id="' . $id . '" name="' . $name . '" class="js-switch" onchange="toggleNumberPapersField()" value="on" checked />';
               echo '</div></div>';
 
               echo '<div id="number_of_papers_field" style="display: none;">';

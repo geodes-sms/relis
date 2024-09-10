@@ -275,7 +275,7 @@ class Data_extractionUnitTest
         $actual_assignement = "Not assigned";
 
         $userId = getAdminUserId(); //reviewer user ID
-        $postData = ["number_of_users" => 1, "percentage" => 100, "user_1" => $userId];
+        $postData = ["number_of_users" => 1, "percentage" => 100, "user_1" => $userId, "assign_all_paper_checkbox" => "on"];
         $response = $this->http_client->response($this->controller, $action, $postData, "POST");
 
         if ($response['status_code'] >= 400) {
@@ -318,7 +318,7 @@ class Data_extractionUnitTest
         //perform screening
         assignPapers_and_performScreening([getAdminUserId()], 'Title');
 
-        $postData = ["number_of_users" => 3, "percentage" => 100, "user_1" => getAdminUserId(), "user_2" => getTestUserId(), "user_3" => getDemoUserId()];
+        $postData = ["number_of_users" => 3, "percentage" => 100, "user_1" => getAdminUserId(), "user_2" => getTestUserId(), "user_3" => getDemoUserId(), "assign_all_paper_checkbox" => "on"];
         $response = $this->http_client->response($this->controller, $action, $postData, "POST");
 
         if ($response['status_code'] >= 400) {
@@ -365,7 +365,7 @@ class Data_extractionUnitTest
         //perform screening
         assignPapers_and_performScreening([getAdminUserId()], 'Title');
 
-        $postData = ["number_of_users" => 3, "percentage" => 100, "user_1" => getAdminUserId(), "user_2" => getTestUserId(), "user_3" => getDemoUserId()];
+        $postData = ["number_of_users" => 3, "percentage" => 100, "user_1" => getAdminUserId(), "user_2" => getTestUserId(), "user_3" => getDemoUserId(), "assign_all_paper_checkbox" => "on"];
         $response = $this->http_client->response($this->controller, $action, $postData, "POST");
 
         if ($response['status_code'] >= 400) {
@@ -417,7 +417,7 @@ class Data_extractionUnitTest
         //perform screening
         assignPapers_and_performScreening([getAdminUserId()], 'Title');
 
-        $postData = ["number_of_users" => 2, "percentage" => 100, "user_1" => getAdminUserId(), "user_2" => getTestUserId()];
+        $postData = ["number_of_users" => 2, "percentage" => 100, "user_1" => getAdminUserId(), "user_2" => getTestUserId(), "assign_all_paper_checkbox" => "on"];
         $response = $this->http_client->response($this->controller, $action, $postData, "POST");
 
         if ($response['status_code'] >= 400) {
