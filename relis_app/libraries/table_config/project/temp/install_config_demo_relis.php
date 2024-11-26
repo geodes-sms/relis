@@ -194,12 +194,70 @@ $config['classification']['fields'][ 'brand']=array(
  	}
  		
  		
-$config['classification']['fields'][ 'cocoa_origin']=array( 		
+$config['cocoa_origin']['table_name']='cocoa_origin';
+$config['cocoa_origin']['table_id']='cocoa_origin_id';
+$config['cocoa_origin']['table_active_field']='cocoa_origin_active';
+$config['cocoa_origin']['main_field']='cocoa_origin';
+$config['cocoa_origin']['order_by']='cocoa_origin_id ASC ';
+
+
+$config['cocoa_origin']['reference_title']='Cocoa origin';
+$config['cocoa_origin']['reference_title_min']='Cocoa origin';
+		
+$config['cocoa_origin']['entity_label_plural']='Cocoa origin';
+$config['cocoa_origin']['entity_label']='Cocoa origin';
+
+
+$config['cocoa_origin']['links'][ 'edit']=array(
+	   			'label'=>'Edit',
+	   			'title'=>'Edit ',
+	   			'on_list'=>False,
+	   			'on_view'=>True
+	   	);
+
+$config['cocoa_origin']['links'][ 'view']=array(
+	   			'label'=>'View',
+	   			'title'=>'View',
+	   			'on_list'=>True,
+	   			'on_view'=>True
+	   	);
+	   	
+$config['cocoa_origin']['fields']['cocoa_origin_id']=array(
+			   	'field_title'=>'#',
+			   	'field_type'=>'int',
+			   	'field_size'=>11,
+			   	'field_value'=>'auto_increment',					   	
+			   	'default_value'=>'auto_increment',
+			   	//to clean
+			   	'on_add'=>'hidden',
+			   	'on_edit'=>'hidden',
+			   	'on_list'=>'show',
+			   	'on_view'=>'hidden'
+			   	);
+$config['cocoa_origin']['fields']['parent_field_id']=array(
+					   	'category_type'=>'ParentExternalKey',
+					   	'field_title'=>'Parent',
+					   	'field_type'=>'int',
+					   	//'field_value'=>'normal',
+					   	'field_size'=>11,
+					   	'mandatory'=>' mandatory ',
+					   	'input_type'=>'select',
+					   	'input_select_source'=>'table',
+					   	'input_select_values'=>'classification',
+					   	//to clean
+					   	'compute_result'=>'no',							   
+					   	'on_add'=>'hidden',
+					   	'on_edit'=>'hidden',
+					   	'on_list'=>'hidden',
+					   	'on_view'=>'hidden'
+				);
+				
+$config['cocoa_origin']['fields'][ 'cocoa_origin']=array( 		
 	'category_type'=>'StaticCategory',		
  	'field_title'=>'Cocoa origin',	
  	'field_type'=>'text',
  	//'field_value'=>'normal',
- 	'number_of_values'=>'0',// a  verifier
+ 	'number_of_values'=>'1',// a  verifier
  	'field_size'=>20,
  	'input_type'=>'select',
  	'input_select_source'=>'array',
@@ -221,6 +279,40 @@ $config['classification']['fields'][ 'cocoa_origin']=array(
  	);   
  		
  		
+$config['cocoa_origin']['fields']['cocoa_origin_active']=array(
+					   	'field_title'=>'Active',
+					   	'field_type'=>'int',
+					   	'field_size'=>'1',
+					   	'field_value'=>'1',
+					   	//to clean				
+					   	'on_add'=>'not_set',
+					   	'on_edit'=>'not_set',
+					   	'on_list'=>'hidden',
+					   	'on_view'=>'hidden'
+			);
+$config['cocoa_origin']['operations']=array();
+			
+$config['classification']['fields'][ 'cocoa_origin']=array( 		
+	'category_type'=>'WithMultiValues',		
+ 	'field_title'=>'Cocoa origin',	
+ 	'field_type'=>'int',
+ 	'field_size'=>11,
+ 	//'field_value'=>'normal',
+ 	'number_of_values'=>'*',//a verifier
+ 	
+ 	
+ 	'input_type'=>'select',
+ 	'input_select_source'=>'table',
+ 	'input_select_values'=>'cocoa_origin',
+ 	'input_select_key_field'=>'parent_field_id',
+ 	'input_select_source_type'=>'normal',
+ 	'multi-select' => 'Yes',
+ 	'on_add'=>'enabled',
+ 	'on_edit'=>'enabled',
+ 	'compute_result'=>'no',
+ 	'on_list'=>'show'				
+ 				);			
+
 $config['classification']['fields'][ 'cocoa_level']=array( 		
 	'category_type'=>'StaticCategory',		
  	'field_title'=>'Cocoa level',	
@@ -252,12 +344,70 @@ $config['classification']['fields'][ 'cocoa_level']=array(
  	);   
  		
  		
-$config['classification']['fields'][ 'types']=array( 		
+$config['types']['table_name']='types';
+$config['types']['table_id']='types_id';
+$config['types']['table_active_field']='types_active';
+$config['types']['main_field']='types';
+$config['types']['order_by']='types_id ASC ';
+
+
+$config['types']['reference_title']='Types';
+$config['types']['reference_title_min']='Types';
+		
+$config['types']['entity_label_plural']='Types';
+$config['types']['entity_label']='Types';
+
+
+$config['types']['links'][ 'edit']=array(
+	   			'label'=>'Edit',
+	   			'title'=>'Edit ',
+	   			'on_list'=>False,
+	   			'on_view'=>True
+	   	);
+
+$config['types']['links'][ 'view']=array(
+	   			'label'=>'View',
+	   			'title'=>'View',
+	   			'on_list'=>True,
+	   			'on_view'=>True
+	   	);
+	   	
+$config['types']['fields']['types_id']=array(
+			   	'field_title'=>'#',
+			   	'field_type'=>'int',
+			   	'field_size'=>11,
+			   	'field_value'=>'auto_increment',					   	
+			   	'default_value'=>'auto_increment',
+			   	//to clean
+			   	'on_add'=>'hidden',
+			   	'on_edit'=>'hidden',
+			   	'on_list'=>'show',
+			   	'on_view'=>'hidden'
+			   	);
+$config['types']['fields']['parent_field_id']=array(
+					   	'category_type'=>'ParentExternalKey',
+					   	'field_title'=>'Parent',
+					   	'field_type'=>'int',
+					   	//'field_value'=>'normal',
+					   	'field_size'=>11,
+					   	'mandatory'=>' mandatory ',
+					   	'input_type'=>'select',
+					   	'input_select_source'=>'table',
+					   	'input_select_values'=>'classification',
+					   	//to clean
+					   	'compute_result'=>'no',							   
+					   	'on_add'=>'hidden',
+					   	'on_edit'=>'hidden',
+					   	'on_list'=>'hidden',
+					   	'on_view'=>'hidden'
+				);
+				
+$config['types']['fields'][ 'types']=array( 		
 	'category_type'=>'StaticCategory',		
  	'field_title'=>'Types',	
  	'field_type'=>'text',
  	//'field_value'=>'normal',
- 	'number_of_values'=>'0',// a  verifier
+ 	'number_of_values'=>'1',// a  verifier
  	'field_size'=>20,
  	'input_type'=>'select',
  	'input_select_source'=>'array',
@@ -279,6 +429,40 @@ $config['classification']['fields'][ 'types']=array(
  	);   
  		
  		
+$config['types']['fields']['types_active']=array(
+					   	'field_title'=>'Active',
+					   	'field_type'=>'int',
+					   	'field_size'=>'1',
+					   	'field_value'=>'1',
+					   	//to clean				
+					   	'on_add'=>'not_set',
+					   	'on_edit'=>'not_set',
+					   	'on_list'=>'hidden',
+					   	'on_view'=>'hidden'
+			);
+$config['types']['operations']=array();
+			
+$config['classification']['fields'][ 'types']=array( 		
+	'category_type'=>'WithMultiValues',		
+ 	'field_title'=>'Types',	
+ 	'field_type'=>'int',
+ 	'field_size'=>11,
+ 	//'field_value'=>'normal',
+ 	'number_of_values'=>'*',//a verifier
+ 	
+ 	
+ 	'input_type'=>'select',
+ 	'input_select_source'=>'table',
+ 	'input_select_values'=>'types',
+ 	'input_select_key_field'=>'parent_field_id',
+ 	'input_select_source_type'=>'normal',
+ 	'multi-select' => 'Yes',
+ 	'on_add'=>'enabled',
+ 	'on_edit'=>'enabled',
+ 	'compute_result'=>'no',
+ 	'on_list'=>'show'				
+ 				);			
+
 $config['variety']['table_name']='variety';
 $config['variety']['table_id']='variety_id';
 $config['variety']['table_active_field']='variety_active';
@@ -619,8 +803,8 @@ $result[ 'qa' ]=$qa;
 
  		
 $screening=array();
-$screening['review_per_paper']='2';
-$screening['conflict_type']='ExclusionCriteria';
+$screening['review_per_paper']='1';
+$screening['review_per_paper']='ExclusionCriteria';
 $screening['conflict_resolution']='Unanimity';
 $screening['validation_assigment_mode']='Normal';
 $screening['validation_percentage']='10';
