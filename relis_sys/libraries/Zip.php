@@ -6,7 +6,7 @@
  *
  * This content is released under the MIT License (MIT)
  *
- * Copyright (c) 2014 - 2017, British Columbia Institute of Technology
+ * Copyright (c) 2019 - 2022, CodeIgniter Foundation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,8 +29,9 @@
  * @package	CodeIgniter
  * @author	EllisLab Dev Team
  * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (https://ellislab.com/)
- * @copyright	Copyright (c) 2014 - 2017, British Columbia Institute of Technology (http://bcit.ca/)
- * @license	http://opensource.org/licenses/MIT	MIT License
+ * @copyright	Copyright (c) 2014 - 2019, British Columbia Institute of Technology (https://bcit.ca/)
+ * @copyright	Copyright (c) 2019 - 2022, CodeIgniter Foundation (https://codeigniter.com/)
+ * @license	https://opensource.org/licenses/MIT	MIT License
  * @link	https://codeigniter.com
  * @since	Version 1.0.0
  * @filesource
@@ -50,7 +51,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @subpackage	Libraries
  * @category	Encryption
  * @author		EllisLab Dev Team
- * @link		https://codeigniter.com/user_guide/libraries/zip.html
+ * @link		https://codeigniter.com/userguide3/libraries/zip.html
  */
 class CI_Zip {
 
@@ -106,11 +107,11 @@ class CI_Zip {
 	public $compression_level = 2;
 
 	/**
-	 * mbstring.func_override flag
+	 * mbstring.func_overload flag
 	 *
 	 * @var	bool
 	 */
-	protected static $func_override;
+	protected static $func_overload;
 
 	/**
 	 * Initialize zip compression class
@@ -119,7 +120,7 @@ class CI_Zip {
 	 */
 	public function __construct()
 	{
-		isset(self::$func_override) OR self::$func_override = (extension_loaded('mbstring') && ini_get('mbstring.func_override'));
+		isset(self::$func_overload) OR self::$func_overload = ( ! is_php('8.0') && extension_loaded('mbstring') && @ini_get('mbstring.func_overload'));
 
 		$this->now = time();
 		log_message('info', 'Zip Compression Class Initialized');
@@ -406,13 +407,14 @@ class CI_Zip {
 			return FALSE;
 		}
 
-		return $this->zipdata
-			.$this->directory."\x50\x4b\x05\x06\x00\x00\x00\x00"
+		// @see https://github.com/bcit-ci/CodeIgniter/issues/5864
+		$footer = $this->directory."\x50\x4b\x05\x06\x00\x00\x00\x00"
 			.pack('v', $this->entries) // total # of entries "on this disk"
 			.pack('v', $this->entries) // total # of entries overall
 			.pack('V', self::strlen($this->directory)) // size of central dir
 			.pack('V', self::strlen($this->zipdata)) // offset to start of central dir
 			."\x00\x00"; // .zip file comment length
+		return $this->zipdata.$footer;
 	}
 
 	// --------------------------------------------------------------------
@@ -500,7 +502,7 @@ class CI_Zip {
 	 */
 	protected static function strlen($str)
 	{
-		return (self::$func_override)
+		return (self::$func_overload)
 			? mb_strlen($str, '8bit')
 			: strlen($str);
 	}
@@ -517,7 +519,7 @@ class CI_Zip {
 	 */
 	protected static function substr($str, $start, $length = NULL)
 	{
-		if (self::$func_override)
+		if (self::$func_overload)
 		{
 			// mb_substr($str, $start, null, '8bit') returns an empty
 			// string on PHP 5.3
