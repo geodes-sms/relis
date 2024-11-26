@@ -14,10 +14,6 @@
 	}
 	
 	?>
-      <!--?  <span class="radio"  onclick="change_language()">
-               <span  class="change_lang button_lang">EN <input type="radio"  class="flat button_lang" <?php// echo $en_checked; ?> name="iCheckz" value="en"></span>
-               <span  class="change_lang button_lang"><input type="radio" class="flat button_lang" <?php// echo $fr_checked; ?> name="iCheckz" value="fr"> FR &nbsp&nbsp | </span> 
-        </span>-->
         <span  class="change_lang button_lang"><br/>
         <a title="<?php echo $title ?>"  href="#" onclick="change_language()">
        
