@@ -391,11 +391,11 @@ class DBConnection_mdl extends CI_Model
 					}
 					if ($i == 0) {
 
-						$param .= "'" . mysqli_real_escape_string($this->db3->conn_id, $val) . "'";
+						$param .= "'" . mysqli_real_escape_string($this->db3->conn_id, $val ?? '') . "'";
 
 
 					} else {
-						$param .= ",'" . mysqli_real_escape_string($this->db3->conn_id, $val) . "'";
+						$param .= ",'" . mysqli_real_escape_string($this->db3->conn_id, $val ?? '') . "'";
 
 					}
 					$i = 1;
@@ -421,7 +421,7 @@ class DBConnection_mdl extends CI_Model
 						if (isset($value['input_type']) and $value['input_type'] == 'date' and empty($val)) {
 							$param .= "NULL";
 						} else {
-							$param .= "'" . mysqli_real_escape_string($this->db3->conn_id, $val) . "'";
+							$param .= "'" . mysqli_real_escape_string($this->db3->conn_id, $val ?? '') . "'";
 						}
 
 
@@ -432,7 +432,7 @@ class DBConnection_mdl extends CI_Model
 						if (isset($value['input_type']) and $value['input_type'] == 'date' and empty($val)) {
 							$param .= ", " . "NULL";
 						} else {
-							$param .= ",'" . mysqli_real_escape_string($this->db3->conn_id, $val) . "'";
+							$param .= ",'" . mysqli_real_escape_string($this->db3->conn_id, $val ?? '') . "'";
 						}
 					}
 					$i = 1;
@@ -515,7 +515,7 @@ class DBConnection_mdl extends CI_Model
 					if (isset($value['input_type']) and $value['input_type'] == 'date' and empty($val)) {
 						$param .= "NULL";
 					} else {
-						$param .= "'" . mysqli_real_escape_string($this->db3->conn_id, $val) . "'";
+						$param .= "'" . mysqli_real_escape_string($this->db3->conn_id, $val ?? '') . "'";
 					}
 
 
@@ -524,7 +524,7 @@ class DBConnection_mdl extends CI_Model
 					if (isset($value['input_type']) and $value['input_type'] == 'date' and empty($val)) {
 						$param .= ", " . "NULL";
 					} else {
-						$param .= ",'" . mysqli_real_escape_string($this->db3->conn_id, $val) . "'";
+						$param .= ",'" . mysqli_real_escape_string($this->db3->conn_id, $val ?? '') . "'";
 
 					}
 
