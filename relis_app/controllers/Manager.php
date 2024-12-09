@@ -740,7 +740,7 @@ class Manager extends CI_Controller
 		$multi_select_values = array();
 		foreach ($table_config['fields'] as $key => $value) {
 			$validation = "trim";
-			if ($value[$var_check] == 'enabled') {
+			if (isset($value[$var_check]) && $value[$var_check] == 'enabled') {
 				if (!empty($value['mandatory']) and (trim($value['mandatory']) == "mandatory")) {
 					if ((isset($value['multi-select']) and isset($value['multi-select']) == 'Yes')) {
 						if (empty($post_arr[$key])) {

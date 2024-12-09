@@ -1215,7 +1215,8 @@ class ScreeningUnitTest
             $actual_calculation = "";
 
             $content = strtolower(str_replace(' ', '', $response['content']));
-            if (strstr($content, "admin:" . count($papersAssignedToAdminUser) . "/" . count($papersAssignedToAdminUser)) != false && strstr($content, "christian:" . count($papersAssignedTotestUser) . "/" . count($papersAssignedTotestUser)) != false) {
+            //print_test($content);
+            if (strstr($content, "admintest:" . count($papersAssignedToAdminUser) . "/" . count($papersAssignedToAdminUser)) != false && strstr($content, "christian:" . count($papersAssignedTotestUser) . "/" . count($papersAssignedTotestUser)) != false) {
                 $actual_calculation = "admin: " . count($papersAssignedToAdminUser) . "/" . count($papersAssignedToAdminUser) . " - christian: " . count($papersAssignedTotestUser) . "/" . count($papersAssignedTotestUser);
             }
         }

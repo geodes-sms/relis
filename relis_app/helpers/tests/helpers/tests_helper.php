@@ -49,7 +49,7 @@ function getTestUserConfirmationCode()
 
 function getTestUserId()
 {
-    return getTestUserdetails()["user_id"];
+    return getTestUserdetails()["user_id"] ?? null;
 }
 
 function getDemoUserId()
@@ -148,7 +148,7 @@ function getProjectShortName()
 function getProjectId($projectName = "demoTestProject")
 {
     $ci = get_instance();
-    return $ci->db->query("SELECT project_id from projects where project_label LIKE '" . $projectName . "'")->row_array()['project_id'];
+    return $ci->db->query("SELECT project_id from projects where project_label LIKE '" . $projectName . "'")->row_array()['project_id'] ?? null;
 }
 
 function getProjectDetails($projectName = "demoTestProject")
@@ -186,7 +186,7 @@ function createDemoProject($projectName = "demoTestProject")
     preg_match('/8083\/(.*?)(\.html)?$/', $response['url'], $matches);
     $url = $matches[1];
 
-    if ($response["status_code"] == http_code()[303] && $url == "project/save_new_project_part2/" . $projectName) {
+    if ($response["status_code"] == '303' && $url == "project/save_new_project_part2/" . $projectName) {
         $http_client->response($url, "");
     }
 

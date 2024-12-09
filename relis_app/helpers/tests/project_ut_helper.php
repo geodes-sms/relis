@@ -196,7 +196,7 @@ class ProjectUnitTest
         $response = $this->http_client->response($this->controller, $action, ['fileFieldName' => 'install_config', 'filePath' => $filePath], "POST");
 
         $url = $this->http_client->getShortUrl($response['url']);
-        if ($response["status_code"] == http_code()[303] && $url == "project/save_new_project_part2/" . getProjectShortName()) {
+        if ($response["status_code"] == '303' && $url == "project/save_new_project_part2/" . getProjectShortName()) {
             $response = $this->http_client->response($url, "");
         }
 
@@ -387,7 +387,7 @@ class ProjectUnitTest
         $response = $this->http_client->response($this->controller, $action, ['selected_config' => $filePath], "POST");
 
         $url = $this->http_client->getShortUrl($response['url']);
-        if ($response["status_code"] == http_code()[303] && $url == "project/save_new_project_part2/" . getProjectShortName()) {
+        if ($response["status_code"] == '303' && $url == "project/save_new_project_part2/" . getProjectShortName()) {
             $response = $this->http_client->response($url, "");
         }
 
