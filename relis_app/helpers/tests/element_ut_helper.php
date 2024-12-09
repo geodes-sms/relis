@@ -595,7 +595,7 @@ class ElementUnitTest
         $response = $this->http_client->response($this->controller, $action . "/detail_classification/1");
 
         // follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], ['301', '302', '303', '307'])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 

@@ -1,4 +1,4 @@
-FROM php:7.3.30-apache-buster
+FROM php:8.1.31-apache
 
 ARG DIRECTORY_INDEX
 ARG DOCUMENT_ROOT
@@ -18,7 +18,7 @@ RUN apt-get autoclean && apt-get update && apt-get install -y \
 RUN apt-get install -y libicu-dev
 RUN docker-php-ext-install intl mysqli pdo pdo_mysql zip
 
-RUN if [ "$ENV" = "dev" ]; then pecl install xdebug-2.8.0 && docker-php-ext-enable xdebug; fi
+RUN if [ "$ENV" = "dev" ]; then pecl install xdebug-3.3.0 && docker-php-ext-enable xdebug; fi
 
 
 # Install Composer

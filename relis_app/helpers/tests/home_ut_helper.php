@@ -165,7 +165,7 @@ class HomeUnitTest
             $actual__updatedDB = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual__updatedDB = $this->ci->db->query("SELECT table_name FROM information_schema.tables WHERE table_name = 'TestTable' AND table_schema = 'relis_dev_correct_" . getProjectShortName() . "'")->row_array()['table_name'];
-            $actual__updatedDB = ($actual__updatedDB == "TestTable") ? 'Yes' : 'No';
+            $actual__updatedDB = (strtolower($actual__updatedDB) == strtolower("TestTable")) ? 'Yes' : 'No';
         }
 
         run_test($this->controller, $action, $test_name, $test_updatedDB, $expected_updatedDB, $actual__updatedDB);
@@ -236,7 +236,7 @@ class HomeUnitTest
         } else {
             $query1 = $this->ci->db->query("SELECT table_name FROM information_schema.tables WHERE table_name = 'TestTable2' AND table_schema = 'relis_dev_correct_" . getProjectShortName() . "'")->row_array()['table_name'];
             $query2 = $this->ci->db->query("SELECT table_name FROM information_schema.tables WHERE table_name = 'TestTable3' AND table_schema = 'relis_dev_correct_" . getProjectShortName() . "'")->row_array()['table_name'];
-            $actual__updatedDB = ($query1 == "TestTable2" && $query2 == "TestTable3") ? 'Yes' : 'No';
+            $actual__updatedDB = (strtolower($query1) == "testtable2" && strtolower($query2) == "testtable3") ? 'Yes' : 'No';
         }
 
         run_test($this->controller, $action, $test_name, $test_updatedDB, $expected_updatedDB, $actual__updatedDB);

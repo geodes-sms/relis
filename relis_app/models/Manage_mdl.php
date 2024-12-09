@@ -290,12 +290,12 @@ class Manage_mdl extends CI_Model
 				if($result_table){
 					
 					
-					if(strpos($json, 'num_rows'))
+					if(!empty($resu->num_rows))
 					$result['message']=$this->db2->query($sql)->result_array();
 					
 					
 				}
-				
+
 				return $result;
 				
 			}

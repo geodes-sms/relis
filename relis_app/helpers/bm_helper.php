@@ -1074,7 +1074,7 @@ function project_published($project_id = 'current')
 	//echo $sql;
 	$res = $ci->db->query($sql)->row_array();
 	//print_test($res);
-	if ($res['project_public']) {
+	if (!empty($res['project_public'])) {
 		return TRUE;
 	} else {
 		return FALSE;

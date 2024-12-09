@@ -106,7 +106,7 @@ class Paper_dataAccess extends CI_Model
 	 * Fonction pour récuperer la liste de papiers suivant la catégorie
 	 * Function to retrieve the list of papers according to the category
 	 */
-	function get_papers($paper_cat = "all", $ref_table_config, $val = '_', $page = 0, $rec_per_page = 0)
+	function get_papers($paper_cat = "all", $ref_table_config='', $val = '_', $page = 0, $rec_per_page = 0)
 	{
 		if ($rec_per_page == 0) {
 			$rec_per_page = $this->config->item('rec_per_page');

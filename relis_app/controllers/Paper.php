@@ -1460,7 +1460,7 @@ class Paper extends CI_Controller
     }
 
     //This function is responsible for rendering the form for adding or editing a bibtex paper in ReLiS.
-    public function bibler_add_paper($data = "", $operation = 'new', $display_type = "normal")
+    public function bibler_add_paper($data = [], $operation = 'new', $display_type = "normal")
     {
         $ref_table = "papers";
         if (admin_config($ref_table))
@@ -1481,7 +1481,7 @@ class Paper extends CI_Controller
          */
         foreach ($table_config['fields'] as $k => $v) {
             if (!empty($v['input_type']) and $v['input_type'] == 'select') {
-                if ($v['input_select_source'] == 'table' and ($v[$type_op] == 'enabled' or $v[$type_op] == 'disabled')) {
+                if ($v['input_select_source'] == 'table' and isset($v[$type_op]) and ($v[$type_op] == 'enabled' or $v[$type_op] == 'disabled')) {
                     if (isset($table_config['fields'][$k]['multi-select']) and $table_config['fields'][$k]['multi-select'] == 'Yes') {
                         $table_config['fields'][$k]['input_select_values'] = $this->manager_lib->get_reference_select_values($v['input_select_values'], False, False, True);
                     } else {

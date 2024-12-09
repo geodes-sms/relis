@@ -202,11 +202,11 @@ class RelisManagerUnitTest
         $response = $this->http_client->response($this->controller, $action . "/1");
 
         //follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], [301, 302, 303, 307])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 
-        if ($response['status_code'] != http_code()[200]) {
+        if ($response['status_code'] != 200) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual_value = http_code()[200];
@@ -230,11 +230,11 @@ class RelisManagerUnitTest
         $response = $this->http_client->response($this->controller, $action . "/1");
 
         //follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], [301, 302, 303, 307])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 
-        if ($response['status_code'] != http_code()[200]) {
+        if ($response['status_code'] != 200) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual_value = http_code()[200];

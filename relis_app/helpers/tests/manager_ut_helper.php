@@ -112,11 +112,11 @@ class ManagerUnitTest
         $response = $this->http_client->response($this->controller, $action . "/detail_str_mng/1");
 
         //follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], [301, 302, 303,307])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 
-        if ($response['status_code'] != http_code()[200]) {
+        if ($response['status_code'] != 200) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual_value = "No";
@@ -148,11 +148,11 @@ class ManagerUnitTest
         $response = $this->http_client->response($this->controller, $action . "/edit_info/1");
 
         //follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], [301, 302, 303,307])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 
-        if ($response['status_code'] != http_code()[200]) {
+        if ($response['status_code'] != 200) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual_value = http_code()[200];
@@ -178,11 +178,11 @@ class ManagerUnitTest
         $response = $this->http_client->response($this->controller, $action . "/configurations/1");
 
         //follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], [301, 302, 303,307])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 
-        if ($response['status_code'] != http_code()[200]) {
+        if ($response['status_code'] != 200) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual_value = "Yes";
@@ -208,11 +208,11 @@ class ManagerUnitTest
         $response = $this->http_client->response($this->controller, $action . "/detail_userproject/" . $userProject['userproject_id']);
 
         //follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], [301, 302, 303,307])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 
-        if ($response['status_code'] != http_code()[200]) {
+        if ($response['status_code'] != 200) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual_value = "No";
@@ -244,11 +244,11 @@ class ManagerUnitTest
         $response = $this->http_client->response($this->controller, $action . "/add_affiliation");
 
         //follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], [301, 302, 303,307])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 
-        if ($response['status_code'] != http_code()[200]) {
+        if ($response['status_code'] != 200) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual_value = http_code()[200];
@@ -272,11 +272,11 @@ class ManagerUnitTest
         $response = $this->http_client->response($this->controller, $action . "/add_author");
 
         //follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], [301, 302, 303,307])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 
-        if ($response['status_code'] != http_code()[200]) {
+        if ($response['status_code'] != 200) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual_value = http_code()[200];
@@ -300,11 +300,11 @@ class ManagerUnitTest
         $response = $this->http_client->response($this->controller, $action . "/add_exclusioncrieria");
 
         //follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], [301, 302, 303,307])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 
-        if ($response['status_code'] != http_code()[200]) {
+        if ($response['status_code'] != 200) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual_value = http_code()[200];
@@ -328,11 +328,11 @@ class ManagerUnitTest
         $response = $this->http_client->response($this->controller, $action . "/add_inclusioncriteria");
 
         //follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], [301, 302, 303,307])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 
-        if ($response['status_code'] != http_code()[200]) {
+        if ($response['status_code'] != 200) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual_value = http_code()[200];
@@ -356,11 +356,11 @@ class ManagerUnitTest
         $response = $this->http_client->response($this->controller, $action . "/add_info");
 
         //follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], [301, 302, 303,307])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 
-        if ($response['status_code'] != http_code()[200]) {
+        if ($response['status_code'] != 200) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual_value = http_code()[200];
@@ -384,11 +384,11 @@ class ManagerUnitTest
         $response = $this->http_client->response($this->controller, $action . "/add_paper");
 
         //follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], [301, 302, 303,307])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 
-        if ($response['status_code'] != http_code()[200]) {
+        if ($response['status_code'] != 200) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual_value = http_code()[200];
@@ -412,11 +412,11 @@ class ManagerUnitTest
         $response = $this->http_client->response($this->controller, $action . "/add_qa_questions");
 
         //follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], [301, 302, 303,307])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 
-        if ($response['status_code'] != http_code()[200]) {
+        if ($response['status_code'] != 200) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual_value = http_code()[200];
@@ -440,11 +440,11 @@ class ManagerUnitTest
         $response = $this->http_client->response($this->controller, $action . "/add_qa_responses");
 
         //follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], [301, 302, 303,307])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 
-        if ($response['status_code'] != http_code()[200]) {
+        if ($response['status_code'] != 200) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual_value = http_code()[200];
@@ -468,11 +468,11 @@ class ManagerUnitTest
         $response = $this->http_client->response($this->controller, $action . "/add_ref_brand");
 
         //follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], [301, 302, 303,307])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 
-        if ($response['status_code'] != http_code()[200]) {
+        if ($response['status_code'] != 200) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual_value = http_code()[200];
@@ -496,11 +496,11 @@ class ManagerUnitTest
         $response = $this->http_client->response($this->controller, $action . "/add_ref_variety");
 
         //follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], [301, 302, 303,307])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 
-        if ($response['status_code'] != http_code()[200]) {
+        if ($response['status_code'] != 200) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual_value = http_code()[200];
@@ -524,11 +524,11 @@ class ManagerUnitTest
         $response = $this->http_client->response($this->controller, $action . "/add_research_question");
 
         //follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], [301, 302, 303,307])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 
-        if ($response['status_code'] != http_code()[200]) {
+        if ($response['status_code'] != 200) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual_value = http_code()[200];
@@ -552,11 +552,11 @@ class ManagerUnitTest
         $response = $this->http_client->response($this->controller, $action . "/add_screen_phase");
 
         //follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], [301, 302, 303,307])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 
-        if ($response['status_code'] != http_code()[200]) {
+        if ($response['status_code'] != 200) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual_value = http_code()[200];
@@ -580,11 +580,11 @@ class ManagerUnitTest
         $response = $this->http_client->response($this->controller, $action . "/add_user");
 
         //follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], [301, 302, 303,307])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 
-        if ($response['status_code'] != http_code()[200]) {
+        if ($response['status_code'] != 200) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual_value = http_code()[200];
@@ -608,11 +608,11 @@ class ManagerUnitTest
         $response = $this->http_client->response($this->controller, $action . "/add_user_current_project");
 
         //follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], [301, 302, 303,307])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 
-        if ($response['status_code'] != http_code()[200]) {
+        if ($response['status_code'] != 200) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual_value = http_code()[200];
@@ -636,11 +636,11 @@ class ManagerUnitTest
         $response = $this->http_client->response($this->controller, $action . "/add_venue");
 
         //follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], [301, 302, 303,307])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 
-        if ($response['status_code'] != http_code()[200]) {
+        if ($response['status_code'] != 200) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual_value = http_code()[200];
@@ -664,11 +664,11 @@ class ManagerUnitTest
         $response = $this->http_client->response($this->controller, $action . "/edit_author/1");
 
         //follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], [301, 302, 303,307])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 
-        if ($response['status_code'] != http_code()[200]) {
+        if ($response['status_code'] != 200) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual_value = http_code()[200];
@@ -692,11 +692,11 @@ class ManagerUnitTest
         $response = $this->http_client->response($this->controller, $action . "/edit_exclusioncrieria/1");
 
         //follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], [301, 302, 303,307])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 
-        if ($response['status_code'] != http_code()[200]) {
+        if ($response['status_code'] != 200) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual_value = http_code()[200];
@@ -720,11 +720,11 @@ class ManagerUnitTest
         $response = $this->http_client->response($this->controller, $action . "/edit_paper/1");
 
         //follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], [301, 302, 303,307])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 
-        if ($response['status_code'] != http_code()[200]) {
+        if ($response['status_code'] != 200) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual_value = http_code()[200];
@@ -748,11 +748,11 @@ class ManagerUnitTest
         $response = $this->http_client->response($this->controller, $action . "/edit_qa_questions/1");
 
         //follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], [301, 302, 303,307])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 
-        if ($response['status_code'] != http_code()[200]) {
+        if ($response['status_code'] != 200) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual_value = http_code()[200];
@@ -776,11 +776,11 @@ class ManagerUnitTest
         $response = $this->http_client->response($this->controller, $action . "/edit_qa_responses/1");
 
         //follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], [301, 302, 303,307])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 
-        if ($response['status_code'] != http_code()[200]) {
+        if ($response['status_code'] != 200) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual_value = http_code()[200];
@@ -804,11 +804,11 @@ class ManagerUnitTest
         $response = $this->http_client->response($this->controller, $action . "/edit_ref_brand/1");
 
         //follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], [301, 302, 303,307])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 
-        if ($response['status_code'] != http_code()[200]) {
+        if ($response['status_code'] != 200) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual_value = http_code()[200];
@@ -832,11 +832,11 @@ class ManagerUnitTest
         $response = $this->http_client->response($this->controller, $action . "/edit_ref_variety/1");
 
         //follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], [301, 302, 303,307])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 
-        if ($response['status_code'] != http_code()[200]) {
+        if ($response['status_code'] != 200) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual_value = http_code()[200];
@@ -860,11 +860,11 @@ class ManagerUnitTest
         $response = $this->http_client->response($this->controller, $action . "/edit_screen_phase/1");
 
         //follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], [301, 302, 303,307])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 
-        if ($response['status_code'] != http_code()[200]) {
+        if ($response['status_code'] != 200) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual_value = http_code()[200];
@@ -888,11 +888,11 @@ class ManagerUnitTest
         $response = $this->http_client->response($this->controller, $action . "/edit_user/1");
 
         //follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], [301, 302, 303,307])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 
-        if ($response['status_code'] != http_code()[200]) {
+        if ($response['status_code'] != 200) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual_value = http_code()[200];
@@ -916,11 +916,11 @@ class ManagerUnitTest
         $response = $this->http_client->response($this->controller, $action . "/edit_venue/1");
 
         //follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], [301, 302, 303,307])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 
-        if ($response['status_code'] != http_code()[200]) {
+        if ($response['status_code'] != 200) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual_value = http_code()[200];
@@ -944,11 +944,11 @@ class ManagerUnitTest
         $response = $this->http_client->response($this->controller, $action . "/edit_assignment_class/2");
 
         //follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], [301, 302, 303,307])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 
-        if ($response['status_code'] != http_code()[200]) {
+        if ($response['status_code'] != 200) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual_value = http_code()[200];
@@ -972,11 +972,11 @@ class ManagerUnitTest
         $response = $this->http_client->response($this->controller, $action . "/edit_config_screening/1");
 
         //follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], [301, 302, 303,307])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 
-        if ($response['status_code'] != http_code()[200]) {
+        if ($response['status_code'] != 200) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual_value = http_code()[200];
@@ -1000,11 +1000,11 @@ class ManagerUnitTest
         $response = $this->http_client->response($this->controller, $action . "/edit_config_qa/1");
 
         //follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], [301, 302, 303,307])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 
-        if ($response['status_code'] != http_code()[200]) {
+        if ($response['status_code'] != 200) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual_value = http_code()[200];
@@ -1028,11 +1028,11 @@ class ManagerUnitTest
         $response = $this->http_client->response($this->controller, $action . "/edit_config_class/1");
 
         //follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], [301, 302, 303,307])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 
-        if ($response['status_code'] != http_code()[200]) {
+        if ($response['status_code'] != 200) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual_value = http_code()[200];
@@ -1056,11 +1056,11 @@ class ManagerUnitTest
         $response = $this->http_client->response($this->controller, $action . "/edit_conf_papers/1");
 
         //follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], [301, 302, 303,307])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 
-        if ($response['status_code'] != http_code()[200]) {
+        if ($response['status_code'] != 200) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual_value = http_code()[200];
@@ -1084,11 +1084,11 @@ class ManagerUnitTest
         $response = $this->http_client->response($this->controller, $action . "/edit_project/" . getProjectId());
 
         //follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], [301, 302, 303,307])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 
-        if ($response['status_code'] != http_code()[200]) {
+        if ($response['status_code'] != 200) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual_value = http_code()[200];
@@ -1140,11 +1140,11 @@ class ManagerUnitTest
         $response = $this->http_client->response($this->controller, $action, $postData, "POST");
 
         //follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], [301, 302, 303,307])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 
-        if ($response['status_code'] != http_code()[200]) {
+        if ($response['status_code'] != 200) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual_value = '1';
@@ -1188,11 +1188,11 @@ class ManagerUnitTest
         $response = $this->http_client->response($this->controller, $action, $postData, "POST");
 
         //follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], [301, 302, 303,307])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 
-        if ($response['status_code'] != http_code()[200]) {
+        if ($response['status_code'] != 200) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual_value = '1';
@@ -1234,11 +1234,11 @@ class ManagerUnitTest
         $response = $this->http_client->response($this->controller, $action, $postData, "POST");
 
         //follow redirect
-        while (in_array($response['status_code'], [http_code()[301], http_code()[302], http_code()[303], http_code()[307]])) {
+        while (in_array($response['status_code'], [301, 302, 303,307])) {
             $response = $this->http_client->response($this->http_client->getShortUrl($response['url']), "");
         }
 
-        if ($response['status_code'] != http_code()[200]) {
+        if ($response['status_code'] != 200) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
             $actual_value = '1';

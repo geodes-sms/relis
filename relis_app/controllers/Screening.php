@@ -973,7 +973,8 @@ class Screening extends CI_Controller
             // $this->highlight_search_term($content_item['title'], $search_query);
             $paper_detail = $this->DBConnection_mdl->get_row_details('papers', $data['the_paper']);
             // fetching the search query from the `ref_papers_sources` table
-            $search_query = $this->DBConnection_mdl->get_row_details('get_detail_papers_sources', $paper_detail['papers_sources'], TRUE)['ref_search_query'];
+            $detail_papers_sources = $this->DBConnection_mdl->get_row_details('get_detail_papers_sources', $paper_detail['papers_sources'], TRUE);
+            $search_query = $detail_papers_sources['ref_search_query'] ?? '';
             $data['paper_title'] = $paper_detail['bibtexKey'] . " - " . $this->highlight_search_term($paper_detail['title'], $search_query);
             // TODO: Change this screen to highlight the string
             if (in_array('Abstract', $displayed_fieds))
