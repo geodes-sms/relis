@@ -231,7 +231,8 @@ class Paper extends CI_Controller
          * Ajout de l'entête de la liste
          */
         if (!empty($data['list'])) {
-            $array_header = $field_list_header;;
+            $array_header = $field_list_header;
+            ;
             if (trim($data['list'][$key]['links']) != "") {
                 array_push($array_header, '');
             }
@@ -337,7 +338,8 @@ class Paper extends CI_Controller
                 } elseif ($v['input_select_source'] == 'table') {
                     $dropoboxes[$k] = $this->get_reference_select_values($v['input_select_values']);
                 }
-            };
+            }
+            ;
         }
         /*
          * Vérification des liens (links) a afficher sur la liste
@@ -577,7 +579,8 @@ class Paper extends CI_Controller
                 } elseif ($v['input_select_source'] == 'table') {
                     $dropoboxes[$k] = $this->get_reference_select_values($v['input_select_values']);
                 }
-            };
+            }
+            ;
         }
         $T_item_data_exclusion = array();
         $T_remove_exclusion_button = array();
@@ -620,7 +623,8 @@ class Paper extends CI_Controller
                 } elseif ($v['input_select_source'] == 'table') {
                     $dropoboxes[$k] = $this->get_reference_select_values($v['input_select_values']);
                 }
-            };
+            }
+            ;
         }
         $T_item_data_inclusion = array();
         $T_remove_inclusion_button = array();
@@ -663,7 +667,8 @@ class Paper extends CI_Controller
         } else {
             if (!empty($table_config['links']['add_child']['url']) and !empty($table_config['links']['add_child']['on_view']) and ($table_config['links']['add_child']['on_view'] == True)) {
                 //$data ['classification_button'] = '<li><a><button type="button" class="btn btn-success" data-toggle="modal" data-target="#relisformModal"  data-modal_link="manage/add_classification_modal/'.$ref_id.'"  data-operation_type="1" data-modal_title="Add classification  to : '.$paper_name.'" ><i class="fa fa-plus"></i> '.$table_config['links']['add_child']['label'] .' </button></a></li> ';
-                $data['classification_button'] = get_top_button('add', 'Add classification', 'manage/add_classification/' . $ref_id, 'Add classification') . " ";;
+                $data['classification_button'] = get_top_button('add', 'Add classification', 'manage/add_classification/' . $ref_id, 'Add classification') . " ";
+                ;
             }
         }
         /*
@@ -679,7 +684,8 @@ class Paper extends CI_Controller
                 } elseif ($v['input_select_source'] == 'table') {
                     $dropoboxes[$k] = $this->get_reference_select_values($v['input_select_values']);
                 }
-            };
+            }
+            ;
         }
         $T_item_data_assignation = array();
         $T_remove_assignation_button = array();
@@ -830,7 +836,7 @@ class Paper extends CI_Controller
         );
         $res2 = $this->manage_mdl->add_operation($operation_arr);
         //check if it is demo user
-        if ($active_user != 2) {
+        if($active_user != 2){
             if (!empty($imported)) {
                 set_top_msg(" $imported papers imported successfully");
             }
@@ -838,7 +844,8 @@ class Paper extends CI_Controller
                 set_top_msg(" $exist papers already exist", 'error');
             }
             redirect('screening/screening');
-        } else {
+        }
+        else{
             unset($_POST['data_array']);
             unset($_POST['papers_sources']);
             redirect('project/projects_list');
@@ -963,7 +970,8 @@ class Paper extends CI_Controller
                 $Tpapers = $this->get_bibler_result($bibtextString, "multi_bibtex");
             }
             //		vv
-            $data['json_values'] = $json_papers = json_encode($Tpapers['paper_array']);;
+            $data['json_values'] = $json_papers = json_encode($Tpapers['paper_array']);
+            ;
             // convert json into array
             /////$T_papers=json_decode($bibtextString);
             //z
@@ -1270,7 +1278,7 @@ class Paper extends CI_Controller
                 $exist = True;
                 $verify_title = False;
             }
-        }
+        } 
         if ($verify_title) {
             foreach ($this->Paper_dataAccess->select_all_from_title($title) as $res) {
                 if (!empty($doi) && !empty($res['doi'])) {
@@ -1681,6 +1689,7 @@ class Paper extends CI_Controller
             //usleep(500);
         }
         $end_time = microtime();
+        ini_set('auto_detect_line_endings', TRUE);
         if ($correct) {
             $Tres = json_decode($res, True);
             if (json_last_error() === JSON_ERROR_NONE) {
@@ -1919,8 +1928,7 @@ month={Aug},}
     }
 
     //import papers into the demo project
-    public function import_demo_project_paper()
-    {
+    public function import_demo_project_paper(){
 
         $bibFilePath = 'demo_relis.bib';
 
@@ -1932,5 +1940,6 @@ month={Aug},}
         $_POST['data_array'] = $paperData;
         $_POST['papers_sources'] = "";
         $this->import_papers_save_bibtext();
+
     }
 }
