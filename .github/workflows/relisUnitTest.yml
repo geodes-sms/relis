@@ -69,3 +69,6 @@ jobs:
 
       - name: Stop all running Docker Containers
         run: docker stop $(docker ps -q)
+
+      - name: Delete the Docker Containers
+        run: docker container prune -f
