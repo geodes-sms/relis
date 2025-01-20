@@ -20,6 +20,8 @@ jobs:
           else
             echo "Docker is not installed, please install Docker in your Github Repository."
           fi
+      - name: Delete the Docker Containers before
+        run: docker container prune -f
 
       - name: Build Docker Image
         run: docker compose build
@@ -70,5 +72,3 @@ jobs:
       - name: Stop all running Docker Containers
         run: docker stop $(docker ps -q)
 
-      - name: Delete the Docker Containers
-        run: docker container prune -f
