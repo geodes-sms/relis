@@ -1,4 +1,4 @@
-FROM tomcat:8.5.51-jdk8-openjdk-slim
+FROM tomcat:8.5.51-jdk8-adoptopenjdk-hotspot
 
 RUN apt-get update && apt-get install -y \
     python3 \
