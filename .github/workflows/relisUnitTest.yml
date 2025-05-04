@@ -13,7 +13,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Check if Docker is installed
+      - name: Check if Podman is installed
         run: |
           if podman info; then
             echo "Podman is installed in your repository."
@@ -24,11 +24,11 @@ jobs:
       - name: Install podman compose
         run: pip3 install podman-compose
 
-      - name: Build Docker Image
+      - name: Build Podman Image
         run: podman-compose build
         working-directory: deployment
 
-      - name: Run Docker Containers
+      - name: Run Podman Containers
         run: podman-compose up -d
         working-directory: deployment
 
@@ -37,8 +37,8 @@ jobs:
 
       - name: Set relis-app Container permission
         run: |
-          docker exec relis-app chmod -R 777 /u/relis/public_html/relis_app/ 
-          docker exec relis-app chmod -R 777 /u/relis/public_html/cside/export_r
+          podman exec relis-app chmod -R 777 /u/relis/public_html/relis_app/ 
+          podman exec relis-app chmod -R 777 /u/relis/public_html/cside/export_r
 
       - name: Run Unit test
         run: |
@@ -70,5 +70,5 @@ jobs:
           name: test-report.html
           path: ~/test_report.html
 
-      - name: Stop all running Docker Containers
-        run: docker stop $(docker ps -q)
+      - name: Stop all running Podman Containers
+        run: podman stop $(podman ps -q)
