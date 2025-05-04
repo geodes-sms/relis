@@ -69,5 +69,3 @@ services:
       - 8083:80
     volumes:
       - ../:/u/relis/public_html
-    extra_hosts:
-      - "host.docker.internal:host-gateway"

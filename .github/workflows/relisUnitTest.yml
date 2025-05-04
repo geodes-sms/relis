@@ -15,22 +15,25 @@ jobs:
 
       - name: Check if Docker is installed
         run: |
-          if docker --version; then
-            echo "Docker is installed in your repository."
+          if podman info; then
+            echo "Podman is installed in your repository."
           else
-            echo "Docker is not installed, please install Docker in your Github Repository."
+            echo "Podman is not installed, please install Podman in your Github Repository."
           fi
 
+      - name: Install podman compose
+        run: pip3 install podman-compose
+
       - name: Build Docker Image
-        run: docker compose build
+        run: podman compose build
         working-directory: deployment
 
       - name: Run Docker Containers
-        run: docker compose up -d
+        run: podman compose up -d
         working-directory: deployment
 
       - name: Wait for Application to Start
-        run: sleep 10
+        run: sleep 30
 
       - name: Set relis-app Container permission
         run: |
