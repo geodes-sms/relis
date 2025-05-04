@@ -25,11 +25,11 @@ jobs:
         run: pip3 install podman-compose
 
       - name: Build Docker Image
-        run: podman compose build
+        run: podman-compose build
         working-directory: deployment
 
       - name: Run Docker Containers
-        run: podman compose up -d
+        run: podman-compose up -d
         working-directory: deployment
 
       - name: Wait for Application to Start
