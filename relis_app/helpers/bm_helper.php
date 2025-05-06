@@ -1699,10 +1699,11 @@ function get_paper_screen_status_new($paper_id, $screening_phase = "", $return =
 
 
 	//$sql= "select A.*,S.screening_id,S.decision,S.exclusion_criteria,S.note,S.screening_time from assignment_screen A 	LEFT JOIN screening S ON (A.assignment_id = S.assignment_id AND S.	screening_active=1)  where A.paper_id = $paper_id AND 	A.assignment_active  ";
-	$sql = "select * from  screening_paper   where paper_id = $paper_id AND screening_phase = $screening_phase AND 	screening_active=1  ";
+	//$sql = "select * from  screening_paper   where paper_id = $paper_id AND screening_phase = $screening_phase AND 	screening_active=1  ";
+	//$res_assignment = $ci->db2->query($sql)->result_array();
 
-	$res_assignment = $ci->db2->query($sql)->result_array();
-
+	$sql = "SELECT * FROM screening_paper WHERE paper_id = ? AND screening_phase = ? AND screening_active = 1";
+	$res_assignment = $ci->db2->query($sql, array($paper_id, $screening_phase))->result_array();
 
 	$pending = 0;
 	$accepted = 0;
