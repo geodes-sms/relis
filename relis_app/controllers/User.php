@@ -349,8 +349,8 @@ class User extends CI_Controller
     public function check_create_user()
     {
         $post_arr = $this->input->post();
-        $this->load->library('form_validation');
-        $this->form_validation->set_rules('user_name', 'Name', 'trim|required');
+	$this->load->library('form_validation');
+	$this->form_validation->set_rules('user_name', 'Name', 'trim|required|min_length[2]|max_length[20]');
         $this->form_validation->set_rules('user_mail', 'Email', 'trim|valid_email');
         $this->form_validation->set_rules('user_username', 'Username', 'trim|required');
         $this->form_validation->set_rules('user_password', 'Password', 'trim|required|matches[user_password_validate]');
