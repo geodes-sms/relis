@@ -635,7 +635,7 @@ class Home extends CI_Controller
 	public function metrics_file_content($file = "C:/xampp/htdocs/relis/relis_multi_gen_01/cside/metrics_new/2016_Dec_10/pierre_13.txt")
 	{
 		//$file="C:/xampp/htdocs/relis/relis_multi_gen_01/cside/metrics_new/2016_Dec_11/younous_18.txt";
-		ini_set('auto_detect_line_endings', TRUE);
+		
 		$fp = fopen($file, 'rb');
 		$i = 1;
 		$last_count = 0;
@@ -1094,7 +1094,7 @@ class Home extends CI_Controller
 			'Industrie' => 2
 		);
 		$all_file = "cside/test/classification_edouard.csv";
-		ini_set('auto_detect_line_endings', TRUE);
+		
 		$fp = fopen($all_file, 'rb');
 		$i = 1;
 		$last_count = 0;
@@ -1255,7 +1255,7 @@ class Home extends CI_Controller
 			'SE' => 3
 		);
 		$all_file = "cside/test/classification_lechanceux.csv";
-		ini_set('auto_detect_line_endings', TRUE);
+		
 		$fp = fopen($all_file, 'rb');
 		$i = 1;
 		$last_count = 0;

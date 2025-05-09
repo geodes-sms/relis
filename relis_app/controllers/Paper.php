@@ -1024,7 +1024,7 @@ class Paper extends CI_Controller
             //echo "File must be a .php";
             array_push($error_array, "File must be a csv file");
         } else {
-            ini_set('auto_detect_line_endings', TRUE);
+            
             $fp = fopen($_FILES['paper_file']['tmp_name'], 'rb');
             $i = 1;
             $last_count = 0;
@@ -1184,7 +1184,7 @@ class Paper extends CI_Controller
             $end_time = microtime();
             //print_test($res);
             //	echo "<h1>".($end_time - $init_time)."</h1>";
-            ini_set('auto_detect_line_endings', TRUE);
+            
             if ($correct) {
                 //print_test($res);
                 $res = str_replace("True,", "'True',", $res);
@@ -1689,7 +1689,7 @@ class Paper extends CI_Controller
             //usleep(500);
         }
         $end_time = microtime();
-        ini_set('auto_detect_line_endings', TRUE);
+        
         if ($correct) {
             $Tres = json_decode($res, True);
             if (json_last_error() === JSON_ERROR_NONE) {
@@ -1895,7 +1895,7 @@ month={Aug},}
         $end_time = microtime();
         print_test($res);
         //	echo "<h1>".($end_time - $init_time)."</h1>";
-        ini_set('auto_detect_line_endings', TRUE);
+        
         if ($correct) {
             //$fp = fopen('test_'.time().'.txt', 'w+');
             //fputs($fp, $res);
