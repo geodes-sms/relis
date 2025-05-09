@@ -827,8 +827,8 @@ class Element extends CI_Controller
                 }
             }
         }
-        if ($post_arr['table_config'] == 'users') {
-            $this->form_validation->set_rules('user_username', $table_config['fields']['user_username']['field_title'], 'trim|required|min_length[2]|max_length[12]');
+	if ($post_arr['table_config'] == 'users') {
+		$this->form_validation->set_rules('user_username', $table_config['fields']['user_username']['field_title'], 'trim|required|min_length[2]|max_length[20]');
             if (!(empty($post_arr['user_password']) and $post_arr['operation_type'] == 'edit')) {
                 $this->form_validation->set_rules('user_password', $table_config['fields']['user_password']['field_title'], 'trim|required|matches[user_password_val]');
                 $this->form_validation->set_rules('user_password_val', $table_config['fields']['user_password']['field_title'] . ' Confirmation', 'trim|required');
