@@ -77,18 +77,16 @@ Make sure the user has the rights to access and edit the `export_r/` folder. For
 1. Update **relis_deployment/docker/Dockerfile** by adding: `RUN pecl install xdebug-2.6.0`
 ![xdebug-1](cside/images/xdebug-1.png)
 
-2. Add xdebug setting to **relis_deploymant\docker\php\conf\apache\php.ini** :
+2. Add xdebug setting to **relis_deploymant\php\conf\50_xdebug.ini** :
 ```ini
 [xdebug]
-zend_extension=xdebug.so
-xdebug.remote_enable=1
-xdebug.remote_handler=dbgp
-xdebug.remote_port=9000
-xdebug.remote_autostart=1
-xdebug.remote_connect_back=0
-xdebug.idekey=docker
-xdebug.remote_host=host.docker.internal
-zend_extension=xdebug.so
+xdebug.mode=debug
+xdebug.remote_handler = dbgp
+xdebug.client_host = host.docker.internal
+xdebug.client_port = 9000
+xdebug.start_with_request = yes
+xdebug.discover_client_host = true
+xdebug.idekey = VSCODE
 ```
 
 3. **Configure server in PhpStorm**: In `File -> Setting -> PHP ->Server`. Add a new server using + icon, and configure it like on the following screenshot
