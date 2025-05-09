@@ -520,7 +520,7 @@ class Screening extends CI_Controller
         $accept_file = "cside/screen/accepted.txt";
         $Taccepeted = array();
         $Tall = array();
-        ini_set('auto_detect_line_endings', TRUE);
+        
         $fp = fopen($all_file, 'rb');
         $i = 1;
         $last_count = 0;
