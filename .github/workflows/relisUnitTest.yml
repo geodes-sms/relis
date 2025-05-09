@@ -32,9 +32,6 @@ jobs:
         run: podman-compose up -d
         working-directory: deployment
 
-      - name: Wait for Application to Start
-        run: sleep 30
-
       - name: Set relis-app Container permission
         run: |
           podman exec relis-app chmod -R 777 /u/relis/public_html/relis_app/ 
