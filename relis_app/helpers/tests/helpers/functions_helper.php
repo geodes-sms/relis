@@ -29,7 +29,7 @@ function get_bibler_result($bibtex, $operation = "single")
         }
     }
     $end_time = microtime();
-    //ini_set('auto_detect_line_endings', TRUE);
+    //
     if ($correct) {
         $Tres = json_decode($res, True);
         if (json_last_error() === JSON_ERROR_NONE) {
