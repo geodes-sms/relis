@@ -797,7 +797,134 @@ On line 7 of the R Library file, make sure it states the proper name and path to
     <li>Shapiro Wilk\'s test (for all continuous variables): use the <code>comp_shapiro_wilk_test</code> variable</li>
     <li>Pearson\'s correlation test (for all continuous variables): use the <code>comp_pearson_cor_test</code> variable</li>
     <li>Spearman\'s correlation test (for all continuous variables): use the <code>comp_spearman_cor_test</code> variable</li>
-</ul>','','Help',9,1);
+</ul>','','Help',8,1),(21,'LLM Flow','<p>
+ReLiS now supports AI-powered screening using Large Language Models (LLMs). This feature allows you to automate the screening process by leveraging AI to evaluate papers based on your inclusion and exclusion criteria.
+</p>
+
+<h3><b>Overview of the LLM Flow</b></h3>
+<p>
+The LLM flow guides you through a step-by-step process to set up AI-powered screening for your systematic review. Follow these steps in order:
+</p>
+
+<ol>
+<li><b>LLM Configuration</b></li>
+<li><b>LLM Project Settings</b></li>
+<li><b>Research Questions</b></li>
+<li><b>Exclusion Criteria</b></li>
+<li><b>Inclusion Criteria</b></li>
+<li><b>Prompt Generation</b></li>
+</ol>
+
+<hr>
+
+<h3><b>Step 1: LLM Configuration</b></h3>
+<p>
+Navigate to <b>LLM Configuration</b> in the sidebar under Administration (accessible via <code>admin/llm_configuration</code>).
+</p>
+<p>
+In this step, you will:
+</p>
+<ul>
+<li><b>Select LLM Provider:</b> Choose from available providers such as OpenAI, Anthropic, Google, or OpenRouter</li>
+<li><b>Choose Model:</b> Select the specific AI model (e.g., GPT-3.5 Turbo, GPT-4, Claude-3 Sonnet, etc.)</li>
+<li><b>Enter API Key:</b> Provide your API key for the selected provider. Your API key is stored securely in browser memory only and never saved to the server</li>
+<li><b>Test Connection:</b> Click the "Test Connection" button to verify that your API key is working correctly</li>
+<li><b>Calculate Cost:</b> Use the "Estimate Cost" button to get an estimate of the screening costs based on your paper count and selected model</li>
+<li><b>Start Screening Setup:</b> Once everything is configured, click "Start Screening Setup" to proceed to the next step</li>
+</ul>
+
+<hr>
+
+<h3><b>Step 2: LLM Project Settings</b></h3>
+<p>
+After clicking "Start Screening Setup", you will be redirected to the LLM Project Settings page.
+</p>
+<p>
+Here you need to configure:
+</p>
+<ul>
+<li><b>SLR Topic:</b> Enter the main topic or focus of your Systematic Literature Review</li>
+<li><b>Key Concepts:</b> Add the key concepts, terms, or themes that are central to your review</li>
+</ul>
+<p>
+These settings help the AI understand the context and scope of your review.
+</p>
+
+<hr>
+
+<h3><b>Step 3: Research Questions</b></h3>
+<p>
+Navigate to <b>Research Questions</b> in the Planning menu under Administration.
+</p>
+<p>
+Add your research questions that define what you are trying to answer with your systematic review. These questions guide the AI in understanding the purpose and objectives of your review.
+</p>
+
+<hr>
+
+<h3><b>Step 4: Exclusion Criteria</b></h3>
+<p>
+Go to <b>Exclusion Criteria</b> in the Planning menu.
+</p>
+<p>
+Add the criteria that will be used to exclude papers from your review. These are the conditions under which a paper should NOT be included.
+</p>
+<p>
+After adding your exclusion criteria:
+</p>
+<ul>
+<li>Click the <b>wand button</b> next to each criterion to automatically generate screening questions</li>
+<li>The AI will create specific questions based on your criteria that can be used during the screening process</li>
+</ul>
+
+<hr>
+
+<h3><b>Step 5: Inclusion Criteria</b></h3>
+<p>
+Navigate to <b>Inclusion Criteria</b> in the Planning menu.
+</p>
+<p>
+Add the criteria that define which papers SHOULD be included in your review. These are the positive conditions that papers must meet.
+</p>
+<p>
+Similar to exclusion criteria:
+</p>
+<ul>
+<li>After adding your inclusion criteria, click the <b>wand button</b> next to each criterion</li>
+<li>The AI will generate specific screening questions based on your inclusion criteria</li>
+</ul>
+
+<hr>
+
+<h3><b>Step 6: Prompt Generation</b></h3>
+<p>
+Finally, go to <b>Prompt Generation</b> in the Planning menu.
+</p>
+<p>
+This is where you generate the final screening prompt that will be used by the AI to evaluate papers. The prompt combines:
+</p>
+<ul>
+<li>Your SLR topic and key concepts</li>
+<li>Your research questions</li>
+<li>Your exclusion and inclusion criteria (with their generated questions)</li>
+</ul>
+<p>
+Click the <b>Generate Prompt</b> button to create a comprehensive screening prompt. This prompt will be used by the LLM to automatically screen papers in your review.
+</p>
+
+<hr>
+
+<h3><b>Tips for Best Results</b></h3>
+<ul>
+<li>Be specific and clear when defining your criteria</li>
+<li>Review and refine the AI-generated questions to ensure they accurately reflect your criteria</li>
+<li>Test the generated prompt with a few sample papers before running it on your entire corpus</li>
+<li>Monitor the cost estimates to choose the most cost-effective model for your needs</li>
+</ul>
+
+<p>
+Once you have completed all steps and generated your prompt, you can use the AI-powered screening feature to automatically evaluate papers in your systematic review.
+</p>','','Help',9,1);
 /*!40000 ALTER TABLE `info` ENABLE KEYS */;
 UNLOCK TABLES;
 

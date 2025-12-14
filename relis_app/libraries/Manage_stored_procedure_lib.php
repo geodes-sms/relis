@@ -58,6 +58,7 @@ class Manage_stored_procedure_lib
 			$i = 0;
 			$sql_append .= " AND ( ";
 			foreach ($fields_search as $field_name) {
+				$field_name = trim($field_name);
 				$sql_vars .= " SET @search_" . $field_name . " := CONCAT('%',TRIM(_search),'%') ; ";
 				if ($i == 0) {
 
@@ -311,6 +312,7 @@ END";
 			$i = 0;
 			$sql_append .= " AND ( ";
 			foreach ($fields_search as $field_name) {
+				$field_name = trim($field_name);
 				$sql_vars .= " SET @search_" . $field_name . " := CONCAT('%',TRIM(_search),'%') ; ";
 				if ($i == 0) {
 
@@ -574,7 +576,8 @@ END";
 				$type = " LONGBLOB ";
 			}
 
-			if (($value['on_add'] != 'not_set' and $value['on_add'] != 'drill_down' and $value['on_add'] != 'disabled') and !((isset($value['multi-select']) and isset($value['multi-select']) == 'Yes')))
+			$on_add = isset($value['on_add']) ? $value['on_add'] : 'enabled';
+			if (($on_add != 'not_set' and $on_add != 'drill_down' and $on_add != 'disabled') and !((isset($value['multi-select']) and isset($value['multi-select']) == 'Yes'))) {
 				if ($i == 0) {
 
 					$fields_param .= "_" . $key . " " . $type;
@@ -591,7 +594,8 @@ END";
 					}
 				}
 
-			$i++;
+				$i++;
+			}
 		}
 
 
@@ -660,7 +664,8 @@ END";
 			}
 
 
-			if (($value['on_edit'] != 'not_set' and $value['on_edit'] != 'drill_down' and $value['on_edit'] != 'disabled') and !((isset($value['multi-select']) and isset($value['multi-select']) == 'Yes'))) {
+			$on_edit = isset($value['on_edit']) ? $value['on_edit'] : 'enabled';
+			if (($on_edit != 'not_set' and $on_edit != 'drill_down' and $on_edit != 'disabled') and !((isset($value['multi-select']) and isset($value['multi-select']) == 'Yes'))) {
 				if ($i == 0) {
 
 					$fields_param .= "_" . $key . " " . $type;
@@ -1228,6 +1233,7 @@ END";
 			$i = 0;
 			$sql_append .= " AND ( ";
 			foreach ($fields_search as $field_name) {
+				$field_name = trim($field_name);
 				$sql_vars .= " SET @search_" . $field_name . " := CONCAT('%',TRIM(_search),'%') ; ";
 				if ($i == 0) {
 
@@ -1368,27 +1374,160 @@ END";
 		$fields_val = "";
 
 		$i = 0;
+		$table_id = $config['table_id'];
 
-		foreach ($config['fields'] as $k_field => $v_type) {
-			//get the fields type
-
-			if ($i == 0) {
-
-				$fields_param .= "_" . $k_field . " " . $v_type;
-			} else {
-				$fields_param .= " , _" . $k_field . " " . $v_type;
-
-				if ($i == 1) {
+		foreach ($config['fields'] as $k_field => $value) {
+			// Skip table_id and table_active_field
+			if ($k_field == $table_id || $k_field == $config['table_active_field']) {
+				continue;
+			}
+			
+			// Handle two formats:
+			// 1. Old format: $value is a string (SQL type like 'VARCHAR(105)')
+			// 2. New format: $value is an array with full field configuration
+			if (!is_array($value)) {
+				// Old format: value is the SQL type directly
+				$type = trim($value);
+				// Handle case where type might be incomplete (e.g., just "VARCHAR" without size or empty)
+				if (empty($type) || $type == 'VARCHAR' || (strpos($type, 'VARCHAR') === 0 && strpos($type, '(') === false)) {
+					// Try to get proper type from table configuration
+					// Try to determine config_id from stored_procedure_name (e.g., "add_exclusioncrieria" -> "exclusioncrieria")
+					$config_id = null;
+					if (!empty($config['stored_procedure_name'])) {
+						$proc_name = $config['stored_procedure_name'];
+						if (strpos($proc_name, 'add_') === 0) {
+							$config_id = substr($proc_name, 4);
+						} elseif (strpos($proc_name, 'update_') === 0) {
+							$config_id = substr($proc_name, 7);
+						}
+					}
+					
+					if ($config_id) {
+						$table_config = get_table_config($config_id, $target_db);
+						if (!empty($table_config['fields'][$k_field])) {
+							$field_config = $table_config['fields'][$k_field];
+							// Handle enum type
+							if ((!empty($field_config['field_type']) && $field_config['field_type'] == 'enum') || 
+							    (!empty($field_config['input_type']) && $field_config['input_type'] == 'select' && 
+							     !empty($field_config['input_select_source']) && $field_config['input_select_source'] == 'array')) {
+								if (!empty($field_config['input_select_values']) && is_array($field_config['input_select_values'])) {
+									$enum_values = array();
+									foreach ($field_config['input_select_values'] as $k => $v) {
+										$enum_values[] = "'" . addslashes($k) . "'";
+									}
+									$type = "ENUM(" . implode(",", $enum_values) . ")";
+								}
+							}
+							// If still not set, try to determine from field_type
+							if (empty($type) || $type == 'VARCHAR' || (strpos($type, 'VARCHAR') === 0 && strpos($type, '(') === false)) {
+								if (!empty($field_config['field_type']) && $field_config['field_type'] == 'text') {
+									$size = !empty($field_config['field_size']) ? ($field_config['field_size'] + 5) : 250;
+									$type = "VARCHAR($size)";
+								} elseif (!empty($field_config['field_type']) && ($field_config['field_type'] == 'number' || $field_config['field_type'] == 'int')) {
+									$type = "INT";
+								} else {
+									$type = "VARCHAR(250)";
+								}
+							}
+						}
+					}
+					// If still empty or just VARCHAR, default to VARCHAR(250)
+					if (empty($type) || $type == 'VARCHAR' || (strpos($type, 'VARCHAR') === 0 && strpos($type, '(') === false)) {
+						$type = "VARCHAR(250)";
+					}
+				}
+				// Include all fields in old format (no filtering)
+				if ($i == 0) {
+					$fields_param .= "_" . $k_field . " " . $type;
 					$fields_val .= "_" . $k_field;
 					$fields_col = "$k_field";
 				} else {
-
+					$fields_param .= " , _" . $k_field . " " . $type;
 					$fields_val .= " , _" . $k_field;
 					$fields_col .= " , " . $k_field;
 				}
-			}
+				$i++;
+			} else {
+				// New format: value is an array with field configuration
+				// Skip fields not in database
+				if (!empty($value['not_in_db'])) {
+					continue;
+				}
+				
+				//get the fields type
+				$size = "250";
+				$type = "VARCHAR";
+				
+				// Handle different field types
+				if (!empty($value['field_type']) && $value['field_type'] == 'enum') {
+					// Enum field type - check for enum values
+					if (!empty($value['input_select_values']) && is_array($value['input_select_values'])) {
+						$enum_values = array();
+						foreach ($value['input_select_values'] as $k => $v) {
+							$enum_values[] = "'" . addslashes($k) . "'";
+						}
+						$type = "ENUM(" . implode(",", $enum_values) . ")";
+					} else {
+						// Fallback to VARCHAR if enum values not available
+						$size = !empty($value['field_size']) ? $value['field_size'] : 250;
+						$type = "VARCHAR($size)";
+					}
+				} elseif (!empty($value['input_type']) && $value['input_type'] == 'select' && !empty($value['input_select_source']) && $value['input_select_source'] == 'array') {
+					// Enum type for select with array source
+					$enum_values = array();
+					if (!empty($value['input_select_values']) && is_array($value['input_select_values'])) {
+						foreach ($value['input_select_values'] as $k => $v) {
+							$enum_values[] = "'" . addslashes($k) . "'";
+						}
+						$type = "ENUM(" . implode(",", $enum_values) . ")";
+					} else {
+						// Fallback to VARCHAR if enum values not available
+						$size = !empty($value['field_size']) ? $value['field_size'] : 250;
+						$type = "VARCHAR($size)";
+					}
+				} elseif (!empty($value['field_type']) && ($value['field_type'] == 'number' || $value['field_type'] == 'int')) {
+					$type = "INT";
+				} elseif (!empty($value['field_type']) && $value['field_type'] == 'text') {
+					if (!empty($value['field_size'])) {
+						$size = $value['field_size'] + 5;
+					}
+					$type = "VARCHAR($size)";
+				} elseif (!empty($value['field_type']) && $value['field_type'] == 'decimal') {
+					$size = !empty($value['field_size']) ? $value['field_size'] : "10,2";
+					$type = "DECIMAL($size)";
+				} elseif (!empty($value['field_type']) && $value['field_type'] == 'time') {
+					$type = "TIMESTAMP";
+				} elseif (!empty($value['field_type']) && $value['field_type'] == 'datetime') {
+					$type = "DATETIME";
+				} elseif (!empty($value['field_type']) && $value['field_type'] == 'real') {
+					$type = "DOUBLE";
+				} elseif (!empty($value['field_type']) && $value['field_type'] == 'longtext') {
+					$type = "LONGTEXT";
+				} elseif (isset($value['input_type']) && $value['input_type'] == 'image') {
+					$type = "LONGBLOB";
+				} else {
+					// Default to VARCHAR
+					$size = !empty($value['field_size']) ? $value['field_size'] : 250;
+					$type = "VARCHAR($size)";
+				}
 
-			$i++;
+				$on_add = isset($value['on_add']) ? trim($value['on_add']) : 'enabled';
+				if (($on_add != 'not_set' && $on_add != 'drill_down' && $on_add != 'disabled') && !((isset($value['multi-select']) && isset($value['multi-select']) == 'Yes'))) {
+					if ($i == 0) {
+						$fields_param .= "_" . $k_field . " " . $type;
+					} else {
+						$fields_param .= " , _" . $k_field . " " . $type;
+						if ($i == 1) {
+							$fields_val .= "_" . $k_field;
+							$fields_col = "$k_field";
+						} else {
+							$fields_val .= " , _" . $k_field;
+							$fields_col .= " , " . $k_field;
+						}
+					}
+					$i++;
+				}
+			}
 		}
 
 
@@ -1488,24 +1627,103 @@ END";
 		$fields_val = "";
 
 		$i = 0;
+		$table_id = $config['table_id'];
 
-		foreach ($config['fields'] as $k_field => $v_type) {
-			//get the fields type
-
-			if ($i == 0) {
-
-				$fields_param .= "_" . $k_field . " " . $v_type;
-				$fields_val .= "$k_field = _" . $k_field;
-
-
-			} else {
-				$fields_param .= " , _" . $k_field . " " . $v_type;
-				$fields_val .= " , $k_field = _" . $k_field;
-
+		foreach ($config['fields'] as $k_field => $value) {
+			// Skip table_id and table_active_field
+			if ($k_field == $table_id || $k_field == $config['table_active_field']) {
+				continue;
 			}
-			$i = 1;
+			
+			// Handle two formats:
+			// 1. Old format: $value is a string (SQL type like 'VARCHAR(105)')
+			// 2. New format: $value is an array with full field configuration
+			if (!is_array($value)) {
+				// Old format: value is the SQL type directly
+				$type = trim($value);
+				// Include all fields in old format (no filtering)
+				if (empty($fields_param)) {
+					$fields_param .= "_" . $k_field . " " . $type;
+					$fields_val .= "$k_field = _" . $k_field;
+				} else {
+					$fields_param .= " , _" . $k_field . " " . $type;
+					$fields_val .= " , $k_field = _" . $k_field;
+				}
+			} else {
+				// New format: value is an array with field configuration
+				// Skip fields not in database
+				if (!empty($value['not_in_db'])) {
+					continue;
+				}
+				
+				//get the fields type
+				$size = "250";
+				$type = "VARCHAR";
+				
+				// Handle different field types
+				if (!empty($value['field_type']) && $value['field_type'] == 'enum') {
+					// Enum field type - check for enum values
+					if (!empty($value['input_select_values']) && is_array($value['input_select_values'])) {
+						$enum_values = array();
+						foreach ($value['input_select_values'] as $k => $v) {
+							$enum_values[] = "'" . addslashes($k) . "'";
+						}
+						$type = "ENUM(" . implode(",", $enum_values) . ")";
+					} else {
+						// Fallback to VARCHAR if enum values not available
+						$size = !empty($value['field_size']) ? $value['field_size'] : 250;
+						$type = "VARCHAR($size)";
+					}
+				} elseif (!empty($value['input_type']) && $value['input_type'] == 'select' && !empty($value['input_select_source']) && $value['input_select_source'] == 'array') {
+					// Enum type for select with array source
+					$enum_values = array();
+					if (!empty($value['input_select_values']) && is_array($value['input_select_values'])) {
+						foreach ($value['input_select_values'] as $k => $v) {
+							$enum_values[] = "'" . addslashes($k) . "'";
+						}
+						$type = "ENUM(" . implode(",", $enum_values) . ")";
+					} else {
+						// Fallback to VARCHAR if enum values not available
+						$size = !empty($value['field_size']) ? $value['field_size'] : 250;
+						$type = "VARCHAR($size)";
+					}
+				} elseif (!empty($value['field_type']) && ($value['field_type'] == 'number' || $value['field_type'] == 'int')) {
+					$type = "INT";
+				} elseif (!empty($value['field_type']) && $value['field_type'] == 'text') {
+					if (!empty($value['field_size'])) {
+						$size = $value['field_size'] + 5;
+					}
+					$type = "VARCHAR($size)";
+				} elseif (!empty($value['field_type']) && $value['field_type'] == 'decimal') {
+					$size = !empty($value['field_size']) ? $value['field_size'] : "10,2";
+					$type = "DECIMAL($size)";
+				} elseif (!empty($value['field_type']) && $value['field_type'] == 'time') {
+					$type = "TIMESTAMP";
+				} elseif (!empty($value['field_type']) && $value['field_type'] == 'datetime') {
+					$type = "DATETIME";
+				} elseif (!empty($value['field_type']) && $value['field_type'] == 'real') {
+					$type = "DOUBLE";
+				} elseif (!empty($value['field_type']) && $value['field_type'] == 'longtext') {
+					$type = "LONGTEXT";
+				} elseif (isset($value['input_type']) && $value['input_type'] == 'image') {
+					$type = "LONGBLOB";
+				} else {
+					// Default to VARCHAR
+					$size = !empty($value['field_size']) ? $value['field_size'] : 250;
+					$type = "VARCHAR($size)";
+				}
 
-
+				$on_edit = isset($value['on_edit']) ? trim($value['on_edit']) : 'enabled';
+				if (($on_edit != 'not_set' && $on_edit != 'drill_down' && $on_edit != 'disabled') && !((isset($value['multi-select']) && isset($value['multi-select']) == 'Yes'))) {
+					if (empty($fields_param)) {
+						$fields_param .= "_" . $k_field . " " . $type;
+						$fields_val .= "$k_field = _" . $k_field;
+					} else {
+						$fields_param .= " , _" . $k_field . " " . $type;
+						$fields_val .= " , $k_field = _" . $k_field;
+					}
+				}
+			}
 		}
 
 		$procedure = "
@@ -1663,6 +1881,25 @@ if ($run_query) {
             BEGIN
             START TRANSACTION;
             UPDATE " . $config['table_name'] . " SET " . $config['table_active_field'] . "=0, qa_status ='Pending';
+            COMMIT;
+            END";
+		} else if ($config['stored_procedure_name'] == 'remove_exclusioncrieria' || $config['stored_procedure_name'] == 'remove_inclusioncriteria') {
+			// For exclusion/inclusion criteria, actually DELETE from table instead of soft delete
+			$procedure = "
+				DROP PROCEDURE IF EXISTS " . $config['stored_procedure_name'] . ";
+				";
+
+			if ($run_query)
+				$res = $this->CI->db2->query($procedure);
+
+			if ($verbose)
+				echo "<p>$procedure</p>";
+
+			$procedure = "CREATE PROCEDURE " . $config['stored_procedure_name'] . "(IN _element_id INT)
+            BEGIN
+            START TRANSACTION;
+            DELETE FROM " . $config['table_name'] . "
+            WHERE " . $config['table_id'] . "= _element_id;
             COMMIT;
             END";
 		} else {

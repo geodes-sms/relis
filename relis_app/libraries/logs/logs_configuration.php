@@ -136,7 +136,7 @@ function get_logs()
 		'generate_stored_procedure' => True,
 
 		'fields' => array(
-			'log_id' => array('mandatory' => '', 'field_state' => 'hidden'),
+			// log_id is excluded - it's the table_id (auto_increment)
 			'log_type' => array('mandatory' => '', 'field_state' => 'hidden'),
 			'log_user_id' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
 			'log_event' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),

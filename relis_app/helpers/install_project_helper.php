@@ -141,6 +141,7 @@ function populate_common_tables($target_db = 'current', $config = 'init')
 			'screen_decison',
 			'screening_inclusion_mapping',
 			'screen_phase_config',
+			// 'llm_config' - Now created via SQL in project_initial_query.sql with default data
 			'operations',
 			'qa_questions',
 			'qa_responses',
@@ -394,13 +395,24 @@ function update_screening_values($screening, $target_db = 'current')
 			$result = $ci->db3->update($s_config_value['table'], array('ref_active' => 0));
 			$all_elements = array();
 			foreach ($screening[$s_config_id] as $key => $value) {
+				// Skip default demo/test exclusion criteria
+				if ($s_config_id == 'exclusion_criteria' && 
+				    (trim($value) == 'EC1: Too short' || 
+				     trim($value) == 'EC2: Not abour chocolate' ||
+				     trim($value) == 'EC1: Too short ' ||
+				     trim($value) == 'EC2: Not abour chocolate ')) {
+					continue;
+				}
 				$conf_element['ref_value'] = $value;
 				$conf_element['ref_desc'] = $value;
 				array_push($all_elements, $conf_element);
 			}
-			//	print_test($all_elements);
-			$result = $ci->db3->insert_batch($s_config_value['table'], $all_elements);
-			////print_test($result);
+			// Only insert if there are elements after filtering
+			if (!empty($all_elements)) {
+				//	print_test($all_elements);
+				$result = $ci->db3->insert_batch($s_config_value['table'], $all_elements);
+				////print_test($result);
+			}
 		}
 	}
 }

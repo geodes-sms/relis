@@ -52,3 +52,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $route['default_controller'] = 'home';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
+
+// LLM Integration Routes
+$route['criteria_question_converter'] = 'criteria_question_converter/index';
+$route['criteria_question_converter/(:any)'] = 'criteria_question_converter/$1';

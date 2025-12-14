@@ -211,6 +211,28 @@ function get_configuration()
 		'input_select_values' => '',
 	);
 
+	$fields['project_topic'] = array(
+		'field_title' => 'SLR Topic',
+		'field_type' => 'text',
+		'field_size' => 65535,
+		'field_value' => '',
+		'default_value' => '',
+		'input_type' => 'textarea',
+		'field_desc' => 'Main topic/domain of the systematic literature review (e.g., "Trust in the worldwide software ecosystem")',
+		'mandatory' => ' mandatory '
+	);
+
+	$fields['project_key_concepts'] = array(
+		'field_title' => 'Key Concepts & Definitions',
+		'field_type' => 'longtext',
+		'field_size' => 4294967295,
+		'field_value' => '',
+		'default_value' => '',
+		'input_type' => 'textarea',
+		'field_desc' => 'Detailed key concepts, definitions, and context for the SLR. Can include comprehensive explanations like the TrustSE example.',
+		'mandatory' => ' mandatory '
+	);
+
 	$fields['source_papers_on'] = array(
 		'field_title' => 'Enable source field',
 		'field_type' => 'int',
@@ -437,6 +459,7 @@ function get_configuration()
 			'qa' => array('title' => 'Quality Assessment', 'edit' => 'element/edit_element/edit_config_qa/1'),
 			'class' => array('title' => 'Classification', 'edit' => 'element/edit_element/edit_config_class/1'),
 			'dsl' => array('title' => 'Project Config Editor', 'edit' => 'element/edit_element/edit_config_dsl/1'),
+
 		),
 		'fields' => array(
 
@@ -474,6 +497,8 @@ function get_configuration()
 
 			'editor_url' => array('group' => 'dsl'),
 			'editor_generated_path' => array('group' => 'dsl'),
+
+
 
 
 
@@ -756,6 +781,32 @@ function get_configuration()
 
 		),
 
+	);
+
+	$operations['edit_config_llm_project'] = array(
+		'operation_type' => 'Edit',
+		'operation_title' => 'Edit LLM Project Settings',
+		'operation_description' => 'Edit LLM project settings for prompt generation',
+		'page_title' => 'Edit LLM Project Settings',
+		'save_function' => 'element/save_element',
+		'page_template' => 'general/frm_entity',
+		'redirect_after_save' => 'element/display_element/configurations/1',
+		'data_source' => 'get_detail_config',
+		'db_save_model' => 'update_config',
+		'generate_stored_procedure' => True,
+		'fields' => array(
+			'config_id' => array('mandatory' => '', 'field_state' => 'hidden'),
+			'project_topic' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
+			'project_key_concepts' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
+		),
+		'top_links' => array(
+			'back' => array(
+				'label' => '',
+				'title' => 'Close',
+				'icon' => 'close',
+				'url' => 'home',
+			)
+		),
 	);
 
 	$operations['edit_conf_papers'] = array(

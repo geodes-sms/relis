@@ -503,7 +503,13 @@ class DBConnection_mdl extends CI_Model
 		foreach ($table_config['operations'][$current_operation]['fields'] as $key => $v_field) {
 
 			$value = $table_config['fields'][$key];
-			if ($v_field['field_state'] != 'drill_down' and $v_field['field_state'] != 'disabled' and !((isset($value['multi-select']) and isset($value['multi-select']) == 'Yes'))) {
+			// Skip table_id, table_active_field, drill_down, and disabled fields
+			// Note: We include 'hidden' fields because stored procedures may expect them
+			if ($key != $table_config['table_id'] && 
+			    $key != $table_config['table_active_field'] &&
+			    $v_field['field_state'] != 'drill_down' && 
+			    $v_field['field_state'] != 'disabled' &&
+			    !((isset($value['multi-select']) and isset($value['multi-select']) == 'Yes'))) {
 				//print_test($key);
 				if (!empty($content[$key])) {
 					$val = $content[$key];
@@ -537,7 +543,12 @@ class DBConnection_mdl extends CI_Model
 		if ($content['operation_type'] == 'new') {
 
 			if (!empty($table_config['operations'][$current_operation]['db_save_model'])) {
-				$stored_procedure = " CALL " . $table_config['operations'][$current_operation]['db_save_model'] . "($param)";
+				// Special case: add_logs stored procedure expects log_id as first parameter (legacy)
+				if ($table_config['operations'][$current_operation]['db_save_model'] == 'add_logs') {
+					$stored_procedure = " CALL add_logs(NULL, $param)";
+				} else {
+					$stored_procedure = " CALL " . $table_config['operations'][$current_operation]['db_save_model'] . "($param)";
+				}
 			} else {
 				$stored_procedure = " CALL add_" . $config . "($param)";
 			}

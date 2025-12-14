@@ -2839,8 +2839,14 @@ class Screening extends CI_Controller
                 if (!empty($current_element)) {
                     $url = str_replace('~current_element~', $current_element, $url);
                 }
-                if (!$project_published or (in_array($key, array('all_published', 'close', 'back')))) {
-                    $top_buttons .= get_top_button($type, $title, $url, $label, $icon);
+                if (!$project_published or (in_array($key, array('all_published', 'close', 'back', 'generate_questions')))) {
+                    // Handle onclick attribute for JavaScript functions
+                    if (!empty($value['onclick'])) {
+                        $onclick = htmlspecialchars($value['onclick'], ENT_QUOTES);
+                        $top_buttons .= "<li><a href='#' onclick=\"$onclick; return false;\" title='$title'><button class='btn btn-info'><i class='fa fa-$icon'></i> $label</button></a></li>";
+                    } else {
+                        $top_buttons .= get_top_button($type, $title, $url, $label, $icon);
+                    }
                 }
             }
         }

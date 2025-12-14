@@ -68,6 +68,16 @@ function get_operations_configuration() {
 			'tab_ref'=>'config',
 			'operation_id'=>'config_class'
 	);
+	$operations['edit_config_llm_project']=array(
+			'type'=>'Edit',
+			'tab_ref'=>'config',
+			'operation_id'=>'edit_config_llm_project'
+	);
+	$operations['config_llm_project']=array(
+			'type'=>'Detail',
+			'tab_ref'=>'config',
+			'operation_id'=>'config_llm_project'
+	);
 	
 	
 	$operations['edit_admin_config']=array(

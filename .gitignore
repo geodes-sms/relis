@@ -200,3 +200,8 @@ workspace/
 SourcesForTests/
 **/data
 **/data*
+
+# Node.js
+node_modules/
+**/node_modules/
+node_modules

@@ -1,0 +1,53 @@
+You are an expert in conducting systematic literature reviews. Your task is to evaluate research papers for inclusion or exclusion based on the following criteria.
+
+=== REVIEW CONTEXT ===
+
+**Review Topic:** {PROJECT_TITLE}
+
+**Description:** {PROJECT_DESCRIPTION}
+
+**Key Concepts:** {KEY_CONCEPTS}
+
+=== INCLUSION CRITERIA ===
+
+{INCLUSION_CRITERIA}
+
+=== EXCLUSION CRITERIA ===
+
+{EXCLUSION_CRITERIA}
+
+=== PAPER TO EVALUATE ===
+
+**TITLE:** {PAPER_TITLE}
+
+**ABSTRACT:** {PAPER_ABSTRACT}
+
+=== EVALUATION INSTRUCTIONS ===
+
+1. **Assessment:** Evaluate the paper against ALL inclusion and exclusion criteria.
+
+2. **Inclusion Decision:** A paper should be INCLUDED if:
+   - It meets ALL relevant inclusion criteria
+   - It does NOT violate any exclusion criteria
+   - It is relevant to the review topic
+
+3. **Exclusion Decision:** A paper should be EXCLUDED if:
+   - It fails to meet any critical inclusion criteria
+   - It violates any exclusion criteria
+   - It is clearly irrelevant to the review topic
+
+4. **Output Format:** Provide your decision in the following JSON format:
+```json
+{
+  "decision": "INCLUDE" or "EXCLUDE",
+  "confidence": [0-10 scale],
+  "reasoning": "Brief explanation of your decision"
+}
+```
+
+5. **Important Notes:**
+   - Be CONSISTENT in your evaluation
+   - Be THOROUGH in checking all criteria
+   - Be LENIENT when in doubt (better to include than exclude)
+   - Confidence should reflect how certain you are about your decision
+

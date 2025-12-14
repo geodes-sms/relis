@@ -1161,8 +1161,10 @@ class Manager_lib
 			$menu['adm']['menu']['plan']['sub_menu']['validate_screen_assign'] = array('label' => 'Assign Validation', 'url' => 'data_extraction/class_assignment_validation_set', 'icon' => '');
 
 		$menu['adm']['menu']['plan']['sub_menu']['exclusioncrieria'] = array('label' => 'Exclusion Criteria', 'url' => 'element/entity_list/list_exclusioncrieria', 'icon' => '');
-		if (can_manage_project())
+		if (can_manage_project()) {
 			$menu['adm']['menu']['plan']['sub_menu']['general'] = array('label' => 'Settings ', 'url' => 'element/display_element/configurations/1', 'icon' => '');
+			$menu['adm']['menu']['plan']['sub_menu']['llm_project_settings'] = array('label' => 'LLM Project Settings', 'url' => 'element/edit_element/edit_config_llm_project/1', 'icon' => '');
+		}
 
 		/*
 			  $menu['general']['menu']['assignment_validation_set']=array( 'label'=>'Assign', 'url'=>'data_extraction/class_assignment_validation_set', 'icon'=>'');
@@ -1271,7 +1273,11 @@ class Manager_lib
 			$menu['adm']['menu']['plan']['sub_menu']['qa_assignment_validation_set'] = array('label' => 'Assign Validation', 'url' => 'quality_assessment/qa_assignment_validation_set', 'icon' => '');
 			$menu['adm']['menu']['plan']['sub_menu']['questions'] = array('label' => 'Questions', 'url' => 'element/entity_list/list_qa_questions', 'icon' => '');
 			$menu['adm']['menu']['plan']['sub_menu']['responses'] = array('label' => 'Answers', 'url' => 'element/entity_list/list_qa_responses', 'icon' => '');
+            $menu['adm']['menu']['plan']['sub_menu']['prompt_generation'] = array('label' => 'Prompt Generation', 'url' => 'prompt_generation', 'icon' => '');
 			$menu['adm']['menu']['plan']['sub_menu']['general'] = array('label' => 'Settings ', 'url' => 'element/display_element/configurations/1', 'icon' => '');
+
+            // LLM Configuration as sibling of Planning
+            $menu['adm']['menu']['llm_configuration'] = array('label' => 'LLM Configuration', 'url' => 'admin/llm_configuration', 'icon' => 'cog');
 
 
 		}
@@ -1370,6 +1376,10 @@ class Manager_lib
 
 				$menu['adm']['menu']['plan']['sub_menu']['exclusioncrieria'] = array('label' => 'Exclusion Criteria', 'url' => 'element/entity_list/list_exclusioncrieria', 'icon' => '');
 
+                if (can_manage_project()) {
+                    $menu['adm']['menu']['plan']['sub_menu']['prompt_generation'] = array('label' => 'Prompt Generation', 'url' => 'prompt_generation', 'icon' => '');
+                }
+
 				if (can_validate_project())
 					$menu['adm']['menu']['plan']['sub_menu']['general'] = array('label' => 'Settings ', 'url' => 'element/display_element/configurations/1', 'icon' => '');
 			}
@@ -1440,8 +1450,15 @@ class Manager_lib
 			$menu['settings'] = array('label' => 'ADMINISTRATION');
 			$menu['general']['menu']['users'] = array('label' => 'Users', 'url' => 'element/entity_list/list_users_current_projects', 'icon' => 'user');
 
-			$menu['settings']['menu']['configuration'] = array('label' => 'Planning', 'url' => 'element/display_element/configurations/1', 'icon' => 'th');
+            $menu['settings']['menu']['configuration'] = array('label' => 'Planning', 'url' => 'element/display_element/configurations/1', 'icon' => 'th');
+            // Add LLM Configuration as a sibling of Planning under ADMINISTRATION
+            $menu['settings']['menu']['llm_configuration'] = array('label' => 'LLM Configuration', 'url' => 'admin/llm_configuration', 'icon' => 'cog');
 			$menu['settings']['menu']['configuration']['sub_menu']['settings'] = array('label' => 'Settings ', 'url' => 'element/display_element/configurations/1', 'icon' => '');
+			$menu['settings']['menu']['configuration']['sub_menu']['llm_project_settings'] = array('label' => 'LLM Project Settings', 'url' => 'element/edit_element/edit_config_llm_project/1', 'icon' => '');
+			$menu['settings']['menu']['configuration']['sub_menu']['research_question'] = array('label' => 'Research Questions', 'url' => 'element/entity_list/list_research_question', 'icon' => '');
+            $menu['settings']['menu']['configuration']['sub_menu']['exclusioncrieria'] = array('label' => 'Exclusion Criteria', 'url' => 'element/entity_list/list_exclusioncrieria', 'icon' => '');
+			$menu['settings']['menu']['configuration']['sub_menu']['inclusioncrtieria'] = array('label' => 'Inclusion Criteria', 'url' => 'element/entity_list/list_inclusioncriteria', 'icon' => '');
+            $menu['settings']['menu']['configuration']['sub_menu']['prompt_generation'] = array('label' => 'Prompt Generation', 'url' => 'prompt_generation', 'icon' => '');
 			//$menu['settings']['menu']['configuration']['sub_menu']['users']=array('label'=>'Papers configuration','url'=>'element/display_element/config_papers/1','icon'=>'');
 
 			//	if(get_appconfig_element('screening_on'))
@@ -1454,15 +1471,9 @@ class Manager_lib
 
 
 			//$menu['settings']['menu']['configuration']['sub_menu']['space']=array('label'=>'_______________','url'=>'','icon'=>'');
-			$menu['settings']['menu']['configuration']['sub_menu']['research_question'] = array('label' => 'Research Questions', 'url' => 'element/entity_list/list_research_question', 'icon' => '');
 
 			if (get_appconfig_element('screening_on'))
 				$menu['settings']['menu']['configuration']['sub_menu']['screen_phases'] = array('label' => 'Screening Phases', 'url' => 'element/entity_list/list_screen_phases', 'icon' => '');
-
-
-            $menu['settings']['menu']['configuration']['sub_menu']['exclusioncrieria'] = array('label' => 'Exclusion Criteria', 'url' => 'element/entity_list/list_exclusioncrieria', 'icon' => '');
-			$menu['settings']['menu']['configuration']['sub_menu']['inclusioncrtieria'] = array('label' => 'Inclusion Criteria', 'url' => 'element/entity_list/list_inclusioncriteria', 'icon' => '');
-
 
 			$menu['settings']['menu']['configuration']['sub_menu']['papers_sources'] = array('label' => 'Papers Sources', 'url' => 'element/entity_list/list_papers_sources', 'icon' => '');
 			$menu['settings']['menu']['configuration']['sub_menu']['search_strategy'] = array('label' => 'Search Strategies', 'url' => 'element/entity_list/list_search_strategy', 'icon' => '');
@@ -1473,7 +1484,7 @@ class Manager_lib
 
             if (has_usergroup(1)) {
                 $menu['settings']['menu']['Configuration_managment'] = array('label' => 'Configuration_managment', 'url' => 'admin/list_configurations', 'icon' => 'cog');
-            }
+           }
 			if (debug_coment_active())
 				$menu['settings']['menu']['debug'] = array('label' => 'Debug Comment', 'url' => 'element/entity_list/list_debug', 'icon' => 'cogs');
 

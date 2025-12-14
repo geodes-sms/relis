@@ -247,6 +247,19 @@ function create_stored_procedures($entity_config, $target_db = 'current', $verbo
 							}
 
 							$type = " VARCHAR($size)";
+						} elseif ($field_det['field_type'] == 'enum' || (!empty($field_det['input_type']) && $field_det['input_type'] == 'select' && !empty($field_det['input_select_source']) && $field_det['input_select_source'] == 'array')) {
+							// Handle enum type
+							if (!empty($field_det['input_select_values']) && is_array($field_det['input_select_values'])) {
+								$enum_values = array();
+								foreach ($field_det['input_select_values'] as $k => $v) {
+									$enum_values[] = "'" . addslashes($k) . "'";
+								}
+								$type = "ENUM(" . implode(",", $enum_values) . ")";
+							} else {
+								// Fallback to VARCHAR if enum values not available
+								$size = !empty($field_det['field_size']) ? $field_det['field_size'] : 250;
+								$type = " VARCHAR($size)";
+							}
 						} elseif ($field_det['input_type'] == 'image') {
 
 							$type = " LONGBLOB ";

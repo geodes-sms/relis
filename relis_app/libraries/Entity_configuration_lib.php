@@ -72,13 +72,15 @@ class Entity_configuration_lib
 				break;
 
 			case 'exclusioncrieria':
-				require_once("entity_config/references_configuration.php");
-				$table_configurations['exclusioncrieria'] = get_reference('ref_exclusioncrieria', 'Exclusion criteria', 'exclusioncrieria', 'Criteria');
+				// Use custom configuration for exclusion criteria with LLM category field
+				require_once(APPPATH . 'libraries/entity_config/config_exclusion_criteria.php');
+				$table_configurations['exclusioncrieria'] = get_exclusion_criteria_config();
 				break;
 
 			case 'inclusioncriteria':
-				require_once("entity_config/references_configuration.php");
-				$table_configurations['inclusioncriteria'] = get_reference('ref_inclusioncriteria', 'Inclusion criteria', 'inclusioncriteria', 'Criteria');
+				// Use custom configuration for inclusion criteria with LLM category field
+				require_once(APPPATH . 'libraries/entity_config/config_inclusion_criteria.php');
+				$table_configurations['inclusioncriteria'] = get_inclusion_criteria_config();
 				break;
 			case 'research_question':
 				require_once("entity_config/references_configuration.php");
@@ -178,6 +180,10 @@ class Entity_configuration_lib
 			case 'assignation':
 				require_once("data_extraction/class_assignment_configuration.php");
 				$table_configurations['assignation'] = get_class_assignment();
+				break;
+			case 'llm_config':
+				require_once("entity_config/config_llm_configuration.php");
+				$table_configurations['llm_config'] = get_config_llm_configuration();
 				break;
 			// relis project
 			case 'debug':
