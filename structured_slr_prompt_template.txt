@@ -1,0 +1,50 @@
+# SYSTEMATIC LITERATURE REVIEW PROMPT
+
+## SLR TOPIC: {SLR_TOPIC}
+
+## KEY CONCEPTS AND DEFINITIONS
+
+{KEY_CONCEPTS_SECTION}
+
+## SELECTION CRITERIA
+
+### Types of Study Category
+{INCLUSION_CRITERIA_TYPES_OF_STUDY}
+
+### Quality of Study Category  
+{INCLUSION_CRITERIA_QUALITY_OF_STUDY}
+
+### Topic Relevance Category
+{INCLUSION_CRITERIA_TOPIC_RELEVANCE}
+
+## EXCLUSION CRITERIA
+{EXCLUSION_CRITERIA_SECTION}
+
+## RESEARCH QUESTIONS
+{RESEARCH_QUESTIONS_SECTION}
+
+## TASK INSTRUCTIONS
+
+Based on the above systematic literature review criteria and research questions, please analyze the following paper:
+
+**Paper Title:** {PAPER_TITLE}
+**Paper Abstract:** {PAPER_ABSTRACT}
+
+### Your Task:
+1. **Screening Decision**: Determine if this paper should be INCLUDED or EXCLUDED based on the selection criteria above.
+
+2. **Justification**: Provide a clear justification for your decision, referencing specific criteria that apply.
+
+3. **Criteria Assessment**: For each relevant criterion, indicate whether the paper meets, partially meets, or does not meet the requirement.
+
+4. **Research Question Relevance**: Assess how well this paper addresses the research questions outlined above.
+
+### Output Format:
+- **Decision**: [INCLUDE/EXCLUDE]
+- **Primary Reason**: [Brief explanation]
+- **Criteria Met**: [List applicable criteria]
+- **Criteria Not Met**: [List non-applicable criteria]
+- **Research Question Contribution**: [How it contributes to answering the research questions]
+- **Additional Notes**: [Any other relevant observations]
+
+Please be thorough and systematic in your analysis, ensuring that your decision is well-justified based on the established criteria.

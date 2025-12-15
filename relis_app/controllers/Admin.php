@@ -264,4 +264,168 @@ class Admin extends CI_Controller
 		//create_table_configuration($table_configuration);
 		echo anchor('admin/list_configurations', "<h1>Back</h1>");
 	}
+
+    /**
+     * Test LLM configuration
+     */
+    public function test_llm_config($llm_config_id = null) {
+        $api_key = $this->input->post('api_key');
+        $provider_name = $this->input->post('provider_name');
+        $model_name = $this->input->post('model_name');
+        
+        if (!$api_key) {
+            $this->output->set_content_type('application/json');
+            $this->output->set_output(json_encode(array(
+                'success' => false,
+                'message' => 'API key is required'
+            )));
+            return;
+        }
+        
+        if (!$provider_name || !$model_name) {
+            $this->output->set_content_type('application/json');
+            $this->output->set_output(json_encode(array(
+                'success' => false,
+                'message' => 'Provider and model are required'
+            )));
+            return;
+        }
+        
+        $this->load->library('Llm_lib');
+        $llm_lib = new Llm_lib();
+        
+        // Create temporary config for testing
+        $temp_config = array(
+            'provider_name' => $provider_name,
+            'model_name' => $model_name,
+            'api_key' => $api_key,
+            'max_tokens' => 100,
+            'temperature' => 0.2
+        );
+        
+        $result = $llm_lib->test_api_key_direct($temp_config);
+        
+        // Log the test attempt for debugging
+        error_log("LLM Test Attempt - Provider: " . $provider_name . ", Model: " . $model_name . ", Result: " . json_encode($result));
+        
+        $this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($result));
+    }
+
+    // Display LLM Configuration page in main layout (right side content)
+    // Note: see method below for admin-only version; keeping one method only
+    
+    /**
+     * Estimate LLM cost
+     */
+    public function estimate_llm_cost() {
+        $llm_config_id = $this->input->post('llm_config_id');
+        $estimated_tokens = $this->input->post('estimated_tokens');
+        
+        if (!$llm_config_id || !$estimated_tokens) {
+            $this->output->set_content_type('application/json');
+            $this->output->set_output(json_encode(array(
+                'success' => false,
+                'message' => 'LLM configuration ID and estimated tokens are required'
+            )));
+            return;
+        }
+        
+        $this->load->library('Llm_lib');
+        $llm_lib = new Llm_lib();
+        
+        $result = $llm_lib->estimate_cost($llm_config_id, $estimated_tokens);
+        
+        $this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($result));
+    }
+    
+    /**
+     * Get LLM configurations for dropdown
+     */
+    public function get_llm_configs() {
+        $this->load->library('Llm_lib');
+        $llm_lib = new Llm_lib();
+        
+        $configs = $llm_lib->get_active_configs();
+        
+        $this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode(array(
+            'success' => true,
+            'configs' => $configs
+        )));
+    }
+    
+    /**
+     * Display LLM configuration page
+     */
+    public function llm_configuration() {
+        if (!can_manage_project()) {
+            redirect('home');
+            return;
+        }
+        $data = array();
+        $data['page_title'] = 'LLM Configuration';
+        $data['page'] = 'admin/llm_configuration';
+        $this->load->view('shared/body', $data);
+    }
+    
+    /**
+     * Simple test endpoint to check if controller is working
+     */
+    public function test_endpoint() {
+        $this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode(array(
+            'success' => true,
+            'message' => 'Test endpoint working',
+            'timestamp' => date('Y-m-d H:i:s')
+        )));
+    }
+    
+    /**
+     * Save LLM configuration
+     */
+    public function save_llm_config() {
+        if (!has_usergroup(1)) //just for admins
+            exit;
+            
+        $this->db2 = $this->load->database(project_db(), TRUE);
+        
+        $data = array(
+            'provider_name' => $this->input->post('provider_name'),
+            'model_name' => $this->input->post('model_name'),
+            'api_endpoint' => $this->input->post('api_endpoint'),
+            'max_tokens' => $this->input->post('max_tokens'),
+            'temperature' => $this->input->post('temperature'),
+            'cost_per_1k_tokens' => $this->input->post('cost_per_1k_tokens'),
+            'added_by' => active_user_id(),
+            'is_active' => 1,
+            'llm_config_active' => 1
+        );
+        
+        // Store API key in session for later use
+        $api_key = $this->input->post('api_key');
+        if ($api_key) {
+            $this->load->library('Llm_lib');
+            $llm_lib = new Llm_lib();
+            $llm_lib->store_api_key_temp(1, $api_key); // Store with config ID 1
+        }
+        
+        $result = $this->db2->insert('llm_config', $data);
+        
+        $this->output->set_content_type('application/json');
+        if ($result) {
+            $this->output->set_output(json_encode(array(
+                'success' => true,
+                'message' => 'LLM configuration saved successfully'
+            )));
+        } else {
+            $this->output->set_output(json_encode(array(
+                'success' => false,
+                'message' => 'Failed to save LLM configuration'
+            )));
+        }
+    }
+
+
 }

@@ -22,6 +22,7 @@
                     <h2><?php echo isset($page_title) ? lng($page_title) :"" ; ?></h2>
                     <?php 
                     old_version();
+                    
                     if(isset($top_buttons)){
                     	echo "<ul class='nav navbar-right panel_toolbox'>$top_buttons</ul>";
                     
@@ -32,6 +33,7 @@
                     
                     <div class="clearfix"></div>
                   </div>
+                  
                   
                   
                   
@@ -68,8 +70,8 @@
                     }else{
                     	echo "<p>No records found !</p>";
                     							} 
-					
-					?>
+				
+				?>
                    
                   </div>
                   
@@ -84,3 +86,63 @@
           </div>
         </div>
         <!-- /page content -->
+
+<!-- Generate Questions Modal -->
+<div class="modal fade" id="generateQuestionsModal" tabindex="-1" role="dialog" aria-labelledby="generateQuestionsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title" id="generateQuestionsModalLabel">
+          <i class="fa fa-robot"></i> Generate Questions
+        </h4>
+      </div>
+      <div id="generateQuestionsModalBody">
+        <!-- Content will be loaded here -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function openGenerateQuestionsModal(criteriaType) {
+    // Show loading state
+    document.getElementById('generateQuestionsModalBody').innerHTML = 
+        '<div class="modal-body text-center"><div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div><p class="mt-3">Loading question generator...</p></div>';
+    
+    // Show modal
+    $('#generateQuestionsModal').modal('show');
+    
+    // Load modal content
+    fetch('<?php echo base_url(); ?>criteria_question_converter/get_modal_content?type=' + criteriaType)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('generateQuestionsModalBody').innerHTML = data.content;
+            } else {
+                document.getElementById('generateQuestionsModalBody').innerHTML = 
+                    '<div class="modal-body"><div class="alert alert-danger">Error loading content: ' + data.message + '</div></div>';
+            }
+        })
+        .catch(error => {
+            document.getElementById('generateQuestionsModalBody').innerHTML = 
+                '<div class="modal-body"><div class="alert alert-danger">Error loading content: ' + error.message + '</div></div>';
+        });
+}
+
+function loadModalContent(criteriaType) {
+    // Reload modal content
+    fetch('<?php echo base_url(); ?>criteria_question_converter/get_modal_content?type=' + criteriaType)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('generateQuestionsModalBody').innerHTML = data.content;
+            }
+        })
+        .catch(error => {
+            console.error('Error reloading modal content:', error);
+        });
+}
+</script>

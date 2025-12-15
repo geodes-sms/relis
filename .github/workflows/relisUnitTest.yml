@@ -1,18 +1,70 @@
 name: Relis unit test
-
-on:
+'on':
   pull_request:
     branches:
       - main
-
 jobs:
   relis_unit_testing:
     runs-on: ubuntu-latest
-
     steps:
+      - name: Free up disk space
+        run: >
+          echo "Before cleanup:"
+
+          df -h
+
+
+          # Remove unnecessary software to free up space
+
+          sudo rm -rf /usr/share/dotnet
+
+          sudo rm -rf /usr/local/lib/android
+
+          sudo rm -rf /opt/ghc
+
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+
+          sudo rm -rf /usr/local/share/boost
+
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+
+
+          # Remove large packages
+
+          sudo apt-get remove -y '^aspnetcore-.*' || true
+
+          sudo apt-get remove -y '^dotnet-.*' --fix-missing || true
+
+          sudo apt-get remove -y '^llvm-.*' --fix-missing || true
+
+          sudo apt-get remove -y '^mongodb-.*' --fix-missing || true
+
+          sudo apt-get remove -y '^mysql-.*' --fix-missing || true
+
+          sudo apt-get remove -y azure-cli google-chrome-stable firefox
+          powershell mono-devel libgl1-mesa-dri --fix-missing || true
+
+          sudo apt-get remove -y google-cloud-sdk --fix-missing || true
+
+          sudo apt-get remove -y google-cloud-cli --fix-missing || true
+
+
+          # Clean up
+
+          sudo apt-get autoremove -y
+
+          sudo apt-get clean
+
+          sudo docker image prune --all --force
+
+          sudo rm -rf /var/lib/apt/lists/*
+
+
+          echo "After cleanup:"
+
+          df -h  
       - name: Checkout Code
         uses: actions/checkout@v3
-
       - name: Check if Docker is installed
         run: |
           if docker --version; then
@@ -20,27 +72,25 @@ jobs:
           else
             echo "Docker is not installed, please install Docker in your Github Repository."
           fi
-
       - name: Build Docker Image
         run: docker compose build
         working-directory: deployment
-
       - name: Run Docker Containers
         run: docker compose up -d
         working-directory: deployment
-
       - name: Wait for Application to Start
         run: sleep 10
-
       - name: Set relis-app Container permission
         run: |
           docker exec relis-app chmod -R 777 /u/relis/public_html/relis_app/ 
           docker exec relis-app chmod -R 777 /u/relis/public_html/cside/export_r
-
       - name: Run Unit test
-        run: |
+        run: >
 
-          response=$(php -r 'echo file_get_contents("http://localhost:8083/test/unit_test/relis_unit_test/last_result", false, stream_context_create(["http" => ["timeout" => 900]]));')
+          response=$(php -r 'echo
+          file_get_contents("http://localhost:8083/test/unit_test/relis_unit_test/last_result",
+          false, stream_context_create(["http" => ["timeout" => 900]]));')
+
 
           if [ "$response" == "successful" ]; then
             echo "The unit test passed. Proceeding with the workflow."
@@ -59,13 +109,12 @@ jobs:
             echo $response > ~/test_report.html
             exit 1
           fi
-
       - name: Upload the HTML Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: test-report.html
           path: ~/test_report.html
-
       - name: Stop all running Docker Containers
         run: docker stop $(docker ps -q)
+

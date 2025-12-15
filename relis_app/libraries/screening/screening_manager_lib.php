@@ -179,6 +179,11 @@ class Screening_manager_lib
 
 			$menu['settings']['menu']['configuration'] = array('label' => 'Planning', 'url' => 'element/display_element/configurations/1', 'icon' => 'th');
 			$menu['settings']['menu']['configuration']['sub_menu']['settings'] = array('label' => 'Settings ', 'url' => 'element/display_element/configurations/1', 'icon' => '');
+			$menu['settings']['menu']['configuration']['sub_menu']['llm_project_settings'] = array('label' => 'LLM Project Settings', 'url' => 'element/edit_element/edit_config_llm_project/1', 'icon' => '');
+			$menu['settings']['menu']['configuration']['sub_menu']['research_question'] = array('label' => 'Research Questions', 'url' => 'element/entity_list/list_research_question', 'icon' => '');
+			$menu['settings']['menu']['configuration']['sub_menu']['exclusioncrieria'] = array('label' => 'Exclusion Criteria', 'url' => 'element/entity_list/list_exclusioncrieria', 'icon' => '');
+			$menu['settings']['menu']['configuration']['sub_menu']['inclusioncriteria'] = array('label' => 'Inclusion Criteria', 'url' => 'element/entity_list/list_inclusioncriteria', 'icon' => '');
+			$menu['settings']['menu']['configuration']['sub_menu']['prompt_generation'] = array('label' => 'Prompt Generation', 'url' => 'prompt_generation', 'icon' => '');
 			//$menu['settings']['menu']['configuration']['sub_menu']['users']=array('label'=>'Papers configuration','url'=>'element/display_element/config_papers/1','icon'=>'');
 
 			//	if(get_appconfig_element('screening_on'))
@@ -191,14 +196,9 @@ class Screening_manager_lib
 
 
 			//$menu['settings']['menu']['configuration']['sub_menu']['space']=array('label'=>'_______________','url'=>'','icon'=>'');
-			$menu['settings']['menu']['configuration']['sub_menu']['research_question'] = array('label' => 'Research Questions', 'url' => 'element/entity_list/list_research_question', 'icon' => '');
 
 			if (get_appconfig_element('screening_on'))
 				$menu['settings']['menu']['configuration']['sub_menu']['screen_phases'] = array('label' => 'Screening Phases', 'url' => 'element/entity_list/list_screen_phases', 'icon' => '');
-
-			$menu['settings']['menu']['configuration']['sub_menu']['exclusioncrieria'] = array('label' => 'Exclusion Criteria', 'url' => 'element/entity_list/list_exclusioncrieria', 'icon' => '');
-			$menu['settings']['menu']['configuration']['sub_menu']['inclusioncriteria'] = array('label' => 'Inclusion Criteria', 'url' => 'element/entity_list/list_inclusioncriteria', 'icon' => '');
-
 
 			$menu['settings']['menu']['configuration']['sub_menu']['papers_sources'] = array('label' => 'Papers Sources', 'url' => 'element/entity_list/list_papers_sources', 'icon' => '');
 			$menu['settings']['menu']['configuration']['sub_menu']['search_strategy'] = array('label' => 'Search Strategies', 'url' => 'element/entity_list/list_search_strategy', 'icon' => '');

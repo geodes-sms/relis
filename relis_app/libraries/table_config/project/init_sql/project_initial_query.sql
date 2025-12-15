@@ -161,6 +161,49 @@ CREATE TABLE IF NOT EXISTS `str_management` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1;;;;
 
 
+DROP TABLE IF EXISTS `generated_prompts`;;;;
+CREATE TABLE IF NOT EXISTS `generated_prompts` (
+  `prompt_id` int(11) NOT NULL AUTO_INCREMENT,
+  `project_id` int(11) NOT NULL COMMENT 'Project this prompt belongs to',
+  `template_id` varchar(50) NOT NULL COMMENT 'Template used to generate the prompt',
+  `llm_config_id` int(11) DEFAULT NULL COMMENT 'LLM configuration used',
+  `generated_prompt` longtext NOT NULL COMMENT 'The generated prompt content',
+  `created_by` int(11) NOT NULL COMMENT 'User who generated the prompt',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'When the prompt was generated',
+  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT 'When the prompt was last updated',
+  `is_active` int(1) NOT NULL DEFAULT '1' COMMENT 'Whether this prompt is active',
+  PRIMARY KEY (`prompt_id`),
+  KEY `idx_project` (`project_id`),
+  KEY `idx_template` (`template_id`),
+  KEY `idx_llm_config` (`llm_config_id`),
+  KEY `idx_created_by` (`created_by`),
+  KEY `idx_created_at` (`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci COMMENT='Generated prompts from templates and database values';;;;
+
+
+DROP TABLE IF EXISTS `llm_config`;;;;
+CREATE TABLE IF NOT EXISTS `llm_config` (
+  `llm_config_id` int(11) NOT NULL AUTO_INCREMENT,
+  `provider_name` varchar(50) NOT NULL,
+  `model_name` varchar(100) NOT NULL,
+  `api_endpoint` varchar(255) DEFAULT NULL,
+  `max_tokens` int(11) NOT NULL DEFAULT 300,
+  `temperature` decimal(3,2) NOT NULL DEFAULT 0.20,
+  `is_active` int(1) NOT NULL DEFAULT 1,
+  `cost_per_1k_tokens` decimal(10,6) NOT NULL DEFAULT 0.002000,
+  `added_by` int(11) NOT NULL,
+  `add_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `llm_config_active` int(1) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`llm_config_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;;;;
+
+
+-- Insert default LLM configurations
+INSERT INTO `llm_config` (`provider_name`, `model_name`, `api_endpoint`, `max_tokens`, `temperature`, `is_active`, `cost_per_1k_tokens`, `added_by`, `add_time`, `llm_config_active`) VALUES
+('openrouter', 'openai/gpt-4', NULL, 300, 0.20, 1, 0.030000, 1, NOW(), 1),
+('openrouter', 'anthropic/claude-3-sonnet', NULL, 300, 0.20, 1, 0.015000, 1, NOW(), 1);;;;
+
+
 -- VIEWS
 
 DROP VIEW IF EXISTS `view_paper_assigned`;;;;
