@@ -37,8 +37,6 @@ jobs:
 
           sudo apt-get remove -y '^llvm-.*' --fix-missing || true
 
-          sudo apt-get remove -y 'php.*' --fix-missing || true
-
           sudo apt-get remove -y '^mongodb-.*' --fix-missing || true
 
           sudo apt-get remove -y '^mysql-.*' --fix-missing || true
@@ -119,3 +117,4 @@ jobs:
           path: ~/test_report.html
       - name: Stop all running Docker Containers
         run: docker stop $(docker ps -q)
+
