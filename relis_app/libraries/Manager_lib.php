@@ -1161,7 +1161,25 @@ class Manager_lib
 			$menu['adm']['menu']['plan']['sub_menu']['validate_screen_assign'] = array('label' => 'Assign Validation', 'url' => 'data_extraction/class_assignment_validation_set', 'icon' => '');
 
 		$menu['adm']['menu']['plan']['sub_menu']['exclusioncrieria'] = array('label' => 'Exclusion Criteria', 'url' => 'element/entity_list/list_exclusioncrieria', 'icon' => '');
-		if (can_manage_project())
+// ─── ISSUE #103 — Reviewer tags & assignment rules ─────────────
+        if (can_manage_project() and !$project_published) {
+            $menu['adm']['menu']['plan']['sub_menu']['reviewer_tags'] = array(
+                'label' => 'Reviewer Tags',
+                'url'   => 'element/entity_list/list_reviewer_tag',
+                'icon'  => 'tag'
+            );
+            $menu['adm']['menu']['plan']['sub_menu']['userproject_tags'] = array(
+                'label' => 'User Tag Assignments',
+                'url'   => 'element/entity_list/list_userproject_tag',
+                'icon'  => 'tags'
+            );
+            $menu['adm']['menu']['plan']['sub_menu']['assignment_rules'] = array(
+                'label' => 'Assignment Rules',
+                'url'   => 'element/entity_list/list_assignment_constraint',
+                'icon'  => 'list-alt'
+            );
+        }
+        if (can_manage_project())
 			$menu['adm']['menu']['plan']['sub_menu']['general'] = array('label' => 'Settings ', 'url' => 'element/display_element/configurations/1', 'icon' => '');
 
 		/*
@@ -1273,6 +1291,22 @@ class Manager_lib
 			$menu['adm']['menu']['plan']['sub_menu']['responses'] = array('label' => 'Answers', 'url' => 'element/entity_list/list_qa_responses', 'icon' => '');
 			$menu['adm']['menu']['plan']['sub_menu']['general'] = array('label' => 'Settings ', 'url' => 'element/display_element/configurations/1', 'icon' => '');
 
+            // ─── ISSUE #103 — Reviewer tags & assignment rules ─────────────
+            $menu['adm']['menu']['plan']['sub_menu']['reviewer_tags'] = array(
+                'label' => 'Reviewer Tags',
+                'url'   => 'element/entity_list/list_reviewer_tag',
+                'icon'  => 'tag'
+            );
+            $menu['adm']['menu']['plan']['sub_menu']['userproject_tags'] = array(
+                'label' => 'User Tag Assignments',
+                'url'   => 'element/entity_list/list_userproject_tag',
+                'icon'  => 'tags'
+            );
+            $menu['adm']['menu']['plan']['sub_menu']['assignment_rules'] = array(
+                'label' => 'Assignment Rules',
+                'url'   => 'element/entity_list/list_assignment_constraint',
+                'icon'  => 'list-alt'
+            );
 
 		}
 		return $menu;
@@ -1369,7 +1403,24 @@ class Manager_lib
 				$menu['adm']['menu']['plan']['sub_menu']['inclusioncriteria'] = array('label' => 'Inclusion Criteria', 'url' => 'element/entity_list/list_inclusioncriteria', 'icon' => '');
 
 				$menu['adm']['menu']['plan']['sub_menu']['exclusioncrieria'] = array('label' => 'Exclusion Criteria', 'url' => 'element/entity_list/list_exclusioncrieria', 'icon' => '');
-
+// ─── ISSUE #103 — Reviewer tags & assignment rules ─────────────
+                if (can_manage_project() and !$project_published) {
+                    $menu['adm']['menu']['plan']['sub_menu']['reviewer_tags'] = array(
+                        'label' => 'Reviewer Tags',
+                        'url'   => 'element/entity_list/list_reviewer_tag',
+                        'icon'  => 'tag'
+                    );
+                    $menu['adm']['menu']['plan']['sub_menu']['userproject_tags'] = array(
+                        'label' => 'User Tag Assignments',
+                        'url'   => 'element/entity_list/list_userproject_tag',
+                        'icon'  => 'tags'
+                    );
+                    $menu['adm']['menu']['plan']['sub_menu']['assignment_rules'] = array(
+                        'label' => 'Assignment Rules',
+                        'url'   => 'element/entity_list/list_assignment_constraint',
+                        'icon'  => 'list-alt'
+                    );
+                }
 				if (can_validate_project())
 					$menu['adm']['menu']['plan']['sub_menu']['general'] = array('label' => 'Settings ', 'url' => 'element/display_element/configurations/1', 'icon' => '');
 			}
