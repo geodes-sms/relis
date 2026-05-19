@@ -2597,4 +2597,75 @@ class Element extends CI_Controller
 		//print_test($exist_config);
 		return $res;
 	}
+
+    // ─── ISSUE #103 — Save assignment constraint with JSON params ──
+    function save_assignment_constraint()
+    {
+        $post = $this->input->post();
+        $type = $post['constraint_type'];
+        $params = array();
+
+        switch ($type) {
+            case 'min_tag_per_paper':
+                $params = array(
+                    'tag_id'    => intval($post['p_min_tag_id']),
+                    'min_count' => intval($post['p_min_count']),
+                );
+                break;
+
+            case 'max_tag_per_paper':
+                $params = array(
+                    'tag_id'    => intval($post['p_max_tag_id']),
+                    'max_count' => intval($post['p_max_count']),
+                );
+                break;
+
+            case 'tag_combination':
+                $params = array('options' => array(
+                    array('tag_id' => intval($post['p_comb_tag_a']),
+                        'count'  => intval($post['p_comb_count_a'])),
+                    array('tag_id' => intval($post['p_comb_tag_b']),
+                        'count'  => intval($post['p_comb_count_b'])),
+                ));
+                break;
+
+            case 'same_user_from_previous_phase':
+                $params = array(
+                    'previous_scope'    => $post['p_same_scope'],
+                    'previous_phase_id' => !empty($post['p_same_phase_id'])
+                        ? intval($post['p_same_phase_id']) : null,
+                    'mode'              => $post['p_same_mode'],
+                );
+                break;
+
+            case 'force_different_user_from_previous_phase':
+                $params = array(
+                    'previous_scope'    => $post['p_diff_scope'],
+                    'previous_phase_id' => !empty($post['p_diff_phase_id'])
+                        ? intval($post['p_diff_phase_id']) : null,
+                );
+                break;
+        }
+
+        $this->db2 = $this->load->database(project_db(), TRUE);
+        $this->db2->insert('assignment_constraint', array(
+            'constraint_scope'    => $post['constraint_scope'],
+            'phase_id'            => !empty($post['phase_id']) ? intval($post['phase_id']) : null,
+            'constraint_type'     => $type,
+            'constraint_params'   => json_encode($params),
+            'constraint_priority' => intval($post['constraint_priority']),
+            'created_by'          => $this->session->userdata('user_id'),
+        ));
+
+        set_top_msg('Constraint saved');
+        redirect('element/entity_list/list_assignment_constraint');
+    }
+
+    function new_assignment_constraint()
+    {
+        $this->load->model('Screening_dataAccess');
+        $data['page']       = 'general/frm_assignment_constraint';
+        $data['page_title'] = lng('Create Assignment Constraint');
+        $this->load->view('shared/body', $data);
+    }
 }
