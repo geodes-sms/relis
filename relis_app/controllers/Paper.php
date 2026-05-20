@@ -100,54 +100,54 @@ class Paper extends CI_Controller
         $view_link_url = "";
         foreach ($ref_table_config['links'] as $link_type => $link) {
             if (!empty($link['on_list'])) { {
-                    $link['type'] = $link_type;
-                    if (empty($link['title'])) {
-                        $link['title'] = lng_min($link['label']);
-                    }
-                    $push_link = false;
-                    switch ($link_type) {
-                        case 'add':
-                            $add_link = true; //will appear as a top button
-                            if (empty($link['url']))
-                                $add_link_url = 'manager/add_element/' . $ref_table;
-                            else
-                                $add_link_url = $link['url'];
-                            break;
-                        case 'view':
-                            if (!isset($link['icon']))
-                                $link['icon'] = 'folder';
-                            if (empty($link['url']))
-                                $link['url'] = 'manager/display_element/' . $ref_table . '/';
-                            $push_link = true;
-                            break;
-                        case 'edit':
-                            if (!isset($link['icon']))
-                                $link['icon'] = 'pencil';
-                            if (empty($link['url']))
-                                $link['url'] = 'manager/edit_element/' . $ref_table . '/';
-                            $push_link = true;
-                            break;
-                        case 'delete':
-                            if (!isset($link['icon']))
-                                $link['icon'] = 'trash';
-                            if (empty($link['url']))
-                                $link['url'] = 'manager/delete_element/' . $ref_table . '/';
-                            $push_link = true;
-                            break;
-                        case 'add_child':
-                            if (!isset($link['icon']))
-                                $link['icon'] = 'plus';
-                            if (!empty($link['url'])) {
-                                $link['url'] = 'manager/add_element_child/' . $link['url'] . "/" . $ref_table . "/";
-                                $push_link = true;
-                            }
-                            break;
-                        default:
-                            break;
-                    }
-                    if ($push_link)
-                        array_push($list_links, $link);
+                $link['type'] = $link_type;
+                if (empty($link['title'])) {
+                    $link['title'] = lng_min($link['label']);
                 }
+                $push_link = false;
+                switch ($link_type) {
+                    case 'add':
+                        $add_link = true; //will appear as a top button
+                        if (empty($link['url']))
+                            $add_link_url = 'manager/add_element/' . $ref_table;
+                        else
+                            $add_link_url = $link['url'];
+                        break;
+                    case 'view':
+                        if (!isset($link['icon']))
+                            $link['icon'] = 'folder';
+                        if (empty($link['url']))
+                            $link['url'] = 'manager/display_element/' . $ref_table . '/';
+                        $push_link = true;
+                        break;
+                    case 'edit':
+                        if (!isset($link['icon']))
+                            $link['icon'] = 'pencil';
+                        if (empty($link['url']))
+                            $link['url'] = 'manager/edit_element/' . $ref_table . '/';
+                        $push_link = true;
+                        break;
+                    case 'delete':
+                        if (!isset($link['icon']))
+                            $link['icon'] = 'trash';
+                        if (empty($link['url']))
+                            $link['url'] = 'manager/delete_element/' . $ref_table . '/';
+                        $push_link = true;
+                        break;
+                    case 'add_child':
+                        if (!isset($link['icon']))
+                            $link['icon'] = 'plus';
+                        if (!empty($link['url'])) {
+                            $link['url'] = 'manager/add_element_child/' . $link['url'] . "/" . $ref_table . "/";
+                            $push_link = true;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+                if ($push_link)
+                    array_push($list_links, $link);
+            }
             }
         }
         /*
@@ -1307,7 +1307,7 @@ class Paper extends CI_Controller
     }
 
     /**
-     * checks if a paper already exists based on the DOI or title/authors, 
+     * checks if a paper already exists based on the DOI or title/authors,
      * and then inserts the paper into the database with the appropriate values and relationships with authors
      */
     private function insert_paper_bibtext($paper_array)
@@ -1699,10 +1699,7 @@ class Paper extends CI_Controller
                         $error = 0;
                         $year = !empty($Tres['entry']['year']) ? $Tres['entry']['year'] : "";
                         $paper_array['bibtexKey'] = str_replace('\\', '', $Tres['entry']['entrykey']);
-                        $title = !empty($Tres['entry']['title']) ? $Tres['entry']['title'] : "";
-                        $title = str_replace('{', '', $title);
-                        $title = str_replace('\\', '', $title);
-                        $paper_array['title'] = str_replace('}', '', $title);
+                        $paper_array['title'] = !empty($Tres['entry']['title']) ? $Tres['entry']['title'] : "";
                         $paper_array['preview'] = !empty($Tres['preview']) ? $Tres['preview'] : "";
                         $paper_array['bibtex'] = !empty($Tres['bibtex']) ? $Tres['bibtex'] : "";
                         $paper_array['abstract'] = !empty($Tres['entry']['abstract']) ? $Tres['entry']['abstract'] : "";
@@ -1731,10 +1728,7 @@ class Paper extends CI_Controller
                                                                                            $paper['venueId']=$venue_id;
                                                                                            }*/
                                     $paper['bibtexKey'] = str_replace('\\', '', $value['entry']['entrykey']);
-                                    $title = !empty($value['entry']['title']) ? $value['entry']['title'] : "";
-                                    $title = str_replace('{', '', $title);
-                                    $title = str_replace('\\', '', $title);
-                                    $paper['title'] = str_replace('}', '', $title);
+                                    $paper['title'] = !empty($value['entry']['title']) ? $value['entry']['title'] : "";
                                     $paper['preview'] = !empty($value['preview']) ? $value['preview'] : "";
                                     $paper['bibtex'] = !empty($value['bibtex']) ? $value['bibtex'] : "";
                                     $paper['abstract'] = !empty($value['entry']['abstract']) ? $value['entry']['abstract'] : "";
