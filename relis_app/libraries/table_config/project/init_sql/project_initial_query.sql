@@ -187,15 +187,15 @@ VALUES
 
 DROP TABLE IF EXISTS `userproject_tag`;;;;
 CREATE TABLE IF NOT EXISTS `userproject_tag` (
-                                                 `userproject_tag_id` INT(11)   NOT NULL AUTO_INCREMENT,
-    `userproject_id`     INT(11)   NOT NULL,
-    `tag_id`             INT(11)   NOT NULL,
-    `assigned_by`        INT(11)   DEFAULT NULL,
-    `assigned_time`      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `userproject_tag_id`     INT(11)   NOT NULL AUTO_INCREMENT,
+    `user_id`                INT(11)   NOT NULL,
+    `tag_id`                 INT(11)   NOT NULL,
+    `assigned_by`            INT(11)   DEFAULT NULL,
+    `assigned_time`          TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `userproject_tag_active` INT(1)    NOT NULL DEFAULT 1,
     PRIMARY KEY (`userproject_tag_id`),
-    UNIQUE KEY `uq_up_tag` (`userproject_id`, `tag_id`),
-    KEY `idx_up` (`userproject_id`),
+    UNIQUE KEY `uq_user_tag` (`user_id`, `tag_id`),
+    KEY `idx_user` (`user_id`),
     KEY `idx_tag` (`tag_id`)
     ) ENGINE=InnoDB  DEFAULT CHARSET=latin1;;;;
 

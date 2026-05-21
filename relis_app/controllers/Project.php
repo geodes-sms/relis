@@ -687,6 +687,9 @@ class Project extends CI_Controller
                 $this->session->set_userdata('project_public', $item_data['project_public']);
                 $this->session->set_userdata('working_perspective', 'screen');
                 $this->session->set_userdata('current_screen_phase', 0);
+
+                // ISSUE #103 — Migration automatique
+                run_assignment_migration_if_needed($item_data['project_label']);
             }
         }
         redirect('screening/screening');
@@ -702,6 +705,9 @@ class Project extends CI_Controller
             $this->session->set_userdata('project_db', $projet_label);
             $this->session->set_userdata('project_id', $project_id);
             $this->session->set_userdata('project_title', urldecode(urldecode($project_title)));
+
+            // ISSUE #103 — Migration automatique
+            run_assignment_migration_if_needed($projet_label);
         }
         redirect('screening/screening');
     }
@@ -731,6 +737,9 @@ class Project extends CI_Controller
                 $this->session->set_userdata('project_db', $item_data['project_label']);
                 $this->session->set_userdata('project_id', $project_id);
                 $this->session->set_userdata('project_title', $item_data['project_title']);
+
+                // ISSUE #103 — Migration automatique
+                run_assignment_migration_if_needed($item_data['project_label']);
             }
         }
         redirect('screening/screening');

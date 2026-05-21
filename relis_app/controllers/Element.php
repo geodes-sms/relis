@@ -2598,7 +2598,7 @@ class Element extends CI_Controller
 		return $res;
 	}
 
-    // ─── ISSUE #103 — Save assignment constraint with JSON params ──
+    // ISSUE #103
     function save_assignment_constraint()
     {
         $post = $this->input->post();

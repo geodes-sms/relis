@@ -149,6 +149,9 @@ function check_operation($operation, $type = "List")
 	include_once('operations/op_info.php');
 	$operations = array_merge($operations, get_operations_info());
 
+    include_once('operations/op_assignment.php');
+    $operations = array_merge($operations, get_operations_assignment());
+
 	if (project_db() != 'default') {
 		include_once('operations/op_generated.php');
 		$operations = array_merge($operations, get_operations_generated());
@@ -383,4 +386,90 @@ function admin_initial_db_setup($verbose = FALSE)
 	//change config value
 	$sql = "UPDATE config_admin SET first_connect = 0  ";
 	$res = $ci->db->simple_query($sql);
+}
+
+// ─── ISSUE #103 — Format constraint as human-readable string ──────────────────
+function format_constraint_human($constraint)
+{
+    if (empty($constraint) || empty($constraint['constraint_params'])) {
+        return 'No parameters available';
+    }
+    $params = json_decode($constraint['constraint_params'], true);
+    if (!is_array($params)) return 'Invalid constraint parameters';
+
+    $CI =& get_instance();
+    $db_project = $CI->load->database(project_db(), TRUE);
+
+    $tag_name = function($tag_id) use ($db_project) {
+        $row = $db_project->query(
+            "SELECT tag_name FROM reviewer_tag WHERE tag_id = ?",
+            array($tag_id)
+        )->row_array();
+        return $row ? $row['tag_name'] : '(unknown tag)';
+    };
+
+    $phase_name = function($phase_id) use ($db_project) {
+        if (empty($phase_id)) return null;
+        $row = $db_project->query(
+            "SELECT phase_title FROM screen_phase WHERE screen_phase_id = ?",
+            array($phase_id)
+        )->row_array();
+        return $row ? $row['phase_title'] : null;
+    };
+
+    $scope_labels = array(
+        'screening'                 => 'Screening',
+        'screening_validation'      => 'Screening validation',
+        'qa'                        => 'QA',
+        'qa_validation'             => 'QA validation',
+        'classification'            => 'Classification',
+        'classification_validation' => 'Classification validation',
+    );
+
+    switch ($constraint['constraint_type']) {
+
+        case 'min_tag_per_paper':
+            return 'At least <strong>' . intval($params['min_count'])
+                . '</strong> reviewer(s) tagged <strong>'
+                . htmlspecialchars($tag_name($params['tag_id']))
+                . '</strong> per paper.';
+
+        case 'max_tag_per_paper':
+            return 'At most <strong>' . intval($params['max_count'])
+                . '</strong> reviewer(s) tagged <strong>'
+                . htmlspecialchars($tag_name($params['tag_id']))
+                . '</strong> per paper.';
+
+        case 'tag_combination':
+            $parts = array();
+            foreach ($params['options'] as $opt) {
+                $parts[] = '<strong>' . intval($opt['count']) . '</strong> '
+                    . htmlspecialchars($tag_name($opt['tag_id']));
+            }
+            return implode(' <em>OR</em> ', $parts) . ' per paper.';
+
+        case 'same_user_from_previous_phase':
+            $scope_label = isset($scope_labels[$params['previous_scope']])
+                ? $scope_labels[$params['previous_scope']]
+                : htmlspecialchars($params['previous_scope']);
+            $phase = $phase_name(isset($params['previous_phase_id']) ? $params['previous_phase_id'] : null);
+            $mode  = (!empty($params['mode']) && $params['mode'] === 'strict')
+                ? '(strict)' : '(preferred)';
+            return 'Reuse the same reviewers as <strong>' . $scope_label . '</strong>'
+                . ($phase ? ' — phase <strong>' . htmlspecialchars($phase) . '</strong>' : '')
+                . ' ' . $mode . '.';
+
+        case 'force_different_user_from_previous_phase':
+            $scope_label = isset($scope_labels[$params['previous_scope']])
+                ? $scope_labels[$params['previous_scope']]
+                : htmlspecialchars($params['previous_scope']);
+            $phase = $phase_name(isset($params['previous_phase_id']) ? $params['previous_phase_id'] : null);
+            return 'Forbid reviewers who already saw the paper in <strong>'
+                . $scope_label . '</strong>'
+                . ($phase ? ' — phase <strong>' . htmlspecialchars($phase) . '</strong>' : '')
+                . '.';
+
+        default:
+            return htmlspecialchars($constraint['constraint_type']);
+    }
 }

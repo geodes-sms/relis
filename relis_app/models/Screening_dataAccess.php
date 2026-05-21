@@ -426,11 +426,9 @@ class Screening_dataAccess extends CI_Model
         $sql = "SELECT rt.*
             FROM userproject_tag upt
             JOIN reviewer_tag rt ON rt.tag_id = upt.tag_id
-            JOIN userproject up   ON up.userproject_id = upt.userproject_id
-            WHERE up.user_id = ?
+            WHERE upt.user_id = ?
               AND rt.tag_active = 1
-              AND upt.userproject_tag_active = 1
-              AND up.userproject_active = 1";
+              AND upt.userproject_tag_active = 1";
         return $this->db_current->query($sql, array($user_id))->result_array();
     }
 
@@ -443,9 +441,8 @@ class Screening_dataAccess extends CI_Model
         $sql = "SELECT rt2.tag_id
             FROM userproject_tag upt
             JOIN reviewer_tag rt2 ON rt2.tag_id = upt.tag_id
-            JOIN userproject up   ON up.userproject_id = upt.userproject_id
             JOIN reviewer_tag rt_target ON rt_target.tag_id = ?
-            WHERE up.user_id = ?
+            WHERE upt.user_id = ?
               AND upt.userproject_tag_active = 1
               AND rt2.tag_active = 1
               AND (

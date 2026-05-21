@@ -1082,4 +1082,3 @@ function qa_validate($paper_id, $op = 1)
         $after_after_save_redirect = "quality_assessment/qa_conduct_list_val";
     }
 }
-

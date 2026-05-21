@@ -250,6 +250,9 @@ function update_stored_procedure($config, $verbose = FALSE, $target_db = 'curren
 			'qa_assignment',
 			'qa_validation_assignment',
 			'assignation',
+            'reviewer_tag',
+            'userproject_tag',
+            'assignment_constraint',
 			'debug'
 		);
 		//$configs=array('assignation','author','class_scheme','config','exclusion','papers','paper_author','ref_exclusioncrieria','str_mng','venue');
@@ -463,4 +466,104 @@ function populate_common_tables_views($target_db = 'current')
 			}
 		}
 	}
+}
+
+// ─── ISSUE #103 — Migration automatique des tables d'assignation ──────────────
+/**
+ * Vérifie si les tables de l'issue #103 existent dans la DB du projet courant.
+ * Si non, les crée silencieusement et seed les tags par défaut.
+ * Appelé à chaque ouverture de projet — idempotent et sans effet si tables déjà présentes.
+ */
+function run_assignment_migration_if_needed($project_db_name)
+{
+    if (empty($project_db_name) || $project_db_name === 'default') return;
+
+    $CI =& get_instance();
+    $db = $CI->load->database($project_db_name, TRUE);
+
+    // ── Vérifier si les tables existent déjà ─────────────────────────────────
+    $tables_needed = array('reviewer_tag', 'userproject_tag', 'assignment_constraint');
+    $all_exist = true;
+
+    foreach ($tables_needed as $table) {
+        $res = $db->query("SHOW TABLES LIKE '$table'")->num_rows();
+        if ($res === 0) {
+            $all_exist = false;
+            break;
+        }
+    }
+
+    if ($all_exist) return; // Rien à faire
+
+    // ── Créer reviewer_tag ────────────────────────────────────────────────────
+    $db->query("
+        CREATE TABLE IF NOT EXISTS `reviewer_tag` (
+          `tag_id`              INT(11)      NOT NULL AUTO_INCREMENT,
+          `tag_name`            VARCHAR(50)  NOT NULL,
+          `tag_description`     VARCHAR(250) DEFAULT NULL,
+          `tag_color`           VARCHAR(7)   DEFAULT '#888888',
+          `tag_is_hierarchical` TINYINT(1)   NOT NULL DEFAULT 0,
+          `tag_rank`            INT(11)      NOT NULL DEFAULT 0,
+          `tag_active`          INT(1)       NOT NULL DEFAULT 1,
+          `added_by`            INT(11)      DEFAULT NULL,
+          `added_time`          TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          PRIMARY KEY (`tag_id`),
+          UNIQUE KEY `uq_tag_name` (`tag_name`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+    ");
+
+    // ── Seed des 3 tags par défaut ────────────────────────────────────────────
+    $existing = $db->query("SELECT COUNT(*) AS c FROM reviewer_tag")->row_array();
+    if (empty($existing['c'])) {
+        $db->query("
+            INSERT INTO reviewer_tag
+              (tag_name, tag_description, tag_color, tag_is_hierarchical, tag_rank)
+            VALUES
+              ('Junior',        'Reviewer débutant',          '#7AB648', 1, 1),
+              ('Senior',        'Reviewer expérimenté',       '#2E75B6', 1, 2),
+              ('Methodologist', 'Spécialiste méthodologique', '#C0504D', 0, 0)
+        ");
+    }
+
+    // ── Créer userproject_tag ─────────────────────────────────────────────────
+    $db->query("
+        CREATE TABLE IF NOT EXISTS `userproject_tag` (
+          `userproject_tag_id`     INT(11)   NOT NULL AUTO_INCREMENT,
+          `user_id`                INT(11)   NOT NULL,
+          `tag_id`                 INT(11)   NOT NULL,
+          `assigned_by`            INT(11)   DEFAULT NULL,
+          `assigned_time`          TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          `userproject_tag_active` INT(1)    NOT NULL DEFAULT 1,
+          PRIMARY KEY (`userproject_tag_id`),
+          UNIQUE KEY `uq_user_tag` (`user_id`, `tag_id`),
+          KEY `idx_user` (`user_id`),
+          KEY `idx_tag` (`tag_id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+    ");
+
+    // ── Créer assignment_constraint ───────────────────────────────────────────
+    $db->query("
+        CREATE TABLE IF NOT EXISTS `assignment_constraint` (
+          `constraint_id`       INT(11)      NOT NULL AUTO_INCREMENT,
+          `constraint_scope`    VARCHAR(40)  NOT NULL,
+          `phase_id`            INT(11)      DEFAULT NULL,
+          `constraint_type`     VARCHAR(60)  NOT NULL,
+          `constraint_params`   TEXT         NOT NULL,
+          `constraint_priority` INT(11)      NOT NULL DEFAULT 100,
+          `constraint_active`   INT(1)       NOT NULL DEFAULT 1,
+          `created_by`          INT(11)      DEFAULT NULL,
+          `creation_time`       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          PRIMARY KEY (`constraint_id`),
+          KEY `idx_scope_phase` (`constraint_scope`, `phase_id`, `constraint_active`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+    ");
+
+    // ── Régénérer les stored procedures pour les nouvelles entités ────────────
+    $configs_to_generate = array('reviewer_tag', 'userproject_tag', 'assignment_constraint');
+    foreach ($configs_to_generate as $config_name) {
+        $config = get_table_configuration($config_name);
+        if (!empty($config)) {
+            create_stored_procedures($config, $project_db_name, false);
+        }
+    }
 }
