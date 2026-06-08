@@ -720,6 +720,8 @@ class Project extends CI_Controller
             $this->session->set_userdata('project_db', $projet_label);
             $this->session->set_userdata('project_id', $project_id);
             $this->session->set_userdata('project_title', urldecode(urldecode($project_title)));
+            run_assignment_migration_if_needed($projet_label);
+
         }
         //redirect('home');
     }

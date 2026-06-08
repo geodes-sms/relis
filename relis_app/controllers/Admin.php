@@ -264,4 +264,31 @@ class Admin extends CI_Controller
 		//create_table_configuration($table_configuration);
 		echo anchor('admin/list_configurations', "<h1>Back</h1>");
 	}
+
+    /**
+     * Issue #103 - Force la régénération des stored procedures pour les 3 entités
+     * de l'issue #103. À utiliser si la migration automatique a échoué pour un projet.
+     *
+     * URL: /admin/regenerate_assignment_procedures
+     */
+    public function regenerate_assignment_procedures()
+    {
+        $entities = array('reviewer_tag', 'userproject_tag', 'assignment_constraint');
+        $project_db_name = project_db();
+
+        echo "<h2>Regenerating stored procedures for project: $project_db_name</h2>";
+
+        foreach ($entities as $entity) {
+            echo "<h3>$entity</h3>";
+            $config = get_table_configuration($entity);
+            if (empty($config)) {
+                echo "<p style='color:red'>Configuration not found for $entity</p>";
+                continue;
+            }
+            create_stored_procedures($config, $project_db_name, false);
+            echo "<p style='color:green'>Done.</p>";
+        }
+
+        echo "<hr><a href='" . base_url('home') . "'>Back to home</a>";
+    }
 }

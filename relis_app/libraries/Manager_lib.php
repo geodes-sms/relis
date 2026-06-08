@@ -1166,17 +1166,17 @@ class Manager_lib
             $menu['adm']['menu']['plan']['sub_menu']['reviewer_tags'] = array(
                 'label' => 'Reviewer Tags',
                 'url'   => 'element/entity_list/list_reviewer_tag',
-                'icon'  => 'tag'
+                'icon'  => ''
             );
             $menu['adm']['menu']['plan']['sub_menu']['userproject_tags'] = array(
                 'label' => 'User Tag Assignments',
                 'url'   => 'element/entity_list/list_userproject_tag',
-                'icon'  => 'tags'
+                'icon'  => ''
             );
             $menu['adm']['menu']['plan']['sub_menu']['assignment_rules'] = array(
                 'label' => 'Assignment Rules',
                 'url'   => 'element/entity_list/list_assignment_constraint',
-                'icon'  => 'list-alt'
+                'icon'  => ''
             );
         }
         if (can_manage_project())
@@ -1290,24 +1290,6 @@ class Manager_lib
 			$menu['adm']['menu']['plan']['sub_menu']['questions'] = array('label' => 'Questions', 'url' => 'element/entity_list/list_qa_questions', 'icon' => '');
 			$menu['adm']['menu']['plan']['sub_menu']['responses'] = array('label' => 'Answers', 'url' => 'element/entity_list/list_qa_responses', 'icon' => '');
 			$menu['adm']['menu']['plan']['sub_menu']['general'] = array('label' => 'Settings ', 'url' => 'element/display_element/configurations/1', 'icon' => '');
-
-            // ─── ISSUE #103 — Reviewer tags & assignment rules ─────────────
-            $menu['adm']['menu']['plan']['sub_menu']['reviewer_tags'] = array(
-                'label' => 'Reviewer Tags',
-                'url'   => 'element/entity_list/list_reviewer_tag',
-                'icon'  => 'tag'
-            );
-            $menu['adm']['menu']['plan']['sub_menu']['userproject_tags'] = array(
-                'label' => 'User Tag Assignments',
-                'url'   => 'element/entity_list/list_userproject_tag',
-                'icon'  => 'tags'
-            );
-            $menu['adm']['menu']['plan']['sub_menu']['assignment_rules'] = array(
-                'label' => 'Assignment Rules',
-                'url'   => 'element/entity_list/list_assignment_constraint',
-                'icon'  => 'list-alt'
-            );
-
 		}
 		return $menu;
 	}
@@ -1403,24 +1385,6 @@ class Manager_lib
 				$menu['adm']['menu']['plan']['sub_menu']['inclusioncriteria'] = array('label' => 'Inclusion Criteria', 'url' => 'element/entity_list/list_inclusioncriteria', 'icon' => '');
 
 				$menu['adm']['menu']['plan']['sub_menu']['exclusioncrieria'] = array('label' => 'Exclusion Criteria', 'url' => 'element/entity_list/list_exclusioncrieria', 'icon' => '');
-// ─── ISSUE #103 — Reviewer tags & assignment rules ─────────────
-                if (can_manage_project() and !$project_published) {
-                    $menu['adm']['menu']['plan']['sub_menu']['reviewer_tags'] = array(
-                        'label' => 'Reviewer Tags',
-                        'url'   => 'element/entity_list/list_reviewer_tag',
-                        'icon'  => 'tag'
-                    );
-                    $menu['adm']['menu']['plan']['sub_menu']['userproject_tags'] = array(
-                        'label' => 'User Tag Assignments',
-                        'url'   => 'element/entity_list/list_userproject_tag',
-                        'icon'  => 'tags'
-                    );
-                    $menu['adm']['menu']['plan']['sub_menu']['assignment_rules'] = array(
-                        'label' => 'Assignment Rules',
-                        'url'   => 'element/entity_list/list_assignment_constraint',
-                        'icon'  => 'list-alt'
-                    );
-                }
 				if (can_validate_project())
 					$menu['adm']['menu']['plan']['sub_menu']['general'] = array('label' => 'Settings ', 'url' => 'element/display_element/configurations/1', 'icon' => '');
 			}
@@ -1517,7 +1481,9 @@ class Manager_lib
 
 			$menu['settings']['menu']['configuration']['sub_menu']['papers_sources'] = array('label' => 'Papers Sources', 'url' => 'element/entity_list/list_papers_sources', 'icon' => '');
 			$menu['settings']['menu']['configuration']['sub_menu']['search_strategy'] = array('label' => 'Search Strategies', 'url' => 'element/entity_list/list_search_strategy', 'icon' => '');
-
+            $menu['settings']['menu']['configuration']['sub_menu']['reviewer_tags'] = array('label' => 'Reviewer Tags', 'url' => 'element/entity_list/list_reviewer_tag', 'icon' => '');
+            $menu['settings']['menu']['configuration']['sub_menu']['userproject_tags'] = array('label' => 'User Tag Assignments', 'url' => 'element/entity_list/list_userproject_tag', 'icon' => '');
+            $menu['settings']['menu']['configuration']['sub_menu']['assignment_rules'] = array('label' => 'Assignment Rules', 'url' => 'element/entity_list/list_assignment_constraint', 'icon' => '');
 			$menu['settings']['menu']['operations'] = array('label' => 'Operations Management', 'url' => 'element/entity_list/list_operations', 'icon' => 'reorder');
 			$menu['settings']['menu']['str_mng'] = array('label' => 'Label Management', 'url' => 'element/entity_list/list_str_mng', 'icon' => 'text-width');
 			$menu['settings']['menu']['install_form_editor'] = array('label' => 'Update Project Config', 'url' => 'install/install_form_editor', 'icon' => 'refresh');

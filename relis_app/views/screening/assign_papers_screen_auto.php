@@ -29,22 +29,60 @@
                             </p>
 
                             <?php
-                            // ─── ISSUE #103 — Display active constraints (human-readable) ─
+                            // ─── ISSUE #103 — Display constraints with toggle ────────────────
                             $this->load->model('Screening_dataAccess');
                             $scope    = 'screening';
                             $phase_id = active_screening_phase();
-                            $active_constraints = $this->Screening_dataAccess->get_active_constraints($scope, $phase_id);
+
+                            $db_project = $this->load->database(project_db(), TRUE);
+                            $all_constraints = $db_project->query(
+                                    "SELECT * FROM assignment_constraint
+     WHERE constraint_scope = ?
+       AND (phase_id = ? OR phase_id IS NULL)
+     ORDER BY constraint_priority ASC",
+                                    array($scope, $phase_id)
+                            )->result_array();
                             ?>
-                            <?php if (!empty($active_constraints)): ?>
+
+                            <?php if (!empty($all_constraints)): ?>
                                 <div class="alert alert-info" style="margin-bottom:15px;">
-                                    <strong><i class="fa fa-info-circle"></i> Active rules for this assignment:</strong>
-                                    <ul style="margin-top:8px; margin-bottom:0;">
-                                        <?php foreach ($active_constraints as $c): ?>
-                                            <li><?= format_constraint_human($c) ?></li>
+                                    <strong><i class="fa fa-info-circle"></i> Assignment rules:</strong>
+                                    <small class="text-muted">Toggle to activate or deactivate a rule for this assignment.</small>
+                                    <ul style="margin-top:8px; margin-bottom:0; list-style:none; padding-left:0;">
+                                        <?php foreach ($all_constraints as $c): ?>
+                                            <li style="margin:6px 0;">
+                                                <label style="cursor:pointer; display:flex; align-items:center; gap:10px;">
+                                                    <input type="checkbox"
+                                                           class="constraint-toggle"
+                                                           data-constraint-id="<?= $c['constraint_id'] ?>"
+                                                            <?= $c['constraint_active'] ? 'checked' : '' ?> />
+                                                    <span class="constraint-label" style="<?= !$c['constraint_active'] ? 'opacity:0.5;' : '' ?>">
+              <?= format_constraint_human($c) ?>
+            </span>
+                                                </label>
+                                            </li>
                                         <?php endforeach; ?>
                                     </ul>
                                 </div>
                             <?php endif; ?>
+
+                            <script>
+                                document.querySelectorAll('.constraint-toggle').forEach(function(cb) {
+                                    cb.addEventListener('change', function() {
+                                        var fd = new FormData();
+                                        fd.append('constraint_id', this.dataset.constraintId);
+                                        fd.append('active', this.checked ? '1' : '0');
+
+                                        fetch('<?= base_url('element/toggle_assignment_constraint'); ?>', {
+                                            method: 'POST',
+                                            body: fd
+                                        }).then(function(r) { return r.json(); }).then(function(data) {
+                                            var label = cb.parentElement.querySelector('.constraint-label');
+                                            label.style.opacity = cb.checked ? '1' : '0.5';
+                                        });
+                                    });
+                                });
+                            </script>
 
                             <p class="lead">Select reviewers</p>
 
@@ -114,22 +152,6 @@
 
                             <div class="form-group">
                                 <div class="col-md-9 col-sm-9 col-xs-12 col-md-offset-3">
-                                    <button type="button"
-                                            class="btn btn-default"
-                                            onclick="validateConstraints()"
-                                            style="margin-right:10px;">
-                                        Validate before assigning
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="col-md-9 col-sm-9 col-xs-12 col-md-offset-3">
-                                    <div id="validation_result"></div>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <div class="col-md-9 col-sm-9 col-xs-12 col-md-offset-3">
                                     <button class="btn btn-success">Assign</button>
                                 </div>
                             </div>
@@ -164,30 +186,5 @@
         var checkbox     = document.getElementById('assign_all_paper_checkbox');
         var numberField  = document.getElementById('number_of_papers_field');
         numberField.style.display = checkbox.checked ? 'none' : 'block';
-    }
-
-    function validateConstraints() {
-        var form = document.querySelector('form.form_content');
-        var fd   = new FormData(form);
-        fd.append('validate_only', '1');
-
-        fetch('<?= base_url('screening/validate_assignment'); ?>', {
-            method: 'POST',
-            body: fd
-        })
-            .then(function(r) { return r.json(); })
-            .then(function(data) {
-                var div = document.getElementById('validation_result');
-                if (data.errors && data.errors.length > 0) {
-                    div.innerHTML = '<div class="alert alert-danger"><strong>Constraints not satisfied:</strong><br>'
-                        + data.errors.join('<br>') + '</div>';
-                } else {
-                    div.innerHTML = '<div class="alert alert-success">✓ All constraints satisfied. Ready to assign.</div>';
-                }
-            })
-            .catch(function(err) {
-                document.getElementById('validation_result').innerHTML =
-                    '<div class="alert alert-warning">Validation request failed.</div>';
-            });
     }
 </script>

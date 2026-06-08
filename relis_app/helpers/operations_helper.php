@@ -464,7 +464,7 @@ function format_constraint_human($constraint)
                 ? $scope_labels[$params['previous_scope']]
                 : htmlspecialchars($params['previous_scope']);
             $phase = $phase_name(isset($params['previous_phase_id']) ? $params['previous_phase_id'] : null);
-            return 'Forbid reviewers who already saw the paper in <strong>'
+            return 'Forbid reviewers who were already assigned to the paper in <strong>'
                 . $scope_label . '</strong>'
                 . ($phase ? ' — phase <strong>' . htmlspecialchars($phase) . '</strong>' : '')
                 . '.';

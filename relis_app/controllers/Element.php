@@ -2598,13 +2598,103 @@ class Element extends CI_Controller
 		return $res;
 	}
 
+    function save_userproject_tag()
+    {
+
+        if (!can_manage_project()) {
+            set_top_msg("You are not allowed to perform this action.", 'error');
+            redirect('home');
+            return;
+        }
+
+        $user_id = intval($this->input->post('user_id'));
+        $tag_id  = intval($this->input->post('tag_id'));
+        $record_id = intval($this->input->post('userproject_tag_id'));
+
+        if (empty($user_id) || empty($tag_id)) {
+            set_top_msg("User and Tag are required.", 'error');
+            redirect('element/entity_list/list_userproject_tag');
+            return;
+        }
+
+        $db = $this->load->database(project_db(), TRUE);
+
+        // Vérifier l'unicité (sauf si on édite la ligne courante)
+        $sql = "SELECT userproject_tag_id FROM userproject_tag
+            WHERE user_id = ? AND tag_id = ? AND userproject_tag_active = 1";
+        $params = array($user_id, $tag_id);
+        if ($record_id > 0) {
+            $sql .= " AND userproject_tag_id != ?";
+            $params[] = $record_id;
+        }
+        $existing = $db->query($sql, $params)->row_array();
+
+        if (!empty($existing)) {
+            set_top_msg("This user already has this tag assigned.", 'error');
+            redirect('element/entity_list/list_userproject_tag');
+            return;
+        }
+
+        if ($record_id > 0) {
+            $db->query("UPDATE userproject_tag SET tag_id = ?
+                    WHERE userproject_tag_id = ?",
+                array($tag_id, $record_id));
+            set_top_msg("Tag assignment updated.");
+        } else {
+            $db->query("INSERT INTO userproject_tag (user_id, tag_id, assigned_by)
+                    VALUES (?, ?, ?)",
+                array($user_id, $tag_id, $this->session->userdata('user_id')));
+            set_top_msg("Tag assigned to user.");
+        }
+
+        redirect('element/entity_list/list_userproject_tag');
+    }
     // ISSUE #103
     function save_assignment_constraint()
     {
+        if (!can_manage_project()) {
+            set_top_msg("You are not allowed to perform this action.", 'error');
+            redirect('home');
+            return;
+        }
         $post = $this->input->post();
         $type = $post['constraint_type'];
         $params = array();
 
+        // ─── ISSUE #103 — Validation : reuse/forbid nécessite une phase précédente ──
+        if ($type === 'same_user_from_previous_phase'
+            || $type === 'force_different_user_from_previous_phase') {
+
+            $scope = $post['constraint_scope'];
+            $current_phase_id = !empty($post['phase_id']) ? intval($post['phase_id']) : null;
+
+            if ($scope === 'screening') {
+                $db_check = $this->load->database(project_db(), TRUE);
+
+                // Récupérer toutes les phases du projet, ordonnées
+                $phases = $db_check->query(
+                    "SELECT screen_phase_id FROM screen_phase
+             WHERE screen_phase_active = 1
+             ORDER BY screen_phase_order ASC"
+                )->result_array();
+
+                if (count($phases) < 2) {
+                    set_top_msg("This constraint requires at least 2 screening phases in the project.", 'error');
+                    redirect('element/entity_list/list_assignment_constraint');
+                    return;
+                }
+
+                // Si une phase précise est ciblée, vérifier qu'elle n'est pas la première
+                if ($current_phase_id !== null) {
+                    $first_phase = intval($phases[0]['screen_phase_id']);
+                    if ($current_phase_id === $first_phase) {
+                        set_top_msg("This constraint cannot apply to the first screening phase (no previous phase exists).", 'error');
+                        redirect('element/entity_list/list_assignment_constraint');
+                        return;
+                    }
+                }
+            }
+        }
         switch ($type) {
             case 'min_tag_per_paper':
                 $params = array(
@@ -2667,5 +2757,177 @@ class Element extends CI_Controller
         $data['page']       = 'general/frm_assignment_constraint';
         $data['page_title'] = lng('Create Assignment Constraint');
         $this->load->view('shared/body', $data);
+    }
+
+    function toggle_assignment_constraint()
+    {
+
+        if (!can_manage_project()) {
+            header('Content-Type: application/json', true, 403);
+            echo json_encode(array('success' => false, 'error' => 'unauthorized'));
+            return;
+        }
+        $constraint_id = intval($this->input->post('constraint_id'));
+        $active = intval($this->input->post('active'));
+
+        $db = $this->load->database(project_db(), TRUE);
+        $db->query("UPDATE assignment_constraint
+                SET constraint_active = ?
+                WHERE constraint_id = ?",
+            array($active, $constraint_id));
+
+        header('Content-Type: application/json');
+        echo json_encode(array('success' => true, 'active' => $active));
+    }
+
+    function save_reviewer_tag()
+    {
+        if (!can_manage_project()) {
+            set_top_msg("You are not allowed to perform this action.", 'error');
+            redirect('home');
+            return;
+        }
+
+        $tag_id          = intval($this->input->post('tag_id'));
+        $tag_name        = trim($this->input->post('tag_name'));
+        $tag_description = trim($this->input->post('tag_description'));
+        $tag_color       = trim($this->input->post('tag_color'));
+
+        if (empty($tag_name)) {
+            set_top_msg("Tag name is required.", 'error');
+            redirect('element/entity_list/list_reviewer_tag');
+            return;
+        }
+
+        if (empty($tag_color)) {
+            $tag_color = '#888888';
+        }
+
+        $db = $this->load->database(project_db(), TRUE);
+
+        // ── ÉDITION ─────────────────────────────────────────────────
+        if ($tag_id > 0) {
+            // Conflit uniquement avec un AUTRE tag ACTIF du même nom
+            $existing = $db->query(
+                "SELECT tag_id FROM reviewer_tag
+                 WHERE tag_name = ? AND tag_active = 1 AND tag_id != ?",
+                array($tag_name, $tag_id)
+            )->row_array();
+
+            if (!empty($existing)) {
+                set_top_msg("A tag with this name already exists.", 'error');
+                redirect('element/entity_list/list_reviewer_tag');
+                return;
+            }
+
+            $db->query(
+                "UPDATE reviewer_tag
+                 SET tag_name = ?, tag_description = ?, tag_color = ?
+                 WHERE tag_id = ?",
+                array($tag_name, $tag_description, $tag_color, $tag_id)
+            );
+            set_top_msg("Tag updated.");
+            redirect('element/entity_list/list_reviewer_tag');
+            return;
+        }
+
+        // ── CRÉATION ────────────────────────────────────────────────
+
+        // 1) Un tag ACTIF du même nom existe déjà → refus
+        $active = $db->query(
+            "SELECT tag_id FROM reviewer_tag WHERE tag_name = ? AND tag_active = 1",
+            array($tag_name)
+        )->row_array();
+
+        if (!empty($active)) {
+            set_top_msg("A tag with this name already exists.", 'error');
+            redirect('element/entity_list/list_reviewer_tag');
+            return;
+        }
+
+        // 2) Un tag SOFT-DELETED du même nom existe → on le ressuscite
+        //    (évite la collision UNIQUE et garde une seule ligne par nom)
+        $deleted = $db->query(
+            "SELECT tag_id FROM reviewer_tag WHERE tag_name = ? AND tag_active = 0",
+            array($tag_name)
+        )->row_array();
+
+        if (!empty($deleted)) {
+            $db->query(
+                "UPDATE reviewer_tag
+                 SET tag_active     = 1,
+                     tag_description = ?,
+                     tag_color       = ?,
+                     added_by        = ?,
+                     added_time      = CURRENT_TIMESTAMP
+                 WHERE tag_id = ?",
+                array($tag_description, $tag_color,
+                    $this->session->userdata('user_id'), $deleted['tag_id'])
+            );
+            set_top_msg("Tag created.");
+            redirect('element/entity_list/list_reviewer_tag');
+            return;
+        }
+
+        // 3) Création normale
+        $db->query(
+            "INSERT INTO reviewer_tag (tag_name, tag_description, tag_color, added_by)
+             VALUES (?, ?, ?, ?)",
+            array($tag_name, $tag_description, $tag_color,
+                $this->session->userdata('user_id'))
+        );
+        set_top_msg("Tag created.");
+
+        redirect('element/entity_list/list_reviewer_tag');
+    }
+
+    function get_user_tags_json()
+    {
+        if (!can_review_project()) {
+            header('Content-Type: application/json', true, 403);
+            echo json_encode(array('error' => 'unauthorized'));
+            return;
+        }
+        $project_id = $this->session->userdata('project_id');
+        $db_project = $this->load->database(project_db(), TRUE);
+        $db_system = $this->db;
+
+        // Récupérer les tags de chaque user du projet courant
+        $tags = $db_project->query("
+        SELECT upt.user_id, rt.tag_name AS name, rt.tag_color AS color
+        FROM userproject_tag upt
+        JOIN reviewer_tag rt ON rt.tag_id = upt.tag_id
+        WHERE upt.userproject_tag_active = 1 AND rt.tag_active = 1
+    ")->result_array();
+
+        // Récupérer les noms des users (dans la DB système)
+        $user_names = array();
+        $users = $db_system->query("SELECT user_id, user_name FROM users")->result_array();
+        foreach ($users as $u) {
+            $user_names[$u['user_id']] = $u['user_name'];
+        }
+
+        // Indexer par user_id ET par user_name pour gérer les deux cas
+        $by_id = array();
+        $by_name = array();
+        foreach ($tags as $t) {
+            $entry = array('name' => $t['name'], 'color' => $t['color']);
+
+            $uid = $t['user_id'];
+            if (!isset($by_id[$uid])) $by_id[$uid] = array();
+            $by_id[$uid][] = $entry;
+
+            if (isset($user_names[$uid])) {
+                $uname = $user_names[$uid];
+                if (!isset($by_name[$uname])) $by_name[$uname] = array();
+                $by_name[$uname][] = $entry;
+            }
+        }
+
+        header('Content-Type: application/json');
+        echo json_encode(array(
+            'tags_by_user_id' => $by_id,
+            'tags_by_user_name' => $by_name,
+        ));
     }
 }

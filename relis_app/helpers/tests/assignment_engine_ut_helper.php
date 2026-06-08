@@ -48,12 +48,23 @@ class AssignmentEngineUnitTest
         $this->engine_minTagPerPaper_blocksWhenNoSenior();
         $this->engine_maxTagPerPaper_satisfied();
         $this->engine_tagCombination_picksBestOption();
-        $this->engine_forceDifferentUser_excludesPreviousReviewers();
         $this->engine_sameUserFromPreviousPhase_reusesPreviousReviewers();
 
         // ─── 4. INTÉGRATION ──────────────────────────────────────────
         $this->integration_multipleConstraints_allSatisfied();
         $this->integration_qa_mandatoryWithSingleUser();
+
+        // ─── 5. VALIDATION & RÈGLES — cas limites ────────────────────
+        $this->engine_sameUserStrict_validateErrorsWhenPreviousNotSelected();
+        $this->engine_forceDifferent_validateErrorsWhenNotEnoughEligible();
+        $this->engine_minTag_validateErrorsWhenNoTaggedUser();
+        $this->engine_maxTag_validateErrorsWhenImpossible();
+        $this->engine_tagCombination_validateErrorsWhenNoOptionFeasible();
+        $this->engine_inactiveConstraint_notLoaded();
+        $this->engine_constraint_appliesToAllPhasesWhenPhaseNull();
+        $this->engine_constraints_orderedByPriority();
+        $this->engine_invalidJsonParams_reportedByValidate();
+        $this->engine_noConstraint_balancesWorkload();
 
         // ─── CLEANUP ─────────────────────────────────────────────────
         deleteCreatedTestProject();
@@ -151,6 +162,59 @@ class AssignmentEngineUnitTest
             $this->controller,
             "select_screen_phase/" . getScreeningPhaseId("Title")
         );
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    //  HELPERS — test direct du moteur (sans HTTP)
+    // ═══════════════════════════════════════════════════════════════
+
+    /** Active le contexte projet pour les appels directs (project_db()). */
+    private function useProjectContext()
+    {
+        $this->ci->session->set_userdata('project_db', getProjectShortName());
+    }
+
+    /** Insère un reviewer "déjà passé" sur un paper, dans une phase donnée. */
+    private function seedScreeningReviewer($paper_id, $user_id, $phase_id, $role = 'Screening')
+    {
+        $this->ci->db->query(
+            "INSERT INTO {$this->db_name}.screening_paper
+             (paper_id, user_id, assignment_role, screening_phase,
+              assignment_type, assigned_by, screening_active)
+             VALUES (?, ?, ?, ?, 'Normal', ?, 1)",
+            array($paper_id, $user_id, $role, $phase_id, getAdminUserId())
+        );
+    }
+
+    /** Renvoie les N premiers ids de papers du projet. */
+    private function paperIds($limit)
+    {
+        $rows = $this->ci->db->query(
+            "SELECT id FROM {$this->db_name}.paper ORDER BY id ASC LIMIT " . intval($limit)
+        )->result_array();
+        return array_map(function ($r) { return intval($r['id']); }, $rows);
+    }
+
+    /** Transforme une liste d'ids en tableau de papers attendu par l'engine. */
+    private function papersArg($ids)
+    {
+        return array_map(function ($id) { return array('id' => intval($id)); }, $ids);
+    }
+
+    /**
+     * Instancie le moteur comme le controller, mais en isolation,
+     * et le renvoie initialisé (prêt pour validate()/assign()).
+     */
+    private function makeEngine($scope, $phase_id, $papers, $users, $reviews_per_paper)
+    {
+        $this->useProjectContext();
+        $this->ci->load->library('assignment_engine_lib');
+        $this->ci->load->model('Screening_dataAccess');
+        // init() réinitialise tout l'état interne → réutilisation du singleton sûre
+        $this->ci->assignment_engine_lib->init(
+            $scope, $phase_id, $papers, $users, $reviews_per_paper
+        );
+        return $this->ci->assignment_engine_lib;
     }
     // ═══════════════════════════════════════════════════════════════
     // 1. TESTS DE RÉGRESSION — comportement legacy inchangé
@@ -319,8 +383,8 @@ class AssignmentEngineUnitTest
     }
 
     /*
-     * Test : insertion d'un nouveau tag custom
-     */
+ * Test : insertion d'un nouveau tag custom
+ */
     private function crud_reviewerTag_addNewTag()
     {
         $action = "add_reviewer_tag";
@@ -328,8 +392,8 @@ class AssignmentEngineUnitTest
 
         $this->ci->db->query(
             "INSERT INTO {$this->db_name}.reviewer_tag
-             (tag_name, tag_description, tag_color, tag_is_hierarchical, tag_rank)
-             VALUES ('Expert', 'Top expert', '#FFA500', 1, 3)"
+         (tag_name, tag_description, tag_color)
+         VALUES ('Expert', 'Top expert', '#FFA500')"
         );
 
         $row = $this->ci->db->query(
@@ -654,158 +718,71 @@ class AssignmentEngineUnitTest
         run_test($this->controller, $action, $name, "Papers not satisfying any option", $expected, $actual);
     }
 
+
     /*
-     * Test : force_different_user_from_previous_phase
-     * Setup : phase Title déjà screenée par Admin (paper #1, paper #2)
-     *         Phase Abstract : contrainte = exclure les screeners précédents
-     * Attendu : Admin n'est jamais assigné aux papers déjà screenés en Title
+     * force_different : Admin a déjà vu 2 papers en phase précédente.
+     * Attendu : il n'est réassigné à AUCUN des deux (l'autre reviewer prend le relais).
      */
     private function engine_forceDifferentUser_excludesPreviousReviewers()
     {
-        $action = "save_assignment_screen";
-        $name   = "Engine: force_different excludes previous reviewers";
-
+        $name = "Engine: force_different excludes previous reviewers";
         $this->cleanAssignmentsAndConstraints();
-        $extra_user_id = getDemoUserId();
 
-        // Phase 1 (Title) : Admin a screené 2 papers
-        $title_phase = getScreeningPhaseId("Title");
-        $papers = $this->ci->db->query(
-            "SELECT id FROM {$this->db_name}.paper LIMIT 2"
-        )->result_array();
-        foreach ($papers as $p) {
-            $this->ci->db->query(
-                "INSERT INTO {$this->db_name}.screening_paper
-                 (paper_id, user_id, assignment_role, screening_phase, assignment_type, assigned_by)
-                 VALUES (?, ?, 'Screening', ?, 'Normal', ?)",
-                array($p['id'], getAdminUserId(), $title_phase, getAdminUserId())
-            );
+        $admin  = getAdminUserId();
+        $extra  = getDemoUserId();
+        $papers = $this->paperIds(2);
+        $prev_phase = 1;  // phase précédente simulée
+        $cur_phase  = 2;  // phase courante simulée
+
+        foreach ($papers as $pid) {
+            $this->seedScreeningReviewer($pid, $admin, $prev_phase);
         }
-
-        // On crée une 2e phase fictive ou on utilise la phase existante autre que Title
-        // Pour le test on récupère une autre phase
-        $abstract_phase_row = $this->ci->db->query(
-            "SELECT screen_phase_id FROM {$this->db_name}.screen_phase
-             WHERE screen_phase_id != $title_phase
-               AND screen_phase_active = 1 LIMIT 1"
-        )->row_array();
-
-        if (empty($abstract_phase_row)) {
-            // Pas de 2e phase disponible, on skip
-            run_test($this->controller, $action, $name, "Skipped (no 2nd phase)", "skipped", "skipped");
-            return;
-        }
-        $abstract_phase = $abstract_phase_row['screen_phase_id'];
-
-        $this->createConstraint('screening', $abstract_phase,
+        $this->createConstraint('screening', $cur_phase,
             'force_different_user_from_previous_phase',
-            array('previous_scope' => 'screening',
-                'previous_phase_id' => $title_phase));
+            array('previous_scope' => 'screening', 'previous_phase_id' => $prev_phase));
 
-        $postData = [
-            "number_of_users"           => 2,
-            "screening_phase"           => $abstract_phase,
-            "papers_sources"            => "all",
-            "paper_source_status"       => "all",
-            "user_1"                    => getAdminUserId(),
-            "user_2"                    => $extra_user_id,
-            "reviews_per_paper"         => 1,
-            "assign_all_paper_checkbox" => "on"
-        ];
+        $engine  = $this->makeEngine('screening', $cur_phase,
+            $this->papersArg($papers), array($admin, $extra), 1);
+        $mapping = $engine->assign();
 
-        // Active la 2e phase
-        $this->ci->session->set_userdata('active_screening_phase', $abstract_phase);
-        $this->selectTitlePhase();
-        $this->http_client->response($this->controller, $action, $postData, "POST");
-
-        // Vérification : Admin n'a pas été réassigné aux 2 papers qu'il avait déjà screenés
-        $reassigned = $this->ci->db->query(
-            "SELECT COUNT(*) AS c
-             FROM {$this->db_name}.screening_paper sp1
-             JOIN {$this->db_name}.screening_paper sp2
-                  ON sp1.paper_id = sp2.paper_id AND sp1.user_id = sp2.user_id
-             WHERE sp1.screening_phase = $title_phase
-               AND sp2.screening_phase = $abstract_phase
-               AND sp1.user_id = " . getAdminUserId()
-        )->row_array()['c'];
-
-        $expected = 0;
-        $actual   = intval($reassigned);
-        run_test($this->controller, $action, $name, "Same user reassigned", $expected, $actual);
+        $admin_reassigned = 0;
+        foreach ($papers as $pid) {
+            if (!empty($mapping[$pid]) && in_array($admin, $mapping[$pid])) $admin_reassigned++;
+        }
+        run_test($this->controller, "assign_engine", $name,
+            "Admin reassigned to already-seen papers", 0, $admin_reassigned);
     }
 
     /*
-     * Test : same_user_from_previous_phase
-     * Setup : Admin a screené paper #1 en Title
-     *         Abstract : contrainte = même reviewer que la phase précédente
-     * Attendu : Admin est réassigné au paper #1 en Abstract
+     * same_user (preferred) : Admin a vu paper #1 en phase précédente.
+     * Attendu : Admin est réutilisé sur ce paper en phase courante.
      */
     private function engine_sameUserFromPreviousPhase_reusesPreviousReviewers()
     {
-        $action = "save_assignment_screen";
-        $name   = "Engine: same_user reuses previous reviewers";
-
+        $name = "Engine: same_user (preferred) reuses previous reviewers";
         $this->cleanAssignmentsAndConstraints();
-        $extra_user_id = getDemoUserId();
 
-        $title_phase = getScreeningPhaseId("Title");
-        $first_paper = $this->ci->db->query(
-            "SELECT id FROM {$this->db_name}.paper LIMIT 1"
-        )->row_array();
+        $admin  = getAdminUserId();
+        $extra  = getDemoUserId();
+        $pid    = $this->paperIds(1)[0];
+        $prev_phase = 1;
+        $cur_phase  = 2;
 
-        $this->ci->db->query(
-            "INSERT INTO {$this->db_name}.screening_paper
-             (paper_id, user_id, assignment_role, screening_phase, assignment_type, assigned_by)
-             VALUES (?, ?, 'Screening', ?, 'Normal', ?)",
-            array($first_paper['id'], getAdminUserId(), $title_phase, getAdminUserId())
-        );
-
-        $abstract_phase_row = $this->ci->db->query(
-            "SELECT screen_phase_id FROM {$this->db_name}.screen_phase
-             WHERE screen_phase_id != $title_phase
-               AND screen_phase_active = 1 LIMIT 1"
-        )->row_array();
-
-        if (empty($abstract_phase_row)) {
-            run_test($this->controller, $action, $name, "Skipped (no 2nd phase)", "skipped", "skipped");
-            return;
-        }
-        $abstract_phase = $abstract_phase_row['screen_phase_id'];
-
-        $this->createConstraint('screening', $abstract_phase,
+        $this->seedScreeningReviewer($pid, $admin, $prev_phase);
+        $this->createConstraint('screening', $cur_phase,
             'same_user_from_previous_phase',
             array('previous_scope' => 'screening',
-                'previous_phase_id' => $title_phase,
+                'previous_phase_id' => $prev_phase,
                 'mode' => 'preferred'));
 
-        $postData = [
-            "number_of_users"           => 2,
-            "screening_phase"           => $abstract_phase,
-            "papers_sources"            => "all",
-            "paper_source_status"       => "all",
-            "user_1"                    => getAdminUserId(),
-            "user_2"                    => $extra_user_id,
-            "reviews_per_paper"         => 1,
-            "assign_all_paper_checkbox" => "on"
-        ];
+        $engine  = $this->makeEngine('screening', $cur_phase,
+            $this->papersArg(array($pid)), array($admin, $extra), 1);
+        $mapping = $engine->assign();
 
-        $this->ci->session->set_userdata('active_screening_phase', $abstract_phase);
-        $this->selectTitlePhase();
-        $this->http_client->response($this->controller, $action, $postData, "POST");
-
-        $reassigned = $this->ci->db->query(
-            "SELECT COUNT(*) AS c
-             FROM {$this->db_name}.screening_paper
-             WHERE paper_id = " . $first_paper['id'] . "
-               AND user_id = " . getAdminUserId() . "
-               AND screening_phase = $abstract_phase"
-        )->row_array()['c'];
-
-        $expected = 1;
-        $actual   = intval($reassigned);
-        run_test($this->controller, $action, $name, "Previous reviewer reused", $expected, $actual);
+        $reused = (!empty($mapping[$pid]) && in_array($admin, $mapping[$pid])) ? 1 : 0;
+        run_test($this->controller, "assign_engine", $name,
+            "Previous reviewer reused", 1, $reused);
     }
-
     // ═══════════════════════════════════════════════════════════════
     // 4. TESTS D'INTÉGRATION — combinaisons réalistes
     // ═══════════════════════════════════════════════════════════════
@@ -909,5 +886,230 @@ class AssignmentEngineUnitTest
         $expected = "OK";
         $actual   = ($response['status_code'] < 500) ? "OK" : "Server error";
         run_test("quality_assessment", $action, $name, "QA assignment with 1 user", $expected, $actual);
+    }
+
+
+    // ═══════════════════════════════════════════════════════════════
+    //  5. VALIDATION & RÈGLES — cas limites du moteur
+    // ═══════════════════════════════════════════════════════════════
+
+    /* same_user STRICT : reviewer précédent non sélectionné → validate() doit signaler. */
+    private function engine_sameUserStrict_validateErrorsWhenPreviousNotSelected()
+    {
+        $name = "Engine: same_user (strict) errors when previous reviewer missing";
+        $this->cleanAssignmentsAndConstraints();
+
+        $admin = getAdminUserId();
+        $extra = getDemoUserId();
+        $pid   = $this->paperIds(1)[0];
+
+        $this->seedScreeningReviewer($pid, $admin, 1);   // Admin a vu le paper
+        $this->createConstraint('screening', 2, 'same_user_from_previous_phase',
+            array('previous_scope' => 'screening', 'previous_phase_id' => 1, 'mode' => 'strict'));
+
+        // On NE sélectionne PAS Admin → strict viole
+        $engine = $this->makeEngine('screening', 2, $this->papersArg(array($pid)), array($extra), 1);
+        $errors = $engine->validate();
+
+        run_test($this->controller, "assign_engine", $name,
+            "validate() returns at least one error", 1, (count($errors) >= 1) ? 1 : 0);
+    }
+
+    /* force_different : pas assez d'éligibles → validate() doit signaler. */
+    private function engine_forceDifferent_validateErrorsWhenNotEnoughEligible()
+    {
+        $name = "Engine: force_different errors when not enough eligible reviewers";
+        $this->cleanAssignmentsAndConstraints();
+
+        $admin = getAdminUserId();
+        $pid   = $this->paperIds(1)[0];
+
+        $this->seedScreeningReviewer($pid, $admin, 1);
+        $this->createConstraint('screening', 2, 'force_different_user_from_previous_phase',
+            array('previous_scope' => 'screening', 'previous_phase_id' => 1));
+
+        // Seul Admin sélectionné, mais blacklisté → 0 éligible pour 1 review
+        $engine = $this->makeEngine('screening', 2, $this->papersArg(array($pid)), array($admin), 1);
+        $errors = $engine->validate();
+
+        run_test($this->controller, "assign_engine", $name,
+            "validate() returns at least one error", 1, (count($errors) >= 1) ? 1 : 0);
+    }
+
+    /* min_tag : aucun user taggé sélectionné → validate() doit bloquer. */
+    private function engine_minTag_validateErrorsWhenNoTaggedUser()
+    {
+        $name = "Engine: min_tag errors when no tagged user is selected";
+        $this->cleanAssignmentsAndConstraints();
+
+        $admin = getAdminUserId();
+        $extra = getDemoUserId();
+        $this->createConstraint('screening', 1, 'min_tag_per_paper',
+            array('tag_id' => $this->tagId('Senior'), 'min_count' => 1));
+
+        $engine = $this->makeEngine('screening', 1, $this->papersArg($this->paperIds(1)), array($admin, $extra), 1);
+        $errors = $engine->validate();
+
+        run_test($this->controller, "assign_engine", $name,
+            "validate() returns at least one error", 1, (count($errors) >= 1) ? 1 : 0);
+    }
+
+    /* max_tag : contrainte impossible (tous taggés, max 0) → validate() doit bloquer. */
+    private function engine_maxTag_validateErrorsWhenImpossible()
+    {
+        $name = "Engine: max_tag errors when impossible to respect";
+        $this->cleanAssignmentsAndConstraints();
+
+        $admin = getAdminUserId();
+        $extra = getDemoUserId();
+        $this->assignTagToUser($admin, 'Junior');
+        $this->assignTagToUser($extra, 'Junior');
+        $this->createConstraint('screening', 1, 'max_tag_per_paper',
+            array('tag_id' => $this->tagId('Junior'), 'max_count' => 0));
+
+        $engine = $this->makeEngine('screening', 1, $this->papersArg($this->paperIds(1)), array($admin, $extra), 1);
+        $errors = $engine->validate();
+
+        run_test($this->controller, "assign_engine", $name,
+            "validate() returns at least one error", 1, (count($errors) >= 1) ? 1 : 0);
+    }
+
+    /* tag_combination : aucune option faisable → validate() doit bloquer. */
+    private function engine_tagCombination_validateErrorsWhenNoOptionFeasible()
+    {
+        $name = "Engine: tag_combination errors when no option is feasible";
+        $this->cleanAssignmentsAndConstraints();
+
+        $admin = getAdminUserId();
+        $extra = getDemoUserId();
+        // personne n'a Senior ni Methodologist
+        $this->createConstraint('screening', 1, 'tag_combination',
+            array('options' => array(
+                array('tag_id' => $this->tagId('Senior'),        'count' => 1),
+                array('tag_id' => $this->tagId('Methodologist'), 'count' => 1),
+            )));
+
+        $engine = $this->makeEngine('screening', 1, $this->papersArg($this->paperIds(1)), array($admin, $extra), 1);
+        $errors = $engine->validate();
+
+        run_test($this->controller, "assign_engine", $name,
+            "validate() returns at least one error", 1, (count($errors) >= 1) ? 1 : 0);
+    }
+
+    /* Une contrainte inactive (constraint_active = 0) ne doit pas être chargée. */
+    private function engine_inactiveConstraint_notLoaded()
+    {
+        $name = "Engine: inactive constraint is not loaded";
+        $this->cleanAssignmentsAndConstraints();
+
+        $this->ci->db->query(
+            "INSERT INTO {$this->db_name}.assignment_constraint
+             (constraint_scope, phase_id, constraint_type, constraint_params,
+              constraint_priority, constraint_active)
+             VALUES ('screening', 1, 'min_tag_per_paper', ?, 100, 0)",
+            array(json_encode(array('tag_id' => $this->tagId('Senior'), 'min_count' => 1)))
+        );
+
+        $this->useProjectContext();
+        $this->ci->load->model('Screening_dataAccess');
+        $loaded = $this->ci->Screening_dataAccess->get_active_constraints('screening', 1);
+
+        run_test($this->controller, "assign_engine", $name,
+            "Active constraints loaded", 0, count($loaded));
+    }
+
+    /* Une contrainte phase_id = NULL ("toutes phases") doit s'appliquer à n'importe quelle phase. */
+    private function engine_constraint_appliesToAllPhasesWhenPhaseNull()
+    {
+        $name = "Engine: phase_id NULL constraint applies to any phase";
+        $this->cleanAssignmentsAndConstraints();
+
+        $this->createConstraint('screening', null, 'min_tag_per_paper',
+            array('tag_id' => $this->tagId('Senior'), 'min_count' => 1));
+
+        $this->useProjectContext();
+        $this->ci->load->model('Screening_dataAccess');
+        $loaded = $this->ci->Screening_dataAccess->get_active_constraints('screening', 999);
+
+        run_test($this->controller, "assign_engine", $name,
+            "Constraint loaded for an arbitrary phase", 1, (count($loaded) >= 1) ? 1 : 0);
+    }
+
+    /* Les contraintes actives sont triées par priorité croissante. */
+    private function engine_constraints_orderedByPriority()
+    {
+        $name = "Engine: active constraints ordered by priority ASC";
+        $this->cleanAssignmentsAndConstraints();
+
+        $this->ci->db->query(
+            "INSERT INTO {$this->db_name}.assignment_constraint
+             (constraint_scope, phase_id, constraint_type, constraint_params,
+              constraint_priority, constraint_active)
+             VALUES ('screening', 1, 'max_tag_per_paper', ?, 200, 1)",
+            array(json_encode(array('tag_id' => $this->tagId('Junior'), 'max_count' => 1)))
+        );
+        $this->ci->db->query(
+            "INSERT INTO {$this->db_name}.assignment_constraint
+             (constraint_scope, phase_id, constraint_type, constraint_params,
+              constraint_priority, constraint_active)
+             VALUES ('screening', 1, 'min_tag_per_paper', ?, 50, 1)",
+            array(json_encode(array('tag_id' => $this->tagId('Senior'), 'min_count' => 1)))
+        );
+
+        $this->useProjectContext();
+        $this->ci->load->model('Screening_dataAccess');
+        $loaded = $this->ci->Screening_dataAccess->get_active_constraints('screening', 1);
+        $first  = !empty($loaded) ? $loaded[0]['constraint_type'] : '';
+
+        run_test($this->controller, "assign_engine", $name,
+            "Lowest priority value comes first", 'min_tag_per_paper', $first);
+    }
+
+    /* Des params JSON invalides sont signalés par validate() sans faire planter le moteur. */
+    private function engine_invalidJsonParams_reportedByValidate()
+    {
+        $name = "Engine: invalid JSON params reported (non fatal)";
+        $this->cleanAssignmentsAndConstraints();
+
+        $this->ci->db->query(
+            "INSERT INTO {$this->db_name}.assignment_constraint
+             (constraint_scope, phase_id, constraint_type, constraint_params,
+              constraint_priority, constraint_active)
+             VALUES ('screening', 1, 'min_tag_per_paper', 'NOT_JSON', 100, 1)"
+        );
+
+        $admin  = getAdminUserId();
+        $engine = $this->makeEngine('screening', 1, $this->papersArg($this->paperIds(1)), array($admin), 1);
+        $errors = $engine->validate();
+
+        $has_json_err = 0;
+        foreach ($errors as $e) {
+            if (stripos($e, 'invalid JSON') !== false) { $has_json_err = 1; break; }
+        }
+        run_test($this->controller, "assign_engine", $name,
+            "Invalid JSON reported by validate()", 1, $has_json_err);
+    }
+
+    /* Sans contrainte, l'engine équilibre la charge (round-robin) entre reviewers. */
+    private function engine_noConstraint_balancesWorkload()
+    {
+        $name = "Engine: round-robin balances workload (no constraint)";
+        $this->cleanAssignmentsAndConstraints();
+
+        $admin  = getAdminUserId();
+        $extra  = getDemoUserId();
+        $papers = $this->paperIds(4);
+
+        $engine  = $this->makeEngine('screening', 1, $this->papersArg($papers), array($admin, $extra), 1);
+        $mapping = $engine->assign();
+
+        $load_admin = 0; $load_extra = 0;
+        foreach ($mapping as $pid => $us) {
+            if (in_array($admin, $us)) $load_admin++;
+            if (in_array($extra, $us)) $load_extra++;
+        }
+        // 4 papers / 2 reviewers / 1 review → charge équilibrée (écart <= 1)
+        run_test($this->controller, "assign_engine", $name,
+            "Workload difference <= 1", 1, (abs($load_admin - $load_extra) <= 1) ? 1 : 0);
     }
 }

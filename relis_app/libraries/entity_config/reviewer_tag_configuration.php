@@ -10,7 +10,7 @@ function get_reviewer_tag()
     $config['main_field']          = 'tag_name';
     $config['entity_label_plural'] = 'Reviewer Tags';
     $config['entity_label']        = 'Reviewer Tag';
-    $config['order_by']            = ' tag_rank DESC, tag_name ASC ';
+    $config['order_by']            = ' tag_name ASC ';
 
     // ─── Fields ──────────────────────────────────────────────────
     $fields['tag_id'] = array(
@@ -44,24 +44,6 @@ function get_reviewer_tag()
         'default_value' => '#888888'
     );
 
-    $fields['tag_is_hierarchical'] = array(
-        'field_title'         => 'Hierarchical',
-        'field_type'          => 'int',
-        'field_size'          => 1,
-        'input_type'          => 'select',
-        'input_select_source' => 'array',
-        'input_select_values' => array('0' => 'No', '1' => 'Yes'),
-        'default_value'       => 0
-    );
-
-    $fields['tag_rank'] = array(
-        'field_title'   => 'Rank',
-        'field_type'    => 'int',
-        'field_size'    => 11,
-        'input_type'    => 'number',
-        'default_value' => 0
-    );
-
     $fields['tag_active'] = array(
         'field_title'   => 'Active',
         'field_type'    => 'int',
@@ -79,18 +61,16 @@ function get_reviewer_tag()
         'operation_description'     => 'Add a new reviewer tag',
         'page_title'                => 'Add a new reviewer tag',
         'save_function'             => 'element/save_element',
-        'page_template'             => 'general/frm_entity',
+        'page_template'             => 'general/frm_reviewer_tag',
         'redirect_after_save'       => 'element/entity_list/list_reviewer_tag',
         'db_save_model'             => 'add_reviewer_tag',
         'generate_stored_procedure' => True,
 
         'fields' => array(
-            'tag_id'              => array('mandatory' => '',          'field_state' => 'hidden'),
-            'tag_name'            => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
-            'tag_description'     => array('mandatory' => '',          'field_state' => 'enabled'),
-            'tag_color'           => array('mandatory' => '',          'field_state' => 'enabled'),
-            'tag_is_hierarchical' => array('mandatory' => '',          'field_state' => 'enabled'),
-            'tag_rank'            => array('mandatory' => '',          'field_state' => 'enabled'),
+            'tag_id'          => array('mandatory' => '',          'field_state' => 'hidden'),
+            'tag_name'        => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
+            'tag_description' => array('mandatory' => '',          'field_state' => 'enabled'),
+            'tag_color'       => array('mandatory' => '',          'field_state' => 'enabled'),
         ),
 
         'top_links' => array(
@@ -104,19 +84,17 @@ function get_reviewer_tag()
         'operation_description'     => 'Edit reviewer tag',
         'page_title'                => 'Edit reviewer tag',
         'save_function'             => 'element/save_element',
-        'page_template'             => 'general/frm_entity',
+        'page_template'             => 'general/frm_reviewer_tag',
         'redirect_after_save'       => 'element/entity_list/list_reviewer_tag',
         'data_source'               => 'get_detail_reviewer_tag',
         'db_save_model'             => 'update_reviewer_tag',
         'generate_stored_procedure' => True,
 
         'fields' => array(
-            'tag_id'              => array('mandatory' => '',          'field_state' => 'hidden'),
-            'tag_name'            => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
-            'tag_description'     => array('mandatory' => '',          'field_state' => 'enabled'),
-            'tag_color'           => array('mandatory' => '',          'field_state' => 'enabled'),
-            'tag_is_hierarchical' => array('mandatory' => '',          'field_state' => 'enabled'),
-            'tag_rank'            => array('mandatory' => '',          'field_state' => 'enabled'),
+            'tag_id'          => array('mandatory' => '',          'field_state' => 'hidden'),
+            'tag_name'        => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
+            'tag_description' => array('mandatory' => '',          'field_state' => 'enabled'),
+            'tag_color'       => array('mandatory' => '',          'field_state' => 'enabled'),
         ),
 
         'top_links' => array(
@@ -139,12 +117,10 @@ function get_reviewer_tag()
                     'trim'     => '0'
                 )
             ),
-            'tag_description'     => array(),
-            'tag_color'           => array(),
-            'tag_is_hierarchical' => array(),
-            'tag_rank'            => array(),
+            'tag_description' => array(),
+            'tag_color'       => array(),
         ),
-        'order_by' => 'tag_rank DESC, tag_name ASC ',
+        'order_by' => 'tag_name ASC ',
 
         'list_links' => array(
             'view' => array(
@@ -185,11 +161,9 @@ function get_reviewer_tag()
         'generate_stored_procedure' => True,
 
         'fields' => array(
-            'tag_name'            => array(),
-            'tag_description'     => array(),
-            'tag_color'           => array(),
-            'tag_is_hierarchical' => array(),
-            'tag_rank'            => array(),
+            'tag_name'        => array(),
+            'tag_description' => array(),
+            'tag_color'       => array(),
         ),
 
         'top_links' => array(

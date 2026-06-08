@@ -3,7 +3,7 @@
 
 // Récupération des tags depuis la DB projet
 $db_project = $this->load->database(project_db(), TRUE);
-$tags = $db_project->query("SELECT * FROM reviewer_tag WHERE tag_active = 1 ORDER BY tag_rank DESC")->result_array();
+$tags = $db_project->query("SELECT * FROM reviewer_tag WHERE tag_active = 1 ORDER BY tag_name ASC")->result_array();
 $phases = $db_project->query("SELECT * FROM screen_phase WHERE screen_phase_active = 1 ORDER BY screen_phase_order")->result_array();
 
 $scopes = array(
@@ -20,7 +20,7 @@ $types = array(
         'max_tag_per_paper'                        => 'Maximum N reviewers with a specific tag',
         'tag_combination'                          => 'Tag combination (option A OR option B)',
         'same_user_from_previous_phase'            => 'Reuse same reviewers as a previous phase',
-        'force_different_user_from_previous_phase' => 'Forbid reviewers who already saw the paper',
+        'force_different_user_from_previous_phase' => 'Forbid reviewers who were already assigned to the paper',
 );
 ?>
 
@@ -124,8 +124,7 @@ $types = array(
                         <!-- Params: tag_combination -->
                         <div class="params_block" id="params_tag_combination" style="display:none">
                             <p style="margin-left:15px;">
-                                <small class="text-muted">Define two alternative options. The engine picks the most balanced one for each paper.</small>
-                            </p>
+                                <small class="text-muted">Define alternative tag options (OR logic). For each paper, the engine picks the feasible option that forces the fewest mandatory placements.</small>                            </p>
                             <div class="form-group">
                                 <label class="control-label col-md-3">Option A — Tag</label>
                                 <div class="col-md-4">

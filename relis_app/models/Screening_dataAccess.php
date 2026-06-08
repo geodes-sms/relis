@@ -407,14 +407,26 @@ class Screening_dataAccess extends CI_Model
     // ============================================================
 // ISSUE #103 — Tags & constraints data access
 // ============================================================
-
+    /**
+     * Garantit que db_current pointe sur la base du projet courant.
+     * Évite un fatal "query() on null" si une méthode est appelée avant
+     * qu'un autre point d'entrée n'ait initialisé db_current (cas du moteur
+     * d'assignation appelé en premier, et des tests directs).
+     */
+    private function ensure_db_current()
+    {
+        if (empty($this->db_current)) {
+            $this->db_current = $this->load->database(project_db(), TRUE);
+        }
+    }
     /**
      * Récupère tous les tags actifs du projet.
      */
     function get_all_reviewer_tags()
     {
+        $this->ensure_db_current();
         $sql = "SELECT * FROM reviewer_tag WHERE tag_active = 1
-            ORDER BY tag_rank DESC, tag_name ASC";
+            ORDER BY tag_name ASC";
         return $this->db_current->query($sql)->result_array();
     }
 
@@ -423,6 +435,8 @@ class Screening_dataAccess extends CI_Model
      */
     function get_user_tags($user_id)
     {
+        $this->ensure_db_current();
+
         $sql = "SELECT rt.*
             FROM userproject_tag upt
             JOIN reviewer_tag rt ON rt.tag_id = upt.tag_id
@@ -438,23 +452,15 @@ class Screening_dataAccess extends CI_Model
      */
     function user_has_tag($user_id, $tag_id)
     {
-        $sql = "SELECT rt2.tag_id
-            FROM userproject_tag upt
-            JOIN reviewer_tag rt2 ON rt2.tag_id = upt.tag_id
-            JOIN reviewer_tag rt_target ON rt_target.tag_id = ?
+        $this->ensure_db_current();
+        $sql = "SELECT 1 FROM userproject_tag upt
+            JOIN reviewer_tag rt ON rt.tag_id = upt.tag_id
             WHERE upt.user_id = ?
+              AND upt.tag_id = ?
               AND upt.userproject_tag_active = 1
-              AND rt2.tag_active = 1
-              AND (
-                rt2.tag_id = rt_target.tag_id
-                OR (
-                  rt_target.tag_is_hierarchical = 1
-                  AND rt2.tag_is_hierarchical = 1
-                  AND rt2.tag_rank >= rt_target.tag_rank
-                )
-              )
+              AND rt.tag_active = 1
             LIMIT 1";
-        $res = $this->db_current->query($sql, array($tag_id, $user_id))->row_array();
+        $res = $this->db_current->query($sql, array($user_id, $tag_id))->row_array();
         return !empty($res);
     }
 
@@ -463,14 +469,16 @@ class Screening_dataAccess extends CI_Model
      */
     function get_active_constraints($scope, $phase_id = null)
     {
+        $this->ensure_db_current();
         if ($phase_id === null) {
             $sql = "SELECT * FROM assignment_constraint
                 WHERE constraint_scope = ?
-                  AND phase_id IS NULL
                   AND constraint_active = 1
                 ORDER BY constraint_priority ASC";
             return $this->db_current->query($sql, array($scope))->result_array();
         }
+
+        // Contraintes qui ciblent SOIT cette phase précise, SOIT toutes les phases (NULL)
         $sql = "SELECT * FROM assignment_constraint
             WHERE constraint_scope = ?
               AND (phase_id = ? OR phase_id IS NULL)
@@ -485,6 +493,8 @@ class Screening_dataAccess extends CI_Model
      */
     function get_previous_reviewers($paper_id, $previous_scope, $previous_phase_id = null)
     {
+        $this->ensure_db_current();
+
         $users = array();
 
         if ($previous_scope === 'screening' || $previous_scope === 'screening_validation') {

@@ -169,8 +169,6 @@ CREATE TABLE IF NOT EXISTS `reviewer_tag` (
     `tag_name`            VARCHAR(50)  NOT NULL,
     `tag_description`     VARCHAR(250) DEFAULT NULL,
     `tag_color`           VARCHAR(7)   DEFAULT '#888888',
-    `tag_is_hierarchical` TINYINT(1)   NOT NULL DEFAULT 0,
-    `tag_rank`            INT(11)      NOT NULL DEFAULT 0,
     `tag_active`          INT(1)       NOT NULL DEFAULT 1,
     `added_by`            INT(11)      DEFAULT NULL,
     `added_time`          TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -179,11 +177,11 @@ CREATE TABLE IF NOT EXISTS `reviewer_tag` (
     ) ENGINE=InnoDB DEFAULT CHARSET=latin1;;;;
 
 INSERT INTO `reviewer_tag`
-(`tag_name`, `tag_description`, `tag_color`, `tag_is_hierarchical`, `tag_rank`)
+(`tag_name`, `tag_description`, `tag_color`)
 VALUES
-    ('Junior',        'Reviewer débutant',          '#7AB648', 1, 1),
-    ('Senior',        'Reviewer expérimenté',       '#2E75B6', 1, 2),
-    ('Methodologist', 'Spécialiste méthodologique', '#C0504D', 0, 0);;;;
+    ('Junior',        'Reviewer débutant',          '#7AB648'),
+    ('Senior',        'Reviewer expérimenté',       '#2E75B6'),
+    ('Methodologist', 'Spécialiste méthodologique', '#C0504D');;;;
 
 DROP TABLE IF EXISTS `userproject_tag`;;;;
 CREATE TABLE IF NOT EXISTS `userproject_tag` (
