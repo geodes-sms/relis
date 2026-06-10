@@ -33,7 +33,7 @@
                         <div class="col-md-9 col-sm-9 col-xs-12 col-md-offset-3">
                        
                        <button class="btn btn-success" id="submit_but">Submit</button>
-                        <a href="#" data-dismiss="modal"><button type="button" class="btn btn-primary">close</button></a>
+                        <a href="#" data-dismiss="modal"><button type="button" class="btn btn-primary">Close</button></a>
                   
                         </div>
                       </div>

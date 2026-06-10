@@ -66,7 +66,7 @@ foreach ($table_config['operations'][$current_operation]['fields'] as $key => $v
 	if (!empty($v_field['field_title'])) {
 		$value['field_title'] = $v_field['field_title'];
 	}
-
+	
 	$value['field_title'] = lng($value['field_title']);
 
 	if ($v_field['field_state'] == 'drill_down') {
