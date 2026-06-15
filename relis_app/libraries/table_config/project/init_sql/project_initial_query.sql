@@ -206,6 +206,7 @@ CREATE TABLE IF NOT EXISTS `assignment_constraint` (
     `constraint_params`   TEXT         NOT NULL,
     `constraint_priority` INT(11)      NOT NULL DEFAULT 100,
     `constraint_active`   INT(1)       NOT NULL DEFAULT 1,
+    `constraint_enabled` INT NOT NULL DEFAULT 1,
     `created_by`          INT(11)      DEFAULT NULL,
     `creation_time`       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`constraint_id`),

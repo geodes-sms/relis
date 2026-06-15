@@ -574,6 +574,15 @@ function run_assignment_migration_if_needed($project_db_name)
             ) ENGINE=InnoDB DEFAULT CHARSET=latin1
         ");
     }
+    // Issue #103 — Add constraint_enabled column if missing (toggle state, separate from soft-delete)
+    $col_exists = $db->query(
+        "SHOW COLUMNS FROM assignment_constraint LIKE 'constraint_enabled'"
+    )->row_array();
+    if (empty($col_exists)) {
+        $db->query("ALTER TABLE assignment_constraint
+                ADD COLUMN constraint_enabled INT NOT NULL DEFAULT 1
+                AFTER constraint_active");
+    }
 
     // ─── 4. (Re)générer les stored procedures ────────────────────────────────
     $configs_to_generate = array('reviewer_tag', 'userproject_tag', 'assignment_constraint');

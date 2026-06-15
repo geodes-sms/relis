@@ -49,6 +49,8 @@ CREATE TABLE `admin_config` (
 
 LOCK TABLES `admin_config` WRITE;
 /*!40000 ALTER TABLE `admin_config` DISABLE KEYS */;
+INSERT INTO `admin_config` (`config_label`, `config_value`, `config_description`, `config_user`, `config_active`)
+VALUES ('assignment_rules_enabled', '0', 'Enable the reviewer tags and assignment rules feature (Issue #103). Set to 0 to hide the menu entries.', 0, 1);
 /*!40000 ALTER TABLE `admin_config` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -798,6 +800,163 @@ On line 7 of the R Library file, make sure it states the proper name and path to
     <li>Pearson\'s correlation test (for all continuous variables): use the <code>comp_pearson_cor_test</code> variable</li>
     <li>Spearman\'s correlation test (for all continuous variables): use the <code>comp_spearman_cor_test</code> variable</li>
 </ul>','','Help',9,1);
+
+                INSERT INTO `info` (
+    `info_title`,
+    `info_desc`,
+    `info_link`,
+    `info_type`,
+    `info_order`,
+    `info_active`
+) VALUES (
+    ''Assign papers with tags and rules'',
+    ''<p>
+        Once your <a href="http://relis.iro.umontreal.ca/auth/help_det/6"
+        style="text-decoration: underline;
+">reviewers</a> have been added to
+        the project, papers can be assigned to them. ReLiS distributes papers
+        automatically using a round-robin algorithm, and you can shape that
+        distribution with <strong>reviewer tags</strong> (profile labels) and
+        <strong>assignment constraints</strong> (rules).
+    </p>
+    <p>
+        This page applies to every place in ReLiS where reviewers are assigned
+        to papers: <a href="
+http://relis.iro.umontreal.ca/auth/help_det/14
+"
+        style="text-decoration: underline;">screening</a>, screening validation,
+        quality assessment, QA validation, classification and classification
+        validation. The mechanics are the same in all six.
+    </p>
+    <hr>
+    <h3>Reviewer tags</h3>
+    <p>
+        A <i>reviewer tag</i> is a profile label that you can attach to any
+        project member, for example <i>Junior</i>, <i>Senior</i>, or
+        <i>Methodologist</i>. Three tags are seeded automatically when a project
+        is created; you can add, edit and remove your own.
+    </p>
+    <p>
+        To create a tag, go to
+        <code>Planning &rarr; Reviewer Tags &rarr; New reviewer tag</code>.
+        You set a name, an optional description, and a color (color picker).
+        Tag names are unique per project.
+    </p>
+    <hr>
+    <h3>Attributing tags to users</h3>
+    <p>
+        Tags do not do anything until they are attached to people. Go to
+        <code>Planning &rarr; User Tag Assignments &rarr; New user tag assignment</code>,
+        pick a project member and a tag. A user can carry several tags. Their
+        tags appear as colored badges next to their name everywhere reviewers
+        are listed: assignment screens, the participants tab, and the users list.
+    </p>
+    <hr>
+    <h3>Assignment constraints (rules)</h3>
+    <p>
+        A <i>constraint</i> is a declarative rule that the assignment engine
+        respects automatically when distributing papers. Five types are available:
+    </p>
+    <table class="
+tg">
+        <thead>
+            <tr>
+                <th class="tg-uzvj">Type</th>
+                <th class="tg-uzvj">What it does</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="tg-g7sd">Min tag per paper</td>
+                <td class="tg-nrix">
+                    Each paper must receive <b>at least N</b> reviewers
+                    carrying a given tag.
+                </td>
+            </tr>
+            <tr>
+                <td class="tg-g7sd">Max tag per paper</td>
+                <td class="tg-nrix">
+                    Each paper must receive <b>at most N</b> reviewers
+                    carrying a given tag.
+                </td>
+            </tr>
+            <tr>
+                <td class="tg-g7sd">Tag combination</td>
+                <td class="tg-nrix">
+                    OR-rule. Example: <i>1 Senior</i> <b>OR</b> <i>2 Juniors</i>.
+                    For each paper, the engine picks the feasible option that
+                    forces the fewest mandatory placements.
+                </td>
+            </tr>
+            <tr>
+                <td class="tg-g7sd">Same user from previous phase</td>
+                <td class="tg-nrix">
+                    Reuse on a paper the reviewer(s) who already worked on it
+                    in an earlier phase.
+                </td>
+            </tr>
+            <tr>
+                <td class="tg-g7sd">Force different user from previous phase</td>
+                <td class="tg-nrix">
+                    Forbid assigning a paper to someone who already worked on it.
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <p>
+        Each rule has a <i>scope</i> (which assignment screen it applies to)
+        and an optional <i>phase</i> (or "all phases"). Rules can be enabled
+        or disabled at any time without being deleted.
+    </p>
+    <p>
+        To create a rule, go to
+        <code>Planning &rarr; Assignment Rules &rarr; New assignment rule</code>,
+        pick a type, and fill the form. There is no JSON to write: the form
+        adapts to the type you chose and asks only for the relevant fields.
+    </p>
+    <hr>
+    <h3>How assignment works</h3>
+    <p>
+        Open any assignment screen (for example
+        <code>Screening &rarr; Assignment</code>). You will see:
+    </p>
+    <ol>
+        <li>
+            The list of project members you can select as reviewers,
+            with their tag badges.
+        </li>
+        <li>
+            A panel listing the <b>active rules</b> that apply to this screen,
+            each with a checkbox to enable or disable it on the fly.
+        </li>
+        <li>
+            The usual configuration (number of papers, reviewers per paper,
+            and so on).
+        </li>
+    </ol>
+    <p>
+        When you click <i>Assign</i>, the engine works in two passes.
+        <b>Pass 1</b> places the reviewers required by the rules (e.g. one
+        Senior per paper, or the reviewer who already worked on the paper in
+        an earlier phase). <b>Pass 2</b> fills the remaining slots with a
+        round-robin that picks the least-loaded reviewer first, while still
+        respecting the <i>max tag</i> rules. If you have no rules defined,
+        Pass 1 does nothing and the result is exactly the same as the legacy
+        round-robin &mdash; your existing workflow is unchanged.
+    </p>
+    <hr>
+    <h3>Deleting tags and rules</h3>
+    <p>
+        Tags and rules are soft-deleted: removing them hides them from the
+        lists but the entry stays in the database. Re-creating a tag with the
+        same name later will simply revive the previous one, so you never
+        get duplicates.
+    </p>'',
+    '''',
+    ''Help'',
+    4,
+    1
+);
 /*!40000 ALTER TABLE `info` ENABLE KEYS */;
 UNLOCK TABLES;
 

@@ -3,12 +3,19 @@
 /**
  * Issue #103 - Unit tests for the reviewer tag & assignment constraints system.
  *
- * Cette classe de tests couvre :
- *   1. Régression : comportements existants doivent rester identiques quand
- *      aucune contrainte n'est définie (vérifie qu'on n'a rien cassé)
- *   2. CRUD : reviewer_tag, userproject_tag, assignment_constraint
- *   3. Engine : chaque type de contrainte appliqué isolément
- *   4. Intégration : combinaisons réalistes (contrainte + assignation)
+ * This test class covers:
+ *   1. Regression: existing behaviors must remain identical when no constraint
+ *      is defined (verifies that nothing was broken)
+ *   2. CRUD: reviewer_tag, userproject_tag, assignment_constraint
+ *   3. Engine: each constraint type applied in isolation
+ *   4. Integration: realistic combinations (constraint + assignment)
+ *   5. Validation & rules: engine edge cases
+ *
+ * Note: these tests require the 'assignment_rules_enabled' feature flag to
+ * be ON in admin_config. TestInitialize() forces it to 1, but if the helper
+ * assignment_rules_enabled() was already statically cached as false earlier
+ * in the same HTTP request, the tests will fail. In that case, either run
+ * them via a fresh request, or add a force-refresh argument to the helper.
  */
 class AssignmentEngineUnitTest
 {
@@ -22,14 +29,14 @@ class AssignmentEngineUnitTest
         $this->controller   = "screening";
         $this->http_client  = new Http_client();
         $this->ci           = get_instance();
-        $this->db_name      = ""; // sera défini après création du projet
+        $this->db_name      = ""; // will be set after the project is created
     }
 
     function run_tests()
     {
         $this->TestInitialize();
 
-        // ─── 1. RÉGRESSION ───────────────────────────────────────────
+        // ─── 1. REGRESSION ───────────────────────────────────────────
         $this->regression_assignment_noConstraint_5papers_2reviewers();
         $this->regression_assignment_noConstraint_5papers_3reviewers_2reviewsPerPaper();
         $this->regression_assignment_noConstraint_emptyUsers();
@@ -43,18 +50,19 @@ class AssignmentEngineUnitTest
         $this->crud_assignmentConstraint_createMinTagConstraint();
         $this->crud_assignmentConstraint_loadActiveConstraints();
 
-        // ─── 3. ENGINE — chaque type de contrainte ───────────────────
+        // ─── 3. ENGINE — each constraint type ────────────────────────
         $this->engine_minTagPerPaper_satisfied();
         $this->engine_minTagPerPaper_blocksWhenNoSenior();
         $this->engine_maxTagPerPaper_satisfied();
         $this->engine_tagCombination_picksBestOption();
+        $this->engine_forceDifferentUser_excludesPreviousReviewers();
         $this->engine_sameUserFromPreviousPhase_reusesPreviousReviewers();
 
-        // ─── 4. INTÉGRATION ──────────────────────────────────────────
+        // ─── 4. INTEGRATION ──────────────────────────────────────────
         $this->integration_multipleConstraints_allSatisfied();
         $this->integration_qa_mandatoryWithSingleUser();
 
-        // ─── 5. VALIDATION & RÈGLES — cas limites ────────────────────
+        // ─── 5. VALIDATION & RULES — edge cases ──────────────────────
         $this->engine_sameUserStrict_validateErrorsWhenPreviousNotSelected();
         $this->engine_forceDifferent_validateErrorsWhenNotEnoughEligible();
         $this->engine_minTag_validateErrorsWhenNoTaggedUser();
@@ -77,38 +85,60 @@ class AssignmentEngineUnitTest
 
     private function TestInitialize()
     {
-        // Nettoyage de l'état précédent
+        // Clean previous state
         deleteSessionFiles();
         deleteCreatedTestUser();
         deleteCreatedTestProject();
 
-        // Création du test user
+        // Create the test user
         addTestUser();
 
-        // Login en admin via HTTP (pattern ReLiS)
+        // Login as admin via HTTP (ReLiS pattern)
         $this->http_client->response(
             "user", "check_form",
             ['user_username' => 'admin', 'user_password' => '123'],
             "POST"
         );
 
-        // Création du projet de test
+        // Ensure the Issue #103 feature flag is ENABLED so tests can exercise
+        // the constraints engine. We upsert manually since admin_config has no
+        // UNIQUE key on config_label.
+        $existing_flag = $this->ci->db->query(
+            "SELECT config_id FROM admin_config
+             WHERE config_label = 'assignment_rules_enabled' LIMIT 1"
+        )->row_array();
+        if (!empty($existing_flag)) {
+            $this->ci->db->query(
+                "UPDATE admin_config SET config_value = '1', config_active = 1
+                 WHERE config_label = 'assignment_rules_enabled'"
+            );
+        } else {
+            $this->ci->db->query(
+                "INSERT INTO admin_config
+                 (config_label, config_value, config_description, config_user, config_active)
+                 VALUES ('assignment_rules_enabled', '1',
+                         'Feature flag (Issue #103) — forced ON by unit tests.', 0, 1)"
+            );
+        }
+
+        // Create the test project
         createDemoProject();
 
-        // Ajout des reviewers au projet
+        // Add the reviewers to the project
         addUserToProject(getAdminUserId(), "Reviewer");
         addUserToProject(getTestUserId(),  "Reviewer");
-        addUserToProject(getDemoUserId(), "Reviewer");
+        addUserToProject(getDemoUserId(),  "Reviewer");
 
-        // Import des 5 papers de test
+        // Import the 5 test papers
         addBibtextPapersToProject("relis_app/helpers/tests/testFiles/paper/5_bibPapers.bib");
 
-        // Mise à jour de db_name maintenant que le projet existe
+        // Refresh db_name now that the project exists
         $this->db_name = "relis_dev_correct_" . getProjectShortName();
     }
+
     /**
-     * Réinitialise les tables d'assignation et de contraintes entre 2 tests
-     * pour éviter les interférences.
+     * Reset the assignment and constraint tables between tests to avoid
+     * cross-test interference.
      */
     private function cleanAssignmentsAndConstraints()
     {
@@ -118,7 +148,7 @@ class AssignmentEngineUnitTest
     }
 
     /**
-     * Helper : récupère l'ID d'un tag par son nom.
+     * Helper: look up a tag id by its name.
      */
     private function tagId($name)
     {
@@ -128,7 +158,7 @@ class AssignmentEngineUnitTest
     }
 
     /**
-     * Helper : assigne un tag à un user dans le projet.
+     * Helper: assign a tag to a user in the current project.
      */
     private function assignTagToUser($user_id, $tag_name)
     {
@@ -141,7 +171,7 @@ class AssignmentEngineUnitTest
     }
 
     /**
-     * Helper : crée une contrainte pour un scope donné.
+     * Helper: create a constraint for a given scope.
      */
     private function createConstraint($scope, $phase_id, $type, $params)
     {
@@ -153,8 +183,8 @@ class AssignmentEngineUnitTest
     }
 
     /**
-     * Active la phase Title pour la session courante.
-     * À appeler avant chaque test qui fait une assignation de screening.
+     * Activate the Title screening phase for the current session.
+     * Must be called before any test that performs a screening assignment.
      */
     private function selectTitlePhase()
     {
@@ -165,16 +195,16 @@ class AssignmentEngineUnitTest
     }
 
     // ═══════════════════════════════════════════════════════════════
-    //  HELPERS — test direct du moteur (sans HTTP)
+    // HELPERS — direct engine tests (without HTTP)
     // ═══════════════════════════════════════════════════════════════
 
-    /** Active le contexte projet pour les appels directs (project_db()). */
+    /** Activate the project context for direct calls (project_db()). */
     private function useProjectContext()
     {
         $this->ci->session->set_userdata('project_db', getProjectShortName());
     }
 
-    /** Insère un reviewer "déjà passé" sur un paper, dans une phase donnée. */
+    /** Insert a reviewer that has "already worked on" a paper in a given phase. */
     private function seedScreeningReviewer($paper_id, $user_id, $phase_id, $role = 'Screening')
     {
         $this->ci->db->query(
@@ -186,7 +216,7 @@ class AssignmentEngineUnitTest
         );
     }
 
-    /** Renvoie les N premiers ids de papers du projet. */
+    /** Return the first N paper ids of the project. */
     private function paperIds($limit)
     {
         $rows = $this->ci->db->query(
@@ -195,35 +225,36 @@ class AssignmentEngineUnitTest
         return array_map(function ($r) { return intval($r['id']); }, $rows);
     }
 
-    /** Transforme une liste d'ids en tableau de papers attendu par l'engine. */
+    /** Convert a list of ids into the paper array shape expected by the engine. */
     private function papersArg($ids)
     {
         return array_map(function ($id) { return array('id' => intval($id)); }, $ids);
     }
 
     /**
-     * Instancie le moteur comme le controller, mais en isolation,
-     * et le renvoie initialisé (prêt pour validate()/assign()).
+     * Instantiate the engine the same way the controller does, but in isolation,
+     * and return it initialized (ready for validate()/assign()).
      */
     private function makeEngine($scope, $phase_id, $papers, $users, $reviews_per_paper)
     {
         $this->useProjectContext();
         $this->ci->load->library('assignment_engine_lib');
         $this->ci->load->model('Screening_dataAccess');
-        // init() réinitialise tout l'état interne → réutilisation du singleton sûre
+        // init() resets all internal state → singleton reuse is safe
         $this->ci->assignment_engine_lib->init(
             $scope, $phase_id, $papers, $users, $reviews_per_paper
         );
         return $this->ci->assignment_engine_lib;
     }
+
     // ═══════════════════════════════════════════════════════════════
-    // 1. TESTS DE RÉGRESSION — comportement legacy inchangé
+    // 1. REGRESSION TESTS — legacy behavior unchanged
     // ═══════════════════════════════════════════════════════════════
 
     /*
-     * Test : 5 papers, 2 reviewers, 1 review/paper, aucune contrainte
-     * Attendu : 5 assignations totales (comportement round-robin équilibré),
-     *           identique à l'ancienne implémentation.
+     * Test: 5 papers, 2 reviewers, 1 review/paper, no constraint.
+     * Expected: 5 total assignments (balanced round-robin), identical to
+     *           the pre-engine implementation.
      */
     private function regression_assignment_noConstraint_5papers_2reviewers()
     {
@@ -257,8 +288,8 @@ class AssignmentEngineUnitTest
     }
 
     /*
-     * Test : 5 papers, 3 reviewers, 2 reviews/paper
-     * Attendu : 10 assignations totales (5 * 2 reviews)
+     * Test: 5 papers, 3 reviewers, 2 reviews/paper.
+     * Expected: 10 total assignments (5 * 2 reviews).
      */
     private function regression_assignment_noConstraint_5papers_3reviewers_2reviewsPerPaper()
     {
@@ -267,7 +298,7 @@ class AssignmentEngineUnitTest
 
         $this->cleanAssignmentsAndConstraints();
 
-        // Crée un 3e user pour ce test
+        // Use a 3rd user for this test
         $extra_user_id = getDemoUserId();
 
         $postData = [
@@ -295,8 +326,8 @@ class AssignmentEngineUnitTest
     }
 
     /*
-     * Test : assignation sans utilisateurs sélectionnés
-     * Attendu : aucune assignation créée, comportement identique à l'avant-engine.
+     * Test: assignment with no user selected.
+     * Expected: no assignment created, same as the pre-engine behavior.
      */
     private function regression_assignment_noConstraint_emptyUsers()
     {
@@ -327,8 +358,8 @@ class AssignmentEngineUnitTest
     }
 
     /*
-     * Test : reviews_per_paper > nombre d'utilisateurs sélectionnés
-     * Attendu : erreur de validation, aucune assignation créée.
+     * Test: reviews_per_paper greater than the number of selected users.
+     * Expected: validation error, no assignment created.
      */
     private function regression_assignment_noConstraint_reviewsExceedsUsers()
     {
@@ -360,12 +391,12 @@ class AssignmentEngineUnitTest
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // 2. TESTS CRUD — tables reviewer_tag, userproject_tag, etc.
+    // 2. CRUD TESTS — reviewer_tag, userproject_tag, assignment_constraint
     // ═══════════════════════════════════════════════════════════════
 
     /*
-     * Test : vérifier que le seed des 3 tags par défaut a bien été inséré
-     * lors de la création du projet.
+     * Test: verify that the 3 default tags have been seeded when the project
+     * was created.
      */
     private function crud_reviewerTag_seedExists()
     {
@@ -383,8 +414,8 @@ class AssignmentEngineUnitTest
     }
 
     /*
- * Test : insertion d'un nouveau tag custom
- */
+     * Test: insertion of a new custom tag.
+     */
     private function crud_reviewerTag_addNewTag()
     {
         $action = "add_reviewer_tag";
@@ -406,7 +437,7 @@ class AssignmentEngineUnitTest
     }
 
     /*
-     * Test : attribuer un tag à un user
+     * Test: attach a tag to a user.
      */
     private function crud_userprojectTag_assignTagToUser()
     {
@@ -428,8 +459,8 @@ class AssignmentEngineUnitTest
     }
 
     /*
-     * Test : refus de double attribution du même tag au même user
-     * (contrainte UNIQUE uq_user_tag)
+     * Test: refusal of a duplicate (user, tag) pair, enforced by the UNIQUE
+     * constraint uq_user_tag.
      */
     private function crud_userprojectTag_duplicateRefused()
     {
@@ -439,7 +470,7 @@ class AssignmentEngineUnitTest
         $this->ci->db->query("DELETE FROM {$this->db_name}.userproject_tag");
         $this->assignTagToUser(getAdminUserId(), 'Senior');
 
-        // Tentative de double insertion brute (sans ON DUPLICATE KEY)
+        // Attempt a raw duplicate insert (without ON DUPLICATE KEY)
         $db_ignore_errors = $this->ci->db->db_debug;
         $this->ci->db->db_debug = FALSE;
         $this->ci->db->query(
@@ -461,7 +492,7 @@ class AssignmentEngineUnitTest
     }
 
     /*
-     * Test : création d'une contrainte min_tag_per_paper
+     * Test: create a min_tag_per_paper constraint.
      */
     private function crud_assignmentConstraint_createMinTagConstraint()
     {
@@ -487,7 +518,7 @@ class AssignmentEngineUnitTest
     }
 
     /*
-     * Test : chargement des contraintes actives pour un scope
+     * Test: load only active constraints for a given scope.
      */
     private function crud_assignmentConstraint_loadActiveConstraints()
     {
@@ -496,7 +527,7 @@ class AssignmentEngineUnitTest
 
         $this->ci->db->query("DELETE FROM {$this->db_name}.assignment_constraint");
 
-        // 2 actives + 1 inactive
+        // 2 active + 1 inactive
         $this->createConstraint('screening', null, 'min_tag_per_paper',
             array('tag_id' => $this->tagId('Senior'), 'min_count' => 1));
         $this->createConstraint('screening', null, 'max_tag_per_paper',
@@ -518,14 +549,13 @@ class AssignmentEngineUnitTest
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // 3. TESTS DE L'ENGINE — chaque type de contrainte
+    // 3. ENGINE TESTS — each constraint type
     // ═══════════════════════════════════════════════════════════════
 
     /*
-     * Test : min_tag_per_paper, contrainte satisfaite
-     * Setup : Admin = Senior, Test = Junior
-     *         Contrainte = au moins 1 Senior par paper
-     * Attendu : chaque paper a au moins 1 assignation à un Senior
+     * Test: min_tag_per_paper, constraint satisfied.
+     * Setup: Admin = Senior, Test = Junior, constraint = at least 1 Senior per paper.
+     * Expected: every paper has at least one Senior reviewer.
      */
     private function engine_minTagPerPaper_satisfied()
     {
@@ -570,8 +600,8 @@ class AssignmentEngineUnitTest
     }
 
     /*
-     * Test : min_tag_per_paper bloque quand aucun senior n'est sélectionné
-     * Attendu : 0 assignation créée (validation bloque)
+     * Test: min_tag_per_paper blocks when no senior is selected.
+     * Expected: 0 assignment created (validation blocks).
      */
     private function engine_minTagPerPaper_blocksWhenNoSenior()
     {
@@ -579,7 +609,7 @@ class AssignmentEngineUnitTest
         $name   = "Engine: min 1 senior blocks when no senior selected";
 
         $this->cleanAssignmentsAndConstraints();
-        // Aucun user n'est Senior
+        // No user is Senior
         $this->createConstraint('screening', getScreeningPhaseId("Title"),
             'min_tag_per_paper',
             array('tag_id' => $this->tagId('Senior'), 'min_count' => 1));
@@ -608,10 +638,10 @@ class AssignmentEngineUnitTest
     }
 
     /*
-     * Test : max_tag_per_paper satisfait
-     * Setup : Admin = Junior, Test = Junior, Extra = Senior
-     *         Contrainte = max 1 Junior par paper, reviews_per_paper = 2
-     * Attendu : aucun paper avec plus d'1 Junior
+     * Test: max_tag_per_paper satisfied.
+     * Setup: Admin = Junior, Test = Junior, Extra = Senior,
+     *        constraint = max 1 Junior per paper, reviews_per_paper = 2.
+     * Expected: no paper has more than 1 Junior.
      */
     private function engine_maxTagPerPaper_satisfied()
     {
@@ -658,10 +688,10 @@ class AssignmentEngineUnitTest
     }
 
     /*
-     * Test : tag_combination — choisit l'option qui équilibre la charge
-     * Setup : Admin = Senior, Test = Junior, Extra = Junior
-     *         Contrainte : 1 senior OU 2 juniors par paper
-     * Attendu : chaque paper satisfait une des deux options
+     * Test: tag_combination picks an option that satisfies each paper.
+     * Setup: Admin = Senior, Test = Junior, Extra = Junior,
+     *        constraint = 1 Senior OR 2 Juniors per paper.
+     * Expected: every paper satisfies at least one of the two options.
      */
     private function engine_tagCombination_picksBestOption()
     {
@@ -699,7 +729,7 @@ class AssignmentEngineUnitTest
         $senior_tag = $this->tagId('Senior');
         $junior_tag = $this->tagId('Junior');
 
-        // Pour chaque paper, vérifier : ≥1 senior OU ≥2 juniors
+        // For each paper, verify: ≥1 senior OR ≥2 juniors
         $bad_papers = $this->ci->db->query(
             "SELECT sp.paper_id
              FROM {$this->db_name}.screening_paper sp
@@ -718,10 +748,9 @@ class AssignmentEngineUnitTest
         run_test($this->controller, $action, $name, "Papers not satisfying any option", $expected, $actual);
     }
 
-
     /*
-     * force_different : Admin a déjà vu 2 papers en phase précédente.
-     * Attendu : il n'est réassigné à AUCUN des deux (l'autre reviewer prend le relais).
+     * force_different: Admin has already seen 2 papers in the previous phase.
+     * Expected: he is reassigned to NEITHER of them (the other reviewer takes over).
      */
     private function engine_forceDifferentUser_excludesPreviousReviewers()
     {
@@ -731,8 +760,8 @@ class AssignmentEngineUnitTest
         $admin  = getAdminUserId();
         $extra  = getDemoUserId();
         $papers = $this->paperIds(2);
-        $prev_phase = 1;  // phase précédente simulée
-        $cur_phase  = 2;  // phase courante simulée
+        $prev_phase = 1;  // simulated previous phase
+        $cur_phase  = 2;  // simulated current phase
 
         foreach ($papers as $pid) {
             $this->seedScreeningReviewer($pid, $admin, $prev_phase);
@@ -754,8 +783,8 @@ class AssignmentEngineUnitTest
     }
 
     /*
-     * same_user (preferred) : Admin a vu paper #1 en phase précédente.
-     * Attendu : Admin est réutilisé sur ce paper en phase courante.
+     * same_user (preferred): Admin saw paper #1 in the previous phase.
+     * Expected: Admin is reused on that paper in the current phase.
      */
     private function engine_sameUserFromPreviousPhase_reusesPreviousReviewers()
     {
@@ -783,14 +812,15 @@ class AssignmentEngineUnitTest
         run_test($this->controller, "assign_engine", $name,
             "Previous reviewer reused", 1, $reused);
     }
+
     // ═══════════════════════════════════════════════════════════════
-    // 4. TESTS D'INTÉGRATION — combinaisons réalistes
+    // 4. INTEGRATION TESTS — realistic combinations
     // ═══════════════════════════════════════════════════════════════
 
     /*
-     * Test : 2 contraintes appliquées simultanément
-     *        - min 1 senior par paper
-     *        - max 2 juniors par paper
+     * Test: 2 constraints applied simultaneously:
+     *       - min 1 Senior per paper
+     *       - max 2 Juniors per paper
      */
     private function integration_multipleConstraints_allSatisfied()
     {
@@ -848,18 +878,19 @@ class AssignmentEngineUnitTest
     }
 
     /*
-     * Test : assignation QA avec 1 seul user, doit fonctionner (mandatory)
-     *        sans appliquer la contrainte reviews_per_paper > users
+     * Test: QA assignment with a single user must work (mandatory bypass),
+     * without enforcing reviews_per_paper > users.
      */
     private function integration_qa_mandatoryWithSingleUser()
     {
         $action = "qa_assignment_save";
         $name   = "Integration: QA mandatory bypass with single user";
 
-        // Pré-requis : assignations screening doivent exister pour qu'il y ait des papers en QA
+        // Pre-requisite: screening assignments must exist so that some papers
+        // are available for QA.
         $this->cleanAssignmentsAndConstraints();
 
-        // Faire une assignation screening complète pour qu'il y ait des papers à QA
+        // Run a full screening assignment first so QA has papers to work on.
         $screening_post = [
             "number_of_users"           => 1,
             "screening_phase"           => getScreeningPhaseId("Title"),
@@ -872,7 +903,7 @@ class AssignmentEngineUnitTest
         $this->selectTitlePhase();
         $this->http_client->response("screening", "save_assignment_screen", $screening_post, "POST");
 
-        // Vérifier juste que l'engine ne plante pas avec 1 seul user en QA
+        // Just verify that the engine does not crash when QA has a single user.
         $postData = [
             "number_of_users"           => 1,
             "user_1"                    => getAdminUserId(),
@@ -882,18 +913,17 @@ class AssignmentEngineUnitTest
         $this->selectTitlePhase();
         $response = $this->http_client->response("quality_assessment", $action, $postData, "POST");
 
-        // On vérifie que la requête a abouti (pas un 500)
+        // Verify the request did not 500
         $expected = "OK";
         $actual   = ($response['status_code'] < 500) ? "OK" : "Server error";
         run_test("quality_assessment", $action, $name, "QA assignment with 1 user", $expected, $actual);
     }
 
-
     // ═══════════════════════════════════════════════════════════════
-    //  5. VALIDATION & RÈGLES — cas limites du moteur
+    // 5. VALIDATION & RULES — engine edge cases
     // ═══════════════════════════════════════════════════════════════
 
-    /* same_user STRICT : reviewer précédent non sélectionné → validate() doit signaler. */
+    /* same_user STRICT: previous reviewer not selected → validate() must report it. */
     private function engine_sameUserStrict_validateErrorsWhenPreviousNotSelected()
     {
         $name = "Engine: same_user (strict) errors when previous reviewer missing";
@@ -903,11 +933,11 @@ class AssignmentEngineUnitTest
         $extra = getDemoUserId();
         $pid   = $this->paperIds(1)[0];
 
-        $this->seedScreeningReviewer($pid, $admin, 1);   // Admin a vu le paper
+        $this->seedScreeningReviewer($pid, $admin, 1);   // Admin saw the paper
         $this->createConstraint('screening', 2, 'same_user_from_previous_phase',
             array('previous_scope' => 'screening', 'previous_phase_id' => 1, 'mode' => 'strict'));
 
-        // On NE sélectionne PAS Admin → strict viole
+        // We do NOT select Admin → strict is violated
         $engine = $this->makeEngine('screening', 2, $this->papersArg(array($pid)), array($extra), 1);
         $errors = $engine->validate();
 
@@ -915,7 +945,7 @@ class AssignmentEngineUnitTest
             "validate() returns at least one error", 1, (count($errors) >= 1) ? 1 : 0);
     }
 
-    /* force_different : pas assez d'éligibles → validate() doit signaler. */
+    /* force_different: not enough eligible reviewers → validate() must report it. */
     private function engine_forceDifferent_validateErrorsWhenNotEnoughEligible()
     {
         $name = "Engine: force_different errors when not enough eligible reviewers";
@@ -928,7 +958,7 @@ class AssignmentEngineUnitTest
         $this->createConstraint('screening', 2, 'force_different_user_from_previous_phase',
             array('previous_scope' => 'screening', 'previous_phase_id' => 1));
 
-        // Seul Admin sélectionné, mais blacklisté → 0 éligible pour 1 review
+        // Only Admin selected, but blacklisted → 0 eligible for 1 review
         $engine = $this->makeEngine('screening', 2, $this->papersArg(array($pid)), array($admin), 1);
         $errors = $engine->validate();
 
@@ -936,7 +966,7 @@ class AssignmentEngineUnitTest
             "validate() returns at least one error", 1, (count($errors) >= 1) ? 1 : 0);
     }
 
-    /* min_tag : aucun user taggé sélectionné → validate() doit bloquer. */
+    /* min_tag: no tagged user selected → validate() must block. */
     private function engine_minTag_validateErrorsWhenNoTaggedUser()
     {
         $name = "Engine: min_tag errors when no tagged user is selected";
@@ -954,7 +984,7 @@ class AssignmentEngineUnitTest
             "validate() returns at least one error", 1, (count($errors) >= 1) ? 1 : 0);
     }
 
-    /* max_tag : contrainte impossible (tous taggés, max 0) → validate() doit bloquer. */
+    /* max_tag: impossible constraint (everyone tagged, max 0) → validate() must block. */
     private function engine_maxTag_validateErrorsWhenImpossible()
     {
         $name = "Engine: max_tag errors when impossible to respect";
@@ -974,7 +1004,7 @@ class AssignmentEngineUnitTest
             "validate() returns at least one error", 1, (count($errors) >= 1) ? 1 : 0);
     }
 
-    /* tag_combination : aucune option faisable → validate() doit bloquer. */
+    /* tag_combination: no feasible option → validate() must block. */
     private function engine_tagCombination_validateErrorsWhenNoOptionFeasible()
     {
         $name = "Engine: tag_combination errors when no option is feasible";
@@ -982,7 +1012,7 @@ class AssignmentEngineUnitTest
 
         $admin = getAdminUserId();
         $extra = getDemoUserId();
-        // personne n'a Senior ni Methodologist
+        // Nobody has Senior nor Methodologist
         $this->createConstraint('screening', 1, 'tag_combination',
             array('options' => array(
                 array('tag_id' => $this->tagId('Senior'),        'count' => 1),
@@ -996,7 +1026,7 @@ class AssignmentEngineUnitTest
             "validate() returns at least one error", 1, (count($errors) >= 1) ? 1 : 0);
     }
 
-    /* Une contrainte inactive (constraint_active = 0) ne doit pas être chargée. */
+    /* An inactive constraint (constraint_active = 0) must not be loaded. */
     private function engine_inactiveConstraint_notLoaded()
     {
         $name = "Engine: inactive constraint is not loaded";
@@ -1018,7 +1048,7 @@ class AssignmentEngineUnitTest
             "Active constraints loaded", 0, count($loaded));
     }
 
-    /* Une contrainte phase_id = NULL ("toutes phases") doit s'appliquer à n'importe quelle phase. */
+    /* A phase_id = NULL ("all phases") constraint must apply to any phase. */
     private function engine_constraint_appliesToAllPhasesWhenPhaseNull()
     {
         $name = "Engine: phase_id NULL constraint applies to any phase";
@@ -1035,7 +1065,7 @@ class AssignmentEngineUnitTest
             "Constraint loaded for an arbitrary phase", 1, (count($loaded) >= 1) ? 1 : 0);
     }
 
-    /* Les contraintes actives sont triées par priorité croissante. */
+    /* Active constraints are sorted by ascending priority. */
     private function engine_constraints_orderedByPriority()
     {
         $name = "Engine: active constraints ordered by priority ASC";
@@ -1065,7 +1095,7 @@ class AssignmentEngineUnitTest
             "Lowest priority value comes first", 'min_tag_per_paper', $first);
     }
 
-    /* Des params JSON invalides sont signalés par validate() sans faire planter le moteur. */
+    /* Invalid JSON params are reported by validate() without crashing the engine. */
     private function engine_invalidJsonParams_reportedByValidate()
     {
         $name = "Engine: invalid JSON params reported (non fatal)";
@@ -1084,13 +1114,13 @@ class AssignmentEngineUnitTest
 
         $has_json_err = 0;
         foreach ($errors as $e) {
-            if (stripos($e, 'invalid JSON') !== false) { $has_json_err = 1; break; }
+            if (stripos($e, 'invalid parameters') !== false) { $has_json_err = 1; break; }
         }
         run_test($this->controller, "assign_engine", $name,
             "Invalid JSON reported by validate()", 1, $has_json_err);
     }
 
-    /* Sans contrainte, l'engine équilibre la charge (round-robin) entre reviewers. */
+    /* With no constraint, the engine balances the workload (round-robin). */
     private function engine_noConstraint_balancesWorkload()
     {
         $name = "Engine: round-robin balances workload (no constraint)";
@@ -1108,7 +1138,7 @@ class AssignmentEngineUnitTest
             if (in_array($admin, $us)) $load_admin++;
             if (in_array($extra, $us)) $load_extra++;
         }
-        // 4 papers / 2 reviewers / 1 review → charge équilibrée (écart <= 1)
+        // 4 papers / 2 reviewers / 1 review → balanced workload (diff <= 1)
         run_test($this->controller, "assign_engine", $name,
             "Workload difference <= 1", 1, (abs($load_admin - $load_extra) <= 1) ? 1 : 0);
     }

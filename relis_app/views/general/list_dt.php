@@ -104,7 +104,7 @@
         </div>
     <?php
     // ─── ISSUE #103 — Inject reviewer tags on the project users list ──
-    if (isset($page_title) && strpos($page_title, 'Users in this project') !== false):
+    if (assignment_rules_enabled() && isset($page_title) && strpos($page_title, 'Users in this project') !== false):
         ?>
         <script>
             (function() {

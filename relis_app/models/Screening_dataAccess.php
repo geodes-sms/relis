@@ -437,6 +437,10 @@ class Screening_dataAccess extends CI_Model
     {
         $this->ensure_db_current();
 
+        if (!assignment_rules_enabled()) {
+            return array();
+        }
+
         $sql = "SELECT rt.*
             FROM userproject_tag upt
             JOIN reviewer_tag rt ON rt.tag_id = upt.tag_id
@@ -470,20 +474,27 @@ class Screening_dataAccess extends CI_Model
     function get_active_constraints($scope, $phase_id = null)
     {
         $this->ensure_db_current();
+
+        if (!assignment_rules_enabled()) {
+            return array();
+        }
+
         if ($phase_id === null) {
             $sql = "SELECT * FROM assignment_constraint
-                WHERE constraint_scope = ?
-                  AND constraint_active = 1
-                ORDER BY constraint_priority ASC";
+        WHERE constraint_scope = ?
+          AND constraint_active = 1
+          AND constraint_enabled = 1
+        ORDER BY constraint_priority ASC";
             return $this->db_current->query($sql, array($scope))->result_array();
         }
 
         // Contraintes qui ciblent SOIT cette phase précise, SOIT toutes les phases (NULL)
         $sql = "SELECT * FROM assignment_constraint
-            WHERE constraint_scope = ?
-              AND (phase_id = ? OR phase_id IS NULL)
-              AND constraint_active = 1
-            ORDER BY constraint_priority ASC";
+        WHERE constraint_scope = ?
+          AND constraint_active = 1
+          AND constraint_enabled = 1
+          AND (phase_id = ? OR phase_id IS NULL)
+        ORDER BY constraint_priority ASC";
         return $this->db_current->query($sql, array($scope, $phase_id))->result_array();
     }
 

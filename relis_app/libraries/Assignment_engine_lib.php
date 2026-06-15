@@ -71,36 +71,46 @@ class Assignment_engine_lib
     {
         $errors = array();
 
-        // Bypass mandatory pour QA et Classification avec 1 seul user
+        // Single-user assignment bypass for QA/Classification (no validation needed)
         if (in_array($this->scope, array('qa','qa_validation','classification','classification_validation'))
             && count($this->users) === 1) {
-            return $errors; // pas de validation, on assigne quoi qu'il arrive
+            return $errors;
         }
 
         if (count($this->users) < $this->reviews_per_paper) {
-            $errors[] = "Reviews per paper ($this->reviews_per_paper) exceeds the number of selected users (" . count($this->users) . ").";
+            $errors[] = "You set {$this->reviews_per_paper} reviews per paper, but only "
+                . count($this->users) . " reviewer(s) are selected. "
+                . "Please select more reviewers or lower the number of reviews per paper.";
             return $errors;
         }
 
         foreach ($this->constraints as $c) {
             $params = json_decode($c['constraint_params'], true);
             if (!is_array($params)) {
-                $errors[] = "Constraint #{$c['constraint_id']} has invalid JSON params.";
+                $errors[] = "One of your assignment rules is misconfigured (invalid parameters). "
+                    . "Please review your rules in Planning &rarr; Assignment Rules.";
                 continue;
             }
 
             switch ($c['constraint_type']) {
                 case 'min_tag_per_paper':
-                    $count = $this->count_selected_users_with_tag($params['tag_id']);
-                    if ($count < intval($params['min_count'])) {
-                        $errors[] = "Constraint min_tag_per_paper: only $count selected user(s) have the required tag (need {$params['min_count']}).";
+                    $count    = $this->count_selected_users_with_tag($params['tag_id']);
+                    $needed   = intval($params['min_count']);
+                    if ($count < $needed) {
+                        $tag_name = $this->lookup_tag_name($params['tag_id']);
+                        $errors[] = "Rule \"At least {$needed} reviewer(s) tagged <b>{$tag_name}</b> per paper\" "
+                            . "cannot be respected: only {$count} selected reviewer(s) carry this tag.";
                     }
                     break;
 
                 case 'max_tag_per_paper':
                     $without = count($this->users) - $this->count_selected_users_with_tag($params['tag_id']);
-                    if ($without < ($this->reviews_per_paper - intval($params['max_count']))) {
-                        $errors[] = "Constraint max_tag_per_paper: not enough users without the tag to respect the max.";
+                    $max     = intval($params['max_count']);
+                    if ($without < ($this->reviews_per_paper - $max)) {
+                        $tag_name = $this->lookup_tag_name($params['tag_id']);
+                        $errors[] = "Rule \"At most {$max} reviewer(s) tagged <b>{$tag_name}</b> per paper\" "
+                            . "cannot be respected with the current selection: "
+                            . "not enough reviewers without this tag are available.";
                     }
                     break;
 
@@ -113,7 +123,12 @@ class Assignment_engine_lib
                         }
                     }
                     if (!$any_feasible) {
-                        $errors[] = "Constraint tag_combination: no option is feasible with the selected users.";
+                        $human_opts = array();
+                        foreach ($params['options'] as $opt) {
+                            $human_opts[] = intval($opt['count']) . ' ' . $this->lookup_tag_name($opt['tag_id']);
+                        }
+                        $errors[] = "Rule \"" . implode(' OR ', $human_opts) . " per paper\" "
+                            . "cannot be respected: none of the options is feasible with the current selection.";
                     }
                     break;
 
@@ -123,7 +138,10 @@ class Assignment_engine_lib
                             $previous = $this->get_previous_cached($paper['id'], $params);
                             foreach ($previous as $u) {
                                 if (!in_array($u, $this->users)) {
-                                    $errors[] = "Constraint same_user (strict): user #$u must be selected for paper #{$paper['id']}.";
+                                    $user_name = $this->lookup_user_name($u);
+                                    $errors[] = "Rule \"Reuse the same reviewer as previous phase (strict)\": "
+                                        . "reviewer <b>{$user_name}</b> already reviewed paper #{$paper['id']} "
+                                        . "and must be selected.";
                                 }
                             }
                         }
@@ -135,13 +153,42 @@ class Assignment_engine_lib
                         $previous = $this->get_previous_cached($paper['id'], $params);
                         $eligible = array_diff($this->users, $previous);
                         if (count($eligible) < $this->reviews_per_paper) {
-                            $errors[] = "Constraint force_different: paper #{$paper['id']} has only " . count($eligible) . " eligible reviewers (need $this->reviews_per_paper).";
+                            $errors[] = "Rule \"Forbid reviewers from previous phase\": "
+                                . "paper #{$paper['id']} has only " . count($eligible)
+                                . " eligible reviewer(s) left, but {$this->reviews_per_paper} are required.";
                         }
                     }
                     break;
             }
         }
         return $errors;
+    }
+
+    /**
+     * Resolve a tag id to its display name (falls back to "#id" if not found).
+     */
+    private function lookup_tag_name($tag_id)
+    {
+        $ci  = &get_instance();
+        $db  = $ci->load->database(project_db(), TRUE);
+        $row = $db->query(
+            "SELECT tag_name FROM reviewer_tag WHERE tag_id = ? AND tag_active = 1 LIMIT 1",
+            array(intval($tag_id))
+        )->row_array();
+        return !empty($row) ? $row['tag_name'] : "#{$tag_id}";
+    }
+
+    /**
+     * Resolve a user id to its display name (falls back to "#id" if not found).
+     */
+    private function lookup_user_name($user_id)
+    {
+        $ci  = &get_instance();
+        $row = $ci->db->query(
+            "SELECT user_name FROM users WHERE user_id = ? LIMIT 1",
+            array(intval($user_id))
+        )->row_array();
+        return !empty($row) ? $row['user_name'] : "#{$user_id}";
     }
 
     /**

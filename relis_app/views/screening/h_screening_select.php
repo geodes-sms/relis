@@ -167,15 +167,18 @@
                             <h4 class="briefs"><i><?php echo $value['usergroup_name']?></i></h4>
                               <?php
                               // ─── ISSUE #103 — Afficher les tags du reviewer ──
-                              $db_project_tags = $this->load->database(project_db(), TRUE);
-                              $user_tags = $db_project_tags->query("
-    SELECT rt.tag_name, rt.tag_color
-    FROM userproject_tag upt
-    JOIN reviewer_tag rt ON rt.tag_id = upt.tag_id
-    WHERE upt.user_id = ?
-      AND upt.userproject_tag_active = 1
-      AND rt.tag_active = 1
-", array($value['user_id']))->result_array();
+                              $user_tags = array();
+                              if (assignment_rules_enabled()) {
+                                  $db_project_tags = $this->load->database(project_db(), TRUE);
+                                  $user_tags = $db_project_tags->query("
+                                        SELECT rt.tag_name, rt.tag_color
+                                        FROM userproject_tag upt
+                                        JOIN reviewer_tag rt ON rt.tag_id = upt.tag_id
+                                        WHERE upt.user_id = ?
+                                          AND upt.userproject_tag_active = 1
+                                          AND rt.tag_active = 1
+                                ", array($value['user_id']))->result_array();
+                              }
                               ?>
                               <?php if (!empty($user_tags)): ?>
                                   <div class="col-xs-12" style="text-align:center; padding:10px 0; border-top:1px solid #eee;">

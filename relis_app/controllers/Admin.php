@@ -291,4 +291,67 @@ class Admin extends CI_Controller
 
         echo "<hr><a href='" . base_url('home') . "'>Back to home</a>";
     }
+
+    /**
+     * Display the feature flag toggle page for the Issue #103 feature.
+     * Admin-only.
+     */
+    function feature_flag_assignment_rules()
+    {
+        if (!has_usergroup(1)) {
+            set_top_msg("You are not allowed to access this page.", 'error');
+            redirect('home');
+            return;
+        }
+
+        $row = $this->db->query(
+            "SELECT config_value FROM admin_config
+             WHERE config_label = 'assignment_rules_enabled' AND config_active = 1
+             LIMIT 1"
+        )->row_array();
+
+        $data['is_enabled'] = (!empty($row) && intval($row['config_value']) === 1);
+        $data['page']       = 'general/frm_feature_flag_assignment_rules';
+        $data['page_title'] = 'Feature flag — Assignment rules';
+        $this->load->view('shared/body', $data);
+    }
+
+    /**
+     * Persist the new value of the assignment_rules_enabled flag.
+     * Admin-only.
+     */
+    function save_feature_flag_assignment_rules()
+    {
+        if (!has_usergroup(1)) {
+            set_top_msg("You are not allowed to perform this action.", 'error');
+            redirect('home');
+            return;
+        }
+
+        $new_value = $this->input->post('enabled') === '1' ? '1' : '0';
+
+        // Upsert: insert if missing, update otherwise
+        $exists = $this->db->query(
+            "SELECT config_id FROM admin_config WHERE config_label = 'assignment_rules_enabled' LIMIT 1"
+        )->row_array();
+
+        if (!empty($exists)) {
+            $this->db->query(
+                "UPDATE admin_config SET config_value = ?, config_active = 1
+                 WHERE config_label = 'assignment_rules_enabled'",
+                array($new_value)
+            );
+        } else {
+            $this->db->query(
+                "INSERT INTO admin_config (config_label, config_value, config_description, config_user, config_active)
+                 VALUES ('assignment_rules_enabled', ?, 'Enable the reviewer tags and assignment rules feature (Issue #103). Set to 0 to hide the menu entries.', 0, 1)",
+                array($new_value)
+            );
+        }
+
+        set_top_msg($new_value === '1'
+            ? 'Assignment rules feature enabled.'
+            : 'Assignment rules feature disabled.');
+        redirect('admin/feature_flag_assignment_rules');
+    }
 }

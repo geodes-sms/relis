@@ -29,19 +29,21 @@
                             $this->load->model('Screening_dataAccess');
                             $scope    = 'classification_validation';
                             $phase_id = null;
-
-                            $db_project = $this->load->database(project_db(), TRUE);
-                            $all_constraints = $db_project->query(
-                                    "SELECT * FROM assignment_constraint
-                   WHERE constraint_scope = ?
-                   ORDER BY constraint_priority ASC",
-                                    array($scope)
-                            )->result_array();
+                            if (assignment_rules_enabled()) {
+                                $db_project = $this->load->database(project_db(), TRUE);
+                                $all_constraints = $db_project->query(
+                                        "SELECT * FROM assignment_constraint
+                                         WHERE constraint_scope = ?
+                                           AND constraint_active = 1
+                                         ORDER BY constraint_priority ASC",
+                                        array($scope)
+                                )->result_array();
+                            }
                             ?>
                             <?php if (!empty($all_constraints)): ?>
                                 <div class="alert alert-info" style="margin-bottom:15px;">
                                     <strong><i class="fa fa-info-circle"></i> Assignment rules:</strong>
-                                    <small class="text-muted">Toggle to activate or deactivate a rule for this assignment.</small>
+
                                     <ul style="margin-top:8px; margin-bottom:0; list-style:none; padding-left:0;">
                                         <?php foreach ($all_constraints as $c): ?>
                                             <li style="margin:6px 0;">
@@ -49,8 +51,8 @@
                                                     <input type="checkbox"
                                                            class="constraint-toggle"
                                                            data-constraint-id="<?= $c['constraint_id'] ?>"
-                                                            <?= $c['constraint_active'] ? 'checked' : '' ?> />
-                                                    <span class="constraint-label" style="<?= !$c['constraint_active'] ? 'opacity:0.5;' : '' ?>">
+                                                            <?= $c['constraint_enabled'] ? 'checked' : '' ?> />
+                                                    <span class="constraint-label" style="<?= !$c['constraint_enabled'] ? 'opacity:0.5;' : '' ?>">
                             <?= format_constraint_human($c) ?>
                           </span>
                                                 </label>

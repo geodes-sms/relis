@@ -2657,25 +2657,26 @@ class Element extends CI_Controller
             redirect('home');
             return;
         }
-        $post = $this->input->post();
-        $type = $post['constraint_type'];
-        $params = array();
 
-        // ─── ISSUE #103 — Validation : reuse/forbid nécessite une phase précédente ──
+        $post           = $this->input->post();
+        $constraint_id  = !empty($post['constraint_id']) ? intval($post['constraint_id']) : 0;
+        $type           = $post['constraint_type'];
+        $params         = array();
+
+        // Validation: reuse/forbid rules require a previous screening phase
         if ($type === 'same_user_from_previous_phase'
             || $type === 'force_different_user_from_previous_phase') {
 
-            $scope = $post['constraint_scope'];
+            $scope            = $post['constraint_scope'];
             $current_phase_id = !empty($post['phase_id']) ? intval($post['phase_id']) : null;
 
             if ($scope === 'screening') {
                 $db_check = $this->load->database(project_db(), TRUE);
 
-                // Récupérer toutes les phases du projet, ordonnées
                 $phases = $db_check->query(
                     "SELECT screen_phase_id FROM screen_phase
-             WHERE screen_phase_active = 1
-             ORDER BY screen_phase_order ASC"
+                     WHERE screen_phase_active = 1
+                     ORDER BY screen_phase_order ASC"
                 )->result_array();
 
                 if (count($phases) < 2) {
@@ -2684,7 +2685,6 @@ class Element extends CI_Controller
                     return;
                 }
 
-                // Si une phase précise est ciblée, vérifier qu'elle n'est pas la première
                 if ($current_phase_id !== null) {
                     $first_phase = intval($phases[0]['screen_phase_id']);
                     if ($current_phase_id === $first_phase) {
@@ -2695,6 +2695,8 @@ class Element extends CI_Controller
                 }
             }
         }
+
+        // Build the type-specific JSON parameters
         switch ($type) {
             case 'min_tag_per_paper':
                 $params = array(
@@ -2738,16 +2740,27 @@ class Element extends CI_Controller
         }
 
         $this->db2 = $this->load->database(project_db(), TRUE);
-        $this->db2->insert('assignment_constraint', array(
+
+        $row = array(
             'constraint_scope'    => $post['constraint_scope'],
             'phase_id'            => !empty($post['phase_id']) ? intval($post['phase_id']) : null,
             'constraint_type'     => $type,
             'constraint_params'   => json_encode($params),
             'constraint_priority' => intval($post['constraint_priority']),
-            'created_by'          => $this->session->userdata('user_id'),
-        ));
+        );
 
-        set_top_msg('Constraint saved');
+        if ($constraint_id > 0) {
+            // UPDATE existing
+            $this->db2->where('constraint_id', $constraint_id)
+                ->update('assignment_constraint', $row);
+            set_top_msg('Constraint updated.');
+        } else {
+            // INSERT new
+            $row['created_by'] = $this->session->userdata('user_id');
+            $this->db2->insert('assignment_constraint', $row);
+            set_top_msg('Constraint saved.');
+        }
+
         redirect('element/entity_list/list_assignment_constraint');
     }
 
@@ -2761,23 +2774,27 @@ class Element extends CI_Controller
 
     function toggle_assignment_constraint()
     {
-
         if (!can_manage_project()) {
             header('Content-Type: application/json', true, 403);
             echo json_encode(array('success' => false, 'error' => 'unauthorized'));
             return;
         }
+
         $constraint_id = intval($this->input->post('constraint_id'));
-        $active = intval($this->input->post('active'));
+        $enabled       = $this->input->post('active') === '1' ? 1 : 0;
+
+        if ($constraint_id <= 0) {
+            header('Content-Type: application/json', true, 400);
+            echo json_encode(array('success' => false, 'error' => 'invalid_id'));
+            return;
+        }
 
         $db = $this->load->database(project_db(), TRUE);
-        $db->query("UPDATE assignment_constraint
-                SET constraint_active = ?
-                WHERE constraint_id = ?",
-            array($active, $constraint_id));
+        $db->where('constraint_id', $constraint_id)
+            ->update('assignment_constraint', array('constraint_enabled' => $enabled));
 
         header('Content-Type: application/json');
-        echo json_encode(array('success' => true, 'active' => $active));
+        echo json_encode(array('success' => true));
     }
 
     function save_reviewer_tag()
