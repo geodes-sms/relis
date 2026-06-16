@@ -606,11 +606,14 @@ class ElementUnitTest
 
             //get entry in the db
             $data = $this->ci->db->query("SELECT * FROM relis_dev_correct_" . getProjectShortName() . ".classification WHERE class_id = 1")->row_array();
-            $paper = $this->ci->db->query("SELECT * FROM relis_dev_correct_" . getProjectShortName() . ".paper WHERE id = " . $data['class_paper_id'])->row_array();
 
-            //check if entry is listed
-            if (strstr($response['content'], $paper['title']) != false) {
-                $actual_value = "Yes";
+            if (!empty($data) && !empty($data['class_paper_id'])) {
+                $paper = $this->ci->db->query("SELECT * FROM relis_dev_correct_" . getProjectShortName() . ".paper WHERE id = " . $data['class_paper_id'])->row_array();
+
+                //check if entry is listed
+                if (!empty($paper) && strstr($response['content'], $paper['title']) != false) {
+                    $actual_value = "Yes";
+                }
             }
         }
 

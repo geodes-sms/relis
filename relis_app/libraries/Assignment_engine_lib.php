@@ -45,7 +45,7 @@ class Assignment_engine_lib
     {
         $this->scope             = $scope;
         $this->phase_id          = $phase_id;
-        $this->papers            = $papers;
+        $this->papers            = $this->normalize_papers($papers);
         $this->users             = array_map('intval', $users);
         $this->reviews_per_paper = max(1, intval($reviews_per_paper));
 
@@ -62,6 +62,24 @@ class Assignment_engine_lib
         foreach ($this->users as $u) {
             $this->user_tags[$u] = $this->CI->Screening_dataAccess->get_user_tags($u);
         }
+    }
+
+    /**
+     * Accepte soit un array de paper_ids bruts (ex: [12, 15]),
+     * soit un array de tableaux paper (ex: [['id'=>12], ['id'=>15]]),
+     * et renvoie toujours la forme normalisée [['id'=>12], ['id'=>15]].
+     */
+    private function normalize_papers($papers)
+    {
+        $normalized = array();
+        foreach ($papers as $p) {
+            if (is_array($p) && isset($p['id'])) {
+                $normalized[] = $p;
+            } else {
+                $normalized[] = array('id' => intval($p));
+            }
+        }
+        return $normalized;
     }
 
     /**
