@@ -162,9 +162,35 @@
                   
                   
                    <div class="col-md-6 col-sm-6 col-xs-12 profile_details">
-                        <div class=" col-sm-12 well profile_view">
+                        <div class=" col-sm-12 well profile_view" >
                           <div class="col-sm-12">
                             <h4 class="briefs"><i><?php echo $value['usergroup_name']?></i></h4>
+                              <?php
+                              // ─── ISSUE #103 — Afficher les tags du reviewer ──
+                              $user_tags = array();
+                              if (assignment_rules_enabled()) {
+                                  $db_project_tags = $this->load->database(project_db(), TRUE);
+                                  $user_tags = $db_project_tags->query("
+                                        SELECT rt.tag_name, rt.tag_color
+                                        FROM userproject_tag upt
+                                        JOIN reviewer_tag rt ON rt.tag_id = upt.tag_id
+                                        WHERE upt.user_id = ?
+                                          AND upt.userproject_tag_active = 1
+                                          AND rt.tag_active = 1
+                                ", array($value['user_id']))->result_array();
+                              }
+                              ?>
+                              <?php if (!empty($user_tags)): ?>
+                                  <div class="col-xs-12" style="text-align:center; padding:10px 0; border-top:1px solid #eee;">
+                                      <?php foreach ($user_tags as $tag): ?>
+                                          <span style="display:inline-block; padding:3px 12px; margin:2px;
+                                                  border-radius:12px; color:white; font-size:11px; font-weight:500;
+                                                  background-color:<?= htmlspecialchars($tag['tag_color']) ?>;">
+        <?= htmlspecialchars($tag['tag_name']) ?>
+      </span>
+                                      <?php endforeach; ?>
+                                  </div>
+                              <?php endif; ?>
                             <div class="left col-xs-7">
                               <h2><?php echo $value['user_name']?></h2>
                               

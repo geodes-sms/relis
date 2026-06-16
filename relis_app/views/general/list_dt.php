@@ -102,4 +102,52 @@
             </div>
           </div>
         </div>
+    <?php
+    // ─── ISSUE #103 — Inject reviewer tags on the project users list ──
+    if (assignment_rules_enabled() && isset($page_title) && strpos($page_title, 'Users in this project') !== false):
+        ?>
+        <script>
+            (function() {
+                fetch('<?= base_url('element/get_user_tags_json') ?>')
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        var byId = data.tags_by_user_id || {};
+                        var byName = data.tags_by_user_name || {};
+
+                        var table = document.querySelector('#datatable-responsive');
+                        if (!table) return;
+
+                        var headRow = table.querySelector('thead tr');
+                        if (headRow) {
+                            var th = document.createElement('th');
+                            th.textContent = 'Tags';
+                            headRow.appendChild(th);
+                        }
+
+                        table.querySelectorAll('tbody tr').forEach(function(tr) {
+                            var firstCell = tr.querySelector('td');
+                            if (!firstCell) return;
+                            var raw = firstCell.textContent.trim();
+
+                            // Le champ user_id peut être un nom (drill_down) ou un ID
+                            var tags = byName[raw] || byId[raw] || [];
+
+                            var td = document.createElement('td');
+                            if (tags.length === 0) {
+                                td.innerHTML = '<em style="color:#aaa;">No tag</em>';
+                            } else {
+                                td.innerHTML = tags.map(function(t) {
+                                    return '<span style="display:inline-block; padding:2px 8px; margin:2px; '
+                                        + 'border-radius:10px; color:white; font-size:11px; '
+                                        + 'background-color:' + (t.color || '#888') + ';">'
+                                        + (t.name || '') + '</span>';
+                                }).join('');
+                            }
+                            tr.appendChild(td);
+                        });
+                    })
+                    .catch(function() {/* silent */});
+            })();
+        </script>
+    <?php endif; ?>
         <!-- /page content -->

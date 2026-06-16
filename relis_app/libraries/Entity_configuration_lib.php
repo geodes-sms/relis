@@ -220,6 +220,21 @@ class Entity_configuration_lib
 
 
 
+            // ISSUE #103 - Reviewer tags & assignment constraints
+            case 'reviewer_tag':
+                require_once("entity_config/reviewer_tag_configuration.php");
+                $table_configurations['reviewer_tag'] = get_reviewer_tag();
+                break;
+
+            case 'userproject_tag':
+                require_once("entity_config/userproject_tag_configuration.php");
+                $table_configurations['userproject_tag'] = get_userproject_tag();
+                break;
+
+            case 'assignment_constraint':
+                require_once("entity_config/assignment_constraint_configuration.php");
+                $table_configurations['assignment_constraint'] = get_assignment_constraint();
+                break;
 
 
 

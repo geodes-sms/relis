@@ -220,169 +220,180 @@ class Quality_assessment extends CI_Controller
 	}
 
 	//save the assignments of papers for quality assessment.
-	function qa_assignment_save()
-	{
-		$post_arr = $this->input->post();
-		//print_test($post_arr); exit;
-		$users = array();
-		$i = 1;
-		$percentage = intval($post_arr['percentage']);
-		if (empty($percentage)) {
-			$percentage = 100;
-		}
-		// Get selected users
-		while ($i <= $post_arr['number_of_users']) {
-			if (!empty($post_arr['user_' . $i])) {
-				array_push($users, $post_arr['user_' . $i]);
-			}
-			$i++;
-		}
-		//Verify if selected users is > of required reviews per paper
-		if (count($users) < 1) {
-			$data['err_msg'] = lng('Please select at least one user  ');
-			$this->qa_assignment_set($data);
-		} else {
-			$reviews_per_paper = 1;
-			$papers_all = $this->get_papers_for_qa();
-			$papers = $papers_all['papers_to_assign'];
-            if (isset($post_arr['assign_all_paper_checkbox']) && $post_arr['assign_all_paper_checkbox'] == 'off') {
-                $number_of_papers_to_assign = intval($post_arr['number_of_papers_to_assign']);
-            } else {
-                $number_of_papers_to_assign = count($papers);
-            }
-			//		print_test($papers);
-			$papers_to_validate_nbr = round(count($papers) * $percentage / 100);
-			$operation_description = "Assign  papers for QA";
-			//	print_test($papers);
-			shuffle($papers); // randomize the list
-			//		print_test($papers);exit;
-			//	print_test($papers);
-			$assign_papers = array();
-			$this->db2 = $this->load->database(project_db(), TRUE);
-			$operation_code = active_user_id() . "_" . time();
-            $assigned_count = 0;
-			foreach ($papers as $key => $value) {
-                if ($assigned_count >= $number_of_papers_to_assign) {
-                    break;
-                }
-				if ($key < $papers_to_validate_nbr) {
-					//$assign_papers[$key]['paper']=$value['id'];
-					//$assign_papers[$key]['users']=array();
-					$assignment_save = array(
-						'paper_id' => $value,
-						'assigned_to' => '',
-						'assigned_by' => active_user_id(),
-						'operation_code' => $operation_code,
-						'assignment_mode' => 'auto',
-					);
-					$j = 1;
-					//the table to save assignments
-					$table_name = get_table_configuration('qa_assignment', 'current', 'table_name');
-					while ($j <= $reviews_per_paper) {
-						$temp_user = ($key % count($users)) + $j;
-						if ($temp_user >= count($users))
-							$temp_user = $temp_user - count($users);
-						$assignment_save['assigned_to'] = $users[$temp_user];
-						//	print_test($assignment_save);
-						$this->db2->insert($table_name, $assignment_save);
-						$j++;
-					}
-				}
-                $assigned_count++;
-			}
-			//exit;
-			//	print_test();
-			$operation_arr = array(
-				'operation_code' => $operation_code,
-				'operation_type' => 'assign_qa',
-				'user_id' => active_user_id(),
-				'operation_desc' => $operation_description
-			);
-			//print_test($operation_arr);
-			$res2 = $this->manage_mdl->add_operation($operation_arr);
-			set_top_msg('Operation completed');
-			redirect('home');
-		}
-	}
+    function qa_assignment_save()
+    {
+        $post_arr = $this->input->post();
+        $users    = array();
+        $i        = 1;
+        $percentage = intval($post_arr['percentage']);
+        if (empty($percentage)) {
+            $percentage = 100;
+        }
 
+        while ($i <= $post_arr['number_of_users']) {
+            if (!empty($post_arr['user_' . $i])) {
+                array_push($users, $post_arr['user_' . $i]);
+            }
+            $i++;
+        }
+
+        if (count($users) < 1) {
+            $data['err_msg'] = lng('Please select at least one user  ');
+            $this->qa_assignment_set($data);
+            return;
+        }
+
+        $reviews_per_paper = 1;
+        $papers_all = $this->get_papers_for_qa();
+        $papers     = $papers_all['papers_to_assign'];
+
+        if (isset($post_arr['assign_all_paper_checkbox']) && $post_arr['assign_all_paper_checkbox'] == 'off') {
+            $number_of_papers_to_assign = intval($post_arr['number_of_papers_to_assign']);
+        } else {
+            $number_of_papers_to_assign = count($papers);
+        }
+        $papers_to_validate_nbr = round(count($papers) * $percentage / 100);
+        $limit = min($number_of_papers_to_assign, $papers_to_validate_nbr);
+
+        shuffle($papers);
+        $papers_to_assign = array_slice($papers, 0, $limit);
+
+        // ─── ISSUE #103 — assignation via Assignment_engine_lib ──────────
+        $this->load->library('assignment_engine_lib');
+        $this->load->model('Screening_dataAccess');
+
+        $this->assignment_engine_lib->init(
+            'qa', null,
+            $papers_to_assign, $users, $reviews_per_paper
+        );
+
+        $errors = $this->assignment_engine_lib->validate();
+        if (!empty($errors)) {
+            $data['err_msg'] = implode("<br>", $errors);
+            $this->qa_assignment_set($data);
+            return;
+        }
+
+        $mapping = $this->assignment_engine_lib->assign();
+
+        $this->db2      = $this->load->database(project_db(), TRUE);
+        $operation_code = active_user_id() . "_" . time();
+        $table_name     = get_table_configuration('qa_assignment', 'current', 'table_name');
+
+        foreach ($mapping as $paper_id => $user_ids) {
+            foreach ($user_ids as $user_id) {
+                $this->db2->insert($table_name, array(
+                    'paper_id'        => $paper_id,
+                    'assigned_to'     => $user_id,
+                    'assigned_by'     => active_user_id(),
+                    'operation_code'  => $operation_code,
+                    'assignment_mode' => 'auto',
+                ));
+            }
+        }
+
+        $operation_arr = array(
+            'operation_code' => $operation_code,
+            'operation_type' => 'assign_qa',
+            'user_id'        => active_user_id(),
+            'operation_desc' => 'Assign  papers for QA',
+        );
+        $this->manage_mdl->add_operation($operation_arr);
+
+        set_top_msg('Operation completed');
+        redirect('home');
+    }
 	//save the assignments of papers for quality assessment validation.
-	function qa_validation_assignment_save()
-	{
-		$post_arr = $this->input->post();
-		//print_test($post_arr); exit;
-		$users = array();
-		$i = 1;
-		$percentage = intval($post_arr['percentage']);
-		if (empty($percentage)) {
-			$data['err_msg'] = lng(' Please provide  "Percentage of papers" ');
-			$this->qa_assignment_validation_set($data);
-		} elseif ($percentage > 100 or $percentage <= 0) {
-			$data['err_msg'] = lng("Please provide a correct value of percentage");
-			$this->qa_assignment_validation_set($data);
-		} else {
-			// Get selected users
-			while ($i <= $post_arr['number_of_users']) {
-				if (!empty($post_arr['user_' . $i])) {
-					array_push($users, $post_arr['user_' . $i]);
-				}
-				$i++;
-			}
-			//Verify if selected users is > of required reviews per paper
-			if (count($users) < 1) {
-				$data['err_msg'] = lng('Please select at least one user  ');
-				$this->qa_assignment_validation_set($data);
-			} else {
-				$reviews_per_paper = 1;
-				$papers_all = $this->get_papers_for_qa_validation();
-				$papers = $papers_all['papers_to_assign'];
-				//		print_test($papers);
-				$papers_to_validate_nbr = round(count($papers) * $percentage / 100);
-				$operation_description = "Assign  papers for QA validation";
-				//	print_test($papers);
-				shuffle($papers); // randomize the list
-				//		print_test($papers);exit;
-				//	print_test($papers);
-				$assign_papers = array();
-				$this->db2 = $this->load->database(project_db(), TRUE);
-				$operation_code = active_user_id() . "_" . time();
-				foreach ($papers as $key => $value) {
-					if ($key < $papers_to_validate_nbr) {
-						$assignment_save = array(
-							'paper_id' => $value,
-							'assigned_to' => '',
-							'assigned_by' => active_user_id(),
-							'operation_code' => $operation_code,
-							'assignment_mode' => 'auto',
-						);
-						$j = 1;
-						//the table to save assignments
-						$table_name = get_table_configuration('qa_validation_assignment', 'current', 'table_name');
-						while ($j <= $reviews_per_paper) {
-							$temp_user = ($key % count($users)) + $j;
-							if ($temp_user >= count($users))
-								$temp_user = $temp_user - count($users);
-							$assignment_save['assigned_to'] = $users[$temp_user];
-							//	print_test($assignment_save);
-							$this->db2->insert($table_name, $assignment_save);
-							$j++;
-						}
-					}
-				}
-				//exit;
-				//	print_test();
-				$operation_arr = array(
-					'operation_code' => $operation_code,
-					'operation_type' => 'assign_qa_validation',
-					'user_id' => active_user_id(),
-					'operation_desc' => $operation_description
-				);
-				//print_test($operation_arr);
-				$res2 = $this->manage_mdl->add_operation($operation_arr);
-				set_top_msg('Operation completed');
-				redirect('home');
-			}
-		}
-	}
+    function qa_validation_assignment_save()
+    {
+        $post_arr = $this->input->post();
+        $users    = array();
+        $i        = 1;
+        $percentage = intval($post_arr['percentage']);
+
+        if (empty($percentage)) {
+            $data['err_msg'] = lng(' Please provide  "Percentage of papers" ');
+            $this->qa_assignment_validation_set($data);
+            return;
+        }
+        if ($percentage > 100 or $percentage <= 0) {
+            $data['err_msg'] = lng("Please provide a correct value of percentage");
+            $this->qa_assignment_validation_set($data);
+            return;
+        }
+
+        while ($i <= $post_arr['number_of_users']) {
+            if (!empty($post_arr['user_' . $i])) {
+                array_push($users, $post_arr['user_' . $i]);
+            }
+            $i++;
+        }
+
+        if (count($users) < 1) {
+            $data['err_msg'] = lng('Please select at least one user  ');
+            $this->qa_assignment_validation_set($data);
+            return;
+        }
+
+        $reviews_per_paper = 1;
+        $papers_all = $this->get_papers_for_qa_validation();
+        $papers     = $papers_all['papers_to_assign'];
+
+        $papers_to_validate_nbr = round(count($papers) * $percentage / 100);
+        if ($papers_to_validate_nbr <= 0) {
+            $data['err_msg'] = " No papers selected for assignment. Please increase the percentage.";
+            $this->qa_assignment_validation_set($data);
+            return;
+        }
+
+        shuffle($papers);
+        $papers_to_assign = array_slice($papers, 0, $papers_to_validate_nbr);
+
+        // ─── ISSUE #103 — assignation via Assignment_engine_lib ──────────
+        $this->load->library('assignment_engine_lib');
+        $this->load->model('Screening_dataAccess');
+
+        $this->assignment_engine_lib->init(
+            'qa_validation', null,
+            $papers_to_assign, $users, $reviews_per_paper
+        );
+
+        $errors = $this->assignment_engine_lib->validate();
+        if (!empty($errors)) {
+            $data['err_msg'] = implode("<br>", $errors);
+            $this->qa_assignment_validation_set($data);
+            return;
+        }
+
+        $mapping = $this->assignment_engine_lib->assign();
+
+        $this->db2      = $this->load->database(project_db(), TRUE);
+        $operation_code = active_user_id() . "_" . time();
+        $table_name     = get_table_configuration('qa_validation_assignment', 'current', 'table_name');
+
+        foreach ($mapping as $paper_id => $user_ids) {
+            foreach ($user_ids as $user_id) {
+                $this->db2->insert($table_name, array(
+                    'paper_id'        => $paper_id,
+                    'assigned_to'     => $user_id,
+                    'assigned_by'     => active_user_id(),
+                    'operation_code'  => $operation_code,
+                    'assignment_mode' => 'auto',
+                ));
+            }
+        }
+
+        $operation_arr = array(
+            'operation_code' => $operation_code,
+            'operation_type' => 'assign_qa_validation',
+            'user_id'        => active_user_id(),
+            'operation_desc' => 'Assign  papers for QA validation',
+        );
+        $this->manage_mdl->add_operation($operation_arr);
+
+        set_top_msg('Operation completed');
+        redirect('home');
+    }
 
 	/**
 	 * display the list of QA conduct results. 

@@ -403,4 +403,144 @@ class Screening_dataAccess extends CI_Model
         }
     }
 
+
+    // ============================================================
+// ISSUE #103 — Tags & constraints data access
+// ============================================================
+    /**
+     * Garantit que db_current pointe sur la base du projet courant.
+     * Évite un fatal "query() on null" si une méthode est appelée avant
+     * qu'un autre point d'entrée n'ait initialisé db_current (cas du moteur
+     * d'assignation appelé en premier, et des tests directs).
+     */
+    private function ensure_db_current()
+    {
+        if (empty($this->db_current)) {
+            $this->db_current = $this->load->database(project_db(), TRUE);
+        }
+    }
+    /**
+     * Récupère tous les tags actifs du projet.
+     */
+    function get_all_reviewer_tags()
+    {
+        $this->ensure_db_current();
+        $sql = "SELECT * FROM reviewer_tag WHERE tag_active = 1
+            ORDER BY tag_name ASC";
+        return $this->db_current->query($sql)->result_array();
+    }
+
+    /**
+     * Récupère les tags d'un user dans le projet courant.
+     */
+    function get_user_tags($user_id)
+    {
+        $this->ensure_db_current();
+
+        if (!assignment_rules_enabled()) {
+            return array();
+        }
+
+        $sql = "SELECT rt.*
+            FROM userproject_tag upt
+            JOIN reviewer_tag rt ON rt.tag_id = upt.tag_id
+            WHERE upt.user_id = ?
+              AND rt.tag_active = 1
+              AND upt.userproject_tag_active = 1";
+        return $this->db_current->query($sql, array($user_id))->result_array();
+    }
+
+    /**
+     * Vrai si user_id a au moins un tag dont tag_id == $tag_id
+     * OU (si le tag est hiérarchique) un tag de rang supérieur ou égal.
+     */
+    function user_has_tag($user_id, $tag_id)
+    {
+        $this->ensure_db_current();
+        $sql = "SELECT 1 FROM userproject_tag upt
+            JOIN reviewer_tag rt ON rt.tag_id = upt.tag_id
+            WHERE upt.user_id = ?
+              AND upt.tag_id = ?
+              AND upt.userproject_tag_active = 1
+              AND rt.tag_active = 1
+            LIMIT 1";
+        $res = $this->db_current->query($sql, array($user_id, $tag_id))->row_array();
+        return !empty($res);
+    }
+
+    /**
+     * Charge toutes les contraintes actives pour un scope (et optionnellement une phase).
+     */
+    function get_active_constraints($scope, $phase_id = null)
+    {
+        $this->ensure_db_current();
+
+        if (!assignment_rules_enabled()) {
+            return array();
+        }
+
+        if ($phase_id === null) {
+            $sql = "SELECT * FROM assignment_constraint
+        WHERE constraint_scope = ?
+          AND constraint_active = 1
+          AND constraint_enabled = 1
+        ORDER BY constraint_priority ASC";
+            return $this->db_current->query($sql, array($scope))->result_array();
+        }
+
+        // Contraintes qui ciblent SOIT cette phase précise, SOIT toutes les phases (NULL)
+        $sql = "SELECT * FROM assignment_constraint
+        WHERE constraint_scope = ?
+          AND constraint_active = 1
+          AND constraint_enabled = 1
+          AND (phase_id = ? OR phase_id IS NULL)
+        ORDER BY constraint_priority ASC";
+        return $this->db_current->query($sql, array($scope, $phase_id))->result_array();
+    }
+
+    /**
+     * Renvoie la liste des user_ids qui ont reviewé un paper dans un scope/phase précédent.
+     * Sert pour same_user_from_previous_phase et force_different_user_from_previous_phase.
+     */
+    function get_previous_reviewers($paper_id, $previous_scope, $previous_phase_id = null)
+    {
+        $this->ensure_db_current();
+
+        $users = array();
+
+        if ($previous_scope === 'screening' || $previous_scope === 'screening_validation') {
+            $role = ($previous_scope === 'screening') ? 'Screening' : 'Validation';
+            $phase_condition = ($previous_phase_id !== null)
+                ? "AND screening_phase = " . intval($previous_phase_id) : "";
+            $sql = "SELECT DISTINCT user_id FROM screening_paper
+                WHERE paper_id = ?
+                  AND assignment_role = ?
+                  AND screening_active = 1
+                  $phase_condition";
+            $rows = $this->db_current->query($sql, array($paper_id, $role))->result_array();
+            foreach ($rows as $r) $users[] = (int)$r['user_id'];
+
+        } elseif ($previous_scope === 'qa') {
+            $sql = "SELECT DISTINCT assigned_to AS user_id FROM qa_assignment
+                WHERE paper_id = ? AND qa_assignment_active = 1";
+            $rows = $this->db_current->query($sql, array($paper_id))->result_array();
+            foreach ($rows as $r) $users[] = (int)$r['user_id'];
+
+        } elseif ($previous_scope === 'qa_validation') {
+            $sql = "SELECT DISTINCT assigned_to AS user_id FROM qa_validation_assignment
+                WHERE paper_id = ? AND qa_validation_assignment_active = 1";
+            $rows = $this->db_current->query($sql, array($paper_id))->result_array();
+            foreach ($rows as $r) $users[] = (int)$r['user_id'];
+
+        } elseif ($previous_scope === 'classification' || $previous_scope === 'classification_validation') {
+            $type = ($previous_scope === 'classification') ? 'Classification' : 'Validation';
+            $sql = "SELECT DISTINCT assigned_user_id AS user_id FROM assigned
+                WHERE paper_id = ? AND assignment_type = ? AND assigned_active = 1";
+            $rows = $this->db_current->query($sql, array($paper_id, $type))->result_array();
+            foreach ($rows as $r) $users[] = (int)$r['user_id'];
+        }
+
+        return $users;
+    }
+
 }

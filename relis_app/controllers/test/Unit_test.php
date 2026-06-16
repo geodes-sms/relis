@@ -46,6 +46,8 @@ class Unit_test extends CI_Controller
     private $inclusion_mode_conflictUnitTest;
     private $customScreeningPhaseConfigTest;
 
+    private $assignment_engineUnitTest;
+
     function __construct()
     {
         parent::__construct();
@@ -74,6 +76,7 @@ class Unit_test extends CI_Controller
         $this->load->helper('tests/apiquery_ut');
         $this->load->helper('tests/op_ut');
         $this->load->helper('tests/inclusion_mode_conflict_ut');
+        $this->load->helper('tests/assignment_engine_ut');
         $this->load->library('unit_test');
 
         $this->unit->use_strict(TRUE);
@@ -98,6 +101,7 @@ class Unit_test extends CI_Controller
         $this->apiQueryUnitTest = new ApiQueryUnitTest();
         $this->opUnitTest = new OpUnitTest();
         $this->inclusion_mode_conflictUnitTest = new inclusion_mode_conflictUnitTest();
+        $this->assignment_engineUnitTest = new AssignmentEngineUnitTest();
     }
 
     public function relis_unit_test($result = "html_report")
@@ -124,12 +128,40 @@ class Unit_test extends CI_Controller
         $this->apiQueryUnitTest->run_tests();
         $this->opUnitTest->run_tests();
         $this->inclusion_mode_conflictUnitTest->run_tests();
-
+        $this->assignment_engineUnitTest->run_tests();
 
         // Record the end time of the tests
         $endTime = microtime(true);
 
         // Tests execution time in minutes
+        $executionTime = $endTime - $startTime;
+
+        if ($executionTime >= 60) {
+            $executionTime = round($executionTime / 60, 2) . " min";
+        } else {
+            $executionTime = round($executionTime, 2) . " sec";
+        }
+
+        if ($result == "html_report") {
+            echo $this->unit->report(array(), $executionTime);
+        } elseif ($result == "raw_data") {
+            print_r($this->unit->result());
+        } elseif ($result == "last_result") {
+            print_r($this->unit->last_result());
+        }
+    }
+
+    /**
+     * Issue #103 - Run only the assignment engine tests.
+     * URL: /test/unit_test/assignment_engine_test
+     */
+    public function assignment_engine_test($result = "html_report")
+    {
+        $startTime = microtime(true);
+
+        $this->assignment_engineUnitTest->run_tests();
+
+        $endTime = microtime(true);
         $executionTime = $endTime - $startTime;
 
         if ($executionTime >= 60) {

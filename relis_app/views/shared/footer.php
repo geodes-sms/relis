@@ -225,13 +225,55 @@ function get_screen_info(){
 			//alert('maintenant il contient : "'+obj.value+'"')
 		//alert(parametter);
 	}
-	
-	function confirm_delete(msg='Remove record'){
-		
-		return result=confirm(msg);
-	
-		
-	}
+
+      function confirm_delete(msg) {
+          msg = msg || 'Remove record';
+          // Récupère l'URL du bouton (a href ou data-href)
+          var clickEvent = window.event || arguments.callee.caller.arguments[0];
+          var sourceElement = clickEvent ? clickEvent.target.closest('a, button') : null;
+          var targetUrl = sourceElement ? sourceElement.href : null;
+
+          // Si pas d'URL trouvée, fallback au confirm natif
+          if (!targetUrl) {
+              return confirm(msg);
+          }
+
+          // Affiche la modal Bootstrap custom
+          showDeleteModal(msg, targetUrl);
+          return false; // Empêche la navigation immédiate
+      }
+
+      function showDeleteModal(msg, url) {
+          // Crée la modal si elle n'existe pas encore
+          var modal = document.getElementById('relis_delete_modal');
+          if (!modal) {
+              var html = ''
+                  + '<div id="relis_delete_modal" class="modal fade" tabindex="-1" role="dialog">'
+                  +   '<div class="modal-dialog" role="document">'
+                  +     '<div class="modal-content">'
+                  +       '<div class="modal-header" style="background:#c9302c; color:white;">'
+                  +         '<button type="button" class="close" data-dismiss="modal" style="color:white; opacity:1;">&times;</button>'
+                  +         '<h4 class="modal-title"><i class="fa fa-exclamation-triangle"></i> Confirm deletion</h4>'
+                  +       '</div>'
+                  +       '<div class="modal-body">'
+                  +         '<p id="relis_delete_modal_msg" style="font-size:15px;"></p>'
+                  +         '<p class="text-muted" style="margin-top:10px;">This action cannot be undone.</p>'
+                  +       '</div>'
+                  +       '<div class="modal-footer">'
+                  +         '<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>'
+                  +         '<a id="relis_delete_modal_confirm" href="#" class="btn btn-danger"><i class="fa fa-trash"></i> Delete</a>'
+                  +       '</div>'
+                  +     '</div>'
+                  +   '</div>'
+                  + '</div>';
+              document.body.insertAdjacentHTML('beforeend', html);
+              modal = document.getElementById('relis_delete_modal');
+          }
+
+          document.getElementById('relis_delete_modal_msg').textContent = msg;
+          document.getElementById('relis_delete_modal_confirm').href = url;
+          $(modal).modal('show');
+      }
 
 
      $(document).ready(function(){

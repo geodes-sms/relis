@@ -250,6 +250,9 @@ function update_stored_procedure($config, $verbose = FALSE, $target_db = 'curren
 			'qa_assignment',
 			'qa_validation_assignment',
 			'assignation',
+            'reviewer_tag',
+            'userproject_tag',
+            'assignment_constraint',
 			'debug'
 		);
 		//$configs=array('assignation','author','class_scheme','config','exclusion','papers','paper_author','ref_exclusioncrieria','str_mng','venue');
@@ -463,4 +466,127 @@ function populate_common_tables_views($target_db = 'current')
 			}
 		}
 	}
+}
+
+// ─── ISSUE #103 — Migration automatique des tables d'assignation ──────────────
+/**
+ * Vérifie si les tables de l'issue #103 existent dans la DB du projet courant.
+ * Si non, les crée silencieusement et seed les tags par défaut.
+ * Appelé à chaque ouverture de projet — idempotent et sans effet si tables déjà présentes.
+ */
+function run_assignment_migration_if_needed($project_db_name)
+{
+    if (empty($project_db_name) || $project_db_name === 'default') return;
+
+    $CI =& get_instance();
+    $db = $CI->load->database($project_db_name, TRUE);
+
+    // ─── 1. Vérifier les tables ──────────────────────────────────────────────
+    $tables_needed = array('reviewer_tag', 'userproject_tag', 'assignment_constraint');
+    $tables_missing = false;
+
+    foreach ($tables_needed as $table) {
+        $res = $db->query("SHOW TABLES LIKE '$table'")->num_rows();
+        if ($res === 0) {
+            $tables_missing = true;
+            break;
+        }
+    }
+
+    // ─── 2. Vérifier les stored procedures critiques ────────────────────────
+    $procs_needed = array(
+        'get_list_reviewer_tag',
+        'get_list_userproject_tag',
+        'get_list_assignment_constraint'
+    );
+    $procs_missing = false;
+
+    foreach ($procs_needed as $proc) {
+        $res = $db->query(
+            "SELECT ROUTINE_NAME FROM information_schema.ROUTINES
+             WHERE ROUTINE_SCHEMA = ? AND ROUTINE_NAME = ?",
+            array($project_db_name, $proc)
+        )->num_rows();
+        if ($res === 0) {
+            $procs_missing = true;
+            break;
+        }
+    }
+
+    // Si tout est en place, on sort immédiatement
+    if (!$tables_missing && !$procs_missing) return;
+
+    // ─── 3. Créer les tables si manquantes ──────────────────────────────────
+    if ($tables_missing) {
+        $db->query("
+            CREATE TABLE IF NOT EXISTS `reviewer_tag` (
+              `tag_id`          INT(11)      NOT NULL AUTO_INCREMENT,
+              `tag_name`        VARCHAR(50)  NOT NULL,
+              `tag_description` VARCHAR(250) DEFAULT NULL,
+              `tag_color`       VARCHAR(7)   DEFAULT '#888888',
+              `tag_active`      INT(1)       NOT NULL DEFAULT 1,
+              `added_by`        INT(11)      DEFAULT NULL,
+              `added_time`      TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              PRIMARY KEY (`tag_id`),
+              UNIQUE KEY `uq_tag_name` (`tag_name`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+        ");
+
+        $existing = $db->query("SELECT COUNT(*) AS c FROM reviewer_tag")->row_array();
+        if (empty($existing['c'])) {
+            $db->query("
+                INSERT INTO reviewer_tag (tag_name, tag_description, tag_color)
+                VALUES
+                  ('Junior',        'Reviewer débutant',          '#7AB648'),
+                  ('Senior',        'Reviewer expérimenté',       '#2E75B6'),
+                  ('Methodologist', 'Spécialiste méthodologique', '#C0504D')
+            ");
+        }
+
+        $db->query("
+            CREATE TABLE IF NOT EXISTS `userproject_tag` (
+              `userproject_tag_id`     INT(11)   NOT NULL AUTO_INCREMENT,
+              `user_id`                INT(11)   NOT NULL,
+              `tag_id`                 INT(11)   NOT NULL,
+              `assigned_by`            INT(11)   DEFAULT NULL,
+              `assigned_time`          TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              `userproject_tag_active` INT(1)    NOT NULL DEFAULT 1,
+              PRIMARY KEY (`userproject_tag_id`),
+              UNIQUE KEY `uq_user_tag` (`user_id`, `tag_id`),
+              KEY `idx_user` (`user_id`),
+              KEY `idx_tag` (`tag_id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+        ");
+
+        $db->query("
+            CREATE TABLE IF NOT EXISTS `assignment_constraint` (
+              `constraint_id`       INT(11)      NOT NULL AUTO_INCREMENT,
+              `constraint_scope`    VARCHAR(40)  NOT NULL,
+              `phase_id`            INT(11)      DEFAULT NULL,
+              `constraint_type`     VARCHAR(60)  NOT NULL,
+              `constraint_params`   TEXT         NOT NULL,
+              `constraint_priority` INT(11)      NOT NULL DEFAULT 100,
+              `constraint_active`   INT(1)       NOT NULL DEFAULT 1,
+              `created_by`          INT(11)      DEFAULT NULL,
+              `creation_time`       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              PRIMARY KEY (`constraint_id`),
+              KEY `idx_scope_phase` (`constraint_scope`, `phase_id`, `constraint_active`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+        ");
+    }
+    // Issue #103 — Add constraint_enabled column if missing (toggle state, separate from soft-delete)
+    $col_exists = $db->query(
+        "SHOW COLUMNS FROM assignment_constraint LIKE 'constraint_enabled'"
+    )->row_array();
+    if (empty($col_exists)) {
+        $db->query("ALTER TABLE assignment_constraint
+                ADD COLUMN constraint_enabled INT NOT NULL DEFAULT 1
+                AFTER constraint_active");
+    }
+
+    // ─── 4. (Re)générer les stored procedures ────────────────────────────────
+    $configs_to_generate = array('reviewer_tag', 'userproject_tag', 'assignment_constraint');
+    foreach ($configs_to_generate as $config_name) {
+        create_stored_procedures($config_name, $project_db_name, false);
+    }
 }

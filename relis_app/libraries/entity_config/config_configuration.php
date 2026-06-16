@@ -437,6 +437,11 @@ function get_configuration()
 			'qa' => array('title' => 'Quality Assessment', 'edit' => 'element/edit_element/edit_config_qa/1'),
 			'class' => array('title' => 'Classification', 'edit' => 'element/edit_element/edit_config_class/1'),
 			'dsl' => array('title' => 'Project Config Editor', 'edit' => 'element/edit_element/edit_config_dsl/1'),
+            // ISSUE #103 — Feature flag toggle for the assignment rules feature
+            'assignment_rules' => array(
+                'title' => 'Assignment Rules feature — ' . (assignment_rules_enabled() ? 'Enabled' : 'Disabled'),
+                'edit' => 'admin/feature_flag_assignment_rules'
+            ),
 		),
 		'fields' => array(
 

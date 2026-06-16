@@ -160,6 +160,59 @@ CREATE TABLE IF NOT EXISTS `str_management` (
   PRIMARY KEY (`str_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1;;;;
 
+-- ============================================================
+-- ISSUE #103 — Reviewer tags & assignment constraints
+-- ============================================================
+DROP TABLE IF EXISTS `reviewer_tag`;;;;
+CREATE TABLE IF NOT EXISTS `reviewer_tag` (
+                                              `tag_id`              INT(11)      NOT NULL AUTO_INCREMENT,
+    `tag_name`            VARCHAR(50)  NOT NULL,
+    `tag_description`     VARCHAR(250) DEFAULT NULL,
+    `tag_color`           VARCHAR(7)   DEFAULT '#888888',
+    `tag_active`          INT(1)       NOT NULL DEFAULT 1,
+    `added_by`            INT(11)      DEFAULT NULL,
+    `added_time`          TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`tag_id`),
+    UNIQUE KEY `uq_tag_name` (`tag_name`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=latin1;;;;
+
+INSERT INTO `reviewer_tag`
+(`tag_name`, `tag_description`, `tag_color`)
+VALUES
+    ('Junior',        'Reviewer débutant',          '#7AB648'),
+    ('Senior',        'Reviewer expérimenté',       '#2E75B6'),
+    ('Methodologist', 'Spécialiste méthodologique', '#C0504D');;;;
+
+DROP TABLE IF EXISTS `userproject_tag`;;;;
+CREATE TABLE IF NOT EXISTS `userproject_tag` (
+    `userproject_tag_id`     INT(11)   NOT NULL AUTO_INCREMENT,
+    `user_id`                INT(11)   NOT NULL,
+    `tag_id`                 INT(11)   NOT NULL,
+    `assigned_by`            INT(11)   DEFAULT NULL,
+    `assigned_time`          TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `userproject_tag_active` INT(1)    NOT NULL DEFAULT 1,
+    PRIMARY KEY (`userproject_tag_id`),
+    UNIQUE KEY `uq_user_tag` (`user_id`, `tag_id`),
+    KEY `idx_user` (`user_id`),
+    KEY `idx_tag` (`tag_id`)
+    ) ENGINE=InnoDB  DEFAULT CHARSET=latin1;;;;
+
+DROP TABLE IF EXISTS `assignment_constraint`;;;;
+CREATE TABLE IF NOT EXISTS `assignment_constraint` (
+                                                       `constraint_id`       INT(11)      NOT NULL AUTO_INCREMENT,
+    `constraint_scope`    VARCHAR(40)  NOT NULL,
+    `phase_id`            INT(11)      DEFAULT NULL,
+    `constraint_type`     VARCHAR(60)  NOT NULL,
+    `constraint_params`   TEXT         NOT NULL,
+    `constraint_priority` INT(11)      NOT NULL DEFAULT 100,
+    `constraint_active`   INT(1)       NOT NULL DEFAULT 1,
+    `constraint_enabled` INT NOT NULL DEFAULT 1,
+    `created_by`          INT(11)      DEFAULT NULL,
+    `creation_time`       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`constraint_id`),
+    KEY `idx_scope_phase` (`constraint_scope`, `phase_id`, `constraint_active`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=latin1;;;;
+
 
 -- VIEWS
 
@@ -360,3 +413,5 @@ CREATE   PROCEDURE  get_list_papers_processed  (IN  _start_by  INT, IN  _range  
  WHERE paper_active=1 AND  classification_status <> 'Waiting' AND ( (bibtexKey LIKE @search_bibtexKey) OR (title LIKE @search_title) OR (preview LIKE @search_preview) ) ORDER BY id ASC LIMIT _start_by , _range; 
  COMMIT;
  END;;;;
+
+

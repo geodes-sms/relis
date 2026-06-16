@@ -2164,4 +2164,24 @@ function path_separator()
 	} else {
 		return '/';
 	}
-}	
+}
+
+/**
+ * Returns whether the assignment rules feature (Issue #103) is enabled
+ * for the whole installation. Result is statically cached per request.
+ */
+function assignment_rules_enabled()
+{
+    static $cached = null;
+    if ($cached !== null) return $cached;
+
+    $ci = &get_instance();
+    $row = $ci->db->query(
+            "SELECT config_value FROM admin_config
+         WHERE config_label = 'assignment_rules_enabled' AND config_active = 1
+         LIMIT 1"
+    )->row_array();
+
+    $cached = (!empty($row) && intval($row['config_value']) === 1);
+    return $cached;
+}

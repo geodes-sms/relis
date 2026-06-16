@@ -5,7 +5,8 @@ services:
     restart: always
     environment:
       MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: "yes"
-      
+    ports:
+      - "3307:3306"
     volumes:
       - ./db/initial_db.sql:/docker-entrypoint-initdb.d/initial_db.sql
       - ../data/db:/var/lib/mysql
