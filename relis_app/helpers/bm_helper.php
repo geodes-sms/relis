@@ -2165,3 +2165,51 @@ function path_separator()
 		return '/';
 	}
 }	
+
+
+//check if the current user can access a user's page 
+function can_access_user_page($target_user_id, $user = 0)
+{
+    $ci = get_instance();
+
+    if ($user == 0) {
+        $user = $ci->session->userdata('user_id');
+    }
+
+    if (empty($user)) {
+        return FALSE;
+    }
+
+    $user = (int) $user;
+    $target_user_id = (int) $target_user_id;
+
+    if ($user == $target_user_id) {
+        return TRUE;
+    }
+
+    if (has_usergroup(1, $user)) {
+        return TRUE;
+    }
+
+    if (has_usergroup(1, $target_user_id)) {
+        return FALSE;
+    }
+
+    $sql = "SELECT 1
+            FROM userproject up_current
+            INNER JOIN userproject up_target
+                ON up_current.project_id = up_target.project_id
+            WHERE up_current.user_id = $user
+              AND up_current.user_role = 'Project admin'
+              AND up_current.userproject_active = 1
+              AND up_target.user_id = $target_user_id
+              AND up_target.userproject_active = 1
+            LIMIT 1";
+    $res = $ci->db->query($sql)->row_array();
+
+    if (!empty($res)) {
+        return TRUE;
+    }
+
+    return FALSE;
+}

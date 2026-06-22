@@ -43,6 +43,15 @@ class Element extends CI_Controller
         $op = check_operation($operation_name, 'Detail');
         $ref_table = $op['tab_ref'];
         $ref_table_operation = $op['operation_id'];
+
+        // === Contrôle d'accès : empêcher la lecture/édition d'une fiche utilisateur d'autrui ===
+        if ($ref_table === 'users' && !can_access_user_page($ref_id)) {
+            set_top_msg(lng_min("Permission denied"), 'error');
+            set_log('Security', "Unauthorized user page access by user "
+            . $this->session->userdata('user_id') . " on $operation_name/$ref_id");
+            redirect('home');
+            return;
+        }
         // todo correction gestion des utilisateurs
         //if(admin_config($ref_table))
         //$data['left_menu_admin']=True;

@@ -122,21 +122,76 @@ class Op extends CI_Controller
 		return $result;
 	}
 
-	//remove a picture associated with a specific element in a table
-	public function remove_picture($ref_table, $table_name, $table_id, $field, $element_id)
-	{
-		$table_name = mysql_real_escape_string($table_name);
-		$table_id = mysql_real_escape_string($table_id);
-		$field = mysql_real_escape_string($field);
-		$element_id = mysql_real_escape_string($element_id);
-		$sql = "UPDATE $table_name SET $field = NULL WHERE $table_id ='" . $element_id . "'";
-		$res = $this->manage_mdl->run_query($sql, False, 'default');
-		if ($res) {
-			set_top_msg(lng_min("Success - picture removed"));
-		} else {
-			set_top_msg(lng_min(" Operation failed "), 'error');
-		}
+//remove a picture associated with a specific element in a table
+public function remove_picture($ref_table, $table_name, $table_id, $field, $element_id)
+{
+    $current_user_id = $this->session->userdata('user_id');
+    if (empty($current_user_id)) {
+        set_top_msg(lng_min("You must be logged in"), 'error');
+        redirect('user/login');
+        return;
+    }
+
+    if (!ctype_digit((string)$element_id) || (int)$element_id <= 0) {
+        set_top_msg(lng_min("Invalid element id"), 'error');
+        redirect('home');
+        return;
+    }
+    $element_id = (int)$element_id;
+
+    $is_admin = has_usergroup(1, $current_user_id);
+    $authorized = false;
+
+    if ($table_name === 'users') {
+        if ($is_admin || $current_user_id == $element_id) {
+            $authorized = true;
+        }
+    } elseif ($table_name === 'projects') {
+        if ($is_admin || has_user_role('Project admin', $current_user_id, $element_id)) {
+            $authorized = true;
+        }
+    } else {
+        if ($is_admin) {
+            $authorized = true;
+        }
+    }
+
+    if (!$authorized) {
+        set_top_msg(lng_min("Permission denied"), 'error');
+        set_log('Security', "Unauthorized picture removal attempt by user $current_user_id on $table_name #$element_id");
+        redirect('home');
+        return;
+    }
+
+    $table_name = $this->db->escape_str($table_name);
+    $table_id = $this->db->escape_str($table_id);
+    $field = $this->db->escape_str($field);
+
+    $sql = "UPDATE $table_name SET $field = NULL WHERE $table_id = '" . $element_id . "'";
+    $res = $this->manage_mdl->run_query($sql, False, 'default');
+
+    if ($res) {
+        set_top_msg(lng_min("Success - picture removed"));
+    } else {
+        set_top_msg(lng_min("Operation failed"), 'error');
+    }
+
+    redirect('element/display_element/' . $ref_table . '/' . $element_id);
+}
+	//public function remove_picture($ref_table, $table_name, $table_id, $field, $element_id)
+	//{
+	//	$table_name = $this->db->escape_str($table_name);
+	//	$table_id = $this->db->escape_str($table_id);
+	//	$field = $this->db->escape_str($field);
+	//	$element_id = $this->db->escape_str($element_id);
+	//	$sql = "UPDATE $table_name SET $field = NULL WHERE $table_id ='" . $element_id . "'";
+	//	$res = $this->manage_mdl->run_query($sql, False, 'default');
+	//	if ($res) {
+	//		set_top_msg(lng_min("Success - picture removed"));
+	//	} else {
+	//		set_top_msg(lng_min(" Operation failed "), 'error');
+	//	}
 		//redirect ( 'element/display_element/' .$ref_table.'/'.$element_id  );
-		redirect('element/display_element/' . $ref_table . '/' . $element_id);
-	}
+	//	redirect('element/display_element/' . $ref_table . '/' . $element_id);
+	//}
 }

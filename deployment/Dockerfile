@@ -13,10 +13,14 @@ RUN apt-get autoclean && apt-get update && apt-get install -y \
     unzip \
     zip \
     git \
-    libzip-dev
+    libzip-dev \
+    libjpeg-dev \
+    libpng-dev \
+    libfreetype6-dev
 
 RUN apt-get install -y libicu-dev
-RUN docker-php-ext-install intl mysqli pdo pdo_mysql zip
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg
+RUN docker-php-ext-install intl mysqli pdo pdo_mysql zip gd
 
 RUN if [ "$ENV" = "dev" ]; then pecl install xdebug-3.3.0 && docker-php-ext-enable xdebug; fi
 
