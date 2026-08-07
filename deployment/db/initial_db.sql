@@ -550,8 +550,13 @@ articles','ReLiS allows you to manually add references or import a list from CSV
             <h4><b>Dependent Dynamic List</b></h4>\r\n
             <p>This is similar to a <code>Dynamic List</code>, but the values come from another category. This is useful if you want to restrict the possible values, but these values come from another <code>DynamicList</code> category. The format is:</p>\r\n<pre>\r\n<b>DynamicList</b> category_name <b>\"</b>Label to display<b>\" * [</b>n<b>]</b> <b>depends_on</b> dependent_category\r\n</pre>\r\n
             <dl>\r\n<dt><code>category_name</code>, <code>Label to display</code>, <code>*</code>, <code>n</code></dt>\r\n
-                <dd>Same as the <code>Dynamic List</code> category.</dd>\r\n<dt><code>dependent_category</code></dt>\r\n
-                <dd>The <code>category_name</code> of another <code>Dynamic List</code> from which the values are populated.</dd>\r\n</dl>\r\n
+                <dt><code>dependent_category</code></dt>
+                <dd>The <code>category_name</code> of another <code>Dynamic List</code> from which the values are populated.</dd>
+                </dl>
+                <b>Warning:</b> When <code>depends_on</code> targets a <code>Dynamic List</code> parent that has only a single selected value, the filtering behavior is not enforced. 
+                The sub-category dropdown will display all the values defined in the parent dynamic list instead of only the selected one. For guaranteed filtering,
+                 ensure the parent dynamic list has multiple selected values.</p>\r\n
+                
             <h4><b>Sub-categories</b></h4>\r\n
             <p>Any of the above categories can contain sub-categories. A category containing sub-categories is called a super-category. On the data extraction form, adding a value to a super-category will pop-up a secondary form. The format is:</p>\r\n<pre>\r\nSUPER CATEGORY DEFINITION <b>{</b>\r\n  SUB CATEGORY DEFINITION\r\n  SUB CATEGORY DEFINITION\r\n<b>}</b>\r\n</pre>\r\n
             <p>Here, <code>SUPER</code> and <code>SUB CATEGORY DEFINITION</code> are the same as any category type above. All you need is to enclose the sub-categories between curly brackets.\r\n</p>\r\n

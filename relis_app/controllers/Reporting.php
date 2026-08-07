@@ -161,12 +161,29 @@ class Reporting extends CI_Controller
 		 */
 		$field_list = array();
 		$field_list_header = array();
-		foreach ($ref_table_config['fields'] as $k => $v) {
-			if ($v['on_list'] == 'show') {
-				array_push($field_list, $k);
-				array_push($field_list_header, $v['field_title']);
-			}
-		}
+		$field_list = array();
+        $field_list_header = array();
+        foreach ($ref_table_config['fields'] as $k => $v) {
+            if ($v['on_list'] == 'show') {
+                array_push($field_list, $k);
+                array_push($field_list_header, $v['field_title']);
+
+                // FIX #21 : add sub-categories as separate columns
+                if (!empty($v['category_type']) &&
+                    in_array($v['category_type'], ['WithSubCategories', 'WithMultiValues'])) {
+                    $sub_table_config = get_table_configuration($k);
+                    if (!empty($sub_table_config['fields'])) {
+                        foreach ($sub_table_config['fields'] as $sub_key => $sub_field) {
+                            if (!empty($sub_field['category_type']) &&
+                                $sub_field['category_type'] === 'DependentDynamicCategory') {
+                                array_push($field_list, $k . '.' . $sub_key);
+                                array_push($field_list_header, $v['field_title'] . '.' . $sub_field['field_title']);
+                            }
+                        }
+                    }
+                }
+            }
+        }
 		//prepare paper info 
 		$this->db2 = $this->load->database(project_db(), TRUE);
 
@@ -205,6 +222,29 @@ class Reporting extends CI_Controller
 			$element_array['search_strategy'] = !empty($arrangedPapers[$value['class_paper_id']]) ? $arrangedPapers[$value['class_paper_id']]['search_strategy'] : '';
 			$element_array['reviewers'] = !empty($arrangedPapers[$value['class_paper_id']]) ? $arrangedPapers[$value['class_paper_id']]['reviewers'] : '';
 			foreach ($field_list as $key_field => $v_field) {
+				// FIX #21 : composite key "supercat.subcat" - resolve sub-category values via DBConnection_mdl
+				if (strpos($v_field, '.') !== false) {
+    				list($parent_field, $sub_field_name) = explode('.', $v_field, 2);
+    
+    				// Get the intermediate (depends_on) table name from the field configuration
+    				$sub_table_config = get_table_configuration($parent_field);
+    				$sub_field_config = $sub_table_config['fields'][$sub_field_name] ?? null;
+    				$intermediate = $sub_field_config['input_select_values'] ?? null;
+    
+    				if (!empty($intermediate)) {
+        				$sub_values = $this->DBConnection_mdl->get_subcategory_resolved_values(
+            			$parent_field,
+            			$sub_field_name,
+            			$intermediate,
+            			$data['list'][$key][$table_id]
+        				);
+        				$element_array[$v_field] = implode(' | ', $sub_values);
+    				} else {
+        				$element_array[$v_field] = "";
+    				}
+    					continue;
+				}
+
 				if (isset($value[$v_field])) {
 					if (isset($dropoboxes[$v_field][$value[$v_field]])) {
 						$element_array[$v_field] = $dropoboxes[$v_field][$value[$v_field]];
@@ -767,7 +807,8 @@ class Reporting extends CI_Controller
 		$rsae_classification_form = array_change_key_case($rsae_classification_form, CASE_LOWER);
 
 		foreach ($table_fields as $field_name => &$field_value) {
-			$field_title = strtolower(preg_replace('/[\s\-?]/', '_', $field_value['field_title']));
+			// FIX #21: also convert dots so composite "SuperCat.SubCat" titles match form keys
+			$field_title = strtolower(preg_replace('/[\s\-?.]/', '_', $field_value['field_title']));
 			// Check if the key exists in the array
 			if (!array_key_exists($field_title, $rsae_classification_form)) {
 				unset($table_fields[$field_name]);
@@ -817,11 +858,38 @@ class Reporting extends CI_Controller
 	 */
 	private function python_extract_classification_configuration()
 	{
-		$table_ref = "classification";
+    	$table_ref = "classification";
 
-		$this->db2 = $this->load->database(project_db(), TRUE);
-		$ref_table_config = get_table_config($table_ref);
-		return $ref_table_config['fields'];
+    	$this->db2 = $this->load->database(project_db(), TRUE);
+    	$ref_table_config = get_table_config($table_ref);
+    	$fields = $ref_table_config['fields'];
+
+    	// FIX #21: include DependentDynamicCategory sub-fields so that sub-categories
+    	// appear in the generated Python export files (consistent with the CSV export
+    	// and the RSAE configuration form).
+    	$extended_fields = array();
+    	foreach ($fields as $field_key => $field) {
+        	$extended_fields[$field_key] = $field;
+        	if (!empty($field['category_type']) &&
+            	in_array($field['category_type'], ['WithSubCategories', 'WithMultiValues'])) {
+            	$sub_table_config = get_table_configuration($field_key);
+            	if (!empty($sub_table_config['fields'])) {
+                	foreach ($sub_table_config['fields'] as $sub_key => $sub_field) {
+                    	if (!empty($sub_field['category_type']) &&
+                        	$sub_field['category_type'] === 'DependentDynamicCategory') {
+                        	$composite_key   = $field_key . '.' . $sub_key;
+                        	$composite_title = ($field['field_title'] ?? $field_key)
+                                         . '.' . ($sub_field['field_title'] ?? $sub_key);
+                        	$extended_fields[$composite_key] = array_merge($sub_field, [
+                            	'field_title' => $composite_title
+                        	]);
+                    	}
+                	}
+            	}
+        	}
+    	}
+
+    	return $extended_fields;	
 	}
 
 	/**
@@ -1078,22 +1146,52 @@ class Reporting extends CI_Controller
 
 	public function rsae_export_configurations($rsae_gpl, $data = "", $operation = "new", $display_type = "normal")
 	{
-		$res_install_config = $this->entity_configuration_lib->get_install_config();
-		$fields = $res_install_config['config']['classification']['fields'];
-		// Remove the first 2 elements using array_slice()
-		$fields = array_slice($fields, 2);
-		// Remove the last 3 elements using array_slice() and a negative offset
-		$fields = array_slice($fields, 0, -3);
+    	$res_install_config = $this->entity_configuration_lib->get_install_config();
+    	$fields = $res_install_config['config']['classification']['fields'];
+    	// Remove the first 2 elements using array_slice()
+    	$fields = array_slice($fields, 2);
+    	// Remove the last 3 elements using array_slice() and a negative offset
+    	$fields = array_slice($fields, 0, -3);
 
-		$data = $this->session->userdata('redirect_values');
+    	// FIX #21: include DependentDynamicCategory sub-fields under WithSubCategories /
+    	// WithMultiValues parents (e.g. "Variety.Level 1") so they appear in the
+    	// RSAE configuration form and end up in the exported R/Python files.
+    	$extended_fields = array();
+		foreach ($fields as $field_key => $field) {
+        	$extended_fields[$field_key] = $field;
+        
+        	if (!empty($field['category_type']) &&
+            	in_array($field['category_type'], ['WithSubCategories', 'WithMultiValues'])) {
+            	$sub_table_config = get_table_configuration($field_key);
+            	if (!empty($sub_table_config['fields'])) {
+                	foreach ($sub_table_config['fields'] as $sub_key => $sub_field) {
+                    	if (!empty($sub_field['category_type']) &&
+                        	$sub_field['category_type'] === 'DependentDynamicCategory') {
+                        	$composite_key   = $field_key . '.' . $sub_key;
+                        	$composite_title = ($field['field_title'] ?? $field_key)
+                                         . '.' . ($sub_field['field_title'] ?? $sub_key);
+                        	// Inherit the sub_field properties but override the title
+                        	// to be the composite "SuperCat.SubCat" (same format as in
+                        	// the CSV columns produced by generate_result_export_classification).
+                        	$extended_fields[$composite_key] = array_merge($sub_field, [
+                            	'field_title' => $composite_title
+                        	]);
+                    	}
+                	}
+            	}
+        	}
+    	}
+    	$fields = $extended_fields;
 
-		$data["rsae_gpl"] = $rsae_gpl;
+    	$data = $this->session->userdata('redirect_values');
 
-		$data["category"] = $fields;
+    	$data["rsae_gpl"] = $rsae_gpl;
 
-		$data['page'] = 'relis/rsae_export_configurations';
+    	$data["category"] = $fields;
 
-		$this->load->view('shared/body', $data);
+    	$data['page'] = 'relis/rsae_export_configurations';
+
+    	$this->load->view('shared/body', $data);
 	}
 
 	/**

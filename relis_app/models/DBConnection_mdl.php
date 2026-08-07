@@ -680,9 +680,51 @@ class DBConnection_mdl extends CI_Model
 
 
     }
+    // FIX #21 : get subcategries to display them 
+   function get_subcategory_resolved_values($parent_table, $sub_field, $intermediate, $element_id)
+    {
+        $this->db2 = $this->load->database(project_db(), TRUE);
+    
+        // FIX #21: $intermediate may be in the form "table;column" 
+        $intermediate_parts = explode(';', $intermediate);
+        $intermediate_table = $intermediate_parts[0];
+    
+        $ref_table = 'ref_' . $intermediate_table;
+        $intermediate_id_col = $intermediate_table . '_id';
+        $intermediate_value_col = $intermediate_table;
+        $parent_key = 'parent_field_id';
+        $active_field = $parent_table . '_active';
+    
+        // Detect which case we are in by checking table existence
+        $intermediate_exists = $this->db2->table_exists($intermediate_table);
+        $ref_exists = $this->db2->table_exists($ref_table);
+    
+        if ($intermediate_exists && $ref_exists) {
+            // Case A: depends_on DynamicList - double join via intermediate table
+            // Example: variety.level1 -> cocoa_level.cocoa_level_id -> ref_cocoa_level.ref_id
+            $sql = "SELECT r.ref_value
+                FROM $parent_table p
+                LEFT JOIN $intermediate_table i ON i.$intermediate_id_col = p.$sub_field
+                LEFT JOIN $ref_table r ON r.ref_id = i.$intermediate_value_col
+                WHERE p.$parent_key = ?
+                  AND p.$active_field = 1";
+        
+            $rows = $this->db2->query($sql, array($element_id))->result_array();
+            return array_column($rows, 'ref_value');
+        }
+    
+        // Case B: depends_on List - no intermediate table, value stored directly in parent
+        // Example: type.level1 contains the value directly (ENUM-style or raw)
+        $sql = "SELECT $sub_field AS value
+            FROM $parent_table p
+            WHERE p.$parent_key = ?
+              AND p.$active_field = 1";
+    
+        $rows = $this->db2->query($sql, array($element_id))->result_array();
+        return array_column($rows, 'value');
+    }
 
-
-
+    
     /*
      * Fonction pour appeler la procédure stockée qui récupère la liste d'éléments suivant les paramètres reçus
      * Input: $ref_table_config: le nom donné à le stucture de la table à récuperer
