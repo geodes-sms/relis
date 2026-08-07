@@ -27,6 +27,37 @@ class Manager_lib
 		$this->CI =& get_instance();
 	}
 
+	/**
+ 		* Fix152: Extract ENUM values from a column when no ref_table exists.
+ 		* Used to support `DynamicList ... depends_on X` where X is declared as a `List` (ENUM).
+ 		* 
+ 		* @param string $column_name The name of the column to inspect
+ 		* @return array List of ENUM values, or empty array if not found / not an ENUM
+ 	*/
+	private function get_enum_values_from_classification($column_name)
+	{
+    	$this->CI->db3 = $this->CI->load->database(project_db(), TRUE);
+    
+    	$sql = "SHOW COLUMNS FROM classification WHERE Field = '" . $this->CI->db3->escape_str($column_name) . "'";
+    	$query = $this->CI->db3->query($sql);
+    
+    	if (!$query) {
+        	return array();
+    	}
+    
+    	$row = $query->row_array();
+    	if (empty($row) || empty($row['Type'])) {
+        	return array();
+    	}
+    
+    	if (preg_match("/^enum\\((.+)\\)$/i", $row['Type'], $matches)) {
+        	preg_match_all("/'([^']*)'/", $matches[1], $values);
+        	return $values[1];
+    	}
+    
+    	return array();
+	}
+	
 	/*
 		responsible for retrieving reference select values based on a provided configuration. 
 		It supports fetching values from multiple levels of reference tables and applies optional filters.
@@ -35,10 +66,35 @@ class Manager_lib
 	function get_reference_select_values($config, $start_with_empty = True, $get_leaf = False, $multiselect = False, $filter = array())
 	{
 		$conf = explode(";", $config);
-		//	print_test($conf);
-		$ref_table = $conf[0];
-		$fields = $conf[1];
-		$ref_table_config = get_table_configuration($ref_table);
+    
+    	// FIX 152 : handle bare reference names from DSL Forge DependentDynamicCategory
+    	if (count($conf) < 2 || empty($conf[1])) {
+        	$bare_name = $conf[0];
+        	$ref_table = 'ref_' . $bare_name;
+        	$fields    = 'ref_value';
+        
+        $ci = get_instance();
+        if (!$ci->db->table_exists($ref_table)) {
+            $enum_values = $this->get_enum_values_from_classification($bare_name);
+            if (!empty($enum_values)) {
+                $result = array();
+                if ($start_with_empty) {
+                    $result[''] = "Select...";
+                }
+                foreach ($enum_values as $value) {
+                    $result[$value] = $value;
+                }
+                return $result;
+            }
+            log_message('error', "cannot resolve '$bare_name': no ref table, no ENUM column");
+            return array('' => "(Cannot load: '$bare_name')");
+        }
+		} else {
+        	$ref_table = $conf[0];
+        	$fields    = $conf[1];
+    	}
+    
+  		$ref_table_config = get_table_configuration($ref_table);
 		//for_array
 
 		if ($get_leaf) {
