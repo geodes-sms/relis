@@ -1281,19 +1281,32 @@ class Element extends CI_Controller
          * @var array $field_list va contenir les champs à afficher
          * @var array $ field_list will contain the fields to display
          */
-        $link_field_list = array();
+$link_field_list = array();
         $field_list = array();
         $field_list_header = array();
         foreach ($ref_table_config['operations'][$ref_table_operation]['fields'] as $k => $v) {
-            //print_test($k);
-            //print_test($v);
             if (!empty($ref_table_config['fields'][$k])) {
-                //$field_det=$ref_table_config['fields'][$k];
                 array_push($field_list, $k);
                 $field_header = !empty($v['field_title']) ? $v['field_title'] : $ref_table_config['fields'][$k]['field_title'];
                 array_push($field_list_header, $field_header);
                 if (!empty($v['link'])) {
                     $link_field_list[$k] = $v;
+                }
+                
+                // FIX #21 : add sub-categories as separate columns
+                $field_config = $ref_table_config['fields'][$k];
+                if (!empty($field_config['category_type']) &&
+                    in_array($field_config['category_type'], ['WithSubCategories', 'WithMultiValues'])) {
+                    $sub_table_config = get_table_configuration($k);
+                    if (!empty($sub_table_config['fields'])) {
+                        foreach ($sub_table_config['fields'] as $sub_key => $sub_field) {
+                            if (!empty($sub_field['category_type']) &&
+                                $sub_field['category_type'] === 'DependentDynamicCategory') {
+                                array_push($field_list, $k . '.' . $sub_key);
+                                array_push($field_list_header, $field_header . '.' . $sub_field['field_title']);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -1303,7 +1316,30 @@ class Element extends CI_Controller
         foreach ($data['list'] as $key => $value) {
             $element_array = array();
             $element_array['links'] = '';
+            
             foreach ($field_list as $key_field => $v_field) {
+                // FIX #21 : composite key "supercat.subcat" - resolve sub-category values via DBConnection_mdl
+                if (strpos($v_field, '.') !== false) {
+                    list($parent_field, $sub_field_name) = explode('.', $v_field, 2);
+
+                    // Get the intermediate (depends_on) table name from the field configuration
+                    $sub_table_config = get_table_configuration($parent_field);
+                    $sub_field_config = $sub_table_config['fields'][$sub_field_name] ?? null;
+                    $intermediate = $sub_field_config['input_select_values'] ?? null;
+
+                    if (!empty($intermediate)) {
+                        $sub_values = $this->DBConnection_mdl->get_subcategory_resolved_values(
+                            $parent_field,
+                            $sub_field_name,
+                            $intermediate,
+                            $data['list'][$key][$table_id]
+                        );
+                        $element_array[$v_field] = implode(' | ', $sub_values);
+                    } else {
+                        $element_array[$v_field] = "";
+                    }
+                        continue;
+                }
                 if (isset($value[$v_field])) {
                     if (isset($dropoboxes[$v_field][$value[$v_field]])) {
                         $element_array[$v_field] = $dropoboxes[$v_field][$value[$v_field]];
@@ -1537,6 +1573,22 @@ class Element extends CI_Controller
                 array_push($field_list, $k);
                 $field_header = !empty($v['field_title']) ? $v['field_title'] : $ref_table_config['fields'][$k]['field_title'];
                 array_push($field_list_header, $field_header);
+
+                // FIX #21 : add sub-categories as separate columns
+                $field_config = $ref_table_config['fields'][$k];
+                if (!empty($field_config['category_type']) &&
+                    in_array($field_config['category_type'], ['WithSubCategories', 'WithMultiValues'])) {
+                    $sub_table_config = get_table_configuration($k);
+                    if (!empty($sub_table_config['fields'])) {
+                        foreach ($sub_table_config['fields'] as $sub_key => $sub_field) {
+                            if (!empty($sub_field['category_type']) &&
+                                $sub_field['category_type'] === 'DependentDynamicCategory') {
+                                array_push($field_list, $k . '.' . $sub_key);
+                                array_push($field_list_header, $field_header . '.' . $sub_field['field_title']);
+                            }
+                        }
+                    }
+                }
             }
         }
         $i = 1;
@@ -1544,6 +1596,28 @@ class Element extends CI_Controller
         foreach ($data['list'] as $key => $value) {
             $element_array = array();
             foreach ($field_list as $key_field => $v_field) {
+               // FIX #21 : composite key "supercat.subcat" - resolve sub-category values via DBConnection_mdl
+                if (strpos($v_field, '.') !== false) {
+                    list($parent_field, $sub_field_name) = explode('.', $v_field, 2);
+    
+                    // Get the intermediate (depends_on) table name from the field configuration
+                    $sub_table_config = get_table_configuration($parent_field);
+                    $sub_field_config = $sub_table_config['fields'][$sub_field_name] ?? null;
+                    $intermediate = $sub_field_config['input_select_values'] ?? null;
+    
+                    if (!empty($intermediate)) {
+                        $sub_values = $this->DBConnection_mdl->get_subcategory_resolved_values(
+                        $parent_field,
+                        $sub_field_name,
+                        $intermediate,
+                        $data['list'][$key][$table_id]
+                        );
+                        $element_array[$v_field] = implode(' | ', $sub_values);
+                    } else {
+                        $element_array[$v_field] = "";
+                    }
+                    continue;
+                }
                 if (isset($value[$v_field])) {
                     if (isset($dropoboxes[$v_field][$value[$v_field]])) {
                         $element_array[$v_field] = $dropoboxes[$v_field][$value[$v_field]];
