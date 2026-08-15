@@ -599,6 +599,46 @@ articles','ReLiS allows you to manually add references or import a list from CSV
                             <li><code>Link</code> to show the link to the actual article online and have access to the full text (if available)</li>\r\n </ul>\r\n </dd>\r\n</dl>\r\n
             <p>\r\nOnce the articles have been screened, they become available for <a href=\ "http://relis.iro.umontreal.ca/auth/help_det/13\" style=\ "text-decoration: underline;\">classification and data extraction</a>.\r\n</p>\r\n
             <hr>\r\n
+    <h3>Screening Process</h3>
+    <p>The screening phase allows reviewers to evaluate assigned papers and decide on their inclusion or exclusion from
+        the project according to the configured protocol.</p>
+
+    <h4><strong>Decision Panel</strong></h4>
+    <p><img width="90%" height="520" src="http://relis.iro.umontreal.ca/cside/images/screening_decision_panel_illustration.png" alt="Screening Decision Panel Illustration"></p>
+
+    <ul>
+        <li><strong>Included:</strong> The paper meets the preliminary research criteria. Selecting an inclusion
+            criterion depends on the specific project configuration.</li>
+        <li><strong>Excluded:</strong> The paper does not match the objectives of the literature review. Selecting an
+            exclusion criterion is mandatory to validate this decision.</li>
+        <li><strong>Note:</strong> An optional free-text field to add comments, details, or justifications for other
+            reviewers.</li>
+        <li><strong>Flag:</strong> Allows tagging a paper for specific tracking (e.g., doubtful, key article). The
+            available flags must be created beforehand in the <em>Administration &gt; Planning &gt; Flags</em> menu. If
+            the paper requires no specific tag, leave the value as <code>None</code>.</li>
+        <li><strong>Save and Next:</strong> Saves the decision, notes, and criteria to the database, then automatically
+            loads the next assigned paper.</li>
+    </ul>
+
+    <h4><strong>Paper Tracking (Sidebar Navigation)</strong></h4>
+    <p><img width="90%" height="520" src="http://relis.iro.umontreal.ca/cside/images/papers_menu.png" alt="Papers Menu Navigation"></p>
+    <p>The Papers dropdown menu in the sidebar provides categorized views to monitor and browse articles based on their
+        current status in the pipeline:</p>
+
+    <ul>
+        <li><strong>All:</strong> Displays the complete repository of imported papers.</li>
+        <li><strong>Pending:</strong> Lists papers currently awaiting evaluation in the active phase.</li>
+        <li><strong>Included:</strong> Houses all papers validated for inclusion.</li>
+        <li><strong>Excluded:</strong> Houses all rejected papers (along with their mandatory exclusion criteria).</li>
+        <li><strong>Flagged Papers:</strong> Filters and displays papers tagged with custom flags for specific
+            follow-ups.</li>
+    </ul>
+
+    <h4><strong>Flags Management</strong></h4>
+    <p><img width="90%" height="520" src="http://relis.iro.umontreal.ca/cside/images/flags_view.png" alt="Flags View"></p>
+    <p>The Flags view allows to manage the flags.</p>
+    <p>Note that a flag can only be deleted if no papers are currently tagged with it.</p>
+    <hr>\r\n
             <h3>
                 <a name=\ "qa\"></a>Adding a quality assurance step</h3>\r\n
             <p>If desired, you may add a quality assurance (QA) step after all <a href=\ "http://relis.iro.umontreal.ca/auth/help_det/14#screen\" style=\ "text-decoration: underline;\">the screening phases</a> and before the <a href=\

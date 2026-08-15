@@ -914,6 +914,15 @@ class Screening extends CI_Controller
         $inclusion_crit = $this->manager_lib->get_reference_select_values('inclusioncriteria;ref_value');
         $data['exclusion_criteria'] = $exclusion_crit;
         $data['inclusion_criteria'] = $inclusion_crit;
+        if ($this->db_current->table_exists('flag')) {
+            $data['flag_active'] = 1;
+            $flags = $this->manager_lib->get_reference_select_values('flag_category;ref_value');
+            $flags[''] = 'None';
+            $data['flags'] = $flags;
+        } else {
+            $data['flag_active'] = 0;
+        }
+
         $data['inclusion_mode'] = $model->get_phase_config_value(active_screening_phase(), "screening_inclusion_mode");
         if (!empty($data['content_item'])) {
             //edit screening: used for conflict resolution
@@ -970,8 +979,20 @@ class Screening extends CI_Controller
         $data['screening_phase_info'] = $screening_phase_info;
         // $search_string = $this->DBConnection_mdl->get_row_details('ref_papers_sources', $data['the_paper']);
         if (!empty($data['the_paper'])) {
-            // $this->highlight_search_term($content_item['title'], $search_query);
+            if ($data['flag_active'] == 1) {
+                $query_flag_details = $this->db_current->select('flag_category_id, flag_active')
+                    ->where('paper_id', $data['the_paper'])
+                    ->get('flag');
+                $flag_details = $query_flag_details->row_array();
+                if (!empty($flag_details['flag_category_id']) && !empty($flag_details['flag_active'])) {
+                    $data['flag_category'] = $flag_details['flag_category_id'];
+                } else {
+                    $data['flag_category'] = '';
+                }
+            }
             $paper_detail = $this->DBConnection_mdl->get_row_details('papers', $data['the_paper']);
+            // $this->highlight_search_term($content_item['title'], $search_query);
+
             // fetching the search query from the `ref_papers_sources` table
             $detail_papers_sources = $this->DBConnection_mdl->get_row_details('get_detail_papers_sources', $paper_detail['papers_sources'], TRUE);
             $search_query = $detail_papers_sources['ref_search_query'] ?? '';
@@ -1064,6 +1085,34 @@ class Screening extends CI_Controller
             );
             //print_test($inclusion_criteria); exit;
             $this->db2->trans_start();
+            if ($this->db2->table_exists('flag')) {
+                $flag_query = $this->db2->select('id, paper_id, flag_category_id, flag_active')
+                    ->where('paper_id', $post_arr['paper_id'])
+                    ->get('flag');
+                $current_flag = $flag_query->row_array();
+                if ($post_arr['flag_category'] != '') {
+                    if (empty($current_flag)) {
+                        $this->db2->insert('flag', array(
+                                'paper_id' => $post_arr['paper_id'],
+                                'flag_category_id' => $post_arr['flag_category'],
+                                'added_by' => active_user_id())
+                        );
+                    } else {
+                        if ($current_flag['flag_category_id'] != $post_arr['flag_category']) {
+                            $this->db2->update('flag', array(
+                                'flag_category_id' => $post_arr['flag_category'],
+                                'flag_active' => 1,
+                                //'added_by' => active_user_id(),
+                                //'timestamp' => bm_current_time('Y-m-d H:i:s')
+                            ), array('id' => $current_flag['id']));
+                        } else if ($current_flag['flag_active'] == 0) {
+                            $this->db2->update('flag', array('flag_active' => 1, 'added_by' => active_user_id(), 'timestamp' => bm_current_time('Y-m-d H:i:s')), array('id' => $current_flag['id']));
+                        }
+                    }
+                } else if (!empty($current_flag)) {
+                    $this->db2->update('flag', array('flag_active' => 0), array('id' => $current_flag['id']));
+                }
+            }
             $res = $this->db2->update('screening_paper', $screening_save, array('screening_id' => $post_arr['screening_id']));
             $this->db_current->where('screening_id', $post_arr['screening_id'])->delete('screen_inclusion_mapping');
             if ($res == 1) {
@@ -2034,6 +2083,21 @@ class Screening extends CI_Controller
             }
             //print_test($data['screen_history']);
         }
+
+        $data['flag'] = '';
+        $flag_id_query = $this->db2->select('flag_category_id')
+            ->where('paper_id', $ref_id)
+            ->get('flag');
+        $flag_id = $flag_id_query->row_array();
+
+        if (!empty($flag_id)) {
+            $flag_query = $this->db2->select('ref_value')
+                ->where('ref_id', $flag_id['flag_category_id'])
+                ->get('ref_flag_category');
+            $flag = $flag_query->row_array();
+            $data['flag'] = $flag['ref_value'];
+        }
+
         /*
          * Création des boutons qui vont s'afficher en haut de la page (top_buttons)
          */

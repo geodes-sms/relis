@@ -135,6 +135,14 @@ class ElementUnitTest
         $this->remove_ref_variety();
         $this->remove_screen_phase();
         $this->remove_venue();
+        $this->listAllFlaggedPapers();
+        $this->listFlaggedPapersEmpty();
+        $this->listFlaggedPapersWithInactiveFlag();
+        $this->save_new_flag_category();
+        $this->edit_flag_category();
+        $this->delete_flag_category();
+        $this->edit_flag();
+        $this->delete_flag();
     }
 
     private function TestInitialize()
@@ -607,7 +615,6 @@ class ElementUnitTest
             //get entry in the db
             $data = $this->ci->db->query("SELECT * FROM relis_dev_correct_" . getProjectShortName() . ".classification WHERE class_id = 1")->row_array();
             $paper = $this->ci->db->query("SELECT * FROM relis_dev_correct_" . getProjectShortName() . ".paper WHERE id = " . $data['class_paper_id'])->row_array();
-
             //check if entry is listed
             if (strstr($response['content'], $paper['title']) != false) {
                 $actual_value = "Yes";
@@ -3740,7 +3747,320 @@ class ElementUnitTest
 
         run_test($this->controller, $action, $test_name, $test_aspect, $expected_value, $actual_value);
     }
+
+    /*
+     * Test 118
+     * Action : entity_list
+     * Description : display list of all flagged related papers
+     * Expected result: check if the flagged papers are listed
+     */
+    private function listAllFlaggedPapers()
+    {
+        $action = "entity_list";
+        $test_name = "display list of all flagged papers with 3 papers";
+        $test_aspect = "Correct elements displayed?";
+        $expected_value = "Yes";
+        $actual_value = "No";
+
+        $this->ci->db->query("INSERT INTO relis_dev_correct_" . getProjectShortName() . ".ref_flag_category (ref_value) VALUES ('flag 1'), ('flag 2')");
+        $this->ci->db->query("INSERT INTO relis_dev_correct_" . getProjectShortName() . ".flag (paper_id, flag_category_id, added_by, flag_active) VALUES (1, 1, 1, 1), (2, 2, 1, 1), (3, 1, 1, 1)");
+
+        $response = $this->http_client->response($this->controller, $action . "/list_flagged_papers");
+        if ($response['status_code'] >= 400) {
+            $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
+        } else {
+            if (substr_count($response['content'], 'flag 1') == 2 && substr_count($response['content'], 'flag 2') == 1) {
+                $actual_value = "Yes";
+            }
+        }
+
+        $this->ci->db->query("DELETE FROM relis_dev_correct_" . getProjectShortName() . ".flag");
+        $this->ci->db->query("DELETE FROM relis_dev_correct_" . getProjectShortName() . ".ref_flag_category");
+
+        run_test($this->controller, $action, $test_name, $test_aspect, $expected_value, $actual_value);
+    }
+
+    /*
+     * Test 119
+     * Action : entity_list
+     * Description : display the list of flagged related papers when none are flagged
+     * Expected result: check if the list is empty when there is no flagged paper
+     */
+    private function listFlaggedPapersEmpty()
+    {
+        $action = "entity_list";
+        $test_name = "display list of flagged papers when none are flagged";
+        $test_aspect = "Correct elements displayed?";
+        $expected_value = "Yes";
+        $actual_value = "No";
+
+        $this->ci->db->query("DELETE FROM relis_dev_correct_" . getProjectShortName() . ".flag");
+        $this->ci->db->query("DELETE FROM relis_dev_correct_" . getProjectShortName() . ".ref_flag_category");
+
+        $response = $this->http_client->response($this->controller, $action . "/list_flagged_papers");
+        if ($response['status_code'] >= 400) {
+            $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
+        } else {
+            $papers = $this->ci->db->query("SELECT * FROM relis_dev_correct_" . getProjectShortName() . ".paper")->result_array();
+            $actual_value = "Yes";
+            foreach ($papers as $paper) {
+                if (strstr($response['content'], $paper['title']) != false) {
+                    $actual_value = "No";
+                    break;
+                }
+            }
+        }
+
+        run_test($this->controller, $action, $test_name, $test_aspect, $expected_value, $actual_value);
+    }
+
+    /*
+     * Test 120
+     * Action : entity_list
+     * Description : display list of all flagged related papers
+     * Expected result: check if the flagged papers are listed
+     */
+    private function listFlaggedPapersWithInactiveFlag()
+    {
+        $action = "entity_list";
+        $test_name = "display list of flagged papers with 1 inactive flag";
+        $test_aspect = "Correct elements displayed?";
+        $expected_value = "Yes";
+        $actual_value = "No";
+
+        $this->ci->db->query("INSERT INTO relis_dev_correct_" . getProjectShortName() . ".ref_flag_category (ref_value) VALUES ('flag 1')");
+        $this->ci->db->query("INSERT INTO relis_dev_correct_" . getProjectShortName() . ".flag (paper_id, flag_category_id, added_by, flag_active) VALUES (1, 1, 1, 0)");
+
+        $response = $this->http_client->response($this->controller, $action . "/list_flagged_papers");
+        if ($response['status_code'] >= 400) {
+            $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
+        } else {
+            if (substr_count($response['content'], 'flag 1') == 0) {
+                $actual_value = "Yes";
+            }
+        }
+
+        $this->ci->db->query("DELETE FROM relis_dev_correct_" . getProjectShortName() . ".flag");
+        $this->ci->db->query("DELETE FROM relis_dev_correct_" . getProjectShortName() . ".ref_flag_category");
+
+        run_test($this->controller, $action, $test_name, $test_aspect, $expected_value, $actual_value);
+    }
+
+    /*
+     * Test 121
+     * Action : save_element
+     * Description : save new flag category
+     * Expected result: check if the element is saved in the DB
+     */
+    private function save_new_flag_category()
+    {
+        $action = "save_element";
+        $test_name = "save new flag category";
+        $test_aspect = "is element saved?";
+        $expected_value = 'Yes';
+        $actual_value = 'No';
+
+        $postData = [
+            'operation_type' => 'new',
+            'table_config' => 'flag_category',
+            'current_operation' => 'add_flag_category',
+            'redirect_after_save' => 'element/entity_list/list_flag_category',
+            'operation_source' => 'own',
+            'child_field' => '',
+            'table_config_parent' => '',
+            'parent_id' => '',
+            'parent_field' => '',
+            'parent_table' => '',
+            'ref_id' => '',
+            'ref_value' => 'test',
+            'ref_desc' => ''
+        ];
+
+        $response = $this->http_client->response($this->controller, $action, $postData, "POST");
+
+        if ($response['status_code'] >= 400) {
+            $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
+        } else {
+            $data = $this->ci->db->query("SELECT * FROM relis_dev_correct_" . getProjectShortName() . ".ref_flag_category WHERE ref_value = 'test'")->row_array();
+            if (!empty($data)) {
+                $actual_value = 'Yes';
+            }
+        }
+
+        $this->ci->db->query("DELETE FROM relis_dev_correct_" . getProjectShortName() . ".ref_flag_category");
+
+        run_test($this->controller, $action, $test_name, $test_aspect, $expected_value, $actual_value);
+    }
+
+    /*
+     * Test 122
+     * Action : save_element
+     * Description : edit flag category
+     * Expected result: check if the element is updated in the DB
+     */
+    private function edit_flag_category()
+    {
+        $action = "save_element";
+        $test_name = "edit flag category";
+        $test_aspect = "is element updated?";
+        $expected_value = 'Yes';
+        $actual_value = 'No';
+
+        $this->ci->db->query("INSERT INTO relis_dev_correct_" . getProjectShortName() . ".ref_flag_category (ref_value) VALUES ('test')");
+        $id = $this->ci->db->insert_id();
+
+        $postData = [
+            'operation_type' => 'edit',
+            'table_config' => 'flag_category',
+            'current_operation' => 'edit_flag_category',
+            'redirect_after_save' => 'element/entity_list/list_flag_category',
+            'operation_source' => 'own',
+            'child_field' => '',
+            'table_config_parent' => '',
+            'parent_id' => '',
+            'parent_field' => '',
+            'parent_table' => '',
+            'ref_id' => $id,
+            'ref_value' => 'retest',
+            'ref_desc' => ''
+        ];
+
+        $response = $this->http_client->response($this->controller, $action, $postData, "POST");
+
+        if ($response['status_code'] >= 400) {
+            $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
+        } else {
+            $data_retest = $this->ci->db->query("SELECT * FROM relis_dev_correct_" . getProjectShortName() . ".ref_flag_category WHERE ref_value = 'retest'")->row_array();
+            $data_test = $this->ci->db->query("SELECT * FROM relis_dev_correct_" . getProjectShortName() . ".ref_flag_category WHERE ref_value = 'test'")->row_array();
+            if (!empty($data_retest) && empty($data_test)) {
+                $actual_value = 'Yes';
+            }
+        }
+
+        $this->ci->db->query("DELETE FROM relis_dev_correct_" . getProjectShortName() . ".ref_flag_category");
+
+        run_test($this->controller, $action, $test_name, $test_aspect, $expected_value, $actual_value);
+    }
+
+    /*
+     * Test 123
+     * Action : delete_element
+     * Description : delete flag category
+     * Expected result: check if the element is deleted in the DB
+     */
+    private function delete_flag_category()
+    {
+        $action = "delete_element";
+        $test_name = "delete flag category";
+        $test_aspect = "is element deleted?";
+        $expected_value = 'Yes';
+        $actual_value = 'No';
+
+        $this->ci->db->query("INSERT INTO relis_dev_correct_" . getProjectShortName() . ".ref_flag_category (ref_value) VALUES ('test')");
+        $id = $this->ci->db->insert_id();
+
+        $response = $this->http_client->response($this->controller, $action . "/remove_flag_category/" . $id);
+
+        if ($response['status_code'] >= 400) {
+            $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
+        } else {
+            $data = $this->ci->db->query("SELECT * FROM relis_dev_correct_" . getProjectShortName() . ".ref_flag_category WHERE ref_id = " . $id)->row_array();
+            if ($data['ref_active'] == 0) {
+                $actual_value = 'Yes';
+            }
+        }
+
+        $this->ci->db->query("DELETE FROM relis_dev_correct_" . getProjectShortName() . ".ref_flag_category");
+
+        run_test($this->controller, $action, $test_name, $test_aspect, $expected_value, $actual_value);
+    }
+
+    /*
+     * Test 124
+     * Action : save_element
+     * Description : edit flag
+     * Expected result: check if the element is updated in the DB
+     */
+    private function edit_flag()
+    {
+        $action = "save_element";
+        $test_name = "edit flag";
+        $test_aspect = "is element updated?";
+        $expected_value = 'Yes';
+        $actual_value = 'No';
+
+        $this->ci->db->query("INSERT INTO relis_dev_correct_" . getProjectShortName() . ".ref_flag_category (ref_value) VALUES ('test')");
+        $flag_category_id = $this->ci->db->insert_id();
+        $this->ci->db->query("INSERT INTO relis_dev_correct_" . getProjectShortName() . ".flag (paper_id, flag_category_id, added_by, flag_active) VALUES (1, " . $flag_category_id . ", 1, 1)");
+        $flag_id = $this->ci->db->insert_id();
+        $this->ci->db->query("INSERT INTO relis_dev_correct_" . getProjectShortName() . ".ref_flag_category (ref_value) VALUES ('retest')");
+        $flag_category_id = $this->ci->db->insert_id();
+
+        $postData = [
+            'operation_type' => 'edit',
+            'table_config' => 'flags',
+            'current_operation' => 'edit_flag',
+            'redirect_after_save' => 'element/entity_list/list_flagged_papers',
+            'operation_source' => 'own',
+            'child_field' => '',
+            'table_config_parent' => '',
+            'parent_id' => '',
+            'parent_field' => '',
+            'parent_table' => '',
+            'id' => $flag_id,
+            'flag_category_id' => $flag_category_id
+        ];
+
+        $response = $this->http_client->response($this->controller, $action, $postData, "POST");
+
+        if ($response['status_code'] >= 400) {
+            $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
+        } else {
+            $result = $this->ci->db->query("SELECT * FROM relis_dev_correct_" . getProjectShortName() . ".flag WHERE id = " . $flag_id . " AND flag_active = 1")->row_array();
+            if (!empty($result)) {
+                $actual_value = "Yes";
+            }
+        }
+
+        $this->ci->db->query("DELETE FROM relis_dev_correct_" . getProjectShortName() . ".ref_flag_category");
+        $this->ci->db->query("DELETE FROM relis_dev_correct_" . getProjectShortName() . ".flag");
+
+        run_test($this->controller, $action, $test_name, $test_aspect, $expected_value, $actual_value);
+    }
+
+    /*
+     * Test 125
+     * Action : delete_element
+     * Description : delete flag
+     * Expected result: check if the element is deleted in the DB
+     */
+    private function delete_flag()
+    {
+        $action = "delete_element";
+        $test_name = "delete flag";
+        $test_aspect = "is element deleted?";
+        $expected_value = 'Yes';
+        $actual_value = 'No';
+
+        $this->ci->db->query("INSERT INTO relis_dev_correct_" . getProjectShortName() . ".ref_flag_category (ref_value) VALUES ('test')");
+        $flag_category_id = $this->ci->db->insert_id();
+        $this->ci->db->query("INSERT INTO relis_dev_correct_" . getProjectShortName() . ".flag (paper_id, flag_category_id, added_by, flag_active) VALUES (1, " . $flag_category_id . ", 1, 1)");
+        $flag_id = $this->ci->db->insert_id();
+
+        $response = $this->http_client->response($this->controller, $action . "/remove_flag/" . $flag_id);
+
+        if ($response['status_code'] >= 400) {
+            $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
+        } else {
+            $data = $this->ci->db->query("SELECT * FROM relis_dev_correct_" . getProjectShortName() . ".flag WHERE id = " . $flag_id)->row_array();
+            if ($data['flag_active'] == 0) {
+                $actual_value = 'Yes';
+            }
+        }
+
+        $this->ci->db->query("DELETE FROM relis_dev_correct_" . getProjectShortName() . ".ref_flag_category");
+        $this->ci->db->query("DELETE FROM relis_dev_correct_" . getProjectShortName() . ".flag");
+
+        run_test($this->controller, $action, $test_name, $test_aspect, $expected_value, $actual_value);
+    }
 }
-
-
-

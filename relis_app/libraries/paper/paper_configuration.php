@@ -333,6 +333,7 @@ function get_papers()
 		'default_value' => '1',
 		'on_list' => 'hidden',
 	);
+
 	$config['fields'] = $fields;
 
 	/*

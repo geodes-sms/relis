@@ -708,7 +708,6 @@ class Element extends CI_Controller
          * Récuperation des valeurs soumis dans le formulaire
          */
         $post_arr = $this->input->post();
-        //print_test($post_arr); exit;
         /*
          * Récupération de la configuration (structure ) de la table qui est concerné
          */
@@ -1348,6 +1347,9 @@ class Element extends CI_Controller
             $action_button = "";
             $arr_buttons = array();
             foreach ($list_links as $key_l => $value_l) {
+                if ($operation_name == 'list_flag_category' && $value_l['type'] == 'delete' && $value['number_of_papers'] != 0) {
+                    continue;
+                }
                 //setting redo link for list of operations
                 if ($ref_table == 'operations' and !empty($value['operation_state'])) {
                     if ($value['operation_state'] == 'Cancelled') {

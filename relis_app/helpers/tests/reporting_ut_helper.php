@@ -23,6 +23,7 @@ class ReportingUnitTest
         $this->result_export_classification();
         $this->result_export_excluded_class();
         $this->result_export_papers();
+        $this->result_export_flagged_papers();
         $this->result_export_papers_bib();
         $this->result_export_papers_bib_included();
         $this->result_export_papers_bib_excluded();
@@ -161,6 +162,38 @@ class ReportingUnitTest
                 $actual_generated_file = "File not generated";
             }
         }
+
+        run_test($this->controller, $action, $test_name, $test_generated_file, $expected_generated_file, $actual_generated_file);
+    }
+
+    /*
+     * Action : result_export_flagged_papers
+     * Description : exporting the necessary data about the papers to a CSV file
+     * Expected generated reporting file: check if the reproting file is generated
+     */
+    private function result_export_flagged_papers()
+    {
+        $action = "result_export_flagged_papers";
+        $test_name = "Exporting the necessary data about the flagged papers to a CSV file";
+        $test_generated_file = "Generated file";
+        $expected_generated_file = "relis_flagged_papers_demoTestProject.csv";
+
+        $this->ci->db->query("INSERT INTO relis_dev_correct_" . getProjectShortName() . ".ref_flag_category (ref_value) VALUES ('flag 1'), ('flag 2')");
+        $this->ci->db->query("INSERT INTO relis_dev_correct_" . getProjectShortName() . ".flag (paper_id, flag_category_id, added_by, flag_active) VALUES (1, 1, 1, 1), (2, 2, 1, 1), (3, 1, 1, 0)");
+        $response = $this->http_client->response($this->controller, $action);
+
+        if ($response['status_code'] >= 400) {
+            $actual_generated_file = "<span style='color:red'>" . $response['content'] . "</span>";
+        } else {
+            if (file_get_contents('cside/export_r/relis_flagged_papers_demoTestProject.csv') == file_get_contents('relis_app/helpers/tests/testFiles/reporting/get_relis_flagged_papers.csv')) {
+                $actual_generated_file = "relis_flagged_papers_demoTestProject.csv";
+            } else {
+                $actual_generated_file = "File not generated";
+            }
+        }
+
+        $this->ci->db->query("DELETE FROM relis_dev_correct_" . getProjectShortName() . ".flag");
+        $this->ci->db->query("DELETE FROM relis_dev_correct_" . getProjectShortName() . ".ref_flag_category");
 
         run_test($this->controller, $action, $test_name, $test_generated_file, $expected_generated_file, $actual_generated_file);
     }

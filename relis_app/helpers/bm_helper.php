@@ -311,7 +311,6 @@ function input_textarea_bm($label, $name, $id, $value = "", $max = 100, $classe 
 */
 function dropdown_form_bm($label, $name, $id, $values = array(), $selected = 0, $classe = " ", $readonly = "")
 {
-
 	if (strpos($classe, 'mandatory')) {
 		$mandatory = '<span class="mandatory"> *</span>';
 		$classe = str_replace('mandatory', "", $classe);
@@ -464,7 +463,7 @@ function input_image_bm($label, $name, $id, $value = "", $max = 20, $classe = " 
 /*
 	generate consistent HTML code for a checkbox input field within a form group. This allows users to select or deselect a checkbox as part of a form submission.
 */
-function checkbox_form_bm($label, $name, $id, $values = 1, $selected = 0, $classe = " ", $readonly = "")
+function checkbox_form_bm($label, $name, $id, $values = 1, $selected = 0, $classe = " ", $readonly = "", $on_change="")
 {
 	if (empty($values))
 		$values = 1;
@@ -502,7 +501,7 @@ function checkbox_form_bm($label, $name, $id, $values = 1, $selected = 0, $class
 
 						<div class="form-group "><input name="' . $name . '" value="0" type="hidden"  />' . form_label($label . $mandatory, $name, array(
 			'class' => 'control-label col-md-3 col-sm-3 col-xs-12'
-		)) . '<div class="col-md-6 col-sm-6 col-xs-12"> <input name="' . $name . '" value="' . $values . '" type="checkbox" class="js-switch ' . $classe . ' " ' . $checked . $readonly . ' /></div></div>';
+		)) . '<div class="col-md-6 col-sm-6 col-xs-12"> <input name="' . $name . '" id="'. $id .'" value="' . $values . '" type="checkbox" class="js-switch ' . $classe . ' " onchange="' . $on_change . ' " ' . $checked . $readonly . ' /></div></div>';
 
 	return $bm;
 }

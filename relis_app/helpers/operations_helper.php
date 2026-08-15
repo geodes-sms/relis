@@ -123,6 +123,9 @@ function check_operation($operation, $type = "List")
 	include_once('operations/op_paper.php');
 	$operations = array_merge($operations, get_operations_paper());
 
+    include_once('operations/op_flag.php');
+    $operations = array_merge($operations, get_operation_flag());
+
 	include_once('operations/op_screening.php');
 	$operations = array_merge($operations, get_operations_screening());
 

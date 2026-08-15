@@ -97,7 +97,6 @@ function get_reference($table, $title, $config_id, $value_label = "Value", $desc
             'input_type' => 'textarea',
         );
 
-
         $fields['ref_active'] = array(
             'field_title' => 'Active',
             'field_type' => 'int',
@@ -130,6 +129,15 @@ function get_reference($table, $title, $config_id, $value_label = "Value", $desc
             'input_type' => 'textarea',
         );
 
+        if ($config_id == 'flag_category') {
+            $fields['number_of_papers'] = array(
+                'field_title' => 'Number of papers',
+                'field_type' => 'int',
+                'on_list' => 'show',
+                'not_in_db' => True,
+                'display_null' => True,
+            );
+        }
 
         $fields['ref_active'] = array(
             'field_title' => 'Active',
@@ -470,6 +478,36 @@ function get_reference($table, $title, $config_id, $value_label = "Value", $desc
 
 
     );
+
+    if ($config_id == 'flag_category') {
+        unset($operations['list_' . $config_id]['fields']['ref_desc']);
+        $operations['list_' . $config_id]['fields']['number_of_papers'] = array();
+        $operations['list_' . $config_id]['table_name'] = 'view_flag_category_count';
+
+        $config['table_views']['flag_category_count'] = array(
+            'name' => 'view_flag_category_count',
+            'desc' => 'Get flag categories with paper count',
+            'script' => '
+        SELECT 
+            r.ref_id,
+            r.ref_value,
+            r.ref_active,
+            COUNT(f.id) AS number_of_papers
+        FROM ref_flag_category r
+        LEFT JOIN flag f 
+            ON (
+                r.ref_id = f.flag_category_id 
+                AND f.flag_active = 1
+            )
+        WHERE r.ref_active = 1
+        GROUP BY 
+            r.ref_id,
+            r.ref_value,
+            r.ref_active
+        '
+        );
+    }
+
     $config['operations'] = $operations;
 
     return $config;

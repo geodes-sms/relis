@@ -98,12 +98,14 @@ class Reporting extends CI_Controller
 	//display the export options for the result data
 	public function result_export($type = 1)
 	{
+        $this->db2 = $this->load->database(project_db(), TRUE);
 		$data['t_type'] = $type;
 		$data['page_title'] = lng('Exports');
 		$data['top_buttons'] = get_top_button('back', 'Back', 'home');
 		$data['left_menu_perspective'] = 'z_left_menu_screening';
 		$data['project_perspective'] = 'screening';
 		$data['page'] = 'relis/result_export';
+        $data['flag_active'] = $this->db2->table_exists('flag');
 		/*
 		 * Chargement de la vue avec les données préparés dans le controleur suivant le type d'affichage : (popup modal ou pas)
 		 */
@@ -430,6 +432,41 @@ class Reporting extends CI_Controller
 		}
 		redirect('reporting/result_export');
 	}
+
+    public function result_export_flagged_papers()
+    {
+        $table_ref = "flags";
+        $this->db2 = $this->load->database(project_db(), TRUE);
+
+        $data = $this->Reporting_dataAccess->prepare_paper_export7();
+
+        $result = $data->result_array();
+        $array_header = array('#', "key", 'Title', 'Link', 'Preview', 'Abstract', 'Year', 'Flag');
+        array_unshift($result, $array_header);
+        try {
+            $memoryStream = fopen('php://memory', 'r+');
+            if (!$memoryStream) {
+                throw new Exception('Could not open memory stream');
+            }
+            
+            $i = 0;
+            foreach ($result as $val) {
+                if ($i > 0) {
+                    $val['id'] = $i;
+                }
+                fputcsv($memoryStream, $val, get_appconfig_element('csv_field_separator_export'));
+                $i++;
+            }
+
+            rewind($memoryStream);
+            file_put_contents("cside/export_r/relis_flagged_papers_" . project_db() . ".csv", stream_get_contents($memoryStream));
+            fclose($memoryStream);
+            set_top_msg(lng_min('File generated'));
+        } catch (Exception $e) {
+            set_top_msg(lng_min("Error (File: " . $e->getFile() . ", line " . $e->getLine() . "): " . $e->getMessage()), 'error');
+        }
+        redirect('reporting/result_export');
+    }
 
 	public function result_export_included_papers_bib()
 	{

@@ -80,6 +80,9 @@ class Entity_configuration_lib
 				require_once("entity_config/references_configuration.php");
 				$table_configurations['inclusioncriteria'] = get_reference('ref_inclusioncriteria', 'Inclusion criteria', 'inclusioncriteria', 'Criteria');
 				break;
+            case 'flag_category':
+                require_once("entity_config/references_configuration.php");
+                $table_configurations['flag_category'] = get_reference('ref_flag_category', 'Flags', 'flag_category', 'Flag name');
 			case 'research_question':
 				require_once("entity_config/references_configuration.php");
 				$table_configurations['research_question'] = get_reference('research_question', 'Research question', 'research_question', 'Question');
@@ -101,6 +104,10 @@ class Entity_configuration_lib
 				require_once("paper/paper_configuration.php");
 				$table_configurations['papers'] = get_papers();
 				break;
+            case 'flags':
+                require_once("paper/flag_configuration.php");
+                $table_configurations['flags'] = get_flags();
+                break;
 			case 'author':
 				require_once("paper/author_configuration.php");
 				$table_configurations['author'] = get_author();
