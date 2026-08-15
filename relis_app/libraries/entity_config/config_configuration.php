@@ -183,7 +183,7 @@ function get_configuration()
 		'field_type' => 'int',
 		'field_size' => '1',
 		'field_value' => '1',
-		'default_value' => '0',
+		'default_value' => '1',
 		'input_type' => 'select',
 		'input_select_source' => 'yes_no',
 		'input_select_values' => '',

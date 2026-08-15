@@ -123,7 +123,7 @@ DROP TABLE IF EXISTS `info`;
 CREATE TABLE `info` (
   `info_id` int(11) NOT NULL AUTO_INCREMENT,
   `info_title` varchar(500) NOT NULL,
-  `info_desc` varchar(15000) DEFAULT NULL,
+  `info_desc` varchar(20000) DEFAULT NULL,
   `info_link` varchar(500) DEFAULT NULL,
   `info_type` enum('Home','Features','Help','Reference') NOT NULL DEFAULT 'Help',
   `info_order` int(2) NOT NULL DEFAULT '1',
@@ -599,6 +599,119 @@ articles','ReLiS allows you to manually add references or import a list from CSV
                             <li><code>Link</code> to show the link to the actual article online and have access to the full text (if available)</li>\r\n </ul>\r\n </dd>\r\n</dl>\r\n
             <p>\r\nOnce the articles have been screened, they become available for <a href=\ "http://relis.iro.umontreal.ca/auth/help_det/13\" style=\ "text-decoration: underline;\">classification and data extraction</a>.\r\n</p>\r\n
             <hr>\r\n
+        <h3>Screening Phases Management</h3>
+        <p>The Screening Phases feature allows project administrators to structure, configure, and manage parallel or sequential screening pipelines.</p>
+
+        <h4><strong>Why Use Parallel Screening Pipelines?</strong></h4>
+        <p>During a systematic literature review, adjustments to the screening process may become necessary after evaluation has already started. Parallel screening phases allow creating multiple active phases or workflow streams at the same depth level to handle different sets of papers or update configurations without altering past data:</p>
+
+        <ul>
+            <li><strong>Multiple Entry Points &amp; Sources:</strong> Multiple initial phases can coexist in parallel at the same depth level without restriction, allowing papers from different databases, sources, or batches to enter distinct screening streams.</li>
+            <li><strong>Parallel Workflows:</strong> Allows running concurrent screening streams at the same depth level (e.g., separating reviewer teams or screening protocols for different sub-collections of papers).</li>
+            <li><strong>Preserving Process Integrity:</strong> Once reviewers have started evaluating papers in a phase, its configuration is locked. Adding a parallel phase at the same depth level allows applying a new configuration or new reviewer assignments to subsequent papers without invalidating existing screening statistics.</li>
+            <li><strong>Reviewer Calibration:</strong> Enables creating parallel calibration phases to train and align reviewers before routing papers through the main screening pipeline.</li>
+            <li><strong>Isolated Statistics:</strong> Guarantees that progress and inclusion/exclusion statistics can be calculated independently for each parallel stream or batch.</li>
+        </ul>
+
+        <h4><strong>Workflow &amp; Pipeline Integrity Rules</strong></h4>
+        <p>The phase pipeline enforces structural rules to ensure process rigor while supporting parallel workflows:</p>
+
+        <ul>
+            <li><strong>Directed Tree Structure:</strong> The workflow forms a directed tree/graph flowing downstream without loops or cycles.</li>
+            <li><strong>Coexisting Parallel Phases:</strong> Multiple active phases can exist concurrently at the same depth level (such as multiple initial entry points or parallel intermediate streams).</li>
+            <li><strong>Unrestricted Initial Phases:</strong> Adding new initial phases at the root level has no structural restrictions.</li>
+            <li><strong>Convergence Downstream:</strong> Parallel workflow streams running side-by-side at the same depth can merge into downstream intermediate or final phases.</li>
+            <li><strong>Phase Immutability:</strong> Once papers are assigned or evaluated within a phase, its settings, assigned reviewers, and links become permanently locked.</li>
+            <li><strong>Targeted Phase Inactivation:</strong> Replacing an existing phase with a new parallel alternative deactivates the original phase while archiving its data and redirecting the pipeline flow.</li>
+        </ul>
+        <p>The Screening Phases feature allows project administrators to structure, configure, and manage parallel or sequential screening pipelines.</p>
+
+        <h4><strong>Phases Tree Edition</strong></h4>
+
+        <p>To set up and structure the screening pipeline, navigate to the <em>Screening Phases</em> menu:</p>
+
+        <ul>
+            <li><strong>Initial Phase Creation:</strong> If no phases exist in the project, click anywhere on the editor workspace to add the first phase.</li>
+        </ul>
+
+        <p><img width="90%" height="520" src="http://relis.iro.umontreal.ca/cside/images/PSP_initial_phase.png" alt="Phases Tree Initial State"></p>
+
+        <ul>
+            <li><strong>Context Menu:</strong> Click on an existing phase card to open the context menu. The options shown depend dynamically on the phase''s current status and position in the tree:
+                <ul>
+                    <li><strong>Add Previous Phase:</strong> Adds a new phase directly upstream.</li>
+                    <li><strong>Add Next Phase:</strong> Adds a new phase directly downstream.</li>
+                    <li><strong>Split:</strong> Splits the workflow to create a parallel screening phase at the same level.</li>
+                    <li><strong>Delete:</strong> Removes the phase from the pipeline.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <p><img width="90%" height="520" src="http://relis.iro.umontreal.ca/cside/images/PSP_context_menu.png" alt="Phases Context Menu"></p>
+
+        <h4><strong>Phase Configuration &amp; Management</strong></h4>
+        <p>Phase action buttons adapt according to what is allowed in the current state of the phase (e.g., its position or whether it has already processed papers):</p>
+
+        <ul>
+            <li><strong>Modify:</strong> Allows updating the title, displayed fields, and configuration settings of a phase.</li>
+            <li><strong>Replace:</strong> Replaces an existing phase with a newly configured one while archiving the original.</li>
+            <li><strong>Delete &amp; Paper Transfer:</strong> When deleting a phase, a <em>Transfer Phase</em> selection field may appear. All assigned and pending papers from the deleted phase will be transferred to the selected target phase. If no transfer selector is displayed, papers automatically flow to the next phase.</li>
+        </ul>
+
+        <h4><strong>Importing Papers into Phases</strong></h4>
+        <p><img width="90%" height="520" src="http://relis.iro.umontreal.ca/cside/images/PSP_import.png" alt="Importing Papers into Phase"></p>
+        <p>When importing or adding new papers (e.g., via BibTeX import), you must select the target phase from the dropdown list to specify which entry point in the pipeline the papers will enter.</p>
+
+        <h4><strong>Dashboard &amp; Tracking</strong></h4>
+        <p><img width="90%" height="520" src="http://relis.iro.umontreal.ca/cside/images/PSP_dashboard.png" alt="Project Phases Dashboard"></p>
+        <p>The main Project Phases view screens the papers through the screening pipeline.</p>
+
+        <ul>
+            <li><strong>Show Inactive Phases Toggle:</strong> Located at the top-left of the view, this switch allows you to show or hide inactive phases (phases that were deleted or replaced).</li>
+            <li><strong>Go To Button (on inactive phases):</strong> Clicking the Go To button on a phase card opens its dedicated dashboard, displaying completion statistics, progress meters, and access to all papers screened within that specific phase.</li>
+        </ul>
+        <hr>\r\n
+
+    <h3>Screening Process</h3>
+    <p>The screening phase allows reviewers to evaluate assigned papers and decide on their inclusion or exclusion from
+        the project according to the configured protocol.</p>
+
+    <h4><strong>Decision Panel</strong></h4>
+    <p><img width="90%" height="520" src="http://relis.iro.umontreal.ca/cside/images/screening_decision_panel_illustration.png" alt="Screening Decision Panel Illustration"></p>
+
+    <ul>
+        <li><strong>Included:</strong> The paper meets the preliminary research criteria. Selecting an inclusion
+            criterion depends on the specific project configuration.</li>
+        <li><strong>Excluded:</strong> The paper does not match the objectives of the literature review. Selecting an
+            exclusion criterion is mandatory to validate this decision.</li>
+        <li><strong>Note:</strong> An optional free-text field to add comments, details, or justifications for other
+            reviewers.</li>
+        <li><strong>Flag:</strong> Allows tagging a paper for specific tracking (e.g., doubtful, key article). The
+            available flags must be created beforehand in the <em>Administration &gt; Planning &gt; Flags</em> menu. If
+            the paper requires no specific tag, leave the value as <code>None</code>.</li>
+        <li><strong>Save and Next:</strong> Saves the decision, notes, and criteria to the database, then automatically
+            loads the next assigned paper.</li>
+    </ul>
+
+    <h4><strong>Paper Tracking (Sidebar Navigation)</strong></h4>
+    <p><img width="90%" height="520" src="http://relis.iro.umontreal.ca/cside/images/papers_menu.png" alt="Papers Menu Navigation"></p>
+    <p>The Papers dropdown menu in the sidebar provides categorized views to monitor and browse articles based on their
+        current status in the pipeline:</p>
+
+    <ul>
+        <li><strong>All:</strong> Displays the complete repository of imported papers.</li>
+        <li><strong>Pending:</strong> Lists papers currently awaiting evaluation in the active phase.</li>
+        <li><strong>Included:</strong> Houses all papers validated for inclusion.</li>
+        <li><strong>Excluded:</strong> Houses all rejected papers (along with their mandatory exclusion criteria).</li>
+        <li><strong>Flagged Papers:</strong> Filters and displays papers tagged with custom flags for specific
+            follow-ups.</li>
+    </ul>
+
+    <h4><strong>Flags Management</strong></h4>
+    <p><img width="90%" height="520" src="http://relis.iro.umontreal.ca/cside/images/flags_view.png" alt="Flags View"></p>
+    <p>The Flags view allows to manage the flags.</p>
+    <p>Note that a flag can only be deleted if no papers are currently tagged with it.</p>
+    <hr>\r\n
             <h3>
                 <a name=\ "qa\"></a>Adding a quality assurance step</h3>\r\n
             <p>If desired, you may add a quality assurance (QA) step after all <a href=\ "http://relis.iro.umontreal.ca/auth/help_det/14#screen\" style=\ "text-decoration: underline;\">the screening phases</a> and before the <a href=\

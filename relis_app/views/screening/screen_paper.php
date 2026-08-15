@@ -120,6 +120,8 @@
 
 
                                     <!-- <form class="form-horizontal" action="save_screening" method="POST" onsubmit=" return  validate_screen()"> -->
+
+                                    <br />
                                     <div style='text-align:center' class="screen_decision">
 
                                         <button class="btn  btn-lg" type="button" onclick="include_paper()">Include</button>
@@ -192,6 +194,15 @@
                                         <input type="hidden" name="inclusion_mode" id="inclusion_mode"
                                         value="<?php echo $inclusion_mode ?>" />
                                     <div class="ln_solid"></div>
+                                    <?php
+                                    if ($flag_active) {
+                                        echo '<div id="flag_dropdown_div">
+                                        '. dropdown_form_bm("Flag", "flag_category", "flag_dropdown", $flags, selected: $flag_category) . '
+                                        </div>
+                                        <div class="ln_solid"></div>';
+                                    }
+
+                                    ?>
                                     <div style='text-align:center'>
 
                                         <button class="btn btn-info btn-lg" type="submit">
@@ -234,35 +245,37 @@
 
                     <script>
                         function validate_screen() {
+
                             var inclusion_mode = '<? echo $inclusion_mode ?>';
                             if ($('#decision').val() == 'excluded' && $('#criteria_ex').val() == '') {
                                     alert("You must select an exclusion criterion.");
                                     return false;
-                                }else if ($('#decision').val() == 'accepted') {
-                                    switch(inclusion_mode) {
-                                        case "None" :
-                                            break;
-                                        case "One" :
-                                            if ($('#criteria_in').val() == '') {
-                                                alert("You must select an inclusion criterion.");
-                                                return false;
-                                            }
-                                            break;
-                                        case "Any" :
-                                            if (!Array.isArray($('#criteria_in').val())) {
-                                                alert("You must select at least one criterion.");
-                                                return false;
-                                            }
-                                        case "All":
-                                            var allCriteriaCheck = document.getElementById('allCriteriaCheck').checked;
-                                            if (!allCriteriaCheck) {
-                                                alert("All criteria must be valid, otherwise exclude this paper.");
-                                                return false;
-                                            } 
-                                            break;
-                                    }
-                                    return true;
+                            }else if ($('#decision').val() == 'accepted') {
+
+                                switch(inclusion_mode) {
+                                    case "None" :
+                                        break;
+                                    case "One" :
+                                        if ($('#criteria_in').val() == '') {
+                                            alert("You must select an inclusion criterion.");
+                                            return false;
+                                        }
+                                        break;
+                                    case "Any" :
+                                        if (!Array.isArray($('#criteria_in').val())) {
+                                            alert("You must select at least one criterion.");
+                                            return false;
+                                        }
+                                    case "All":
+                                        var allCriteriaCheck = document.getElementById('allCriteriaCheck').checked;
+                                        if (!allCriteriaCheck) {
+                                            alert("All criteria must be valid, otherwise exclude this paper.");
+                                            return false;
+                                        }
+                                        break;
                                 }
+                                return true;
+                            }
                         }
 
                         function include_paper() {
@@ -282,7 +295,6 @@
                             $('#decision').val('excluded');
                         }
 
-
                         <?php if (!empty($content_item) and $content_item['screening_decision'] == 'Included') { ?>
                             $(document).ready(function () {
                                 include_paper();
@@ -292,7 +304,17 @@
 
                     </script>
 
-
+                    <script>
+                        $(document).ready(function() {
+                            // Rend visible la checkbox sous forme de switch vert
+                            var elem = document.querySelector('.js-switch[name="flagged_paper"]');
+                            if (elem && !elem.dataSwitchery) {
+                                new Switchery(elem, {
+                                    color: '#26B99A'
+                                });
+                            }
+                        });
+                    </script>
 
 
 

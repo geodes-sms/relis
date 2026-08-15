@@ -708,7 +708,6 @@ class Element extends CI_Controller
          * Récuperation des valeurs soumis dans le formulaire
          */
         $post_arr = $this->input->post();
-        //print_test($post_arr); exit;
         /*
          * Récupération de la configuration (structure ) de la table qui est concerné
          */
@@ -1129,6 +1128,9 @@ class Element extends CI_Controller
      */
     public function entity_list($operation_name, $val = "_", $page = 0, $dynamic_table = 1)
     {
+        if ($operation_name == 'list_screen_phases' && $this->db_current->field_exists('next_phase', 'screen_phase')) {
+            redirect('screen_phases/display_phases');
+        }
         $project_published = project_published();
         //print_test($project_published);
         $op = check_operation($operation_name, 'List');
@@ -1348,6 +1350,9 @@ class Element extends CI_Controller
             $action_button = "";
             $arr_buttons = array();
             foreach ($list_links as $key_l => $value_l) {
+                if ($operation_name == 'list_flag_category' && $value_l['type'] == 'delete' && $value['number_of_papers'] != 0) {
+                    continue;
+                }
                 //setting redo link for list of operations
                 if ($ref_table == 'operations' and !empty($value['operation_state'])) {
                     if ($value['operation_state'] == 'Cancelled') {
@@ -1455,7 +1460,6 @@ class Element extends CI_Controller
         }
         if (admin_config($ref_table))
             $data['left_menu_admin'] = True;
-        //print_test($data);
         /*
          * Chargement de la vue avec les données préparés dans le controleur
          * Loading the view with the data prepared in the controller

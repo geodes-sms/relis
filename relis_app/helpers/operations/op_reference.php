@@ -64,6 +64,38 @@ function get_operations_reference() {
 			'tab_ref'=>'inclusioncriteria',
 			'operation_id'=>'remove_inclusioncriteria'
 	);
+
+    //flag category
+
+    $operations['list_flag_category']=array(
+        'type'=>'List',
+        'tab_ref'=>'flag_category',
+        'operation_id'=>'list_flag_category'
+    );
+
+    $operations['add_flag_category']=array(
+        'type'=>'Add',
+        'tab_ref'=>'flag_category',
+        'operation_id'=>'add_flag_category'
+    );
+
+    $operations['edit_flag_category']=array(
+        'type'=>'Edit',
+        'tab_ref'=>'flag_category',
+        'operation_id'=>'edit_flag_category'
+    );
+
+    $operations['detail_flag_category']=array(
+        'type'=>'Detail',
+        'tab_ref'=>'flag_category',
+        'operation_id'=>'detail_flag_category'
+    );
+
+    $operations['remove_flag_category']=array(
+        'type'=>'Remove',
+        'tab_ref'=>'flag_category',
+        'operation_id'=>'remove_flag_category'
+    );
 	
 	//Research question
 	

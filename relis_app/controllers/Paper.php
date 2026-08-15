@@ -742,6 +742,13 @@ class Paper extends CI_Controller
     //prepare the necessary data and load the appropriate view for importing papers from a CSV file
     public function import_papers()
     {
+        $phases = $this->db_current->select('*')
+            ->where('screen_phase_active', 1)
+            ->get('screen_phase')->result_array();
+
+        if ($this->db_current->field_exists('next_phase', 'screen_phase') && count($phases) == 0) {
+            redirect('screen_phases/display_phases');
+        }
         $headder = array('Row', 'Field1', 'Field2', 'Field3', 'Field4', 'Field5', 'Field6');
         $data['page_title'] = lng('Import papers - CSV');
         //	$data ['top_buttons'] = get_top_button ( 'all', 'Import BibTeX', 'paper/import_bibtext','Import BibTeX','fa-upload' );
@@ -762,6 +769,13 @@ class Paper extends CI_Controller
     //import bibliographic data from BibTeX or EndNote files
     public function import_bibtext($format = 'bibtex')
     {
+        $phases = $this->db_current->select('*')
+            ->where('screen_phase_active', 1)
+            ->get('screen_phase')->result_array();
+
+        if ($this->db_current->field_exists('next_phase', 'screen_phase') && count($phases) == 0) {
+            redirect('screen_phases/display_phases');
+        }
         $headder = array('Row', 'Field1', 'Field2', 'Field3', 'Field4', 'Field5', 'Field6');
         $data['import_format'] = $format;
         if (!empty($format) and $format == 'endnote') {
@@ -810,7 +824,11 @@ class Paper extends CI_Controller
         $i = 1;
         $imported = 0;
         $exist = 0;
+        $set_imported = $this->db_current->field_exists('next_phase', 'screen_phase');
         foreach ($data_array as $key => $paper) {
+            if ($set_imported) {
+                $paper['imported_in_phase'] = $post_arr['import_phase'];
+            }
             $paper['papers_sources'] = $papers_sources;
             $paper['search_strategy'] = $search_strategy;
             $paper['operation_code'] = $operation_code;
@@ -885,6 +903,7 @@ class Paper extends CI_Controller
         //exit;
         $i = 1;
         $imported = 0;
+        $set_imported = $this->db_current->field_exists('next_phase', 'screen_phase');
         foreach ($data_array as $key => $value) {
             if ($key >= ($paper_start_from - 1)) {
                 $value['zz'] = "";
@@ -905,7 +924,13 @@ class Paper extends CI_Controller
                 $v_bibtex = $this->mres_escape($value[$bibtex]);
                 $year = (!empty($value[$year]) and is_numeric($value[$year])) ? $this->mres_escape($value[$year]) : NULL;
 
-                $res_sql = $this->Paper_dataAccess->insert_to_paper($v_bibtex_key, $v_title, $v_preview, $v_bibtex, $v_abstract, $v_paper_link, $year, $papers_sources, $search_strategy, $active_user, $added_active_phase, $operation_code, $classification_status);
+                if ($set_imported) {
+                    $res_sql = $this->Paper_dataAccess->insert_to_paper($v_bibtex_key, $v_title, $v_preview, $v_bibtex, $v_abstract, $v_paper_link, $year, $papers_sources, $search_strategy, $active_user, $added_active_phase, $operation_code, $classification_status, $post_arr['import_phase']);
+                    $this->db_current->update('screen_phase',array("has_pending" => 1), array('screen_phase_id' => $post_arr['import_phase']));
+                } else {
+                    $res_sql = $this->Paper_dataAccess->insert_to_paper($v_bibtex_key, $v_title, $v_preview, $v_bibtex, $v_abstract, $v_paper_link, $year, $papers_sources, $search_strategy, $active_user, $added_active_phase, $operation_code, $classification_status);
+                }
+
                 $imported++;
                 //print_test($res_sql);
                 $i++;
@@ -983,6 +1008,22 @@ class Paper extends CI_Controller
             $data['search_strategy'] = $this->manager_lib->get_reference_select_values('search_strategy;ref_value', True, False);
             //print_test($data['search_strategy']);
         }
+
+        $this->db2 = $this->load->database(project_db(), TRUE);
+        $this->db2->trans_start();
+        if ($this->db2->field_exists('next_phase', 'screen_phase')) {
+            $raw_initial_phases = $this->db2->select('screen_phase_id, phase_title')
+                ->where(array('screen_phase_active' => 1, 'depth_level' => 0))
+                ->get('screen_phase')->result_array();
+            $initial_phases = array();
+            foreach ($raw_initial_phases as $id => $phase) {
+                $initial_phases[$phase['screen_phase_id']] = $phase['phase_title'];
+            }
+            $data['phases'] = $initial_phases;
+        }
+
+        $this->db2->trans_complete();
+
         $data['page_title'] = lng('Import papers - BibTeX');
         $data['top_buttons'] = get_top_button('back', 'Back', 'manage');
         $data['page'] = 'paper/import_bibtext_2';
@@ -1077,6 +1118,22 @@ class Paper extends CI_Controller
             $data['search_strategy'] = $this->manager_lib->get_reference_select_values('search_strategy;ref_value', True, False);
             //print_test($data['search_strategy']);
         }
+
+        $this->db2 = $this->load->database(project_db(), TRUE);
+        $this->db2->trans_start();
+        if ($this->db2->field_exists('next_phase', 'screen_phase')) {
+            $raw_initial_phases = $this->db2->select('screen_phase_id, phase_title')
+                ->where(array('screen_phase_active' => 1, 'depth_level' => 0))
+                ->get('screen_phase')->result_array();
+            $initial_phases = array();
+            foreach ($raw_initial_phases as $id => $phase) {
+                $initial_phases[$phase['screen_phase_id']] = $phase['phase_title'];
+            }
+            $data['phases'] = $initial_phases;
+        }
+
+        $this->db2->trans_complete();
+
         $data['page_title'] = lng('Import papers - match fields');
         $data['top_buttons'] = get_top_button('back', 'Back', 'manage');
         $data['page'] = 'paper/import_papers_2';
@@ -1091,6 +1148,25 @@ class Paper extends CI_Controller
      */
     public function add_paper_bibtex($data = array())
     {
+        $this->db2 = $this->load->database(project_db(), TRUE);
+        $this->db2->trans_start();
+        $phases = $this->db2->select('*')
+            ->where('screen_phase_active', 1)
+            ->get('screen_phase')->result_array();
+        if ($this->db2->field_exists('next_phase', 'screen_phase')) {
+            if (count($phases) == 0) {
+                redirect('screen_phases/display_phases');
+            }
+            $raw_initial_phases = $this->db2->select('screen_phase_id, phase_title')
+                ->where(array('screen_phase_active' => 1, 'depth_level' => 0))
+                ->get('screen_phase')->result_array();
+            $initial_phases = array();
+            foreach ($raw_initial_phases as $id => $phase) {
+                $initial_phases[$phase['screen_phase_id']] = $phase['phase_title'];
+            }
+            $data['phases'] = $initial_phases;
+        }
+
         $data['top_buttons'] = get_top_button('close', 'Back', 'element/entity_list/list_all_papers');
         $data['title'] = 'Add BibTeX';
         $data['page'] = 'paper/bibtex_form';
@@ -1114,6 +1190,9 @@ class Paper extends CI_Controller
         } else {
             $bibtex = $post_arr['bibtext'];
             $bibtex_result = $this->get_bibler_result($bibtex);
+            if ($this->db_current->field_exists('next_phase', 'screen_phase')) {
+                $bibtex_result['paper_array']['imported_in_phase'] = $post_arr['import_phase'];
+            }
             //	print_r($bibtex_result);
             if (!empty($bibtex_result['bibtext'])) {
                 $data['bibtext'] = $bibtex_result['bibtext'];
@@ -1123,6 +1202,11 @@ class Paper extends CI_Controller
                 $insert_res = $this->insert_paper_bibtext($bibtex_result['paper_array']);
                 if ($insert_res == 1) {
                     $data['message_success'] .= "Paper added";
+                    $this->db2 = $this->load->database(project_db(), TRUE);
+                    $this->db2->trans_start();
+                    if ($this->db2->field_exists('next_phase', 'screen_phase')) {
+                        $this->db2->update('screen_phase',array("has_pending" => 1), array('screen_phase_id' => $post_arr['import_phase']));
+                    }
                 } else {
                     $data['message_error'] .= $insert_res;
                 }
@@ -1335,6 +1419,9 @@ class Paper extends CI_Controller
             }
             $this->db_current->insert('paper', $paper_array);
             $paper_id = $this->db_current->insert_id();
+            if ($this->db_current->field_exists('next_phase', 'screen_phase')) {
+                $this->db_current->update('screen_phase',array("has_pending" => 1), array('screen_phase_id' => $paper_array['imported_in_phase']));
+            }
             if (!empty($authors)) {
                 $this->add_author($paper_id, $authors);
             }

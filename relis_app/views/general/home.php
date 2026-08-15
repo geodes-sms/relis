@@ -2,7 +2,7 @@
         <div class="right_col" role="main">
         <!-- gauge.js -->
     <script src="<?php echo site_url();?>cside/vendors/bernii/gauge.js/dist/gauge.min.js"></script>
-     
+
         <?php top_msg();  ?> 
         
         <div class="row">

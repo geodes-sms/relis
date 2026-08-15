@@ -1,4 +1,8 @@
-	<!-- page content -->
+<script src="https://d3js.org/d3.v6.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dagre-d3/0.6.4/dagre-d3.min.js"></script>
+<script src="<?php echo site_url();?>cside/js/phases.js"></script>
+<link rel="stylesheet" href="<?php echo site_url();?>cside/css/phases_tree.css">
+<!-- page content -->
         <div class="right_col" role="main">
         
         <?php top_msg();  ?> 
@@ -109,21 +113,52 @@
                 
                 
                 <!-- screening phases-->
-          
-        <?php 
-        if(!empty($phases_list)){
-        	
-        	$tmpl = array (
-        			'table_open'  => '<table class="table table-striped">',
-        			'table_close'  => '</table>'
-        	);
-        	 
-        	$this->table->set_template($tmpl);
-        	 
-        	echo $this->table->generate($phases_list);
-        }
-        
-        ?>
+
+                    <?php if (isset($phases_tree)): ?>
+                        <?php echo checkbox_form_bm("Show inactives phases", "show_inactives_phases", "show_inactives_phases");?>
+                        <div id="graph-container" style="width: 100%; overflow: auto; position: relative;">
+                            <svg width="100%"><g></g></svg>
+                        </div>
+                        <script>
+                            const baseUrl = "<?= base_url(); ?>";
+                            const phasesTree = <?= json_encode($phases_tree); ?>;
+                            const phasesList = <?= json_encode($phases_list); ?>;
+                            const qa = phasesList.find(phase => phase.Title === 'Quality assessment');
+                            const classification = phasesList.find(phase => phase.Title === 'Classification');
+                            var graph = createTree(phasesTree, classification, qa, '', document.querySelector("#show_inactives_phases").checked);
+
+                            var render = new dagreD3.render();
+                            var svg = d3.select("svg");
+                            var svgGroup = svg.select("g");
+
+                            render(svgGroup, graph);
+
+                            var graphHeight = graph.graph().height;
+                            svg.attr("height", graphHeight + 40);
+
+                            var xCenterOffset = (svg.node().getBoundingClientRect().width - graph.graph().width) / 2;
+                            svgGroup.attr("transform", "translate(" + xCenterOffset + ", 20)");
+
+                            document.querySelector("#show_inactives_phases").addEventListener('change', () => {
+                                graph = createTree(phasesTree, classification, qa, '', document.querySelector("#show_inactives_phases").checked);
+                                render(svgGroup, graph)
+                                graphHeight = graph.graph().height;
+                                svg.attr("height", graphHeight + 40);
+                                xCenterOffset = (svg.node().getBoundingClientRect().width - graph.graph().width) / 2;
+                                svgGroup.attr("transform", "translate(" + xCenterOffset + ", 20)");
+                            })
+                        </script>
+
+                    <?php elseif (!empty($phases_list)): ?>
+                        <?php
+                        $tmpl = array (
+                                'table_open'  => '<table class="table table-striped">',
+                                'table_close' => '</table>'
+                        );
+                        $this->table->set_template($tmpl);
+                        echo $this->table->generate($phases_list);
+                        ?>
+                    <?php endif; ?>
          		 <!-- /top tiles -->
                 
                 

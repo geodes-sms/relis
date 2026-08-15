@@ -10,10 +10,10 @@ class Paper_dataAccess extends CI_Model
 		parent::__construct();
 	}
 
-	function insert_to_paper($v_bibtex_key, $v_title, $v_preview, $v_bibtex, $v_abstract, $v_paper_link, $year, $papers_sources, $search_strategy, $active_user, $added_active_phase, $operation_code, $classification_status)
+	function insert_to_paper($v_bibtex_key, $v_title, $v_preview, $v_bibtex, $v_abstract, $v_paper_link, $year, $papers_sources, $search_strategy, $active_user, $added_active_phase, $operation_code, $classification_status, $imported_in_phase)
 	{
-		$sql = "INSERT INTO `paper` (`bibtexKey`, `title`,  `preview`,`bibtex`, `abstract`, `doi`, `year`, `papers_sources`, `search_strategy`, `added_by`, `addition_mode`, `added_active_phase`,`operation_code`,`classification_status`)
-				VALUES('$v_bibtex_key','$v_title','$v_preview','$v_bibtex','$v_abstract','$v_paper_link','$year','$papers_sources','$search_strategy',$active_user,'Automatic','$added_active_phase','$operation_code','$classification_status')";
+		$sql = "INSERT INTO `paper` (`bibtexKey`, `title`,  `preview`,`bibtex`, `abstract`, `doi`, `year`, `papers_sources`, `search_strategy`, `added_by`, `addition_mode`, `added_active_phase`,`operation_code`,`classification_status`,`imported_in_phase`)
+				VALUES('$v_bibtex_key','$v_title','$v_preview','$v_bibtex','$v_abstract','$v_paper_link','$year','$papers_sources','$search_strategy',$active_user,'Automatic','$added_active_phase','$operation_code','$classification_status','$imported_in_phase')";
 		//echo "$sql <br/><br/>";
 		$res_sql = $this->manage_mdl->run_query($sql, False, project_db());
 		return $res_sql;

@@ -35,7 +35,8 @@
                   
                   
                   <div class="x_content" style="min-height:400px ">
-                  
+
+
                  
                   <?php
                    //print_test($item_data);         	
@@ -50,9 +51,19 @@
                   echo $this->table->generate($item_data);
                   
              ?>
-				
-				
-				
+
+
+                      <?php
+                      if (!empty($flag)) {
+                          echo "<div class='row'>
+                                    <div class='col-md-12 col-sm-12 col-xs-12'>
+                                        <div class='x_panel'>
+                                            <h2>Flag : " . $flag ."</h2>
+                                        </div>
+                                    </div>    
+                                </div>";
+                      }
+                      ?>
 				
 				
 				

@@ -46,6 +46,28 @@ class Screening_dataAccess extends CI_Model
         return $all_papers;
     }
 
+    function new_select_screening_all_papers($current_phase, $source_status)
+    {
+        $depth_level = $this->db_current->select('depth_level')
+            ->where('screen_phase_id', $current_phase)
+            ->get('screen_phase')->row_array()['depth_level'];
+
+        if ($depth_level == 0) {
+            $sql = "SELECT P.*,screening_status as paper_status from paper P where paper_active = 1 AND imported_in_phase = '$current_phase' ";
+        } else {
+            $condition = "";
+            if ($source_status != 'all') {
+                $condition = " AND S.screening_decision = '$source_status'";
+            }
+            $sql = "SELECT decison_id,screening_decision as paper_status,P.* from screen_decison S
+        LEFT JOIN paper P ON(S.paper_id=P.id  )
+        WHERE next_phase='$current_phase'	AND  decision_active=1 AND P.paper_active=1 $condition";
+        }
+        //rechercher dans screen et la decision dans screen decision
+        $all_papers = $this->db_current->query($sql)->result_array();
+        return $all_papers;
+    }
+
     function select_screening_paper($current_phase, $condition)
     {
         $sql = "Select DISTINCT (paper_id) from screening_paper WHERE screening_active =1 AND screening_phase = $current_phase  $condition GROUP BY paper_id";

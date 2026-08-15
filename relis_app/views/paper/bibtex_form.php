@@ -71,9 +71,13 @@
 					
 						</div>
                    </div>
-                        
-                        
-                  
+
+
+                      <?php
+                      if (isset($phases)) {
+                          echo dropdown_form_bm("Initial phase", "import_phase", "1", $phases);
+                      }
+                      ?>
                   <div class="ln_solid"></div>
                       <div class="form-group">
                                                
@@ -88,7 +92,7 @@
                         </div>
                   </div>
                   
-                  <?php 
+                  <?php
                   echo form_close();
                  
                   

@@ -25,7 +25,7 @@ if (!defined('BASEPATH'))
 
 class Unit_test extends CI_Controller
 {
-    private $userUnitTest;
+    private $userUnitTesttimestamp;
     private $projectUnitTest;
     private $paperUnitTest;
     private $screeningUnitTest;
@@ -44,6 +44,7 @@ class Unit_test extends CI_Controller
     private $managerUnitTest;
     private $relisManagerUnitTest;
     private $inclusion_mode_conflictUnitTest;
+    private $screenPhaseUnitTest;
     private $customScreeningPhaseConfigTest;
 
     function __construct()
@@ -74,6 +75,7 @@ class Unit_test extends CI_Controller
         $this->load->helper('tests/apiquery_ut');
         $this->load->helper('tests/op_ut');
         $this->load->helper('tests/inclusion_mode_conflict_ut');
+        $this->load->helper('tests/screen_phase_ut');
         $this->load->library('unit_test');
 
         $this->unit->use_strict(TRUE);
@@ -98,6 +100,7 @@ class Unit_test extends CI_Controller
         $this->apiQueryUnitTest = new ApiQueryUnitTest();
         $this->opUnitTest = new OpUnitTest();
         $this->inclusion_mode_conflictUnitTest = new inclusion_mode_conflictUnitTest();
+        $this->screenPhaseUnitTest = new ScreenPhaseUnitTest();
     }
 
     public function relis_unit_test($result = "html_report")
@@ -124,6 +127,7 @@ class Unit_test extends CI_Controller
         $this->apiQueryUnitTest->run_tests();
         $this->opUnitTest->run_tests();
         $this->inclusion_mode_conflictUnitTest->run_tests();
+        $this->screenPhaseUnitTest->run_tests();
 
 
         // Record the end time of the tests

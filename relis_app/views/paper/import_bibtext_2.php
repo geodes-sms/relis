@@ -66,6 +66,11 @@
                        }
                         
                      ?>
+                               <?php
+                               if (isset($phases)) {
+                                   echo dropdown_form_bm("Initial phase", "import_phase", "1", $phases);
+                               }
+                               ?>
                       <div class="ln_solid"></div>
                       <div class="form-group">
                         <div class="col-md-9 col-sm-9 col-xs-12 col-md-offset-3">

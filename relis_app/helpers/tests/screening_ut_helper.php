@@ -65,6 +65,7 @@ class ScreeningUnitTest
         $this->removeScreeningValidation();
         $this->screening_4papersScreened();
         $this->screening_0paperScreened();
+        $this->saveScreening_FlaggedPaper();
     }
 
     private function TestInitialize()
@@ -82,6 +83,9 @@ class ScreeningUnitTest
         //create test Project
         createDemoProject();
         $this->ci->db->query("INSERT INTO relis_dev_correct_" . getProjectShortName() . ".screen_phase_config(screen_phase_id) values(1)");
+
+        // tests for the old phases system
+        $this->ci->db->query("ALTER TABLE relis_dev_correct_" . getProjectShortName() . ".screen_phase DROP `next_phase`");
 
         //add users to test Project
         addUserToProject(getAdminUserId(), "Reviewer");
@@ -1947,7 +1951,7 @@ class ScreeningUnitTest
      * Test 40
      * Action : save_assign_screen_validation
      * Description : save the assignments of papers for screening validation with 100% of paper assignement.
-     * Expected Paper assignements : 
+     * Expected Paper assignements :
      *          - 100% of the papers are added in the project DB in screening_paper table
      *          - assign_papers_valida operation inserted in operations table in the project DB
      */
@@ -2250,7 +2254,7 @@ class ScreeningUnitTest
         $test_aspect = "is data correct";
         $expected_value = "Correct";
         $actual_value = "Not Correct";
-        
+
         //initialise the Database
         $this->TestInitialize();
         //add 5 papers to test Project
@@ -2275,5 +2279,56 @@ class ScreeningUnitTest
         }
 
         run_test($this->controller, $action, $test_name, $test_aspect, $expected_value, $actual_value);
+    }
+
+    /*
+     * Test 49
+     * Action : save_screening
+     * Description : Save the screening decision made for a flagged paper.
+     * Expected update in DB
+     */
+    private function saveScreening_FlaggedPaper()
+    {
+        $action = "save_screening";
+        $test_name = "Save the screening decision made for a flagged paper";
+        $test_aspect_screening = "flag was created ?";
+        $expected_result = 'Yes';
+        $actual_result = 'No';
+
+        $this->ci->db->query("INSERT INTO relis_dev_correct_" . getProjectShortName() . ".ref_flag_category (ref_value) VALUES ('test')");
+        $flag_category_id = $this->ci->db->insert_id();
+
+        $screening_paper = $this->ci->db->query("SELECT * FROM relis_dev_correct_" . getProjectShortName() . ".screening_paper WHERE assignment_role = 'Screening' AND screening_id = 1")->row_array();
+
+        $data = [
+            "criteria_ex" => "",
+            "criteria_in" => 1,
+            "note" => "",
+            "screening_id" => $screening_paper['screening_id'],
+            "decision" => "accepted",
+            "operation_type" => "new",
+            "screening_phase" => $screening_paper['screening_phase'],
+            "operation_source" => "list_screen/mine_screen",
+            "paper_id" => $screening_paper['paper_id'],
+            "assignment_id" => $screening_paper['screening_id'],
+            "screen_type" => "simple_screen",
+            "flag_category" => $flag_category_id
+        ];
+
+        $response = $this->http_client->response($this->controller, $action, $data, "POST");
+
+        if ($response['status_code'] >= 400) {
+            $actual_result= "<span style='color:red'>" . $response['content'] . "</span>";
+        } else {
+            $result = $this->ci->db->query("SELECT * FROM relis_dev_correct_" . getProjectShortName() . ".flag WHERE paper_id = " . $screening_paper['paper_id'] . " AND flag_category_id = " . $flag_category_id . " AND flag_active = 1")->row_array();
+            if (!empty($result)) {
+                $actual_result = "Yes";
+            }
+        }
+
+        $this->ci->db->query("DELETE FROM relis_dev_correct_" . getProjectShortName() . ".ref_flag_category");
+        $this->ci->db->query("DELETE FROM relis_dev_correct_" . getProjectShortName() . ".flag");
+
+        run_test($this->controller, $action, $test_name, $test_aspect_screening, $expected_result, $actual_result);
     }
 }

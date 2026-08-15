@@ -324,6 +324,14 @@ function get_papers()
 		'on_list' => 'hidden',
 	);
 
+    $fields['imported_in_phase'] = array(
+        'field_title' => 'Imported in phase',
+        'field_type' => 'int',
+        'field_size' => 11,
+        'input_type' => 'select',
+        'input_select_source' => 'table',
+        'input_select_values' => 'screen_phase;phase_title',
+    );
 
 	$fields['paper_active'] = array(
 		'field_title' => 'Active',
@@ -333,6 +341,7 @@ function get_papers()
 		'default_value' => '1',
 		'on_list' => 'hidden',
 	);
+
 	$config['fields'] = $fields;
 
 	/*
@@ -410,6 +419,7 @@ function get_papers()
 			'abstract' => array('mandatory' => '', 'field_state' => 'enabled'),
 			'papers_sources' => array('mandatory' => '', 'field_state' => 'enabled'),
 			'search_strategy' => array('mandatory' => '', 'field_state' => 'enabled'),
+            'imported_in_phase' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
 
 		),
 

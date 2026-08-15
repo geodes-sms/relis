@@ -128,6 +128,8 @@ function populate_common_tables($target_db = 'current', $config = 'init')
 			'config',
 			'exclusioncrieria',
 			'inclusioncriteria',
+            'flag_category',
+            'flags',
 			'research_question',
 			'affiliation',
 			'papers_sources',
@@ -227,6 +229,8 @@ function update_stored_procedure($config, $verbose = FALSE, $target_db = 'curren
 		$new_configs = array(
 			'exclusioncrieria',
 			'inclusioncriteria',
+            'flag_category',
+            'flags',
 			'research_question',
 			'affiliation',
 			'papers_sources',
@@ -454,7 +458,7 @@ function update_qa_values($qa, $target_db = 'current')
 function populate_common_tables_views($target_db = 'current')
 {
 	$target_db = ($target_db == 'current') ? project_db() : $target_db;
-	$configs = array('papers', 'assignation', 'qa_assignment', 'author');
+	$configs = array('papers', 'assignation', 'qa_assignment', 'author', 'flag_category');
 	foreach ($configs as $key => $value) {
 		$table_configuration = get_table_configuration($value);
 		if (!empty($table_configuration['table_views'])) {

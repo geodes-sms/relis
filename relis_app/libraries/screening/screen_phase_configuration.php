@@ -213,6 +213,54 @@ function get_config_screen_phase()
 		'input_type' => 'textarea'
 	);
 
+    $fields['next_phase'] = array(
+        'field_title' => 'Next phase',
+        'field_type' => 'int',
+        'field_size' => 11,
+        'default_value' => null,
+        'input_type' => 'text',
+    );
+
+    $fields['parent'] = array(
+        'field_title' => 'Parent',
+        'field_type' => 'text',
+        'field_size' => 255,
+        'default_value' => null,
+        'input_type' => 'text',
+    );
+
+    $fields['depth_level'] = array(
+        'field_title' => 'Depth level',
+        'field_type' => 'int',
+        'field_size' => 11,
+        'field_value' => '0',
+        'default_value' => '0',
+        'input_type' => 'text',
+        'mandatory' => ' mandatory ',
+    );
+
+    $fields['used'] = array(
+        'field_title' => 'Used',
+        'field_type' => 'int',
+        'field_size' => '1',
+        'field_value' => '0',
+        'default_value' => '0',
+        'input_type' => 'select',
+        'input_select_source' => 'yes_no',
+        'input_select_values' => '',
+    );
+
+    $fields['has_pending'] = array(
+        'field_title' => 'Final phase',
+        'field_type' => 'int',
+        'field_size' => '1',
+        'field_value' => '0',
+        'default_value' => '0',
+        'input_type' => 'select',
+        'input_select_source' => 'yes_no',
+        'input_select_values' => '',
+    );
+
 	$fields['added_by'] = array(
 		'field_title' => 'Created by',
 		'field_type' => 'number',
@@ -270,7 +318,6 @@ function get_config_screen_phase()
 			'phase_type' => array('mandatory' => '', 'field_state' => 'hidden', 'field_value' => 'Screening'),
 			'source_paper' => array('mandatory' => 'mandatory', 'field_state' => 'hidden', 'field_value' => 'Previous phase'),
 			'source_paper_status' => array('mandatory' => 'mandatory', 'field_state' => 'hidden', 'field_value' => 'Included'),
-
 			'phase_title' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
 			'description' => array('mandatory' => '', 'field_state' => 'enabled'),
 			'displayed_fields_vals' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),

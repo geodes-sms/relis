@@ -163,9 +163,9 @@ class Screening extends CI_Controller
         //print_test($data);
         //$shortut operations
         $action_but = array();
-        if ((can_manage_project() or has_usergroup(3)) and !$project_published and get_appconfig_element('assign_papers_on'))
+        if ((can_manage_project() or has_usergroup(3)) and !$project_published and get_appconfig_element('assign_papers_on') && active_screening_phase_info()['screen_phase_active'] == 1)
             $action_but['assign_screen'] = get_top_button('all', 'Assign papers for screening', 'screening/assignment_screen', 'Assign papers', 'fa-mail-forward', '', ' btn-info action_butt col-md-2 col-sm-2 col-xs-12 ', False);
-        if (can_review_project() and !$project_published)
+        if (can_review_project() and !$project_published && active_screening_phase_info()['screen_phase_active'] == 1)
             $action_but['screen'] = get_top_button('all', 'Screen papers', 'screening/screen_paper', 'Screen', 'fa-search', '', ' btn-info action_butt col-md-2 col-sm-2 col-xs-12 ', False);
         if (can_manage_project() or has_usergroup(3)) {
             $action_but['screen_result'] = get_top_button('all', 'Screening progress', 'screening/screen_completion', 'Progress', 'fa-tasks', '', ' btn-info action_butt col-md-2 col-sm-2 col-xs-12 ', False);
@@ -207,6 +207,13 @@ class Screening extends CI_Controller
             ->result_array();
         $this->session->set_userdata('working_perspective', 'screen');
         $phases_list = array();
+        $raw_phases_tree = $this->db_current->get('screen_phase')->result_array();
+        $phases_tree = array();
+
+        foreach ($raw_phases_tree as $phase) {
+            $phases_tree[$phase['screen_phase_id']] = $phase;
+        }
+
         $yes_no = array('0' => '', '1' => 'Yes');
         $i = 1;
         if (get_appconfig_element('screening_on')) {
@@ -255,9 +262,14 @@ class Screening extends CI_Controller
                     'Gen_completion' => $gen_perc,
                     'action' => $open_but . $close_but . $select_but,
                 );
+                $phases_tree[$phase['screen_phase_id']]['user_completion'] = $user_perc;
+                $phases_tree[$phase['screen_phase_id']]['gen_completion'] = $gen_perc;
                 array_push($phases_list, $temp);
                 $i++;
             }
+        }
+        if ($this->db_current->field_exists("next_phase", "screen_phase")) {
+            $data['phases_tree'] = $phases_tree;
         }
         //quality assessment
         if (get_appconfig_element('qa_on')) {
@@ -711,8 +723,6 @@ class Screening extends CI_Controller
         $_assign_user = array();
 
         foreach ($users['list'] as $key => $value) {
-
-
             if ((user_project($this->session->userdata('project_id'), $value['user_id'])) and !has_user_role('Guest', $value['user_id'])) {
                 $_assign_user[$value['user_id']] = $value['user_name'];
             }
@@ -747,7 +757,12 @@ class Screening extends CI_Controller
         }
 
         if (empty($validation_by_criteria) or $validation_by_criteria == 'None'){
-            $all_papers = $this->Screening_dataAccess->select_screening_all_papers($source, $source_status);
+
+            if ($this->db_current->field_exists("next_phase", "screen_phase")) {
+                $all_papers = $this->Screening_dataAccess->new_select_screening_all_papers($current_phase, $source_status);
+            } else {
+                $all_papers = $this->Screening_dataAccess->select_screening_all_papers($source, $source_status);
+            }
         }
         else{
             $all_papers = $this->Screening_dataAccess->select_screening_paper_by_criteria($source_status, $validation_by_criteria, $current_phase);
@@ -871,6 +886,9 @@ class Screening extends CI_Controller
                     'user_id' => active_user_id(),
                     'operation_desc' => 'Assign papers for screening'
                 );
+                if ($this->db2->field_exists("next_phase", "screen_phase")) {
+                    $this->db2->update('screen_phase', array("used" => 1, "has_pending" => 0), array("screen_phase_id" => $post_arr['screening_phase']));
+                }
                 $res2 = $this->manage_mdl->add_operation($operation_arr);
                 set_top_msg('Assignement done');
                 redirect('screening/screening');
@@ -914,6 +932,15 @@ class Screening extends CI_Controller
         $inclusion_crit = $this->manager_lib->get_reference_select_values('inclusioncriteria;ref_value');
         $data['exclusion_criteria'] = $exclusion_crit;
         $data['inclusion_criteria'] = $inclusion_crit;
+        if ($this->db_current->table_exists('flag')) {
+            $data['flag_active'] = 1;
+            $flags = $this->manager_lib->get_reference_select_values('flag_category;ref_value');
+            $flags[''] = 'None';
+            $data['flags'] = $flags;
+        } else {
+            $data['flag_active'] = 0;
+        }
+
         $data['inclusion_mode'] = $model->get_phase_config_value(active_screening_phase(), "screening_inclusion_mode");
         if (!empty($data['content_item'])) {
             //edit screening: used for conflict resolution
@@ -970,8 +997,20 @@ class Screening extends CI_Controller
         $data['screening_phase_info'] = $screening_phase_info;
         // $search_string = $this->DBConnection_mdl->get_row_details('ref_papers_sources', $data['the_paper']);
         if (!empty($data['the_paper'])) {
-            // $this->highlight_search_term($content_item['title'], $search_query);
+            if ($data['flag_active'] == 1) {
+                $query_flag_details = $this->db_current->select('flag_category_id, flag_active')
+                    ->where('paper_id', $data['the_paper'])
+                    ->get('flag');
+                $flag_details = $query_flag_details->row_array();
+                if (!empty($flag_details['flag_category_id']) && !empty($flag_details['flag_active'])) {
+                    $data['flag_category'] = $flag_details['flag_category_id'];
+                } else {
+                    $data['flag_category'] = '';
+                }
+            }
             $paper_detail = $this->DBConnection_mdl->get_row_details('papers', $data['the_paper']);
+            // $this->highlight_search_term($content_item['title'], $search_query);
+
             // fetching the search query from the `ref_papers_sources` table
             $detail_papers_sources = $this->DBConnection_mdl->get_row_details('get_detail_papers_sources', $paper_detail['papers_sources'], TRUE);
             $search_query = $detail_papers_sources['ref_search_query'] ?? '';
@@ -1064,6 +1103,34 @@ class Screening extends CI_Controller
             );
             //print_test($inclusion_criteria); exit;
             $this->db2->trans_start();
+            if ($this->db2->table_exists('flag')) {
+                $flag_query = $this->db2->select('id, paper_id, flag_category_id, flag_active')
+                    ->where('paper_id', $post_arr['paper_id'])
+                    ->get('flag');
+                $current_flag = $flag_query->row_array();
+                if ($post_arr['flag_category'] != '') {
+                    if (empty($current_flag)) {
+                        $this->db2->insert('flag', array(
+                                'paper_id' => $post_arr['paper_id'],
+                                'flag_category_id' => $post_arr['flag_category'],
+                                'added_by' => active_user_id())
+                        );
+                    } else {
+                        if ($current_flag['flag_category_id'] != $post_arr['flag_category']) {
+                            $this->db2->update('flag', array(
+                                'flag_category_id' => $post_arr['flag_category'],
+                                'flag_active' => 1,
+                                //'added_by' => active_user_id(),
+                                //'timestamp' => bm_current_time('Y-m-d H:i:s')
+                            ), array('id' => $current_flag['id']));
+                        } else if ($current_flag['flag_active'] == 0) {
+                            $this->db2->update('flag', array('flag_active' => 1, 'added_by' => active_user_id(), 'timestamp' => bm_current_time('Y-m-d H:i:s')), array('id' => $current_flag['id']));
+                        }
+                    }
+                } else if (!empty($current_flag)) {
+                    $this->db2->update('flag', array('flag_active' => 0), array('id' => $current_flag['id']));
+                }
+            }
             $res = $this->db2->update('screening_paper', $screening_save, array('screening_id' => $post_arr['screening_id']));
             $this->db_current->where('screening_id', $post_arr['screening_id'])->delete('screen_inclusion_mapping');
             if ($res == 1) {
@@ -1091,7 +1158,11 @@ class Screening extends CI_Controller
                 $this->db2->trans_commit();
             }
             $screen_phase_detail = $this->DBConnection_mdl->get_row_details('get_screen_phase_detail', $screening_phase, TRUE);
-            $screening_phase_last_status = $screen_phase_detail['screen_phase_final'];
+            if ($this->db2->field_exists('next_phase', 'screen_phase')) {
+                $screening_phase_last_status = $screen_phase_detail['next_phase'] == null;
+            } else {
+                $screening_phase_last_status = $screen_phase_detail['screen_phase_final'];
+            }
             $paper_status = get_paper_screen_status_new($post_arr['paper_id'], $screening_phase);
             $query_screen_decision = $this->db2->get_where('screen_decison', array('paper_id' => $post_arr['paper_id'], 'screening_phase' => $screening_phase, 'decision_active' => 1), 1)->row_array();
             //screen history append
@@ -1106,15 +1177,40 @@ class Screening extends CI_Controller
                 'screening_time' => bm_current_time('Y-m-d H:i:s'),
             );
             $Json_screen_history = json_encode($Tscreen_history);
-            if (empty($query_screen_decision)) {
-                $this->db2->insert('screen_decison', array('paper_id' => $post_arr['paper_id'], 'screening_phase' => $screening_phase, 'screening_decision' => $paper_status, 'decision_source' => $decision_source, 'decision_history' => $Json_screen_history));
-            } else {
-                if (!empty($query_screen_decision['decision_history']))
-                    $Json_screen_history = $query_screen_decision['decision_history'] . "~~__" . $Json_screen_history;
-                if ($query_screen_decision['screening_decision'] != $paper_status) {
-                    $this->db2->update('screen_decison', array('screening_decision' => $paper_status, 'decision_source' => $decision_source, 'decision_history' => $Json_screen_history), array('paper_id' => $post_arr['paper_id'], 'screening_phase' => $screening_phase, 'decision_active' => 1));
+            if ($this->db2->field_exists('next_phase', 'screen_phase')) {
+                $next_phase = $this->db2->select('next_phase')
+                    ->where('screen_phase_id', $screening_phase)
+                    ->get('screen_phase')->row_array()['next_phase'];
+                if (empty($query_screen_decision)) {
+                    $this->db2->insert('screen_decison', array('paper_id' => $post_arr['paper_id'], 'screening_phase' => $screening_phase, 'next_phase' => $next_phase, 'screening_decision' => $paper_status, 'decision_source' => $decision_source, 'decision_history' => $Json_screen_history));
+
+                    if ($paper_status == "Included") {
+                        $this->db2->update('screen_phase',array("has_pending" => 1), array('screen_phase_id' => $next_phase));
+                    }
                 } else {
-                    $this->db2->update('screen_decison', array('decision_history' => $Json_screen_history), array('paper_id' => $post_arr['paper_id'], 'screening_phase' => $screening_phase, 'decision_active' => 1));
+                    if (!empty($query_screen_decision['decision_history']))
+                        $Json_screen_history = $query_screen_decision['decision_history'] . "~~__" . $Json_screen_history;
+                    if ($query_screen_decision['screening_decision'] != $paper_status) {
+                        $this->db2->update('screen_decison', array('screening_decision' => $paper_status, 'decision_source' => $decision_source, 'decision_history' => $Json_screen_history), array('paper_id' => $post_arr['paper_id'], 'screening_phase' => $screening_phase, 'decision_active' => 1));
+
+                        if ($paper_status == "Included") {
+                            $this->db2->update('screen_phase',array("has_pending" => 1), array('screen_phase_id' => $next_phase));
+                        }
+                    } else {
+                        $this->db2->update('screen_decison', array('decision_history' => $Json_screen_history), array('paper_id' => $post_arr['paper_id'], 'screening_phase' => $screening_phase, 'decision_active' => 1));
+                    }
+                }
+            } else {
+                if (empty($query_screen_decision)) {
+                    $this->db2->insert('screen_decison', array('paper_id' => $post_arr['paper_id'], 'screening_phase' => $screening_phase, 'screening_decision' => $paper_status, 'decision_source' => $decision_source, 'decision_history' => $Json_screen_history));
+                } else {
+                    if (!empty($query_screen_decision['decision_history']))
+                        $Json_screen_history = $query_screen_decision['decision_history'] . "~~__" . $Json_screen_history;
+                    if ($query_screen_decision['screening_decision'] != $paper_status) {
+                        $this->db2->update('screen_decison', array('screening_decision' => $paper_status, 'decision_source' => $decision_source, 'decision_history' => $Json_screen_history), array('paper_id' => $post_arr['paper_id'], 'screening_phase' => $screening_phase, 'decision_active' => 1));
+                    } else {
+                        $this->db2->update('screen_decison', array('decision_history' => $Json_screen_history), array('paper_id' => $post_arr['paper_id'], 'screening_phase' => $screening_phase, 'decision_active' => 1));
+                    }
                 }
             }
             if ($screening_phase_last_status or $paper_status == 'Excluded') {
@@ -2034,6 +2130,21 @@ class Screening extends CI_Controller
             }
             //print_test($data['screen_history']);
         }
+
+        $data['flag'] = '';
+        $flag_id_query = $this->db2->select('flag_category_id')
+            ->where('paper_id', $ref_id)
+            ->get('flag');
+        $flag_id = $flag_id_query->row_array();
+
+        if (!empty($flag_id)) {
+            $flag_query = $this->db2->select('ref_value')
+                ->where('ref_id', $flag_id['flag_category_id'])
+                ->get('ref_flag_category');
+            $flag = $flag_query->row_array();
+            $data['flag'] = $flag['ref_value'];
+        }
+
         /*
          * Création des boutons qui vont s'afficher en haut de la page (top_buttons)
          */

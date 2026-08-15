@@ -73,6 +73,15 @@ function get_screening_decision()
 		'mandatory' => ' mandatory ',
 	);
 
+    $fields['next_phase'] = array( // assigned to
+        'field_title' => 'Next_phase',
+        'field_type' => 'int',
+        'field_size' => 11,
+        'input_type' => 'select',
+        'input_select_source' => 'table',
+        'input_select_values' => 'screen_phase;screen_phase_title',
+    );
+
 
 
 	$fields['screening_decision'] = array(
@@ -203,7 +212,7 @@ function get_screening_decision()
 			'paper_id' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
 			'screening_decision' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
 			'screening_phase' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
-
+            'next_phase' => array('mandatory' => 'mandatory', 'field_state' => 'enabled'),
 		),
 
 		'top_links' => array(

@@ -75,4 +75,15 @@ class reporting_dataAccess extends CI_Model
         $data = $this->db2->query($sql);
         return $data;
     }
+
+    function prepare_paper_export7()
+    {
+        $sql = "SELECT p.id, p.bibtexKey, p.title, p.doi, p.preview, p.abstract, p.year, rfc.ref_value AS flag
+    FROM flag f
+    JOIN paper p ON f.paper_id = p.id
+    JOIN ref_flag_category rfc ON f.flag_category_id = rfc.ref_id
+    WHERE f.flag_active = 1 AND p.paper_active = 1 AND rfc.ref_active = 1;";
+        $data = $this->db2->query($sql);
+        return $data;
+    }
 }
