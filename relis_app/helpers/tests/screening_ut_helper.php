@@ -287,6 +287,11 @@ class ScreeningUnitTest
 
         //add 5 papers to test Project
         addBibtextPapersToProject("relis_app/helpers/tests/testFiles/paper/5_bibPapers.bib");
+        // Closing a phase returns to screening_select, which clears the active phase.
+        // Establish an open phase again before testing the assignment workflow.
+        $phaseId = getScreeningPhaseId("Title");
+        $this->http_client->response($this->controller, "screening_phase_manage/" . $phaseId);
+        $this->http_client->response($this->controller, "select_screen_phase/" . $phaseId);
         $response = $this->http_client->response($this->controller, $action);
 
         if ($response['status_code'] >= 400) {

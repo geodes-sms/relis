@@ -1,21 +1,26 @@
 {
-	"description": "The CodeIgniter framework",
-	"name": "codeigniter/framework",
+	"description": "ReLiS, a tool for conducting systematic literature reviews",
+	"name": "geodes-sms/relis",
 	"type": "project",
-	"homepage": "https://codeigniter.com",
-	"license": "MIT",
+	"homepage": "https://github.com/geodes-sms/relis",
+	"license": "GPL-3.0-or-later",
 	"support": {
-		"forum": "http://forum.codeigniter.com/",
-		"wiki": "https://github.com/bcit-ci/CodeIgniter/wiki",
-		"irc": "irc://irc.freenode.net/codeigniter",
-		"source": "https://github.com/bcit-ci/CodeIgniter"
+		"issues": "https://github.com/geodes-sms/relis/issues",
+		"source": "https://github.com/geodes-sms/relis"
 	},
 	"require": {
-		"php": ">=5.2.4",
+    "php": "~8.4.27",
+		"ext-ctype": "*",
+		"ext-curl": "*",
+		"ext-fileinfo": "*",
+		"ext-iconv": "*",
+		"ext-intl": "*",
+		"ext-mbstring": "*",
+		"ext-mysqli": "*",
+		"ext-openssl": "*",
+		"ext-pdo_mysql": "*",
+		"ext-zip": "*",
 		"twig/twig": "^3.0"
-	},
-	"suggest": {
-		"paragonie/random_compat": "Provides better randomness in PHP 5.x"
 	},
 	"require-dev": {
 		"mikey179/vfsstream": "1.1.*"

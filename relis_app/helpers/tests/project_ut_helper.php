@@ -69,10 +69,14 @@ class ProjectUnitTest
         if ($response['status_code'] >= 400) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
-            $actual_value = http_code()[$response['status_code']];
+            $actual_value = http_code()[$response['initial_status_code']];
         }
 
         run_test($this->controller, $action, $test_name, $test_aspect, $expected_value, $actual_value);
+        run_test($this->controller, $action, $test_name, 'Initial redirect destination',
+            'user', $this->http_client->getShortUrl($response['responses'][0]['location'] ?? ''));
+        run_test($this->controller, $action, $test_name, 'Final HTTP response code', 200, $response['status_code']);
+
     }
 
     /*

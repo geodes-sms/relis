@@ -183,8 +183,7 @@ function createDemoProject($projectName = "demoTestProject")
     removeConfigArray($projectName);
 
     $response = $http_client->response("project", "save_new_project", ['fileFieldName' => 'install_config', 'filePath' => getProjectPath($projectName)], "POST");
-    preg_match('/8083\/(.*?)(\.html)?$/', $response['url'], $matches);
-    $url = $matches[1];
+    $url = $http_client->getShortUrl($response['url']);
 
     if ($response["status_code"] == '303' && $url == "project/save_new_project_part2/" . $projectName) {
         $http_client->response($url, "");
@@ -270,8 +269,10 @@ function getCSVdata($filePath)
     $fp = fopen($filePath, 'rb');
     $i = 1;
     $last_count = 0;
-    while ((($Tline = (fgetcsv($fp, 0, ",", get_ci_config("csv_string_dellimitter")))) !== false) and $i < 11) {
-        $Tline = array_map("utf8_encode", $Tline);
+    while ((($Tline = (fgetcsv($fp, 0, ",", get_ci_config("csv_string_dellimitter"), '\\'))) !== false) and $i < 11) {
+        $Tline = array_map(function ($value) {
+            return mb_convert_encoding((string) $value, 'UTF-8', 'ISO-8859-1');
+        }, $Tline);
         if ($last_count < count($Tline)) {
             $last_count = count($Tline);
         }
@@ -279,8 +280,10 @@ function getCSVdata($filePath)
     }
     $i = 1;
     rewind($fp);
-    while ((($Tline = (fgetcsv($fp, 0, ",", get_ci_config("csv_string_dellimitter")))) !== false)) {
-        $Tline = array_map("utf8_encode", $Tline);
+    while ((($Tline = (fgetcsv($fp, 0, ",", get_ci_config("csv_string_dellimitter"), '\\'))) !== false)) {
+        $Tline = array_map(function ($value) {
+            return mb_convert_encoding((string) $value, 'UTF-8', 'ISO-8859-1');
+        }, $Tline);
         array_push($array_tab_values, $Tline);
         $i++;
     }
@@ -749,6 +752,18 @@ function performClassification()
 
 
 ########### Reporting ##########
+// Create a real legacy exclusion; its ID deliberately differs from the paper ID.
+function addLegacyExclusionFixture()
+{
+    $ci = get_instance();
+    $schema = 'relis_dev_correct_' . getProjectShortName();
+    $ci->db->query('INSERT INTO ' . $schema . '.exclusion '
+        . '(exclusion_id,exclusion_paper_id,exclusion_criteria,exclusion_note,exclusion_by) '
+        . 'VALUES (17,1,1,?,?) ON DUPLICATE KEY UPDATE exclusion_active=1',
+        array('Legacy exclusion fixture', getAdminUserId()));
+    return 17;
+}
+
 //delete generated reporting files
 function deleteReportingFiles()
 {

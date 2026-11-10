@@ -32,6 +32,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
 //provides methods for setting and retrieving various configuration properties related to an entity.
 class Entityconf_lib
 {
+	public $CI;
+
 
 	public $config_id = '';
 	public $table_name = '';

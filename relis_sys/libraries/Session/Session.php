@@ -362,10 +362,17 @@ class CI_Session {
 		$this->_config = $params;
 
 		// Security is king
-		ini_set('session.use_trans_sid', 0);
+		if (PHP_VERSION_ID < 80400)
+		{
+			ini_set('session.use_trans_sid', 0);
+			ini_set('session.use_only_cookies', 1);
+		}
+		elseif ((bool) ini_get('session.use_trans_sid') || ! (bool) ini_get('session.use_only_cookies'))
+		{
+			show_error('Session: cookie-only sessions must be enabled and trans-SID disabled in PHP startup configuration.');
+		}
 		ini_set('session.use_strict_mode', 1);
 		ini_set('session.use_cookies', 1);
-		ini_set('session.use_only_cookies', 1);
 
 		$this->_configure_sid_length();
 	}
@@ -389,6 +396,13 @@ class CI_Session {
 	 */
 	protected function _configure_sid_length()
 	{
+		if (PHP_VERSION_ID >= 80400)
+		{
+			// PHP 8.4 deprecates overriding SID length/encoding. Use its default IDs.
+			$this->_sid_regexp = '[0-9a-f]{32}';
+			return;
+		}
+
 		if (PHP_VERSION_ID < 70100)
 		{
 			$hash_function = ini_get('session.hash_function');

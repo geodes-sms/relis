@@ -1,7 +1,7 @@
 services:
   db:
     container_name: relis-db
-    image: mariadb:11.4
+    image: mariadb:11.4.13@sha256:d1891ede5a559f1086f55053bb8cc1569b0298338c4d72d71725a7f74f6ba620
     restart: always
     environment:
       MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: "yes"
@@ -64,7 +64,7 @@ services:
         ENV: dev
     env_file:
       - .env
-    entrypoint: /usr/local/bin/entrypoint.sh
+    entrypoint: /usr/local/bin/relis-entrypoint
     ports:
       - 8083:80
     volumes:

@@ -3,7 +3,7 @@
 
 class MY_Profilerssss extends CI_Profiler
 {
-	function MY_Profilerssss()
+	public function __construct()
 	{
 		parent::__construct();
 	}
@@ -171,7 +171,7 @@ class MY_Profilerssss extends CI_Profiler
 		$fields_displayed = 0;
 		$output = "";
 		foreach ($this->_available_sections as $section) {
-			if ($this->_compile_ { $section} !== FALSE) {
+			if ($this->{'_compile_' . $section} !== FALSE) {
 				$func = '_compile_' . $section;
 				$output .= $this->{$func}();
 				$fields_displayed++;

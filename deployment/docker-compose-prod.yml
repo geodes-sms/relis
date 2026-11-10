@@ -22,7 +22,7 @@ services:
       - bibler
 
   db:
-    image: mariadb:11.4
+    image: mariadb:11.4.13@sha256:d1891ede5a559f1086f55053bb8cc1569b0298338c4d72d71725a7f74f6ba620
     restart: always
     environment:
       MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: "yes"
@@ -90,7 +90,9 @@ services:
         - ENV=prod
     env_file:
       - .env
-    entrypoint: /usr/local/bin/entrypoint.sh
+    environment:
+      ENV: production
+    entrypoint: /usr/local/bin/relis-entrypoint
     restart: always
     deploy:
       replicas: 3

@@ -141,7 +141,24 @@ class Screening_dataAccess extends CI_Model
         return $all_validations;
     }
 
+    public function has_screening_config_fields($config, $phase_id) {
+        $required = array('screening_result_on', 'assign_papers_on', 'screening_reviewer_number',
+            'screening_inclusion_mode', 'screening_conflict_type', 'screening_screening_conflict_resolution',
+            'use_kappa', 'screening_validation_on', 'screening_validator_assignment_type',
+            'assign_to_non_screened_validator_on', 'validation_default_percentage');
+        if (!$phase_id) { $required = array_merge($required, array('config_id', 'screening_on')); }
+        if (!is_array($config)) { return FALSE; }
+        foreach ($required as $field) {
+            if (!isset($config[$field])) { return FALSE; }
+        }
+        return TRUE;
+    }
+
     function edit_screening_config($config, $phase_id, $affected_phases) {
+        if (!$this->has_screening_config_fields($config, $phase_id)) {
+            show_error('Incomplete screening configuration.', 400);
+            return FALSE;
+        }
         $this->db2 = $this->load->database(project_db(), TRUE);
         $config_save = array(
             'screening_result_on' => $config['screening_result_on'],

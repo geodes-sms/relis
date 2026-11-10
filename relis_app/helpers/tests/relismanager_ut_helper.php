@@ -3,6 +3,7 @@
 // TEST ELEMENT CONTROLLER
 class RelisManagerUnitTest
 {
+    private $qa_results;
     private $controller;
     private $http_client;
     private $ci;
@@ -75,7 +76,8 @@ class RelisManagerUnitTest
         $test_aspect = "Response code";
         $expected_value = http_code()[200];
 
-        $response = $this->http_client->response($this->controller, $action . "/1");
+        $exclusionId = addLegacyExclusionFixture();
+        $response = $this->http_client->response($this->controller, $action . "/" . $exclusionId);
 
         if ($response['status_code'] >= 400) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
@@ -84,6 +86,10 @@ class RelisManagerUnitTest
         }
 
         run_test($this->controller, $action, $test_name, $test_aspect, $expected_value, $actual_value);
+        $missing = $this->http_client->response($this->controller, $action . '/2147483647');
+        run_test($this->controller, $action, 'Reject a nonexistent legacy exclusion',
+            'HTTP response code', 404, $missing['status_code']);
+
     }
 
     /*
@@ -125,7 +131,8 @@ class RelisManagerUnitTest
 
         //add exclusion
         $this->ci->Paper_dataAccess->exclude_paper(1);
-        $response = $this->http_client->response($this->controller, $action . "/1/1");
+        $exclusionId = 17;
+        $response = $this->http_client->response($this->controller, $action . "/" . $exclusionId . "/1");
 
         if ($response['status_code'] >= 400) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
@@ -134,6 +141,9 @@ class RelisManagerUnitTest
         }
 
         run_test($this->controller, $action, $test_name, $test_aspect, $expected_value, $actual_value);
+        $active = $this->ci->db->query('SELECT exclusion_active FROM relis_dev_correct_' . getProjectShortName() . '.exclusion WHERE exclusion_id=' . $exclusionId)->row_array()['exclusion_active'];
+        run_test($this->controller, $action, $test_name, 'Exclusion record deactivated', '0', $active);
+
     }
 
     /*

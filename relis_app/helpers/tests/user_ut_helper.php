@@ -17,6 +17,7 @@ class UserUnitTest
     function run_tests()
     {
         $this->TestInitialize();
+        $this->logoutWhenAnonymous();
         $this->descriptionPage();
         $this->helpPage();
         $this->helpDetPage();
@@ -51,6 +52,17 @@ class UserUnitTest
         deleteSessionFiles();
         //delete created test user
         deleteCreatedTestUser();
+    }
+
+    private function logoutWhenAnonymous()
+    {
+        $this->http_client->unsetCookie('relis_session');
+        $response = $this->http_client->response($this->controller, 'discon');
+        $name = 'Logging out without an active session succeeds';
+        run_test($this->controller, 'discon', $name, 'Initial HTTP response code',
+            307, $response['initial_status_code']);
+        run_test($this->controller, 'discon', $name, 'Final HTTP response code',
+            200, $response['status_code']);
     }
 
     /*
@@ -172,10 +184,14 @@ class UserUnitTest
         if ($response['status_code'] >= 400) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
-            $actual_value = http_code()[$response['status_code']];
+            $actual_value = http_code()[$response['initial_status_code']];
         }
 
         run_test($this->controller, $action, $test_name, $test_aspect, $expected_value, $actual_value);
+        run_test($this->controller, $action, $test_name, 'Initial redirect destination',
+            'home', $this->http_client->getShortUrl($response['responses'][0]['location'] ?? ''));
+        run_test($this->controller, $action, $test_name, 'Final HTTP response code', 200, $response['status_code']);
+
         $this->http_client->unsetCookie('relis_session');
     }
 
@@ -535,10 +551,14 @@ class UserUnitTest
         if ($response['status_code'] >= 400) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
-            $actual_value = http_code()[$response['status_code']];
+            $actual_value = http_code()[$response['initial_status_code']];
         }
 
         run_test($this->controller, $action, $test_name, $test_aspect, $expected_value, $actual_value);
+        run_test($this->controller, $action, $test_name, 'Initial redirect destination',
+            'home', $this->http_client->getShortUrl($response['responses'][0]['location'] ?? ''));
+        run_test($this->controller, $action, $test_name, 'Final HTTP response code', 200, $response['status_code']);
+
 
         $this->http_client->unsetCookie('relis_session');
     }

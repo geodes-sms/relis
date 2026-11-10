@@ -77,7 +77,7 @@ class Manager extends CI_Controller
 		 */
 		$dropoboxes = array();
 		foreach ($ref_table_config['fields'] as $k => $v) {
-			if (!empty($v['input_type']) and $v['input_type'] == 'select' and $v['on_list'] == 'show') {
+			if (!empty($v['input_type']) and $v['input_type'] == 'select' and ($v['on_list'] ?? '') == 'show') {
 				if ($v['input_select_source'] == 'array') {
 					$dropoboxes[$k] = $v['input_select_values'];
 				} elseif ($v['input_select_source'] == 'table') {
@@ -97,7 +97,7 @@ class Manager extends CI_Controller
 		$list_links = array();
 		$add_link = false;
 		$add_link_url = "";
-		foreach ($ref_table_config['links'] as $link_type => $link) {
+		foreach (($ref_table_config['links'] ?? array()) as $link_type => $link) {
 			if (!empty($link['on_list'])) { {
 					$link['type'] = $link_type;
 					if (empty($link['title'])) {
@@ -158,7 +158,7 @@ class Manager extends CI_Controller
 		$field_list = array();
 		$field_list_header = array();
 		foreach ($ref_table_config['fields'] as $k => $v) {
-			if ($v['on_list'] == 'show') {
+			if (($v['on_list'] ?? '') == 'show') {
 				array_push($field_list, $k);
 				array_push($field_list_header, $v['field_title']);
 			}
@@ -259,7 +259,7 @@ class Manager extends CI_Controller
 		if (isset($ref_table_config['entity_title']['list'])) {
 			$data['page_title'] = lng($ref_table_config['entity_title']['list']);
 		} else {
-			$data['page_title'] = lng("List of " . $ref_table_config['reference_title']);
+			$data['page_title'] = lng("List of " . ($ref_table_config['reference_title'] ?? $ref_table));
 		}
 		/*
 		 * Configuration pour l'affichage des lien de navigation
@@ -405,7 +405,7 @@ class Manager extends CI_Controller
 		/*
 		 * Prépartions des valeurs qui vont apparaitres dans le formulaire
 		 */
-		$title_append = $table_config['reference_title_min'];
+		$title_append = $table_config['reference_title_min'] ?? '';
 		$data['table_config'] = $table_config;
 		/*
 		 * Titre de la page

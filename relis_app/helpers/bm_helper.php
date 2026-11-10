@@ -1753,7 +1753,7 @@ function get_paper_screen_status_new($paper_id, $screening_phase = "", $return =
 		$criteria2 = $ci->manager_lib->get_reference_select_values('inclusioncriteria;ref_value');
 		$inclusion_criteria = array();
 		foreach ($inclusion_criteria_ids as $id) {
-			array_push($inclusion_criteria, $criteria2[$id]);
+			array_push($inclusion_criteria, $criteria2[$id] ?? '');
 		}
 		$inclusion_criteria = implode(' | ', $inclusion_criteria);
 

@@ -508,9 +508,8 @@ class DBConnection_mdl extends CI_Model
 
         foreach ($table_config['operations'][$current_operation]['fields'] as $key => $v_field) {
             $value = $table_config['fields'][$key];
-            $is_nullable = $fields[$key]["Null"] == "YES";
-
             if ($v_field['field_state'] != 'drill_down' and $v_field['field_state'] != 'disabled' and !((isset($value['multi-select']) and isset($value['multi-select']) == 'Yes'))) {
+                $is_nullable = $fields[$key]["Null"] == "YES";
                 if (!empty($content[$key])) {
                     $val = $content[$key];
                 } else {

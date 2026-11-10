@@ -1101,7 +1101,7 @@ class Home extends CI_Controller
 		$paper = array();
 		$classification = array();
 		$i = 0;
-		while ((($Tline = (fgetcsv($fp, 0, ";", '"')))) !== false) {
+		while ((($Tline = (fgetcsv($fp, 0, ";", '"', '\\')))) !== false) {
 			//	print_test($Tline);
 			if ($i > 0) {
 				print_test("element:" . $i);
@@ -1262,7 +1262,7 @@ class Home extends CI_Controller
 		$paper = array();
 		$classification = array();
 		$i = 0;
-		while ((($Tline = (fgetcsv($fp, 0, ";", '"')))) !== false) {
+		while ((($Tline = (fgetcsv($fp, 0, ";", '"', '\\')))) !== false) {
 			print_test($Tline);
 			if ($i > 0) {
 				print_test("element:" . $i);

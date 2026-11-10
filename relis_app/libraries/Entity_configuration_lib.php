@@ -28,6 +28,8 @@ if (!defined('BASEPATH'))
 //library for retrieving configuration settings for various database tables/entities.
 class Entity_configuration_lib
 {
+	public $CI;
+
 	public function __construct()
 	{
 		$this->CI =& get_instance();

@@ -22,6 +22,8 @@
  */
 class Manager_lib
 {
+	public $CI;
+
 	public function __construct()
 	{
 		$this->CI =& get_instance();

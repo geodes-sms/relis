@@ -100,7 +100,15 @@ class ReportingUnitTest
         $test_httpCode = "Http response code";
         $expected_httpCode = http_code()[200];
 
-        $response = $this->http_client->response($this->controller, $action . "/index.html");
+        // Exercise a real export; CI treats .html as a route suffix, not a filename.
+        $filename = 'migration-download-fixture.csv';
+        $payload = "paper,title\n1,\"Quotes, accents: é\"\n";
+        file_put_contents('cside/export_r/' . $filename, $payload);
+        try {
+            $response = $this->http_client->response($this->controller, $action . '/' . $filename);
+        } finally {
+            unlink('cside/export_r/' . $filename);
+        }
 
         if ($response['status_code'] >= 400) {
             $actual_httpCode = "<span style='color:red'>" . $response['content'] . "</span>";
@@ -109,6 +117,16 @@ class ReportingUnitTest
         }
 
         run_test($this->controller, $action, $test_name, $test_httpCode, $expected_httpCode, $actual_httpCode);
+        run_test($this->controller, $action, $test_name, 'Downloaded bytes', $payload, $response['content']);
+        run_test($this->controller, $action, $test_name, 'Attachment filename', TRUE,
+            strpos($response['headers'], 'filename="' . $filename . '"') !== FALSE);
+
+        $missing = $this->http_client->response($this->controller, $action . '/missing-export-fixture.csv');
+        run_test($this->controller, $action, 'Reject a missing export without a readfile warning',
+            'HTTP response code', 404, $missing['status_code']);
+        $traversal = $this->http_client->response($this->controller, $action . '/' . rawurlencode('../index.php'));
+        run_test($this->controller, $action, 'Reject an export path outside the export directory',
+            'Request denied', TRUE, in_array($traversal['status_code'], array(400, 404), TRUE));
     }
 
     /*
@@ -128,10 +146,10 @@ class ReportingUnitTest
         if ($response['status_code'] >= 400) {
             $actual_generated_file = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
-            if (file_get_contents('cside/export_r/relis_paper_excluded_class_demoTestProject.csv') == file_get_contents('relis_app/helpers/tests/testFiles/reporting/get_relis_paper_excluded_class.csv')) {
+            if ($this->matchesFixture('cside/export_r/relis_paper_excluded_class_demoTestProject.csv', 'relis_app/helpers/tests/testFiles/reporting/get_relis_paper_excluded_class.csv')) {
                 $actual_generated_file = "relis_paper_excluded_class_demoTestProject.csv";
             } else {
-                $actual_generated_file = "File not generated";
+                $actual_generated_file = "File missing or content differs from fixture";
             }
         }
 
@@ -155,10 +173,10 @@ class ReportingUnitTest
         if ($response['status_code'] >= 400) {
             $actual_generated_file = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
-            if (file_get_contents('cside/export_r/relis_paper_demoTestProject.csv') == file_get_contents('relis_app/helpers/tests/testFiles/reporting/get_relis_paper.csv')) {
+            if ($this->matchesFixture('cside/export_r/relis_paper_demoTestProject.csv', 'relis_app/helpers/tests/testFiles/reporting/get_relis_paper.csv')) {
                 $actual_generated_file = "relis_paper_demoTestProject.csv";
             } else {
-                $actual_generated_file = "File not generated";
+                $actual_generated_file = "File missing or content differs from fixture";
             }
         }
 
@@ -182,10 +200,10 @@ class ReportingUnitTest
         if ($response['status_code'] >= 400) {
             $actual_generated_file = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
-            if (file_get_contents('cside/export_r/relis_paper_bibtex_demoTestProject.bib') == file_get_contents('relis_app/helpers/tests/testFiles/reporting/get_relis_paper_bibtex.bib')) {
+            if ($this->matchesFixture('cside/export_r/relis_paper_bibtex_demoTestProject.bib', 'relis_app/helpers/tests/testFiles/reporting/get_relis_paper_bibtex.bib')) {
                 $actual_generated_file = "relis_paper_bibtex_demoTestProject.bib";
             } else {
-                $actual_generated_file = "File not generated";
+                $actual_generated_file = "File missing or content differs from fixture";
             }
         }
 
@@ -212,7 +230,7 @@ class ReportingUnitTest
             if (file_exists("cside/export_r/relis_paper_bibtex_Included_demoTestProject.bib")) {
                 $actual_generated_file = "relis_paper_bibtex_Included_demoTestProject.bib";
             } else {
-                $actual_generated_file = "File not generated";
+                $actual_generated_file = "File missing or content differs from fixture";
             }
         }
 
@@ -236,10 +254,10 @@ class ReportingUnitTest
         if ($response['status_code'] >= 400) {
             $actual_generated_file = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
-            if (file_get_contents('cside/export_r/relis_paper_bibtex_Excluded_demoTestProject.bib') == file_get_contents('relis_app/helpers/tests/testFiles/reporting/get_relis_paper_bibtex_Excluded.bib')) {
+            if ($this->matchesFixture('cside/export_r/relis_paper_bibtex_Excluded_demoTestProject.bib', 'relis_app/helpers/tests/testFiles/reporting/get_relis_paper_bibtex_Excluded.bib')) {
                 $actual_generated_file = "relis_paper_bibtex_Excluded_demoTestProject.bib";
             } else {
-                $actual_generated_file = "File not generated";
+                $actual_generated_file = "File missing or content differs from fixture";
             }
         }
 
@@ -263,10 +281,10 @@ class ReportingUnitTest
         if ($response['status_code'] >= 400) {
             $actual_generated_file = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
-            if (file_get_contents('cside/export_r/relis_paper_excluded_screen_demoTestProject.csv') == file_get_contents('relis_app/helpers/tests/testFiles/reporting/get_relis_paper_excluded_screen.csv')) {
+            if ($this->matchesFixture('cside/export_r/relis_paper_excluded_screen_demoTestProject.csv', 'relis_app/helpers/tests/testFiles/reporting/get_relis_paper_excluded_screen.csv')) {
                 $actual_generated_file = "relis_paper_excluded_screen_demoTestProject.csv";
             } else {
-                $actual_generated_file = "File not generated";
+                $actual_generated_file = "File missing or content differs from fixture";
             }
         }
 
@@ -354,7 +372,9 @@ class ReportingUnitTest
                 $zip->close();
 
                 $expected_config_file = file_get_contents('relis_app/helpers/tests/testFiles/reporting/rsae/r/get_relis_r_config.R');
+                $this->recordComparison('config', $config_file_content, $expected_config_file);
                 $expected_lib_file = file_get_contents('relis_app/helpers/tests/testFiles/reporting/rsae/r/get_relis_r_lib.R');
+                $this->recordComparison('lib', $lib_file_content, $expected_lib_file);
 
                 if ($config_file_content === $expected_config_file && $lib_file_content === $expected_lib_file) {
                     $actual_generated_files = "r_rsae_demoTestProject.zip";
@@ -451,8 +471,11 @@ class ReportingUnitTest
                 $zip->close();
 
                 $expected_playground_file = file_get_contents('relis_app/helpers/tests/testFiles/reporting/rsae/python/get_relis_statistics_playground.py');
+                $this->recordComparison('playground', $playground_file_content, $expected_playground_file);
                 $expected_kernel_file = file_get_contents('relis_app/helpers/tests/testFiles/reporting/rsae/python/get_relis_statistics_kernel.py');
+                $this->recordComparison('kernel', $kernel_file_content, $expected_kernel_file);
                 $expected_requirements_file = file_get_contents('relis_app/helpers/tests/testFiles/reporting/rsae/python/get_requirements.txt');
+                $this->recordComparison('requirements', $requirements_file_content, $expected_requirements_file);
 
                 if (
                     $playground_file_content === $expected_playground_file && $kernel_file_content === $expected_kernel_file &&
@@ -513,10 +536,41 @@ class ReportingUnitTest
             if (file_exists("cside/export_r/relis_classification_demoTestProject.csv")) {
                 $actual_generated_file = "relis_classification_demoTestProject.csv";
             } else {
-                $actual_generated_file = "File not generated";
+                $actual_generated_file = "File missing or content differs from fixture";
             }
         }
 
         run_test($this->controller, $action, $test_name, $test_generated_file, $expected_generated_file, $actual_generated_file);
+    }
+    private function matchesFixture($actualPath, $expectedPath)
+    {
+        $actual = is_file($actualPath) ? file_get_contents($actualPath) : false;
+        $expected = is_file($expectedPath) ? file_get_contents($expectedPath) : false;
+        $this->recordComparison(basename($actualPath), $actual, $expected);
+        return $actual !== false && $expected !== false && $actual === $expected;
+    }
+
+    private function recordComparison($name, $actual, $expected)
+    {
+        if (!getenv('RELIS_MIGRATION_ID')) { return; }
+        $directory = '/migration/export-comparisons';
+        if (!is_dir($directory)) { mkdir($directory, 0755, true); }
+        $prefix = $directory . '/' . preg_replace('/[^a-zA-Z0-9_.-]/', '_', $name);
+        if ($actual !== false) { file_put_contents($prefix . '.actual', $actual); }
+        if ($expected !== false) { file_put_contents($prefix . '.expected', $expected); }
+        $firstDifference = null;
+        if (is_string($actual) && is_string($expected) && $actual !== $expected) {
+            $firstDifference = 0;
+            $limit = min(strlen($actual), strlen($expected));
+            while ($firstDifference < $limit && $actual[$firstDifference] === $expected[$firstDifference]) {
+                $firstDifference++;
+            }
+        }
+        file_put_contents($prefix . '.json', json_encode(array(
+            'equal' => $actual !== false && $expected !== false && $actual === $expected,
+            'actual_bytes' => $actual === false ? null : strlen($actual),
+            'expected_bytes' => $expected === false ? null : strlen($expected),
+            'first_difference' => $firstDifference
+        ), JSON_PRETTY_PRINT));
     }
 }

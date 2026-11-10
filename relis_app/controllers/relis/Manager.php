@@ -25,6 +25,10 @@ class Manager extends CI_Controller
 		 * Appel de la fonction du model pour recupérer la ligne à modifier
 		 */
 		$data['content_item'] = $this->DBConnection_mdl->get_row_details('exclusion', $ref_id);
+		if (empty($data['content_item'])) {
+			show_404();
+			return;
+		}
 		//print_test($data);
 		/*
 		 * Appel de la fonction d'affichage du formulaire

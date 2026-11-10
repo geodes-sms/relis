@@ -24,6 +24,8 @@
  //provides functionalities related to authentication, pagination, email sending, and random string generation within a CodeIgniter application
  class Bm_lib
 {
+	public $CI;
+
 	public function __construct()
 	{
 

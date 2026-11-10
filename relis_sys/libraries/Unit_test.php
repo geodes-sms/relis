@@ -346,6 +346,10 @@ class CI_Unit_test
             $results = $this->results;
         }
 
+        if (count($results) === 0) {
+            return 'failed';
+        }
+
         foreach ($results as $result) {
             if ($result['result'] == 'failed') {
                 $is_success = false;

@@ -524,8 +524,8 @@ class Screening extends CI_Controller
         $fp = fopen($all_file, 'rb');
         $i = 1;
         $last_count = 0;
-        while ((($Tline = (fgetcsv($fp, 0, ";", '"')))) !== false) {
-            $Tline = array_map("utf8_encode", $Tline);
+        while ((($Tline = (fgetcsv($fp, 0, ";", '"', '\\')))) !== false) {
+            $Tline = array_map(function ($value) { return mb_convert_encoding((string) $value, 'UTF-8', 'ISO-8859-1'); }, $Tline);
             //print_test($Tline);
             $Tall[$i] = $Tline;
             $i++;
@@ -537,8 +537,8 @@ class Screening extends CI_Controller
         $fa = fopen($accept_file, 'rb');
         $i = 1;
         $last_count = 0;
-        while ((($Tline = (fgetcsv($fa, 0, "$", '"')))) !== false) {
-            $Tline = array_map("utf8_encode", $Tline);
+        while ((($Tline = (fgetcsv($fa, 0, "$", '"', '\\')))) !== false) {
+            $Tline = array_map(function ($value) { return mb_convert_encoding((string) $value, 'UTF-8', 'ISO-8859-1'); }, $Tline);
             //print_test($Tline);
             $Taccepeted[$i] = $Tline;
             $i++;
@@ -565,7 +565,7 @@ class Screening extends CI_Controller
         print_test($final_added);
         $f_new = fopen("cside/screen/paper_to_classify.csv", 'w+');
         foreach ($final_added as $val) {
-            fputcsv($f_new, $val, ";");
+            fputcsv($f_new, $val, ";", '"', '\\');
         }
         fclose($f_new);
     }
@@ -1051,7 +1051,7 @@ class Screening extends CI_Controller
             $this->db2 = $this->load->database(project_db(), TRUE);
             $screening_phase = !empty($post_arr['screening_phase']) ? $post_arr['screening_phase'] : 1;
             $exclusion_criteria = ($post_arr['decision'] == 'excluded') ? $post_arr['criteria_ex'] : NULL;
-            $inclusion_criteria = ($post_arr['decision'] == 'accepted') ? $post_arr['criteria_in'] : NULL;
+            $inclusion_criteria = ($post_arr['decision'] == 'accepted') ? ($post_arr['criteria_in'] ?? NULL) : NULL;
             $screening_decision = ($post_arr['decision'] == 'excluded') ? 'Excluded' : 'Included';
             $screening_save = array(
                 'screening_note' => $post_arr['note'],
@@ -1263,7 +1263,7 @@ class Screening extends CI_Controller
          */
         $dropoboxes = array();
         foreach ($ref_table_config['fields'] as $k => $v) {
-            if (!empty($v['input_type']) and $v['input_type'] == 'select' and $v['on_list'] == 'show') {
+            if (!empty($v['input_type']) and $v['input_type'] == 'select' and ($v['on_list'] ?? '') == 'show') {
                 if ($v['input_select_source'] == 'array') {
                     $dropoboxes[$k] = $v['input_select_values'];
                 } elseif ($v['input_select_source'] == 'table') {
@@ -1283,7 +1283,7 @@ class Screening extends CI_Controller
         $list_links = array();
         $add_link = false;
         $add_link_url = "";
-        foreach ($ref_table_config['links'] as $link_type => $link) {
+        foreach (($ref_table_config['links'] ?? array()) as $link_type => $link) {
             if (!empty($link['on_list'])) { {
                     $link['type'] = $link_type;
                     if (empty($link['title'])) {
@@ -1356,7 +1356,7 @@ class Screening extends CI_Controller
         $field_list = array();
         $field_list_header = array();
         foreach ($ref_table_config['fields'] as $k => $v) {
-            if ($v['on_list'] == 'show') {
+            if (($v['on_list'] ?? '') == 'show') {
                 array_push($field_list, $k);
                 array_push($field_list_header, $v['field_title']);
             }
@@ -1466,7 +1466,7 @@ class Screening extends CI_Controller
         if (isset($ref_table_config['entity_title']['list'])) {
             $data['page_title'] = lng($ref_table_config['entity_title']['list']);
         } else {
-            $data['page_title'] = lng("List of " . $ref_table_config['reference_title']);
+            $data['page_title'] = lng("List of " . ($ref_table_config['reference_title'] ?? $ref_table));
         }
         if ($list_cat == 'mine_screen') {
             $data['page_title'] = "My screenings";
@@ -2924,7 +2924,11 @@ class Screening extends CI_Controller
     public function edit_screening_config($current_custom_config = null) {
         $model = new Screening_dataAccess();
         $post_arr = $current_custom_config ? $current_custom_config : $this->input->post();
-        $phase_id = !array_key_exists('screen_phase_id', $post_arr) ? null : $post_arr['screen_phase_id'];
+        $phase_id = is_array($post_arr) && array_key_exists('screen_phase_id', $post_arr) ? $post_arr['screen_phase_id'] : null;
+        if (!$model->has_screening_config_fields($post_arr, $phase_id)) {
+            show_error('Incomplete screening configuration.', 400);
+            return;
+        }
         $config_type = $model->get_phase_config_type($phase_id);
         $current_inclusion_mode = $model->get_phase_config_value($phase_id, 'screening_inclusion_mode');
         $new_inclusion_mode = $post_arr['screening_inclusion_mode'];

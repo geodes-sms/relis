@@ -16,6 +16,12 @@ class OpUnitTest
 
     function run_tests()
     {
+        // The preceding API-query suite leaves no active review project.
+        // Perspective tests must establish their own authenticated project context.
+        deleteSessionFiles();
+        deleteCreatedTestProject();
+        $this->http_client->response("user", "check_form", ['user_username' => 'admin', 'user_password' => '123'], "POST");
+        createDemoProject();
         $this->screenPerspective();
         $this->qaPerspective();
         $this->classPerspective();

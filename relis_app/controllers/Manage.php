@@ -1037,10 +1037,14 @@ class Manage extends CI_Controller
 		 * Appel de la fonction du model pour recupérer la ligne à modifier
 		 */
 		$data['content_item'] = $this->DBConnection_mdl->get_row_details('exclusion', $ref_id);
+		if (empty($data['content_item'])) {
+			show_404();
+			return;
+		}
 		/*
 		 * Appel de la fonction d'affichage du formulaire
 		 */
-		$this->new_exclusion($data['content_item']['exclusion_id'], $data, 'edit');
+		$this->new_exclusion($data['content_item']['exclusion_paper_id'], $data, 'edit');
 	}
 
 	/*

@@ -100,31 +100,50 @@ class Unit_test extends CI_Controller
         $this->inclusion_mode_conflictUnitTest = new inclusion_mode_conflictUnitTest();
     }
 
-    public function relis_unit_test($result = "html_report")
+    public function relis_unit_test($result = "html_report", $group = "all")
     {
+        if ($result === 'json_report' && !getenv('RELIS_MIGRATION_ID')) {
+            show_404();
+            return;
+        }
+
+        if ($result === 'json_report') {
+            ob_start();
+        }
+
         // Record the start time of the tests
         $startTime = microtime(true);
 
-        $this->userUnitTest->run_tests();
-        $this->projectUnitTest->run_tests();
-        $this->paperUnitTest->run_tests();
-        $this->screeningUnitTest->run_tests();
-        $this->quality_assessmentUnitTest->run_tests();
-        $this->data_extractionUnitTest->run_tests();
-        $this->reportingUnitTest->run_tests();
-        $this->elementUnitTest->run_tests();
-        $this->homeUnitTest->run_tests();
-        $this->installUnitTest->run_tests();
-        $this->adminUnitTest->run_tests();
-        $this->configUnitTest->run_tests();
-        $this->manageUnitTest->run_tests();
-        $this->managerUnitTest->run_tests();
-        $this->relisManagerUnitTest->run_tests();
-        $this->apiUnitTest->run_tests();
-        $this->apiQueryUnitTest->run_tests();
-        $this->opUnitTest->run_tests();
-        $this->inclusion_mode_conflictUnitTest->run_tests();
-
+        $suites = array(
+            'user' => $this->userUnitTest,
+            'project' => $this->projectUnitTest,
+            'paper' => $this->paperUnitTest,
+            'screening' => $this->screeningUnitTest,
+            'quality_assessment' => $this->quality_assessmentUnitTest,
+            'data_extraction' => $this->data_extractionUnitTest,
+            'reporting' => $this->reportingUnitTest,
+            'element' => $this->elementUnitTest,
+            'home' => $this->homeUnitTest,
+            'install' => $this->installUnitTest,
+            'admin' => $this->adminUnitTest,
+            'config' => $this->configUnitTest,
+            'manage' => $this->manageUnitTest,
+            'manager' => $this->managerUnitTest,
+            'relismanager' => $this->relisManagerUnitTest,
+            'api' => $this->apiUnitTest,
+            'apiquery' => $this->apiQueryUnitTest,
+            'op' => $this->opUnitTest,
+            'inclusion_mode_conflict' => $this->inclusion_mode_conflictUnitTest
+        );
+        if ($group !== 'all' && ($result !== 'json_report' || !getenv('RELIS_MIGRATION_ID') || !isset($suites[$group]))) {
+            show_404();
+            return;
+        }
+        foreach ($suites as $name => $suite) {
+            if ($group === 'all' || $group === $name) {
+                $suite->run_tests();
+            }
+        }
 
         // Record the end time of the tests
         $endTime = microtime(true);
@@ -138,7 +157,30 @@ class Unit_test extends CI_Controller
             $executionTime = round($executionTime, 2) . " sec";
         }
 
-        if ($result == "html_report") {
+        if ($result === 'json_report') {
+            $htmlReport = $this->unit->report(array(), $executionTime);
+            $diagnostics = ob_get_clean();
+            $results = $this->unit->results;
+            $passed = count(array_filter($results, function ($row) {
+                return $row['result'] === 'passed';
+            }));
+            $payload = array(
+                'status' => $this->unit->last_result(),
+                'group' => $group,
+                'total' => count($results),
+                'passed' => $passed,
+                'failed' => count($results) - $passed,
+                'duration_seconds' => $endTime - $startTime,
+                'php_version' => PHP_VERSION,
+                'php_sapi' => PHP_SAPI,
+                'diagnostics' => $diagnostics,
+                'results' => $results,
+                'html_report' => $htmlReport
+            );
+            $this->output->set_content_type('application/json')->set_output(
+                json_encode($payload, JSON_INVALID_UTF8_SUBSTITUTE)
+            );
+        } elseif ($result == "html_report") {
             echo $this->unit->report(array(), $executionTime);
         } elseif ($result == "raw_data") {
             print_r($this->unit->result());

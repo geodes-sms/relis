@@ -162,7 +162,7 @@ function httpPost($url, $data)
 {
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_POST, 1);
-    $payload = json_encode(array("bibtex" => utf8_encode($data)));
+    $payload = json_encode(array("bibtex" => mb_convert_encoding($data, 'UTF-8', 'ISO-8859-1')));
     curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
     // var_dump(json_last_error());
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);

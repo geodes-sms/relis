@@ -50,6 +50,7 @@ class Data_extractionUnitTest
         $this->classValidate_setCcorrect();
         $this->classValidate_setNotCcorrect();
         $this->classValidation_completion_info();
+        $this->rejectUnsupportedClassificationRedirect();
         $this->removeClassification();
         $this->removeClassification_redirectToPaper();
     }
@@ -1264,13 +1265,13 @@ class Data_extractionUnitTest
         $classification_entry = $this->ci->db->query("SELECT * FROM relis_dev_correct_" . getProjectShortName() . ".classification LIMIT 1")->row_array();
         $response = $this->http_client->response($this->controller, $action . "/" . $classification_entry['class_id'] . "/" . $classification_entry['class_paper_id'] . "/data_extraction/display_paper");
 
-        if ($response['status_code'] >= 400) {
-            $actual_class_removed = "<span style='color:red'>" . $response['content'] . "</span>";
-        } else {
-            $actual_class_removed = $this->ci->db->query("SELECT class_active FROM relis_dev_correct_" . getProjectShortName() . ".classification WHERE class_id = " . $classification_entry['class_id'])->row_array()['class_active'];
-        }
+        $actual_class_removed = $this->ci->db->query("SELECT class_active FROM relis_dev_correct_" . getProjectShortName() . ".classification WHERE class_id = " . $classification_entry['class_id'])->row_array()['class_active'];
 
         run_test($this->controller, $action, $test_name, $test_class_removed, $expected_class_removed, $actual_class_removed);
+        run_test($this->controller, $action, $test_name, 'Final HTTP response code', 200, $response['status_code']);
+        run_test($this->controller, $action, $test_name, 'Redirect destination',
+            'data_extraction/display_paper/' . $classification_entry['class_paper_id'], $this->http_client->getShortUrl($response['responses'][0]['location'] ?? ''));
+
     }
 
     /* 
@@ -1289,12 +1290,25 @@ class Data_extractionUnitTest
         $classification_entry = $this->ci->db->query("SELECT * FROM relis_dev_correct_" . getProjectShortName() . ".classification ORDER BY class_id DESC LIMIT 1")->row_array();
         $response = $this->http_client->response($this->controller, $action . "/" . $classification_entry['class_id'] . "/" . $classification_entry['class_paper_id'] . "/paper/view_paper");
 
-        if ($response['status_code'] >= 400) {
-            $actual_class_removed = "<span style='color:red'>" . $response['content'] . "</span>";
-        } else {
-            $actual_class_removed = $this->ci->db->query("SELECT class_active FROM relis_dev_correct_" . getProjectShortName() . ".classification WHERE class_id = " . $classification_entry['class_id'])->row_array()['class_active'];
-        }
+        $actual_class_removed = $this->ci->db->query("SELECT class_active FROM relis_dev_correct_" . getProjectShortName() . ".classification WHERE class_id = " . $classification_entry['class_id'])->row_array()['class_active'];
 
         run_test($this->controller, $action, $test_name, $test_class_removed, $expected_class_removed, $actual_class_removed);
+        run_test($this->controller, $action, $test_name, 'Final HTTP response code', 200, $response['status_code']);
+        run_test($this->controller, $action, $test_name, 'Redirect destination',
+            'paper/view_paper/' . $classification_entry['class_paper_id'], $this->http_client->getShortUrl($response['responses'][0]['location'] ?? ''));
+
+    }
+    private function rejectUnsupportedClassificationRedirect()
+    {
+        $action = 'remove_classification';
+        $name = 'Reject an unsupported classification redirect before changing data';
+        $schema = 'relis_dev_correct_' . getProjectShortName();
+        $row = $this->ci->db->query('SELECT * FROM ' . $schema . '.classification WHERE class_active=1 LIMIT 1')->row_array();
+        if (!$row) { throw new RuntimeException('Expected an active classification fixture.'); }
+        $response = $this->http_client->response($this->controller,
+            $action . '/' . $row['class_id'] . '/' . $row['class_paper_id'] . '/home/index');
+        run_test($this->controller, $action, $name, 'HTTP response code', 400, $response['status_code']);
+        $active = $this->ci->db->query('SELECT class_active FROM ' . $schema . '.classification WHERE class_id=' . $row['class_id'])->row_array()['class_active'];
+        run_test($this->controller, $action, $name, 'Classification remains active', '1', $active);
     }
 }

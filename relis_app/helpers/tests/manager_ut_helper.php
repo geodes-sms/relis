@@ -3,6 +3,7 @@
 // TEST ELEMENT CONTROLLER
 class ManagerUnitTest
 {
+    private $qa_results;
     private $controller;
     private $http_client;
     private $ci;

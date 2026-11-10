@@ -200,3 +200,6 @@ workspace/
 SourcesForTests/
 **/data
 **/data*
+
+# Keep this migration fixture even when a user's global ignore excludes INI files.
+!/deployment/migration/no-debug.ini

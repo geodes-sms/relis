@@ -86,6 +86,9 @@ class CI_Table {
 	 */
 	public $template	= NULL;
 
+	/** Default template used while filling a partial user template. */
+	public $temp;
+
 	/**
 	 * Newline setting
 	 *

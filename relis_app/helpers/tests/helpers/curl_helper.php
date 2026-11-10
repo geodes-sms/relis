@@ -4,11 +4,13 @@ class Http_client
 {
     private $ci;
     private $cookieFile;
+    private $baseUrl;
 
     function __construct()
     {
         $this->ci = get_instance();
-        $this->cookieFile = 'relis_app/helpers/tests/helpers/cookies.txt';
+        $this->cookieFile = getenv('RELIS_TEST_COOKIE_FILE') ?: 'relis_app/helpers/tests/helpers/cookies.txt';
+        $this->baseUrl = rtrim(getenv('RELIS_TEST_BASE_URL') ?: 'http://host.docker.internal:8083/', '/') . '/';
     }
 
     private function http_GET($endpoint)
@@ -23,9 +25,9 @@ class Http_client
 
     private function request($method, $endpoint, $data = [])
     {
-        $url = 'http://host.docker.internal:8083/' . $endpoint;
+        $url = $this->url($endpoint);
 
-        $error = "err";
+        $error = "";
         $statusCode = "";
         $header = "";
         $content = "";
@@ -40,6 +42,21 @@ class Http_client
         curl_setopt($curl, CURLOPT_MAXREDIRS, 5);
         curl_setopt($curl, CURLOPT_COOKIEJAR, $this->cookieFile);
         curl_setopt($curl, CURLOPT_COOKIEFILE, $this->cookieFile);
+        $responses = [];
+        curl_setopt($curl, CURLOPT_HEADERFUNCTION, function ($handle, $line) use (&$responses) {
+            if (preg_match('~^HTTP/\S+\s+(\d{3})~', $line, $match)) {
+                $responses[] = ['status_code' => (int) $match[1], 'headers' => '',
+                    'url' => curl_getinfo($handle, CURLINFO_EFFECTIVE_URL), 'location' => null];
+            }
+            if ($responses) {
+                $index = count($responses) - 1;
+                $responses[$index]['headers'] .= $line;
+                if (stripos($line, 'Location:') === 0) {
+                    $responses[$index]['location'] = trim(substr($line, 9));
+                }
+            }
+            return strlen($line);
+        });
 
         if ($method === 'POST' || $method === 'PUT') {
             if (!empty($data['fileFieldName'])) {
@@ -52,9 +69,11 @@ class Http_client
         }
 
         $response = curl_exec($curl);
-        $headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
-        // Separate the header and content from the response
-        $header = substr($response, 0, $headerSize);
+        // Headers are delivered separately; CURLINFO_HEADER_SIZE is not a body offset.
+        $responses = array_values(array_filter($responses, function ($item) {
+            return $item['status_code'] >= 200;
+        }));
+        $header = implode('', array_column($responses, 'headers'));
         // Get additional information about the request
         $urlInfo = curl_getinfo($curl);
         $statusCode = $urlInfo['http_code'];
@@ -65,8 +84,22 @@ class Http_client
 
         curl_close($curl);
 
+        if (getenv('RELIS_MIGRATION_ID')) {
+            file_put_contents('/migration/http-trace.jsonl', json_encode([
+                'group_request' => $_SERVER['REQUEST_URI'] ?? 'cli', 'method' => $method,
+                'requested_url' => $url, 'final_url' => $urlInfo['url'],
+                'statuses' => array_column($responses, 'status_code'),
+                'locations' => array_column($responses, 'location')
+            ]) . "\n", FILE_APPEND | LOCK_EX);
+        }
+        if ($response === false) {
+            throw new RuntimeException('HTTP test request failed: ' . $endpoint . ' (' . $error . ')');
+        }
+
         return [
             'status_code' => $statusCode,
+            'initial_status_code' => $responses[0]['status_code'] ?? $statusCode,
+            'responses' => $responses,
             'headers' => $header,
             'content' => $response,
             'url' => $urlInfo['url'],
@@ -83,10 +116,19 @@ class Http_client
         }
     }
 
+    function url($endpoint)
+    {
+        return $this->baseUrl . ltrim($endpoint, '/');
+    }
+
     function getShortUrl($url)
     {
-        preg_match('/8083\/(.*?)(\.html)?$/', $url, $matches);
-        return $matches[1];
+        $path = (string) parse_url($url, PHP_URL_PATH);
+        $basePath = (string) parse_url($this->baseUrl, PHP_URL_PATH);
+        if ($basePath !== '' && strpos($path, $basePath) === 0) {
+            $path = substr($path, strlen($basePath));
+        }
+        return preg_replace('/\.html$/', '', ltrim($path, '/'));
     }
 
     //get session id

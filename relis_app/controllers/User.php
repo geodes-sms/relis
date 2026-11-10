@@ -300,7 +300,9 @@ class User extends CI_Controller
      */
     public function discon()
     {
-        set_log('Disconnection', 'User disconnected');
+        if ($this->session->userdata('user_id')) {
+            set_log('Disconnection', 'User disconnected');
+        }
         $this->session->sess_destroy();
         $this->session->set_userdata('user_id', 0);
         redirect('user');
@@ -361,7 +363,7 @@ class User extends CI_Controller
             $this->new_user($data);
             return;
         }
-        $recaptchaResponse = trim($this->input->post('g-recaptcha-response'));
+        $recaptchaResponse = trim((string) $this->input->post('g-recaptcha-response'));
 
         if ($recaptchaResponse != "relis_test") {
             $validatedCaptcha = $this->validateCaptcha($recaptchaResponse);
@@ -461,7 +463,7 @@ class User extends CI_Controller
         curl_setopt($verify, CURLOPT_RETURNTRANSFER, true);
         $response = curl_exec($verify);
         $status = json_decode($response, true);
-        return $status['success'];
+        return is_array($status) && !empty($status['success']);
     }
 
     /*

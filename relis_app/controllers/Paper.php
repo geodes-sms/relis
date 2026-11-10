@@ -78,7 +78,7 @@ class Paper extends CI_Controller
          */
         $dropoboxes = array();
         foreach ($ref_table_config['fields'] as $k => $v) {
-            if (!empty($v['input_type']) and $v['input_type'] == 'select' and $v['on_list'] == 'show') {
+            if (!empty($v['input_type']) and $v['input_type'] == 'select' and ($v['on_list'] ?? '') == 'show') {
                 if ($v['input_select_source'] == 'array') {
                     $dropoboxes[$k] = $v['input_select_values'];
                 } elseif ($v['input_select_source'] == 'table') {
@@ -98,7 +98,7 @@ class Paper extends CI_Controller
         $add_link = false;
         $add_link_url = "";
         $view_link_url = "";
-        foreach ($ref_table_config['links'] as $link_type => $link) {
+        foreach (($ref_table_config['links'] ?? array()) as $link_type => $link) {
             if (!empty($link['on_list'])) { {
                     $link['type'] = $link_type;
                     if (empty($link['title'])) {
@@ -159,7 +159,7 @@ class Paper extends CI_Controller
         $field_list = array();
         $field_list_header = array();
         foreach ($ref_table_config['fields'] as $k => $v) {
-            if ($v['on_list'] == 'show') {
+            if (($v['on_list'] ?? '') == 'show') {
                 array_push($field_list, $k);
                 array_push($field_list_header, $v['field_title']);
             }
@@ -331,7 +331,7 @@ class Paper extends CI_Controller
          */
         $dropoboxes = array();
         foreach ($ref_table_config['fields'] as $k => $v) {
-            if (!empty($v['input_type']) and $v['input_type'] == 'select' and $v['on_list'] == 'show') {
+            if (!empty($v['input_type']) and $v['input_type'] == 'select' and ($v['on_list'] ?? '') == 'show') {
                 if ($v['input_select_source'] == 'array') {
                     $dropoboxes[$k] = $v['input_select_values'];
                 } elseif ($v['input_select_source'] == 'table') {
@@ -898,11 +898,11 @@ class Paper extends CI_Controller
                 //	$v_bibtex_key=!empty($value[$bibtexKey])?$this->mres_escape($value[$bibtexKey]):$default_key_prefix.($default_key_serial+$i);
                 $v_title = $this->mres_escape($value[$paper_title]);
                 //$v_title=$value[$paper_title];
-                $v_paper_link = $this->mres_escape($value[$paper_link]);
+                $v_paper_link = $this->mres_escape($value[$paper_link] ?? '');
                 $v_preview = !empty($value[$paper_author]) ? "<b>Authors:</b><br/>" . $this->mres_escape($value[$paper_author]) . " <br/>" : "";
                 $v_preview .= !empty($value[$paper_key]) ? "<b>Key words:</b><br/>" . $this->mres_escape($value[$paper_key]) . " <br/>" : "";
-                $v_abstract = $this->mres_escape($value[$paper_abstract]);
-                $v_bibtex = $this->mres_escape($value[$bibtex]);
+                $v_abstract = $this->mres_escape($value[$paper_abstract] ?? '');
+                $v_bibtex = $this->mres_escape($value[$bibtex] ?? '');
                 $year = (!empty($value[$year]) and is_numeric($value[$year])) ? $this->mres_escape($value[$year]) : NULL;
 
                 $res_sql = $this->Paper_dataAccess->insert_to_paper($v_bibtex_key, $v_title, $v_preview, $v_bibtex, $v_abstract, $v_paper_link, $year, $papers_sources, $search_strategy, $active_user, $added_active_phase, $operation_code, $classification_status);
@@ -1021,8 +1021,8 @@ class Paper extends CI_Controller
             $i = 1;
             $last_count = 0;
             //	while ( (($line = utf8_encode(fgets($fp))) !== false) AND $i<5) {
-            while ((($Tline = (fgetcsv($fp, 0, get_appconfig_element('csv_field_separator'), get_ci_config("csv_string_dellimitter")))) !== false) and $i < 11) {
-                $Tline = array_map("utf8_encode", $Tline);
+            while ((($Tline = (fgetcsv($fp, 0, get_appconfig_element('csv_field_separator'), get_ci_config("csv_string_dellimitter"), '\\'))) !== false) and $i < 11) {
+                $Tline = array_map(function ($value) { return mb_convert_encoding((string) $value, 'UTF-8', 'ISO-8859-1'); }, $Tline);
                 if ($last_count < count($Tline)) {
                     $last_count = count($Tline);
                 }
@@ -1039,8 +1039,8 @@ class Paper extends CI_Controller
             $i = 1;
             rewind($fp);
             //while ( (($line = fgets($fp)) !== false)) {
-            while ((($Tline = (fgetcsv($fp, 0, get_appconfig_element('csv_field_separator'), get_ci_config("csv_string_dellimitter")))) !== false)) {
-                $Tline = array_map("utf8_encode", $Tline);
+            while ((($Tline = (fgetcsv($fp, 0, get_appconfig_element('csv_field_separator'), get_ci_config("csv_string_dellimitter"), '\\'))) !== false)) {
+                $Tline = array_map(function ($value) { return mb_convert_encoding((string) $value, 'UTF-8', 'ISO-8859-1'); }, $Tline);
                 if ($i < 11) {
                     array_push($array_tab_preview, $Tline);
                 }
@@ -1401,7 +1401,7 @@ class Paper extends CI_Controller
     {
         $search = array("\\", "\x00", "\n", "\r", "'", '"', "\x1a");
         $replace = array("\\\\", "\\0", "\\n", "\\r", "\'", '\"', "\\Z");
-        return str_replace($search, $replace, $value);
+        return str_replace($search, $replace, $value ?? '');
     }
 
     /**
@@ -1681,7 +1681,6 @@ class Paper extends CI_Controller
             //usleep(500);
         }
         $end_time = microtime();
-        ini_set('auto_detect_line_endings', TRUE);
         if ($correct) {
             $Tres = json_decode($res, True);
             if (json_last_error() === JSON_ERROR_NONE) {

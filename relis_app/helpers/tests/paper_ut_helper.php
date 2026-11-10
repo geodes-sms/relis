@@ -796,10 +796,14 @@ class PaperUnitTest
         if ($response['status_code'] >= 400) {
             $actual_httpCode = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
-            $actual_httpCode = http_code()[$response['status_code']];
+            $actual_httpCode = http_code()[$response['initial_status_code']];
         }
 
         run_test($this->controller, $action, $test_name, $test_aspect_httpCode, $expected_httpCode, $actual_httpCode);
+        run_test($this->controller, $action, $test_name, 'Initial redirect destination',
+            'home', $this->http_client->getShortUrl($response['responses'][0]['location'] ?? ''));
+        run_test($this->controller, $action, $test_name, 'Final HTTP response code', 200, $response['status_code']);
+
     }
 
     /*

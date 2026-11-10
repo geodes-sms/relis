@@ -113,7 +113,16 @@ class Reporting extends CI_Controller
 	//enable the user to download the specified file
 	public function download($file_name)
 	{
-		$url = "cside/export_r/" . $file_name;
+		if ($file_name !== basename($file_name) || strpbrk($file_name, "\\\r\n\"") !== FALSE) {
+			show_error('Invalid export filename.', 400);
+			return;
+		}
+		$directory = realpath('cside/export_r');
+		$url = $directory === FALSE ? FALSE : realpath($directory . DIRECTORY_SEPARATOR . $file_name);
+		if ($url === FALSE || !is_file($url) || strpos($url, $directory . DIRECTORY_SEPARATOR) !== 0) {
+			show_404();
+			return;
+		}
 		header("Content-Type: application/octet-stream");
 		header("Content-Transfer-Encoding: Binary");
 		header("Content-disposition: attachment; filename=\"" . $file_name . "\"");
@@ -257,7 +266,7 @@ class Reporting extends CI_Controller
 		}
 		// Iterate over the data, writting each line to the text stream
 		foreach ($list_to_display as $val) {
-			fputcsv($f_new, $val, get_appconfig_element('csv_field_separator_export'));
+			fputcsv($f_new, $val, get_appconfig_element('csv_field_separator_export'), '"', '\\');
 		}
 		fclose($f_new);
 	}
@@ -337,7 +346,7 @@ class Reporting extends CI_Controller
 				throw new Exception('Could not open file export_classification_' . project_db() . ".csv");
 			}
 			foreach ($result as $val) {
-				fputcsv($f_new, $val, get_appconfig_element('csv_field_separator_export'));
+				fputcsv($f_new, $val, get_appconfig_element('csv_field_separator_export'), '"', '\\');
 			}
 			fclose($f_new);
 		} catch (Exception $e) {
@@ -386,7 +395,7 @@ class Reporting extends CI_Controller
 			}
 			// Iterate over the data, writting each line to the text stream
 			foreach ($papers as $val) {
-				fputcsv($f_new, $val, get_appconfig_element('csv_field_separator_export'));
+				fputcsv($f_new, $val, get_appconfig_element('csv_field_separator_export'), '"', '\\');
 			}
 			// Close the stream
 			fclose($f_new);
@@ -420,7 +429,7 @@ class Reporting extends CI_Controller
 				if ($i > 0) {
 					$val['id'] = $i;
 				}
-				fputcsv($f_new, $val, get_appconfig_element('csv_field_separator_export'));
+				fputcsv($f_new, $val, get_appconfig_element('csv_field_separator_export'), '"', '\\');
 				$i++;
 			}
 			fclose($f_new);
@@ -534,7 +543,7 @@ class Reporting extends CI_Controller
 			}
 			// Iterate over the data, writing each line to the text stream
 			foreach ($papers as $val) {
-				fputcsv($f_new, $val, get_appconfig_element('csv_field_separator_export'));
+				fputcsv($f_new, $val, get_appconfig_element('csv_field_separator_export'), '"', '\\');
 			}
 			// Close the stream
 			fclose($f_new);
@@ -570,7 +579,7 @@ class Reporting extends CI_Controller
 				throw new Exception('Could not open file export_paper_' . project_db() . ".csv");
 			}
 			foreach ($result as $val) {
-				fputcsv($f_new, $val, get_appconfig_element('csv_field_separator_export'));
+				fputcsv($f_new, $val, get_appconfig_element('csv_field_separator_export'), '"', '\\');
 			}
 			// Rewind the stream
 			//rewind($stream);

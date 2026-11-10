@@ -48,11 +48,11 @@
                     
                     foreach ($table_config['fields'] as $key => $value) {
                     	
-                    	if($value[$var_check]!='not_set'){
+                        if(($value[$var_check] ?? '')!='not_set'){
                     		
 						$value['field_title']=lng($value['field_title']);
 						
-						if($value[$var_check]=='drill_down'){
+                        if(($value[$var_check] ?? '')=='drill_down'){
 							
 						//	$value['field_value']='Wait for It ;)';
 							if($var_check=='on_add'){
@@ -86,13 +86,13 @@
                     		
                     		
                     		
-                    		if($value[$var_check]=='hidden'){	
+                            if(($value[$var_check] ?? '')=='hidden'){
                     			
                     		echo form_hidden(array( $key => isset($content_item[$key])?$content_item[$key]:$initial_value));
                     		
                     		}else {
                     			
-	                    		if($value[$var_check]=='disabled'){	
+                                if(($value[$var_check] ?? '')=='disabled'){
 	                    			$readonly='readonly';
 	                    		
 	                    		}else{

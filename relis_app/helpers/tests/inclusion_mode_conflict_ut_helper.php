@@ -13,6 +13,7 @@ class inclusion_mode_conflictUnitTest {
 
     function run_tests() {
         $this->TestInitialize();
+        $this->missingDefaultConfigFields();
         $this->changeModeWhenNoInclusionCriteria();
         $this->affected_phases();
         $this->defaultCriteria_one();
@@ -41,6 +42,23 @@ class inclusion_mode_conflictUnitTest {
         addBibtextPapersToProject("relis_app/helpers/tests/testFiles/paper/5_bibPapers.bib");
     }
 
+    private function missingDefaultConfigFields() {
+        $action = 'edit_screening_config';
+        $name = 'Reject incomplete default screening configuration before changing data';
+        $sql = 'SELECT * FROM relis_dev_correct_' . getProjectShortName() . '.config';
+        $before = $this->ci->db->query($sql)->result_array();
+        $response = $this->http_client->response($this->controller, $action, array(
+            'screening_result_on' => 1, 'assign_papers_on' => 1, 'screening_reviewer_number' => 2,
+            'screening_inclusion_mode' => 'None', 'screening_conflict_type' => 'IncludeExclude',
+            'screening_screening_conflict_resolution' => 'Unanimity', 'use_kappa' => 1,
+            'screening_validation_on' => 1, 'screening_validator_assignment_type' => 'Normal',
+            'assign_to_non_screened_validator_on' => 0, 'validation_default_percentage' => 20
+        ), 'POST');
+        run_test($this->controller, $action, $name, 'HTTP response code', 400, $response['status_code']);
+        run_test($this->controller, $action, $name, 'Configuration remains unchanged',
+            json_encode($before), json_encode($this->ci->db->query($sql)->result_array()));
+    }
+
     private function changeModeWhenNoInclusionCriteria() {
         $action = "edit_screening_config";
         $test_name = "Testing if changing inclusion mode from Default is prevented if there are no inclusion criteria";
@@ -48,6 +66,8 @@ class inclusion_mode_conflictUnitTest {
         $expected_value = "None";
         addCriteria("aze", "exclusioncrieria");
         $data = array(
+            'config_id' => 1,
+            'screening_on' => 1,
             'screening_result_on' => true,
             'assign_papers_on' => true,
             'screening_reviewer_number' => 2,
@@ -220,6 +240,8 @@ class inclusion_mode_conflictUnitTest {
         $actual_value = "No";
 
         $data = array(
+            'config_id' => 1,
+            'screening_on' => 1,
             'screening_result_on' => true,
             'assign_papers_on' => true,
             'screening_reviewer_number' => 2,
@@ -297,6 +319,8 @@ class inclusion_mode_conflictUnitTest {
         $actual_value = "No";
 
         $data = array(
+            'config_id' => 1,
+            'screening_on' => 1,
             'screening_result_on' => true,
             'assign_papers_on' => true,
             'screening_reviewer_number' => 2,

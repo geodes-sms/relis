@@ -24,6 +24,8 @@
 //provides functionalities related to authentication, email sending within a CodeIgniter application
 class User_lib 
 {
+	public $CI;
+
 	public function __construct()
 	{ 
 

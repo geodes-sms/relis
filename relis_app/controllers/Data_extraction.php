@@ -45,11 +45,16 @@ class Data_extraction extends CI_Controller
 	}
 
 	//remove a classification feature for a project
-    public function remove_classification($id, $paper_id, $redirectUrl)//tested
+    public function remove_classification($id, $paper_id, $redirectUrl, $redirectMethod = NULL)//tested
     {
+        $destination = $redirectMethod === NULL ? $redirectUrl : $redirectUrl . '/' . $redirectMethod;
+        if (!in_array($destination, array('data_extraction/display_paper', 'paper/view_paper'), TRUE)) {
+            show_error('Invalid classification redirect destination.', 400);
+            return;
+        }
         $res = $this->DBConnection_mdl->remove_element($id, 'classification');
         set_top_msg(lng_min('Classification removed'));
-        redirect($redirectUrl . '/' . $paper_id);
+        redirect($destination . '/' . $paper_id);
     }
 
 	/*
@@ -335,7 +340,7 @@ class Data_extraction extends CI_Controller
 				$value_desc = $value;
 				if (!empty($ref_table_config['fields'][$field]['input_type']) and $ref_table_config['fields'][$field]['input_type'] == 'select') {
 					$values = $this->manager_lib->get_reference_select_values($ref_table_config['fields'][$field]['input_select_values']);
-					$value_desc = $values[$value];
+					$value_desc = $values[$value] ?? '';
 					$sup_title = " for \"" . $ref_table_config['fields'][$field]['field_title'] . "\" :  $value_desc";
 				}
 			}

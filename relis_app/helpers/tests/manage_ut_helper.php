@@ -64,10 +64,14 @@ class ManageUnitTest
         if ($response['status_code'] >= 400) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
-            $actual_value = http_code()[$response['status_code']];
+            $actual_value = http_code()[$response['initial_status_code']];
         }
 
         run_test($this->controller, $action, $test_name, $test_aspect, $expected_value, $actual_value);
+        run_test($this->controller, $action, $test_name, 'Initial redirect destination',
+            'paper/list_paper/all/_/0', $this->http_client->getShortUrl($response['responses'][0]['location'] ?? ''));
+        run_test($this->controller, $action, $test_name, 'Final HTTP response code', 200, $response['status_code']);
+
     }
 
     /*
@@ -86,10 +90,14 @@ class ManageUnitTest
         if ($response['status_code'] >= 400) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
-            $actual_value = http_code()[$response['status_code']];
+            $actual_value = http_code()[$response['initial_status_code']];
         }
 
         run_test($this->controller, $action, $test_name, $test_aspect, $expected_value, $actual_value);
+        run_test($this->controller, $action, $test_name, 'Initial redirect destination',
+            'data_extraction/list_classification_dt/normal/_/0', $this->http_client->getShortUrl($response['responses'][0]['location'] ?? ''));
+        run_test($this->controller, $action, $test_name, 'Final HTTP response code', 200, $response['status_code']);
+
     }
 
     /*
@@ -108,10 +116,14 @@ class ManageUnitTest
         if ($response['status_code'] >= 400) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
-            $actual_value = http_code()[$response['status_code']];
+            $actual_value = http_code()[$response['initial_status_code']];
         }
 
         run_test($this->controller, $action, $test_name, $test_aspect, $expected_value, $actual_value);
+        run_test($this->controller, $action, $test_name, 'Initial redirect destination',
+            'manage/view_ref/config/1', $this->http_client->getShortUrl($response['responses'][0]['location'] ?? ''));
+        run_test($this->controller, $action, $test_name, 'Final HTTP response code', 200, $response['status_code']);
+
     }
 
     /*
@@ -130,10 +142,14 @@ class ManageUnitTest
         if ($response['status_code'] >= 400) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
-            $actual_value = http_code()[$response['status_code']];
+            $actual_value = http_code()[$response['initial_status_code']];
         }
 
         run_test($this->controller, $action, $test_name, $test_aspect, $expected_value, $actual_value);
+        run_test($this->controller, $action, $test_name, 'Initial redirect destination',
+            'paper/list_paper/all/included/0', $this->http_client->getShortUrl($response['responses'][0]['location'] ?? ''));
+        run_test($this->controller, $action, $test_name, 'Final HTTP response code', 200, $response['status_code']);
+
     }
 
     /*
@@ -152,10 +168,14 @@ class ManageUnitTest
         if ($response['status_code'] >= 400) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
-            $actual_value = http_code()[$response['status_code']];
+            $actual_value = http_code()[$response['initial_status_code']];
         }
 
         run_test($this->controller, $action, $test_name, $test_aspect, $expected_value, $actual_value);
+        run_test($this->controller, $action, $test_name, 'Initial redirect destination',
+            'admin/projects_list', $this->http_client->getShortUrl($response['responses'][0]['location'] ?? ''));
+        run_test($this->controller, $action, $test_name, 'Final HTTP response code', 200, $response['status_code']);
+
     }
 
     /*
@@ -175,10 +195,14 @@ class ManageUnitTest
         if ($response['status_code'] >= 400) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
-            $actual_value = http_code()[$response['status_code']];
+            $actual_value = http_code()[$response['initial_status_code']];
         }
 
         run_test($this->controller, $action, $test_name, $test_aspect, $expected_value, $actual_value);
+        run_test($this->controller, $action, $test_name, 'Initial redirect destination',
+            'home', $this->http_client->getShortUrl($response['responses'][0]['location'] ?? ''));
+        run_test($this->controller, $action, $test_name, 'Final HTTP response code', 200, $response['status_code']);
+
     }
 
     /*
@@ -197,10 +221,14 @@ class ManageUnitTest
         if ($response['status_code'] >= 400) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
-            $actual_value = http_code()[$response['status_code']];
+            $actual_value = http_code()[$response['initial_status_code']];
         }
 
         run_test($this->controller, $action, $test_name, $test_aspect, $expected_value, $actual_value);
+        run_test($this->controller, $action, $test_name, 'Initial redirect destination',
+            'home', $this->http_client->getShortUrl($response['responses'][0]['location'] ?? ''));
+        run_test($this->controller, $action, $test_name, 'Final HTTP response code', 200, $response['status_code']);
+
     }
 
     /*
@@ -222,10 +250,14 @@ class ManageUnitTest
         if ($response['status_code'] >= 400) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
-            $actual_value = http_code()[$response['status_code']];
+            $actual_value = http_code()[$response['initial_status_code']];
         }
 
         run_test($this->controller, $action, $test_name, $test_aspect, $expected_value, $actual_value);
+        run_test($this->controller, $action, $test_name, 'Initial redirect destination',
+            'home', $this->http_client->getShortUrl($response['responses'][0]['location'] ?? ''));
+        run_test($this->controller, $action, $test_name, 'Final HTTP response code', 200, $response['status_code']);
+
     }
 
     /*
@@ -244,10 +276,14 @@ class ManageUnitTest
         if ($response['status_code'] >= 400) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
-            $actual_value = http_code()[$response['status_code']];
+            $actual_value = http_code()[$response['initial_status_code']];
         }
 
         run_test($this->controller, $action, $test_name, $test_aspect, $expected_value, $actual_value);
+        run_test($this->controller, $action, $test_name, 'Initial redirect destination',
+            'home', $this->http_client->getShortUrl($response['responses'][0]['location'] ?? ''));
+        run_test($this->controller, $action, $test_name, 'Final HTTP response code', 200, $response['status_code']);
+
     }
 
     /*
@@ -266,10 +302,14 @@ class ManageUnitTest
         if ($response['status_code'] >= 400) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
-            $actual_value = http_code()[$response['status_code']];
+            $actual_value = http_code()[$response['initial_status_code']];
         }
 
         run_test($this->controller, $action, $test_name, $test_aspect, $expected_value, $actual_value);
+        run_test($this->controller, $action, $test_name, 'Initial redirect destination',
+            'home', $this->http_client->getShortUrl($response['responses'][0]['location'] ?? ''));
+        run_test($this->controller, $action, $test_name, 'Final HTTP response code', 200, $response['status_code']);
+
     }
 
     /*
@@ -288,10 +328,14 @@ class ManageUnitTest
         if ($response['status_code'] >= 400) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
-            $actual_value = http_code()[$response['status_code']];
+            $actual_value = http_code()[$response['initial_status_code']];
         }
 
         run_test($this->controller, $action, $test_name, $test_aspect, $expected_value, $actual_value);
+        run_test($this->controller, $action, $test_name, 'Initial redirect destination',
+            'home', $this->http_client->getShortUrl($response['responses'][0]['location'] ?? ''));
+        run_test($this->controller, $action, $test_name, 'Final HTTP response code', 200, $response['status_code']);
+
     }
 
     /*
@@ -310,10 +354,14 @@ class ManageUnitTest
         if ($response['status_code'] >= 400) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
-            $actual_value = http_code()[$response['status_code']];
+            $actual_value = http_code()[$response['initial_status_code']];
         }
 
         run_test($this->controller, $action, $test_name, $test_aspect, $expected_value, $actual_value);
+        run_test($this->controller, $action, $test_name, 'Initial redirect destination',
+            'home', $this->http_client->getShortUrl($response['responses'][0]['location'] ?? ''));
+        run_test($this->controller, $action, $test_name, 'Final HTTP response code', 200, $response['status_code']);
+
     }
 
     /*
@@ -327,15 +375,24 @@ class ManageUnitTest
         $test_name = "function to display the page with a form for editing an paper exclusion";
         $test_aspect = "Http response code";
         $expected_value = http_code()[307];
-        $response = $this->http_client->response($this->controller, $action . "/1");
+        $exclusionId = addLegacyExclusionFixture();
+        $response = $this->http_client->response($this->controller, $action . "/" . $exclusionId);
 
         if ($response['status_code'] >= 400) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
-            $actual_value = http_code()[$response['status_code']];
+            $actual_value = http_code()[$response['initial_status_code']];
         }
 
         run_test($this->controller, $action, $test_name, $test_aspect, $expected_value, $actual_value);
+        run_test($this->controller, $action, $test_name, 'Initial redirect destination',
+            'home', $this->http_client->getShortUrl($response['responses'][0]['location'] ?? ''));
+        run_test($this->controller, $action, $test_name, 'Final HTTP response code', 200, $response['status_code']);
+
+        $missing = $this->http_client->response($this->controller, $action . '/2147483647');
+        run_test($this->controller, $action, 'Reject a nonexistent legacy exclusion',
+            'HTTP response code', 404, $missing['status_code']);
+
     }
 
     /*
@@ -354,9 +411,13 @@ class ManageUnitTest
         if ($response['status_code'] >= 400) {
             $actual_value = "<span style='color:red'>" . $response['content'] . "</span>";
         } else {
-            $actual_value = http_code()[$response['status_code']];
+            $actual_value = http_code()[$response['initial_status_code']];
         }
 
         run_test($this->controller, $action, $test_name, $test_aspect, $expected_value, $actual_value);
+        run_test($this->controller, $action, $test_name, 'Initial redirect destination',
+            'paper/view_paper/1', $this->http_client->getShortUrl($response['responses'][0]['location'] ?? ''));
+        run_test($this->controller, $action, $test_name, 'Final HTTP response code', 200, $response['status_code']);
+
     }
 }

@@ -1,0 +1,102 @@
+# Self-contained: never combine this file with the development/production stack.
+# prepare.py records immutable local image IDs and writes the required environment.
+services:
+  db:
+    image: ${MIGRATION_DB_IMAGE:?Run migration/prepare.py first}
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MIGRATION_DB_PASSWORD:?Missing fixture password}
+    volumes:
+      - database:/var/lib/mysql
+      - ${MIGRATION_SOURCE:?Missing snapshot}/deployment/db/initial_db.sql:/docker-entrypoint-initdb.d/10-seed.sql:ro
+      - ${MIGRATION_DIRECTORY:?Missing fixture directory}/guard.sql:/docker-entrypoint-initdb.d/20-guard.sql:ro
+    healthcheck:
+      test: [CMD, healthcheck.sh, --connect, --innodb_initialized]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  relis-application:
+    image: ${MIGRATION_PHP_IMAGE:?Missing PHP image}
+    working_dir: /u/relis/public_html
+    entrypoint: [/bin/sh, /u/relis/public_html/deployment/migration/start-php.sh]
+    environment:
+      ENV: dev
+      RELIS_MIGRATION_ID: ${MIGRATION_ID:?Missing fixture ID}
+      RELIS_TEST_DB_PASSWORD: ${MIGRATION_DB_PASSWORD}
+      RELIS_TEST_BASE_URL: http://relis.test/
+      RELIS_TEST_COOKIE_FILE: /migration/cookies.txt
+    ports:
+      - 127.0.0.1:${MIGRATION_HTTP_PORT:?Missing loopback port}:80
+    networks:
+      default:
+        aliases: [relis.test]
+    healthcheck:
+      test: [CMD, php, -r, 'exit(fsockopen("127.0.0.1", 80) === false ? 1 : 0);']
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    volumes:
+      - source:/u/relis/public_html
+      - ${MIGRATION_DIRECTORY}/reports:/migration
+      - ${MIGRATION_SOURCE}/deployment/migration/no-debug.ini:/usr/local/etc/php/conf.d/zz-migration.ini:ro
+    extra_hosts:
+      # CAPTCHA rejection tests fail locally; no request can reach Google.
+      - www.google.com:127.0.0.1
+    depends_on:
+      db:
+        condition: service_healthy
+      mail:
+        condition: service_healthy
+      tomcat:
+        condition: service_healthy
+      bibler:
+        condition: service_healthy
+
+  tomcat:
+    image: ${MIGRATION_TOMCAT_IMAGE:?Missing editor image}
+    healthcheck:
+      test: [CMD, python3, -c, 'import urllib.request; urllib.request.urlopen("http://127.0.0.1:8181/apis/tomcat/list_projects", timeout=3).read()']
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    environment:
+      CATALINA_OPTS: -Xms256M -Xmx768M
+    volumes:
+      - workspace:/u/relis/public_html/workspace
+      - ${MIGRATION_SOURCE}/deployment/tomcat/testfiles/classification_install_demoTestProject.php:/u/relis/public_html/workspace/dslforge_workspace/tests/src-gen/classification_install_demoTestProject.php:ro
+      - ${MIGRATION_SOURCE}/deployment/tomcat/testfiles/classification_install_demoTestProject.pdf:/u/relis/public_html/workspace/dslforge_workspace/tests/src-gen/classification_install_demoTestProject.pdf:ro
+      - ${MIGRATION_SOURCE}/deployment/tomcat/testfiles/classification_install_demoTestProject2.php:/u/relis/public_html/workspace/dslforge_workspace/tests/src-gen/classification_install_demoTestProject2.php:ro
+      - ${MIGRATION_SOURCE}/deployment/tomcat/demofiles/classification_install_demo_relis.php:/u/relis/public_html/workspace/dslforge_workspace/demo_relis/src-gen/classification_install_demo_relis.php:ro
+
+  bibler:
+    image: ${MIGRATION_BIBLER_IMAGE:?Missing Bibler image}
+    healthcheck:
+      test: [CMD, python, -c, 'import socket; socket.create_connection(("127.0.0.1", 8000), 3).close()']
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    networks:
+      default:
+        aliases: [relisbibler]
+
+  mail:
+    image: ${MIGRATION_TOMCAT_IMAGE}
+    healthcheck:
+      test: [CMD, python3, -c, 'import socket; socket.create_connection(("127.0.0.1", 1025), 3).close()']
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    entrypoint: [python3, /capture.py]
+    volumes:
+      - ${MIGRATION_SOURCE}/deployment/migration/capture-mail.py:/capture.py:ro
+      - ${MIGRATION_DIRECTORY}/reports/mail:/mail
+
+networks:
+  default:
+    internal: true
+
+volumes:
+  source:
+    name: ${MIGRATION_SOURCE_VOLUME:?Missing isolated source volume}
+  database:
+  workspace:

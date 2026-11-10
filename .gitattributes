@@ -1,1 +1,12 @@
 relis_deployment/docker/*.sh text eol=lf
+deployment/**/*.sh text eol=lf
+
+# Generated text exports use LF inside the Linux runtime.
+relis_app/helpers/tests/testFiles/reporting/get_relis_paper_excluded_class.csv text eol=lf
+relis_app/helpers/tests/testFiles/reporting/get_relis_paper.csv text eol=lf
+relis_app/helpers/tests/testFiles/reporting/get_relis_paper_bibtex.bib text eol=lf
+relis_app/helpers/tests/testFiles/reporting/get_relis_paper_bibtex_Excluded.bib text eol=lf
+relis_app/helpers/tests/testFiles/reporting/get_relis_paper_excluded_screen.csv text eol=lf
+relis_app/helpers/tests/testFiles/reporting/rsae/r/get_relis_r_config.R text eol=lf
+relis_app/helpers/tests/testFiles/reporting/rsae/python/get_relis_statistics_kernel.py text eol=lf
+relis_app/helpers/tests/testFiles/reporting/rsae/python/get_relis_statistics_playground.py text eol=lf

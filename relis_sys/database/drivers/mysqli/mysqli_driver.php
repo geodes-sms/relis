@@ -241,7 +241,35 @@ class CI_DB_mysqli_driver extends CI_DB {
 	 */
 	public function reconnect()
 	{
-		if ($this->conn_id !== FALSE && $this->conn_id->ping() === FALSE)
+		if ($this->conn_id === FALSE)
+		{
+			return;
+		}
+
+		if (PHP_VERSION_ID < 80400)
+		{
+			$alive = $this->conn_id->ping();
+		}
+		else
+		{
+			// mysqli::ping() is deprecated in PHP 8.4. Preserve the liveness
+			// check; automatic reconnect is unavailable with mysqlnd.
+			try
+			{
+				$result = $this->conn_id->query('SELECT 1');
+				$alive = ($result !== FALSE);
+				if ($alive)
+				{
+					$result->free();
+				}
+			}
+			catch (mysqli_sql_exception $e)
+			{
+				$alive = FALSE;
+			}
+		}
+
+		if ($alive === FALSE)
 		{
 			$this->conn_id = FALSE;
 		}
