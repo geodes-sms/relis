@@ -1224,14 +1224,14 @@ class CI_Loader {
 						$found = TRUE;
 					}
 
-					if (file_exists($path.'config/'.ENVIRONMENT.'/'.strtolower($class).'.php'))
+					if (file_exists($path.'config/'.ENVIRONMENT_CONFIG.'/'.strtolower($class).'.php'))
 					{
-						include($path.'config/'.ENVIRONMENT.'/'.strtolower($class).'.php');
+						include($path.'config/'.ENVIRONMENT_CONFIG.'/'.strtolower($class).'.php');
 						$found = TRUE;
 					}
-					elseif (file_exists($path.'config/'.ENVIRONMENT.'/'.ucfirst(strtolower($class)).'.php'))
+					elseif (file_exists($path.'config/'.ENVIRONMENT_CONFIG.'/'.ucfirst(strtolower($class)).'.php'))
 					{
-						include($path.'config/'.ENVIRONMENT.'/'.ucfirst(strtolower($class)).'.php');
+						include($path.'config/'.ENVIRONMENT_CONFIG.'/'.ucfirst(strtolower($class)).'.php');
 						$found = TRUE;
 					}
 
@@ -1304,9 +1304,9 @@ class CI_Loader {
 			include(APPPATH.'config/autoload.php');
 		}
 
-		if (file_exists(APPPATH.'config/'.ENVIRONMENT.'/autoload.php'))
+		if (file_exists(APPPATH.'config/'.ENVIRONMENT_CONFIG.'/autoload.php'))
 		{
-			include(APPPATH.'config/'.ENVIRONMENT.'/autoload.php');
+			include(APPPATH.'config/'.ENVIRONMENT_CONFIG.'/autoload.php');
 		}
 
 		if ( ! isset($autoload))

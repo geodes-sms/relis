@@ -240,9 +240,9 @@ if ( ! function_exists('doctype'))
 				include(APPPATH.'config/doctypes.php');
 			}
 
-			if (file_exists(APPPATH.'config/'.ENVIRONMENT.'/doctypes.php'))
+			if (file_exists(APPPATH.'config/'.ENVIRONMENT_CONFIG.'/doctypes.php'))
 			{
-				include(APPPATH.'config/'.ENVIRONMENT.'/doctypes.php');
+				include(APPPATH.'config/'.ENVIRONMENT_CONFIG.'/doctypes.php');
 			}
 
 			if (empty($_doctypes) OR ! is_array($_doctypes))

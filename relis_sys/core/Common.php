@@ -251,7 +251,7 @@ if ( ! function_exists('get_config'))
 			}
 
 			// Is the config file in the environment folder?
-			if (file_exists($file_path = APPPATH.'config/'.ENVIRONMENT.'/config.php'))
+			if (file_exists($file_path = APPPATH.'config/'.ENVIRONMENT_CONFIG.'/config.php'))
 			{
 				require($file_path);
 			}
@@ -324,9 +324,9 @@ if ( ! function_exists('get_mimes'))
 				? include(APPPATH.'config/mimes.php')
 				: array();
 
-			if (file_exists(APPPATH.'config/'.ENVIRONMENT.'/mimes.php'))
+			if (file_exists(APPPATH.'config/'.ENVIRONMENT_CONFIG.'/mimes.php'))
 			{
-				$_mimes = array_merge($_mimes, include(APPPATH.'config/'.ENVIRONMENT.'/mimes.php'));
+				$_mimes = array_merge($_mimes, include(APPPATH.'config/'.ENVIRONMENT_CONFIG.'/mimes.php'));
 			}
 		}
 

@@ -104,9 +104,9 @@ class CI_Hooks {
 			include(APPPATH.'config/hooks.php');
 		}
 
-		if (file_exists(APPPATH.'config/'.ENVIRONMENT.'/hooks.php'))
+		if (file_exists(APPPATH.'config/'.ENVIRONMENT_CONFIG.'/hooks.php'))
 		{
-			include(APPPATH.'config/'.ENVIRONMENT.'/hooks.php');
+			include(APPPATH.'config/'.ENVIRONMENT_CONFIG.'/hooks.php');
 		}
 
 		// If there are no hooks, we're done.

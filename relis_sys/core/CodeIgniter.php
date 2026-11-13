@@ -58,14 +58,38 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  */
 	const CI_VERSION = '3.1.13';
 
+// Keep canonical environment semantics while preserving existing private folders.
+// Prefer the configured spelling when both folders exist; otherwise accept its
+// alias. All framework configuration loaders use the same selected folder.
+	$relis_config_environment = ENVIRONMENT;
+	$relis_environment_aliases = array('production' => 'prod', 'development' => 'dev');
+	if (isset($relis_environment_aliases[ENVIRONMENT]))
+	{
+		$relis_configured_environment = getenv('ENV') ?: ($_SERVER['CI_ENV'] ?? ENVIRONMENT);
+		$relis_legacy_environment = $relis_environment_aliases[ENVIRONMENT];
+		$relis_environment_paths = ($relis_configured_environment === $relis_legacy_environment)
+			? array($relis_legacy_environment, ENVIRONMENT)
+			: array(ENVIRONMENT, $relis_legacy_environment);
+		$relis_config_environment = $relis_environment_paths[0];
+		foreach ($relis_environment_paths as $relis_environment_path)
+		{
+			if (is_dir(APPPATH.'config/'.$relis_environment_path))
+			{
+				$relis_config_environment = $relis_environment_path;
+				break;
+			}
+		}
+	}
+	define('ENVIRONMENT_CONFIG', $relis_config_environment);
+
 /*
  * ------------------------------------------------------
  *  Load the framework constants
  * ------------------------------------------------------
  */
-	if (file_exists(APPPATH.'config/'.ENVIRONMENT.'/constants.php'))
+	if (file_exists(APPPATH.'config/'.ENVIRONMENT_CONFIG.'/constants.php'))
 	{
-		require_once(APPPATH.'config/'.ENVIRONMENT.'/constants.php');
+		require_once(APPPATH.'config/'.ENVIRONMENT_CONFIG.'/constants.php');
 	}
 
 	if (file_exists(APPPATH.'config/constants.php'))

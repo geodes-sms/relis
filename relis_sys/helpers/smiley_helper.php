@@ -237,9 +237,9 @@ if ( ! function_exists('_get_smiley_array'))
 				include(APPPATH.'config/smileys.php');
 			}
 
-			if (file_exists(APPPATH.'config/'.ENVIRONMENT.'/smileys.php'))
+			if (file_exists(APPPATH.'config/'.ENVIRONMENT_CONFIG.'/smileys.php'))
 			{
-				include(APPPATH.'config/'.ENVIRONMENT.'/smileys.php');
+				include(APPPATH.'config/'.ENVIRONMENT_CONFIG.'/smileys.php');
 			}
 
 			if (empty($smileys) OR ! is_array($smileys))

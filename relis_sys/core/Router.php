@@ -165,9 +165,9 @@ class CI_Router {
 			include(APPPATH.'config/routes.php');
 		}
 
-		if (file_exists(APPPATH.'config/'.ENVIRONMENT.'/routes.php'))
+		if (file_exists(APPPATH.'config/'.ENVIRONMENT_CONFIG.'/routes.php'))
 		{
-			include(APPPATH.'config/'.ENVIRONMENT.'/routes.php');
+			include(APPPATH.'config/'.ENVIRONMENT_CONFIG.'/routes.php');
 		}
 
 		// Validate & get reserved routes

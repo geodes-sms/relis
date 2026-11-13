@@ -407,9 +407,9 @@ if ( ! function_exists('convert_accented_characters'))
 				include(APPPATH.'config/foreign_chars.php');
 			}
 
-			if (file_exists(APPPATH.'config/'.ENVIRONMENT.'/foreign_chars.php'))
+			if (file_exists(APPPATH.'config/'.ENVIRONMENT_CONFIG.'/foreign_chars.php'))
 			{
-				include(APPPATH.'config/'.ENVIRONMENT.'/foreign_chars.php');
+				include(APPPATH.'config/'.ENVIRONMENT_CONFIG.'/foreign_chars.php');
 			}
 
 			if (empty($foreign_characters) OR ! is_array($foreign_characters))
